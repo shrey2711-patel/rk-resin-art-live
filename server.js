@@ -82,9 +82,41 @@ async function initMailer() {
   }
 }
 
-// Resend HTTPS API dispatcher for cloud deployments (Bypasses SMTP port blocking on Render)
+// Hybrid HTTPS API dispatcher for cloud deployments (Bypasses SMTP port blocking on Render)
 async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
+  const BREVO_API_KEY = process.env.BREVO_API_KEY;
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
+  // 1. Try Brevo HTTPS API first (Perfect for free domain-less sending to real customers!)
+  if (BREVO_API_KEY) {
+    try {
+      console.log(`📡 Dispatched mail via Brevo HTTPS API to ${to}...`);
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': BREVO_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'RK Creation', email: 'rinkupatel3495@gmail.com' },
+          to: [{ email: to }],
+          subject: subject,
+          htmlContent: htmlBody,
+          textContent: textBody
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Brevo API error: ${response.status} ${await response.text()}`);
+      }
+      console.log(`✅ Mail successfully delivered via Brevo HTTPS API to ${to}!`);
+      return true;
+    } catch (err) {
+      console.error('❌ Failed to send email via Brevo HTTPS API:', err.message);
+    }
+  }
+
+  // 2. Fallback to Resend HTTPS API (Requires domain to send to real customers)
   if (RESEND_API_KEY) {
     try {
       console.log(`📡 Dispatched mail via Resend HTTPS API to ${to}...`);
@@ -108,7 +140,7 @@ async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'RK Creation <onboarding@resend.dev>',
+          from: process.env.RESEND_FROM_EMAIL || 'RK Creation <onboarding@resend.dev>',
           to: targetEmail,
           subject: finalSubject,
           html: htmlBody,
@@ -123,20 +155,20 @@ async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
       return true;
     } catch (err) {
       console.error('❌ Failed to send email via Resend HTTPS API:', err.message);
-      return false;
     }
   }
   return false;
 }
 
 async function sendAdminEmailNotification(order) {
-  if (!mailTransporter && !process.env.RESEND_API_KEY) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing email...');
     return;
   }
   try {
     const db = readDB();
-    const adminEmail = db.settings.adminEmail || 'rinkupatel3495@gmail.com';
+    // Force admin notification to go to rinkupatel3495@gmail.com as requested
+    const adminEmail = 'rinkupatel3495@gmail.com';
     const isOnline = order.paymentStatus === 'Paid (Razorpay)';
 
     const customer = order.customer || {};
@@ -371,7 +403,7 @@ RK Creation - Premium Craft Supplies
 }
 
 async function sendCustomerOrderConfirmation(order) {
-  if (!mailTransporter && !process.env.RESEND_API_KEY) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing customer email...');
     return;
   }
@@ -586,7 +618,7 @@ RK Creation
 }
 
 async function notifyWishlistSubscribers(product) {
-  if (!mailTransporter && !process.env.RESEND_API_KEY) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing wishlist notifications...');
     return;
   }
