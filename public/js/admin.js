@@ -629,7 +629,7 @@ document.getElementById('adminLoginBtn').onclick = async () => {
     errEl.textContent = '';
     Admin.showDashboard();
   } catch {
-    errEl.textContent = 'Wrong password. Try: rk2024';
+    errEl.textContent = 'Incorrect password. Please try again.';
   }
 };
 document.getElementById('adminPassInput').onkeydown = e => {
