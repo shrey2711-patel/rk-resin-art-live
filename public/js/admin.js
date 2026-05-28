@@ -1,0 +1,1080 @@
+// ── Admin Panel ──────────────────────────────────────────────
+const Admin = {
+  data: { banners: [], nav: [], categories: [], products: [], orders: [], reviews: [], coupons: [] },
+  editState: { section: null, id: null },
+  maxUploadWidth: 3840,
+
+  setUploadStatus(message, type = '') {
+    const el = document.getElementById('productUploadStatus');
+    if (!el) return;
+    el.textContent = message;
+    el.className = `upload-status ${type}`;
+  },
+
+  setBannerUploadStatus(message, type = '') {
+    const el = document.getElementById('bannerUploadStatus');
+    if (!el) return;
+    el.textContent = message;
+    el.className = `upload-status ${type}`;
+  },
+
+  updateBannerImagePreview(url) {
+    const hidden = document.getElementById('bfImageUrl');
+    const wrap = document.getElementById('bannerImagePreview');
+    const img = document.getElementById('bfImagePreviewImg');
+    if (hidden) hidden.value = url || '';
+    if (!wrap || !img) return;
+
+    if (url) {
+      img.src = url;
+      wrap.style.display = '';
+    } else {
+      img.removeAttribute('src');
+      wrap.style.display = 'none';
+    }
+  },
+
+  async uploadBannerImage(file) {
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      return;
+    }
+
+    this.updateBannerImagePreview(URL.createObjectURL(file));
+    this.setBannerUploadStatus('Uploading image...', 'loading');
+    try {
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      this.updateBannerImagePreview(result.url);
+      this.setBannerUploadStatus('Image uploaded and ready to save.', 'success');
+    } catch (e) {
+      this.updateBannerImagePreview('');
+      this.setBannerUploadStatus('Upload failed. Try a smaller JPG, PNG or WEBP.', 'error');
+      showToast('Image upload failed', 'error');
+    }
+  },
+
+  updateImagePreview(url) {
+    const hidden = document.getElementById('pfImageUrl');
+    const wrap = document.getElementById('productImagePreview');
+    const img = document.getElementById('pfImagePreviewImg');
+    if (hidden) hidden.value = url || '';
+    if (!wrap || !img) return;
+
+    if (url) {
+      img.src = url;
+      wrap.style.display = '';
+    } else {
+      img.removeAttribute('src');
+      wrap.style.display = 'none';
+    }
+  },
+
+  async resizeImageForUpload(file) {
+    if (!file.type.startsWith('image/') || file.type === 'image/webp') return file;
+
+    const imageUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = imageUrl;
+    await img.decode();
+
+    const scale = Math.min(1, this.maxUploadWidth / img.width);
+    if (scale === 1) {
+      URL.revokeObjectURL(imageUrl);
+      return file;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(imageUrl);
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, file.type, 0.98));
+    if (!blob) return file;
+    return new File([blob], file.name, { type: file.type });
+  },
+
+  async uploadProductImage(file) {
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      return;
+    }
+
+    this.updateImagePreview(URL.createObjectURL(file));
+    this.setUploadStatus('Uploading image...', 'loading');
+    try {
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      this.updateImagePreview(result.url);
+      this.setUploadStatus('Image uploaded and ready to save.', 'success');
+    } catch (e) {
+      this.updateImagePreview('');
+      this.setUploadStatus('Upload failed. Try a smaller JPG, PNG or WEBP.', 'error');
+      showToast('Image upload failed', 'error');
+    }
+  },
+
+  resetBannerForm() {
+    document.getElementById('bfImageFile').value = '';
+    this.updateBannerImagePreview('');
+    this.setBannerUploadStatus('');
+    const btn = document.getElementById('addBannerBtn');
+    const cancel = document.getElementById('cancelBannerBtn');
+    if (btn) btn.textContent = '+ Add Banner';
+    if (cancel) cancel.style.display = 'none';
+    this.editState = { section: null, id: null };
+  },
+
+  setBannerEdit(banner) {
+    document.getElementById('bfImageFile').value = '';
+    this.updateBannerImagePreview(banner.imageUrl || '');
+    this.setBannerUploadStatus(banner.imageUrl ? 'Current banner image loaded.' : '');
+    const btn = document.getElementById('addBannerBtn');
+    const cancel = document.getElementById('cancelBannerBtn');
+    if (btn) btn.textContent = 'Update Banner';
+    if (cancel) cancel.style.display = '';
+    this.editState = { section: 'banner', id: banner.id };
+  },
+
+  resetNavForm() {
+    document.getElementById('nfLabel').value = '';
+    document.getElementById('nfRow').value = '1';
+    document.getElementById('nfFeat').value = 'false';
+    const btn = document.getElementById('addNavBtn');
+    const cancel = document.getElementById('cancelNavBtn');
+    if (btn) btn.textContent = '+ Add Link';
+    if (cancel) cancel.style.display = 'none';
+    this.editState = { section: null, id: null };
+  },
+
+  setNavEdit(item) {
+    document.getElementById('nfLabel').value = item.label || '';
+    document.getElementById('nfRow').value = String(item.row || 1);
+    document.getElementById('nfFeat').value = item.featured ? 'true' : 'false';
+    const btn = document.getElementById('addNavBtn');
+    const cancel = document.getElementById('cancelNavBtn');
+    if (btn) btn.textContent = 'Update Link';
+    if (cancel) cancel.style.display = '';
+    this.editState = { section: 'nav', id: item.id };
+  },
+
+  resetCategoryForm() {
+    document.getElementById('cfName').value = '';
+    document.getElementById('cfEmoji').value = '';
+    document.getElementById('cfColor').value = '#EDE8FF';
+    const btn = document.getElementById('addCatBtn');
+    const cancel = document.getElementById('cancelCatBtn');
+    if (btn) btn.textContent = '+ Add Category';
+    if (cancel) cancel.style.display = 'none';
+    this.editState = { section: null, id: null };
+  },
+
+  setCategoryEdit(category) {
+    document.getElementById('cfName').value = category.name || '';
+    document.getElementById('cfEmoji').value = category.emoji || '';
+    document.getElementById('cfColor').value = category.color || '#EDE8FF';
+    const btn = document.getElementById('addCatBtn');
+    const cancel = document.getElementById('cancelCatBtn');
+    if (btn) btn.textContent = 'Update Category';
+    if (cancel) cancel.style.display = '';
+    this.editState = { section: 'category', id: category.id };
+  },
+
+  resetProductForm() {
+    ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
+    document.getElementById('pfImageFile').value = '';
+    this.updateImagePreview('');
+    this.setUploadStatus('');
+    const btn = document.getElementById('addProdBtn');
+    const cancel = document.getElementById('cancelProdBtn');
+    if (btn) btn.textContent = '+ Add Product';
+    if (cancel) cancel.style.display = 'none';
+    this.editState = { section: null, id: null };
+  },
+
+  setProductEdit(product) {
+    document.getElementById('pfName').value = product.name || '';
+    document.getElementById('pfCat').value = product.category || this.data.categories[0]?.name || '';
+    document.getElementById('pfPrice').value = product.price || '';
+    document.getElementById('pfOrig').value = product.originalPrice || '';
+    document.getElementById('pfStock').value = product.stock || '';
+    document.getElementById('pfEmoji').value = product.emoji || '';
+    document.getElementById('pfBadge').value = product.badge || '';
+    document.getElementById('pfDesc').value = product.description || '';
+    document.getElementById('pfImageFile').value = '';
+    this.updateImagePreview(product.imageUrl || '');
+    this.setUploadStatus(product.imageUrl ? 'Current product image loaded.' : '');
+    const btn = document.getElementById('addProdBtn');
+    const cancel = document.getElementById('cancelProdBtn');
+    if (btn) btn.textContent = 'Update Product';
+    if (cancel) cancel.style.display = '';
+    this.editState = { section: 'product', id: product.id };
+  },
+
+  async saveBannerForm() {
+    const imageUrl = document.getElementById('bfImageUrl').value.trim();
+    if (!imageUrl) { showToast('Please upload a banner image first', 'error'); return; }
+    const payload = {
+      imageUrl
+    };
+    if (this.editState.section === 'banner' && this.editState.id) {
+      await API.updateBanner(this.editState.id, payload);
+      showToast('Banner updated', 'success');
+    } else {
+      await API.addBanner(payload);
+      showOk('bannerOk');
+    }
+    this.resetBannerForm();
+    await this.loadAll();
+    this.renderBanners();
+    App.loadBanners();
+  },
+
+  async saveNavForm() {
+    const label = document.getElementById('nfLabel').value.trim();
+    if (!label) { showToast('Nav label is required', 'error'); return; }
+    const payload = {
+      label,
+      row: Number(document.getElementById('nfRow').value),
+      featured: document.getElementById('nfFeat').value === 'true'
+    };
+    if (this.editState.section === 'nav' && this.editState.id) {
+      await API.updateNav(this.editState.id, payload);
+      showToast('Nav link updated', 'success');
+    } else {
+      await API.addNav(payload);
+      showOk('navOk');
+    }
+    this.resetNavForm();
+    await this.loadAll();
+    this.renderNav();
+    App.loadNav();
+  },
+
+  async saveCategoryForm() {
+    const name = document.getElementById('cfName').value.trim();
+    if (!name) { showToast('Category name is required', 'error'); return; }
+    const payload = {
+      name,
+      emoji: document.getElementById('cfEmoji').value.trim() || '📦',
+      color: document.getElementById('cfColor').value
+    };
+    if (this.editState.section === 'category' && this.editState.id) {
+      await API.updateCategory(this.editState.id, payload);
+      showToast('Category updated', 'success');
+    } else {
+      await API.addCategory(payload);
+      showOk('catOk');
+    }
+    this.resetCategoryForm();
+    await this.loadAll();
+    this.renderCategories();
+    App.loadCategories();
+  },
+
+  async saveProductForm() {
+    const name = document.getElementById('pfName').value.trim();
+    const price = parseFloat(document.getElementById('pfPrice').value);
+    if (!name || isNaN(price)) { showToast('Product name and price are required', 'error'); return; }
+    const payload = {
+      name,
+      price,
+      originalPrice: parseFloat(document.getElementById('pfOrig').value) || null,
+      category: document.getElementById('pfCat').value,
+      stock: parseInt(document.getElementById('pfStock').value) || 0,
+      emoji: document.getElementById('pfEmoji').value.trim() || '📦',
+      badge: document.getElementById('pfBadge').value,
+      description: document.getElementById('pfDesc').value.trim(),
+      imageUrl: document.getElementById('pfImageUrl').value.trim()
+    };
+    if (this.editState.section === 'product' && this.editState.id) {
+      await API.updateProduct(this.editState.id, payload);
+      showToast('Product updated', 'success');
+    } else {
+      await API.addProduct(payload);
+      showOk('prodOk');
+    }
+    this.resetProductForm();
+    await this.loadAll();
+    this.renderProducts();
+    App.loadProducts();
+  },
+
+  cancelBannerEdit() {
+    this.resetBannerForm();
+  },
+
+  cancelNavEdit() {
+    this.resetNavForm();
+  },
+
+  cancelCategoryEdit() {
+    this.resetCategoryForm();
+  },
+
+  cancelProductEdit() {
+    this.resetProductForm();
+  },
+
+  open() {
+    document.getElementById('adminOverlay').classList.add('open');
+    if (API.isAdminLoggedIn()) {
+      this.showDashboard();
+    } else {
+      this.showLogin();
+    }
+  },
+
+  close() {
+    document.getElementById('adminOverlay').classList.remove('open');
+  },
+
+  showLogin() {
+    document.getElementById('adminLoginScreen').style.display = '';
+    document.getElementById('adminDashboard').style.display = 'none';
+  },
+
+  async showDashboard() {
+    document.getElementById('adminLoginScreen').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = '';
+    await this.loadAll();
+    this.renderBanners();
+    this.renderNav();
+    this.renderCategories();
+    this.renderProducts();
+    this.renderOrders();
+    if (this.renderReviews) this.renderReviews();
+    if (this.renderCoupons) this.renderCoupons();
+  },
+
+  async loadAll() {
+    try {
+      const [banners, nav, cats, prodRes, orders, coupons] = await Promise.all([
+        API.getBanners(),
+        API.getNav(),
+        API.getCategories(),
+        API.getProducts({ limit: 200 }),
+        API.getOrders(),
+        API.getCoupons().catch(() => [])
+      ]);
+      this.data.banners = banners;
+      this.data.nav = nav;
+      this.data.categories = cats;
+      this.data.products = prodRes.products;
+      this.data.orders = orders;
+      this.data.coupons = coupons;
+    } catch (e) {
+      showToast('Error loading admin data', 'error');
+    }
+  },
+
+  // ── Banners ───────────────────────────────────────────────
+  renderBanners() {
+    const list = document.getElementById('adminBannerList');
+    if (!list) return;
+    list.innerHTML = this.data.banners.map(b => `
+      <div class="admin-list-item">
+        <div class="ali-thumb" style="width: 80px; height: 50px; border-radius: 4px; overflow: hidden; background: #eee; border: 1px solid var(--border)">
+          ${b.imageUrl ? `<img src="${b.imageUrl}" style="width:100%; height:100%; object-fit:cover;" alt="Banner">` : '🖼️'}
+        </div>
+        <div class="ali-info">
+          <div class="ali-name">Banner #${b.id}</div>
+          <div class="ali-sub">Pure Visual Image Slide</div>
+        </div>
+        <div class="ali-actions">
+          <button class="ali-edit" data-edit-bid="${b.id}">Edit</button>
+          <button class="ali-del" data-bid="${b.id}">Delete</button>
+        </div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No banners yet.</div>';
+
+    list.querySelectorAll('[data-edit-bid]').forEach(btn => {
+      btn.onclick = () => {
+        const banner = this.data.banners.find(item => item.id === Number(btn.dataset.editBid));
+        if (banner) this.setBannerEdit(banner);
+      };
+    });
+
+    list.querySelectorAll('[data-bid]').forEach(btn => {
+      btn.onclick = async () => {
+        await API.deleteBanner(Number(btn.dataset.bid));
+        showOk('bannerOk');
+        await this.loadAll();
+        this.renderBanners();
+        App.loadBanners();
+      };
+    });
+  },
+
+  // ── Nav ───────────────────────────────────────────────────
+  renderNav() {
+    const list = document.getElementById('adminNavList');
+    if (!list) return;
+    list.innerHTML = this.data.nav.map(n => `
+      <div class="admin-list-item">
+        <div class="ali-dot" style="background:${n.featured ? 'var(--red)' : 'var(--pl)'}"></div>
+        <div class="ali-info">
+          <div class="ali-name">${n.label}</div>
+          <div class="ali-sub">Row ${n.row}${n.featured ? ' · Featured' : ''}</div>
+        </div>
+        <div class="ali-actions">
+          <button class="ali-edit" data-edit-nid="${n.id}">Edit</button>
+          <button class="ali-del" data-nid="${n.id}">Delete</button>
+        </div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No links yet.</div>';
+
+    list.querySelectorAll('[data-edit-nid]').forEach(btn => {
+      btn.onclick = () => {
+        const item = this.data.nav.find(row => row.id === Number(btn.dataset.editNid));
+        if (item) this.setNavEdit(item);
+      };
+    });
+
+    list.querySelectorAll('[data-nid]').forEach(btn => {
+      btn.onclick = async () => {
+        await API.deleteNav(Number(btn.dataset.nid));
+        await this.loadAll();
+        this.renderNav();
+        App.loadNav();
+      };
+    });
+  },
+
+  // ── Categories ────────────────────────────────────────────
+  renderCategories() {
+    const list = document.getElementById('adminCatList');
+    if (!list) return;
+    list.innerHTML = this.data.categories.map(c => `
+      <div class="admin-list-item">
+        <div class="ali-dot" style="background:${c.color}"></div>
+        <div class="ali-info">
+          <div class="ali-name">${c.emoji} ${c.name}</div>
+        </div>
+        <div class="ali-actions">
+          <button class="ali-edit" data-edit-cid="${c.id}">Edit</button>
+          <button class="ali-del" data-cid="${c.id}">Delete</button>
+        </div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No categories.</div>';
+
+    list.querySelectorAll('[data-edit-cid]').forEach(btn => {
+      btn.onclick = () => {
+        const category = this.data.categories.find(item => item.id === Number(btn.dataset.editCid));
+        if (category) this.setCategoryEdit(category);
+      };
+    });
+
+    list.querySelectorAll('[data-cid]').forEach(btn => {
+      btn.onclick = async () => {
+        await API.deleteCategory(Number(btn.dataset.cid));
+        await this.loadAll();
+        this.renderCategories();
+        App.loadCategories();
+      };
+    });
+    this.populateProdCatSelect();
+  },
+
+  populateProdCatSelect() {
+    const sel = document.getElementById('pfCat');
+    if (!sel) return;
+    sel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
+  },
+
+  // ── Products ──────────────────────────────────────────────
+  renderProducts() {
+    const list = document.getElementById('adminProdList');
+    if (!list) return;
+    list.innerHTML = this.data.products.map(p => `
+      <div class="admin-list-item">
+        <div class="ali-thumb" style="background:var(--pl)">
+          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : (p.emoji || '📦')}
+        </div>
+        <div class="ali-info">
+          <div class="ali-name">${p.emoji} ${p.name}</div>
+          <div class="ali-sub">${p.category} · ₹${p.price} · Stock: ${p.stock}</div>
+        </div>
+        <div class="ali-actions">
+          <button class="ali-edit" data-edit-pid="${p.id}">Edit</button>
+          <button class="ali-del" data-pid="${p.id}">Delete</button>
+        </div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No products.</div>';
+
+    list.querySelectorAll('[data-edit-pid]').forEach(btn => {
+      btn.onclick = () => {
+        const product = this.data.products.find(item => item.id === Number(btn.dataset.editPid));
+        if (product) this.setProductEdit(product);
+      };
+    });
+
+    list.querySelectorAll('[data-pid]').forEach(btn => {
+      btn.onclick = async () => {
+        await API.deleteProduct(Number(btn.dataset.pid));
+        await this.loadAll();
+        this.renderProducts();
+        App.loadProducts();
+      };
+    });
+  },
+
+  // ── Orders ────────────────────────────────────────────────
+  renderOrders() {
+    const list = document.getElementById('adminOrderList');
+    if (!list) return;
+    if (!this.data.orders.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.88rem;text-align:center;padding:2rem">No orders yet. Orders will appear here once customers place them.</div>';
+      return;
+    }
+
+    const statusClass = s => ({
+      pending: 'status-pending',
+      confirmed: 'status-confirmed',
+      shipped: 'status-shipped',
+      delivered: 'status-delivered',
+      cancelled: 'status-cancelled'
+    })[s] || 'status-pending';
+
+    list.innerHTML = this.data.orders.map(o => {
+      const c = o.customer || {};
+      const fullName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Guest';
+      const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(', ');
+      const date = new Date(o.createdAt).toLocaleString('en-IN');
+      const hasPhone = c.phone && c.phone.trim();
+
+      // Build WhatsApp notification message for customer
+      const discountLine = o.discount && o.discount > 0 ? `🎟️ Discount (${o.couponCode}): -₹${Number(o.discount).toLocaleString('en-IN')}\n` : '';
+      const waMsg = encodeURIComponent(
+        `Hello ${fullName}! 👋\n\n` +
+        `Your RK Creation order #${o.id} has been *${(o.status || 'confirmed').toUpperCase()}*! 🎉\n\n` +
+        `📦 Order Summary:\n${(o.items || []).map(i => `• ${i.name} ×${i.qty} — ₹${Number(i.price * i.qty).toLocaleString('en-IN')}`).join('\n')}\n\n` +
+        `💰 *PAYMENT SUMMARY*\n` +
+        `Subtotal: ₹${Number(o.total || (o.grandTotal + (o.discount || 0) - o.shipping)).toLocaleString('en-IN')}\n` +
+        discountLine +
+        `🚚 Shipping: ${o.shipping === 0 ? 'FREE' : `₹${o.shipping}`}\n` +
+        `*Grand Total: ₹${Number(o.grandTotal).toLocaleString('en-IN')}*\n\n` +
+        `Thank you for shopping with RK Creation! 🙏\n` +
+        `If you have any questions, just reply to this message.`
+      );
+      const cleanPhone = hasPhone ? c.phone.replace(/[^0-9]/g, '') : '';
+      const waLink = hasPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${waMsg}` : '#';
+
+      return `
+      <div class="order-card" data-oid="${o.id}">
+        <div class="order-head">
+          <div>
+            <span class="order-id">Order #${o.id}</span>
+            <span class="order-status-badge ${statusClass(o.status)}" style="margin-left:8px">${(o.status || 'Pending').charAt(0).toUpperCase() + (o.status || 'pending').slice(1)}</span>
+            <div class="order-date">${date}</div>
+          </div>
+        </div>
+        <div class="order-customer">👤 <strong>${fullName}</strong> | 📞 ${c.phone || '—'} | ${c.city || ''}</div>
+        ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.pin].filter(Boolean).join(', ')}</div>` : ''}
+        <div class="order-items-list">${itemsSummary}</div>
+        <div class="order-footer">
+          <span class="order-total">₹${Number(o.grandTotal).toLocaleString('en-IN')}</span>
+          <div class="order-actions">
+            <select class="order-status-select" data-oid="${o.id}">
+              <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>Pending</option>
+              <option value="confirmed" ${o.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+              <option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+              <option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+              <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+            <button class="order-save-btn" data-save-oid="${o.id}">💾 Save</button>
+            ${hasPhone
+              ? `<a class="order-notify-btn" href="${waLink}" target="_blank">📲 Notify Customer</a>`
+              : `<button class="order-notify-btn" disabled style="opacity:0.4;cursor:default" title="No phone number">📲 No Phone</button>`
+            }
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Save status
+    list.querySelectorAll('[data-save-oid]').forEach(btn => {
+      btn.onclick = async () => {
+        const oid = Number(btn.dataset.saveOid);
+        const sel = list.querySelector(`.order-status-select[data-oid="${oid}"]`);
+        if (!sel) return;
+        try {
+          await API.updateOrder(oid, { status: sel.value });
+          await this.loadAll();
+          this.renderOrders();
+          showToast('Order status updated ✓', 'success');
+        } catch (e) {
+          showToast('Failed to update: ' + e.message, 'error');
+        }
+      };
+    });
+  }
+};
+
+// ── Admin event wiring ────────────────────────────────────────
+document.getElementById('openAdminBtn').onclick = () => Admin.open();
+document.getElementById('closeAdminPanel').onclick = () => Admin.close();
+document.getElementById('adminOverlay').onclick = (e) => {
+  if (e.target === document.getElementById('adminOverlay')) Admin.close();
+};
+
+document.getElementById('adminLoginBtn').onclick = async () => {
+  const pass = document.getElementById('adminPassInput').value;
+  const errEl = document.getElementById('adminErr');
+  try {
+    await API.adminLogin(pass);
+    errEl.textContent = '';
+    Admin.showDashboard();
+  } catch {
+    errEl.textContent = 'Wrong password. Try: rk2024';
+  }
+};
+document.getElementById('adminPassInput').onkeydown = e => {
+  if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+};
+
+document.getElementById('adminLogoutBtn').onclick = () => {
+  API.adminLogout();
+  Admin.showLogin();
+};
+
+// Tab switching
+document.querySelectorAll('.atab').forEach(btn => {
+  btn.onclick = function () {
+    document.querySelectorAll('.atab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById(`atab-${this.dataset.tab}`).classList.add('active');
+  };
+});
+
+// Add / Update Banner
+document.getElementById('addBannerBtn').onclick = async () => {
+  await Admin.saveBannerForm();
+};
+document.getElementById('cancelBannerBtn').onclick = () => {
+  Admin.cancelBannerEdit();
+};
+
+// Save Announce
+document.getElementById('saveAnnounceBtn').onclick = async () => {
+  const text = document.getElementById('afAnnounce').value.trim();
+  if (!text) return;
+  await API.updateSettings({ announce: text });
+  document.getElementById('announceText').textContent = text;
+  showOk('announceOk');
+};
+
+// Add / Update Nav
+document.getElementById('addNavBtn').onclick = async () => {
+  await Admin.saveNavForm();
+};
+document.getElementById('cancelNavBtn').onclick = () => {
+  Admin.cancelNavEdit();
+};
+
+// Add / Update Category
+document.getElementById('addCatBtn').onclick = async () => {
+  await Admin.saveCategoryForm();
+};
+document.getElementById('cancelCatBtn').onclick = () => {
+  Admin.cancelCategoryEdit();
+};
+
+// Add / Update Product
+document.getElementById('pfImageFile').onchange = async (e) => {
+  await Admin.uploadProductImage(e.target.files[0]);
+};
+
+document.getElementById('removeProductImageBtn').onclick = () => {
+  document.getElementById('pfImageFile').value = '';
+  Admin.updateImagePreview('');
+  Admin.setUploadStatus('Image removed. Save product to keep this change.', 'success');
+};
+
+const productUploadBox = document.getElementById('productUploadBox');
+['dragenter', 'dragover'].forEach(eventName => {
+  productUploadBox.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    productUploadBox.classList.add('dragging');
+  });
+});
+['dragleave', 'drop'].forEach(eventName => {
+  productUploadBox.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    productUploadBox.classList.remove('dragging');
+  });
+});
+productUploadBox.addEventListener('drop', async (e) => {
+  const file = e.dataTransfer.files[0];
+  document.getElementById('pfImageFile').files = e.dataTransfer.files;
+  await Admin.uploadProductImage(file);
+});
+
+// Banner Image upload events
+document.getElementById('bfImageFile').onchange = async (e) => {
+  await Admin.uploadBannerImage(e.target.files[0]);
+};
+
+document.getElementById('removeBannerImageBtn').onclick = () => {
+  document.getElementById('bfImageFile').value = '';
+  Admin.updateBannerImagePreview('');
+  Admin.setBannerUploadStatus('Image removed. Save banner to keep this change.', 'success');
+};
+
+const bannerUploadBox = document.getElementById('bannerUploadBox');
+if (bannerUploadBox) {
+  ['dragenter', 'dragover'].forEach(eventName => {
+    bannerUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      bannerUploadBox.classList.add('dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    bannerUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      bannerUploadBox.classList.remove('dragging');
+    });
+  });
+  bannerUploadBox.addEventListener('drop', async (e) => {
+    const file = e.dataTransfer.files[0];
+    document.getElementById('bfImageFile').files = e.dataTransfer.files;
+    await Admin.uploadBannerImage(file);
+  });
+}
+
+document.getElementById('addProdBtn').onclick = async () => {
+  await Admin.saveProductForm();
+};
+document.getElementById('cancelProdBtn').onclick = () => {
+  Admin.cancelProductEdit();
+};
+
+// Seed sample products
+document.getElementById('seedDemoProductsBtn').onclick = async () => {
+  if (!confirm("Are you sure you want to add 10 beautiful sample products (one for each category) to your database?")) return;
+  
+  const demoProducts = [
+    {
+      name: "Premium Ultra-Clear Fast Cast Resin 1:1",
+      price: 899,
+      originalPrice: 1199,
+      category: "Resins",
+      emoji: "🧪",
+      stock: 50,
+      badge: "Hot",
+      swatchColor: "#EDE8FF",
+      description: "Super clear epoxy resin for tabletop and art coatings. Low odor, UV resistant, and bubbles pop easily."
+    },
+    {
+      name: "Chameleon Color Shift Pigment Set",
+      price: 450,
+      originalPrice: 599,
+      category: "Pigments",
+      emoji: "✨",
+      stock: 30,
+      badge: "Sale",
+      swatchColor: "#C8A96E",
+      description: "5 premium shifting colors for stunning metallic art. Creates beautiful multi-tone resin cells."
+    },
+    {
+      name: "Geode Coaster Silicone Mould (4-Pack)",
+      price: 320,
+      originalPrice: 399,
+      category: "Moulds",
+      emoji: "🟪",
+      stock: 25,
+      badge: "",
+      swatchColor: "#FFE8F5",
+      description: "High quality thick silicone moulds for making geode coasters. Durable and shiny finish."
+    },
+    {
+      name: "Mixed Pressed Flower Hydrangeas Pack",
+      price: 180,
+      originalPrice: null,
+      category: "Dry Flowers",
+      emoji: "🌸",
+      stock: 40,
+      badge: "New",
+      swatchColor: "#FBE8FF",
+      description: "Premium selected real pressed hydrangea flowers in purple and blue. Perfect for bookmarks and jewelry."
+    },
+    {
+      name: "Chunky Mermaid Hexagon Glitter 50g",
+      price: 120,
+      originalPrice: 150,
+      category: "Glitters",
+      emoji: "🌟",
+      stock: 60,
+      badge: "Sale",
+      swatchColor: "#FFF8E8",
+      description: "Beautiful reflective chunky hexagon glitter for ocean resin pours and jewelry crafts."
+    },
+    {
+      name: "Resin Art Leveling Board 30x40cm",
+      price: 699,
+      originalPrice: 999,
+      category: "Tools",
+      emoji: "🔧",
+      stock: 15,
+      badge: "",
+      swatchColor: "#E8F5EE",
+      description: "Adjustable leveling board to get perfect flat surfaces for resin pours. Includes bubble level."
+    },
+    {
+      name: "Sterling Silver Pendant Bezels (10pcs)",
+      price: 249,
+      originalPrice: null,
+      category: "Jewellery",
+      emoji: "💍",
+      stock: 80,
+      badge: "New",
+      swatchColor: "#E8F0FF",
+      description: "Open bezel blanks in geometric shapes for resin jewelry makers. Anti-tarnish plating."
+    },
+    {
+      name: "Lavender Scented Oil for Candles 30ml",
+      price: 180,
+      originalPrice: 220,
+      category: "Candle",
+      emoji: "🕯",
+      stock: 45,
+      badge: "",
+      swatchColor: "#FFF3E8",
+      description: "Highly concentrated professional candle fragrance oil. Fills room with calming lavender."
+    },
+    {
+      name: "Premium Round Teak Wood Platter 10-inch",
+      price: 599,
+      originalPrice: 799,
+      category: "Teak Wood",
+      emoji: "🪵",
+      stock: 20,
+      badge: "Hot",
+      swatchColor: "#F5EBD4",
+      description: "Fully seasoned round teak wood base ready for ocean-wave resin art and charcuterie boards."
+    },
+    {
+      name: "Gold Metallic Inspirational Quotes Sheet",
+      price: 99,
+      originalPrice: 149,
+      category: "Stickers",
+      emoji: "🏷",
+      stock: 100,
+      badge: "",
+      swatchColor: "#E8FFF0",
+      description: "Transparent sticker sheet with metallic gold typography quotes for tray and coaster art."
+    }
+  ];
+  
+  showToast("Seeding sample products...", "info");
+  let successCount = 0;
+  for (const p of demoProducts) {
+    try {
+      await API.addProduct(p);
+      successCount++;
+    } catch (e) {
+      console.error("Failed to seed:", p.name, e);
+    }
+  }
+  
+  showToast(`Successfully seeded ${successCount} sample products!`, "success");
+  await Admin.loadAll();
+  Admin.renderProducts();
+  App.loadProducts();
+};
+
+// Refresh Orders
+document.getElementById('refreshOrdersBtn').onclick = async () => {
+  await Admin.loadAll();
+  Admin.renderOrders();
+  showToast('Orders refreshed', 'success');
+};
+
+// ── Admin Reviews ─────────────────────────────────────────────
+Admin.renderReviews = async function() {
+  const list = document.getElementById('adminReviewList');
+  if (!list) return;
+  list.innerHTML = '<div style="padding:16px;color:var(--muted)">Loading reviews...</div>';
+  try {
+    const reviews = await API.getAllReviews();
+    this.data.reviews = reviews;
+    if (!reviews.length) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">No reviews yet.</div>';
+      return;
+    }
+    // Get product names for display
+    const db_products = this.data.products || [];
+    list.innerHTML = reviews.map(r => {
+      const prod = db_products.find(p => p.id === r.productId);
+      const prodName = prod ? prod.name : `Product #${r.productId}`;
+      return `
+        <div class="admin-review-card">
+          <div class="arc-header">
+            <span class="arc-product">${prodName}</span>
+            <button class="arc-delete" data-rid="${r.id}">🗑 Delete</button>
+          </div>
+          <div class="arc-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)} &nbsp;<span class="arc-meta">by ${r.userName} &nbsp;·&nbsp; ${new Date(r.createdAt).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</span></div>
+          <div class="arc-comment">${r.comment}</div>
+        </div>`;
+    }).join('');
+
+    // Bind delete buttons
+    list.querySelectorAll('.arc-delete').forEach(btn => {
+      btn.onclick = async () => {
+        if (!confirm('Delete this review?')) return;
+        try {
+          await API.deleteReview(Number(btn.dataset.rid));
+          showToast('Review deleted', 'success');
+          Admin.renderReviews();
+        } catch (e) {
+          showToast(e.message || 'Could not delete review', 'error');
+        }
+      };
+    });
+  } catch (e) {
+    list.innerHTML = `<div style="padding:16px;color:var(--red)">Error: ${e.message}</div>`;
+  }
+};
+
+document.getElementById('refreshReviewsBtn').onclick = async () => {
+  await Admin.renderReviews();
+  showToast('Reviews refreshed', 'success');
+};
+
+// Auto-load reviews when Reviews tab is clicked
+document.querySelectorAll('.atab[data-tab]').forEach(btn => {
+  if (btn.dataset.tab === 'reviews') {
+    const original = btn.onclick;
+    btn.addEventListener('click', () => Admin.renderReviews());
+  }
+});
+
+// Load announce into admin field when admin opens
+document.getElementById('openAdminBtn').addEventListener('click', async () => {
+  try {
+    const s = await API.getSettings();
+    const el = document.getElementById('afAnnounce');
+    if (el) el.value = s.announce;
+  } catch {}
+});
+
+// ── Admin Coupons CRUD ─────────────────────────────────────────
+Admin.renderCoupons = async function() {
+  const list = document.getElementById('adminCouponList');
+  if (!list) return;
+  list.innerHTML = '<div style="padding:16px;color:var(--muted)">Loading coupons...</div>';
+  try {
+    const coupons = await API.getCoupons();
+    this.data.coupons = coupons;
+    if (!coupons.length) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">No coupons created yet.</div>';
+      return;
+    }
+    list.innerHTML = `
+      <table class="admin-table" style="width:100%; border-collapse:collapse; font-size:0.84rem; margin-bottom:12px;">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.03); border-bottom:1px solid var(--border); font-weight:bold; text-align:left;">
+            <th style="padding:10px;">Code</th>
+            <th style="padding:10px;">Type</th>
+            <th style="padding:10px;">Value</th>
+            <th style="padding:10px;">Min Purchase</th>
+            <th style="padding:10px; text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${coupons.map(c => `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px; font-weight:bold; color:var(--p);">${c.code}</td>
+              <td style="padding:10px;">${c.type === 'percentage' ? 'Percentage (%)' : 'Fixed Amount (₹)'}</td>
+              <td style="padding:10px; font-weight:bold;">${c.type === 'percentage' ? `${c.value}%` : `₹${c.value}`}</td>
+              <td style="padding:10px;">₹${c.minPurchase || 0}</td>
+              <td style="padding:10px; text-align:right;">
+                <button class="arc-delete btn-delete-coupon" data-cid="${c.id}" style="padding:4px 8px; font-size:0.75rem; border-radius:6px; font-weight:bold; background:#fee2e2; color:#b91c1c; border:none; cursor:pointer; transition:all 0.2s;">Delete</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+
+    // Bind delete buttons
+    list.querySelectorAll('.btn-delete-coupon').forEach(btn => {
+      btn.onclick = async () => {
+        if (!confirm('Delete this coupon code?')) return;
+        try {
+          await API.deleteCoupon(Number(btn.dataset.cid));
+          showToast('Coupon deleted ✓', 'success');
+          await Admin.loadAll();
+          Admin.renderCoupons();
+        } catch (e) {
+          showToast(e.message || 'Could not delete coupon', 'error');
+        }
+      };
+    });
+  } catch (e) {
+    list.innerHTML = `<div style="padding:16px;color:var(--red)">Error: ${e.message}</div>`;
+  }
+};
+
+// Create Coupon Form Bindings
+const addCouponBtn = document.getElementById('addCouponBtn');
+if (addCouponBtn) {
+  addCouponBtn.onclick = async () => {
+    const codeInput = document.getElementById('cfCode');
+    const typeInput = document.getElementById('cfType');
+    const valueInput = document.getElementById('cfValue');
+    const minInput = document.getElementById('cfMin');
+    const err = document.getElementById('couponErr');
+    const ok = document.getElementById('couponOk');
+
+    if (err) err.style.display = 'none';
+    if (ok) ok.style.display = 'none';
+
+    const code = codeInput.value.trim().toUpperCase();
+    const type = typeInput.value;
+    const value = Number(valueInput.value);
+    const minPurchase = Number(minInput.value) || 0;
+
+    if (!code) {
+      if (err) { err.textContent = 'Coupon code is required'; err.style.display = 'block'; }
+      return;
+    }
+    if (isNaN(value) || value <= 0) {
+      if (err) { err.textContent = 'Please enter a valid discount value'; err.style.display = 'block'; }
+      return;
+    }
+
+    try {
+      await API.createCoupon({ code, type, value, minPurchase });
+      codeInput.value = '';
+      valueInput.value = '';
+      minInput.value = '';
+      if (ok) ok.style.display = 'block';
+      showToast('Coupon created ✓', 'success');
+      await Admin.loadAll();
+      Admin.renderCoupons();
+    } catch (e) {
+      if (err) { err.textContent = e.message || 'Could not create coupon'; err.style.display = 'block'; }
+    }
+  };
+}
+
+// Auto-load coupons when Coupons tab is clicked
+document.querySelectorAll('.atab[data-tab]').forEach(btn => {
+  if (btn.dataset.tab === 'coupons') {
+    btn.addEventListener('click', () => Admin.renderCoupons());
+  }
+});
+
+// Refresh coupons
+const refreshCouponsBtn = document.getElementById('refreshCouponsBtn');
+if (refreshCouponsBtn) {
+  refreshCouponsBtn.onclick = async () => {
+    await Admin.renderCoupons();
+    showToast('Coupons refreshed', 'success');
+  };
+}

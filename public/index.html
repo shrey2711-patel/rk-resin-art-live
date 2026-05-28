@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RK Creation — Premium Craft Supplies</title>
+  <meta name="description" content="Shop premium resin, mica pigments, moulds, dry flowers and craft supplies at RK Creation. Fast delivery, quality guaranteed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- jsPDF for invoice generation -->
+  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- Razorpay for secure checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<!-- ANNOUNCE BAR -->
+<div class="announce-bar" id="announceBar">
+  <div class="announce-track">
+    <span id="announceText">
+      💎 Premium UV Resin @ ₹349 | Only ₹699/Set 🔥 | 🚚 Free Shipping Above ₹999
+    </span>
+  </div>
+</div>
+
+  <!-- HEADER -->
+  <header class="header" id="siteHeader">
+    <div class="header-inner">
+      <div class="logo">
+        <img class="logo-img" src="/logo.png" alt="RK Creation">
+        <div class="logo-text">
+          <strong>RK Creation</strong>
+          <small>Premium Craft Supplies</small>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <input type="text" id="searchInput" class="search-field" placeholder="Search resin, pigments, moulds...">
+        <button class="search-icon-btn" id="searchBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
+
+      <div class="header-actions">
+        <!-- Dark / Light mode toggle -->
+        <button class="theme-toggle" id="themeToggleBtn" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+
+        <!-- Account button (changes to avatar when logged in) -->
+        <button class="icon-action" id="accountBtn" title="My Account" aria-label="My Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+
+        <!-- Wishlist Button -->
+        <button class="icon-action cart-action" id="wishlistBtn" title="Wishlist" aria-label="My Wishlist">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span class="cart-badge" id="wishlistBadge" style="background: var(--red);">0</span>
+        </button>
+
+        <button class="icon-action cart-action" id="cartBtn" title="Cart" aria-label="Shopping Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+
+        <button class="admin-btn" id="openAdminBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          Admin
+        </button>
+      </div>
+    </div>
+
+    <!-- NAV ROWS -->
+    <nav class="site-nav">
+      <div class="nav-row" id="navRow1"></div>
+      <div class="nav-row" id="navRow2"></div>
+      <div class="nav-row" id="navRow3"></div>
+    </nav>
+  </header>
+
+  <!-- BANNER SLIDER -->
+  <section class="banner-section" id="bannerSection">
+    <div class="banner-track" id="bannerTrack"></div>
+    <button class="banner-arrow prev" id="bPrev" aria-label="Previous">&#8249;</button>
+    <button class="banner-arrow next" id="bNext" aria-label="Next">&#8250;</button>
+    <div class="banner-dots" id="bannerDots"></div>
+  </section>
+
+  <!-- MAIN SHOP -->
+  <main class="shop-main" id="shopMain">
+    <div class="shop-toolbar">
+      <div class="shop-heading" id="shopHeading">All Products</div>
+      <div class="shop-meta" id="shopMeta"></div>
+    </div>
+
+    <div class="cat-filter-row" id="catFilterRow"></div>
+
+    <div class="prod-grid" id="prodGrid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">RK Creation</div>
+        <p>Premium resin, pigments, moulds, tools, flowers and art supplies for handmade creators.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <button class="footer-link" data-footer-cat="Resins">Resin</button>
+        <button class="footer-link" data-footer-cat="Pigments">Pigments</button>
+        <button class="footer-link" data-footer-cat="Moulds">Moulds</button>
+        <button class="footer-link" data-footer-cat="Dry Flowers">Dry Flowers</button>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="https://wa.me/918141994995" target="_blank">WhatsApp Support</a>
+        <button class="footer-link" id="footerAccountBtn">My Account</button>
+        <button class="footer-link" id="footerCartBtn">View Cart</button>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>Phone: +91 81419 94995</p>
+        <p>Fast order confirmation on WhatsApp.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 RK Creation. Crafted for creative makers.</div>
+  </footer>
+
+  <!-- CART DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-head">
+      <h3>Shopping Cart <span id="cartItemCount">(0 items)</span></h3>
+      <button class="drawer-close" id="closeCart">&times;</button>
+    </div>
+    <div class="drawer-body" id="cartItems">
+      <div class="empty-cart">
+        <div style="font-size:3rem">🛒</div>
+        <p>Your cart is empty</p>
+        <small>Add some products to get started!</small>
+      </div>
+    </div>
+    <div class="drawer-footer" id="cartFooter" style="display:none">
+      <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <strong id="cartTotal">₹0</strong>
+      </div>
+      <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+    </div>
+  </aside>
+
+  <!-- WISHLIST DRAWER -->
+  <aside class="cart-drawer" id="wishlistDrawer">
+    <div class="drawer-head">
+      <h3>My Wishlist <span id="wishlistItemCount">(0 items)</span></h3>
+      <button class="drawer-close" id="closeWishlist">&times;</button>
+    </div>
+    <div class="drawer-body" id="wishlistItems">
+      <div class="empty-cart">
+        <div style="font-size:3.5rem; margin-bottom: 12px;">❤️</div>
+        <p style="font-weight: 700; color: var(--ink);">Your wishlist is empty</p>
+        <small style="color: var(--muted); font-size: 0.8rem; display: block; margin-top: 4px;">Save items you love to shop them later!</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModalOverlay">
+    <div class="product-modal" id="productModal">
+      <button class="modal-close" id="closeModal">&times;</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-overlay" id="checkoutModalOverlay">
+    <div class="checkout-modal" id="checkoutModal">
+      <button class="modal-close" id="closeCheckout">&times;</button>
+      <h2 class="modal-title" id="checkoutTitle">Checkout</h2>
+      <div class="checkout-body">
+        <div class="checkout-form-wrap">
+          <h4>Delivery Details</h4>
+          <div class="form-row-2">
+            <div class="form-field">
+              <label>First Name</label>
+              <input type="text" id="ckFirstName" placeholder="Ravi">
+            </div>
+            <div class="form-field">
+              <label>Last Name</label>
+              <input type="text" id="ckLastName" placeholder="Kumar">
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Phone Number *</label>
+            <input type="tel" id="ckPhone" placeholder="+91 98765 43210">
+          </div>
+          <div class="form-field">
+            <label>Email (optional)</label>
+            <input type="email" id="ckEmail" placeholder="you@email.com">
+          </div>
+          <div class="form-field">
+            <label>Full Address *</label>
+            <textarea id="ckAddress" rows="3" placeholder="House no, Street, Area..."></textarea>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field">
+              <label>City</label>
+              <input type="text" id="ckCity" placeholder="Ahmedabad">
+            </div>
+            <div class="form-field">
+              <label>PIN Code</label>
+              <input type="text" id="ckPin" placeholder="380001">
+            </div>
+          </div>
+
+        <!-- Promo Code Block -->
+        <div class="form-field promo-field" style="margin-top: 15px;">
+          <label>Promo Code</label>
+          <div class="promo-input-row" style="display: flex; gap: 8px;">
+            <input type="text" id="ckPromoCode" placeholder="E.g. WELCOME10" style="text-transform: uppercase; flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 0.88rem; outline: none; background: var(--white); color: var(--ink);">
+            <button type="button" class="add-to-cart-btn" id="applyPromoBtn" style="padding: 0 16px; height: 38px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s;">Apply</button>
+          </div>
+          <div id="promoMsg" class="promo-msg" style="display: none; font-size: 0.76rem; font-weight: 700; margin-top: 4px;"></div>
+        </div>
+
+          <div class="form-field payment-method-field" style="margin-top:15px">
+            <label>Payment Method</label>
+            <div class="payment-options">
+              <div class="payment-option active" id="payOnlineOpt" data-method="online">
+                <div class="payment-option-icon">💳</div>
+                <div class="payment-option-details">
+                  <strong>Pay Online</strong>
+                  <span>UPI, Cards, Netbanking</span>
+                </div>
+              </div>
+              <div class="payment-option" id="payCodOpt" data-method="cod">
+                <div class="payment-option-icon">💬</div>
+                <div class="payment-option-details">
+                  <strong>Inquire on WhatsApp</strong>
+                  <span>Send order details via WhatsApp</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="checkout-summary">
+          <h4>Order Summary</h4>
+          <div id="ckOrderItems"></div>
+          <div class="ck-total-row">
+            <span>Subtotal</span><span id="ckSubtotal">₹0</span>
+          </div>
+          <div class="ck-total-row">
+            <span>Shipping</span><span id="ckShipping">₹60</span>
+          </div>
+          <div class="ck-total-row total">
+            <span>Total</span><span id="ckTotal">₹0</span>
+          </div>
+          <button class="place-order-btn" id="placeOrderBtn">Place Order via WhatsApp</button>
+          <button class="invoice-download-btn" id="invoiceDownloadBtn" style="display:none">
+            📄 Download Invoice
+          </button>
+          <p class="ck-note">* Order will be confirmed via WhatsApp</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER ACCOUNT MODAL -->
+  <div class="modal-overlay" id="accountModalOverlay">
+    <div class="account-modal">
+      <button class="modal-close" id="closeAccount">&times;</button>
+      <div class="account-head">
+        <h2>My Account</h2>
+        <p id="accountSubText">Login or register to save your checkout details.</p>
+      </div>
+
+      <div id="accountLoggedOut">
+        <div class="account-tabs">
+          <button class="account-tab active" data-account-tab="login">Login</button>
+          <button class="account-tab" data-account-tab="register">Register</button>
+        </div>
+
+        <div class="account-pane active" id="account-login">
+          <div class="form-field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@email.com"></div>
+          <div class="form-field"><label>Password</label><input id="loginPassword" type="password" placeholder="Your password"></div>
+          <button class="account-primary-btn" id="loginBtn">Login</button>
+        </div>
+
+        <div class="account-pane" id="account-register">
+          <div class="form-field"><label>Full Name</label><input id="regName" placeholder="Your name"></div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Email</label><input id="regEmail" type="email" placeholder="you@email.com"></div>
+            <div class="form-field"><label>Phone</label><input id="regPhone" type="tel" placeholder="+91 98765 43210"></div>
+          </div>
+          <div class="form-field"><label>Password</label><input id="regPassword" type="password" placeholder="Minimum 6 characters"></div>
+          <div class="form-field"><label>Address</label><textarea id="regAddress" rows="2" placeholder="House no, street, area"></textarea></div>
+          <div class="form-row-2">
+            <div class="form-field"><label>City</label><input id="regCity" placeholder="City"></div>
+            <div class="form-field"><label>PIN Code</label><input id="regPin" placeholder="PIN"></div>
+          </div>
+          <button class="account-primary-btn" id="registerBtn">Create Account</button>
+        </div>
+      </div>
+
+      <div id="accountLoggedIn" style="display:none">
+        <!-- Profile Tab Nav -->
+        <div class="account-tabs" id="profileTabsNav">
+          <button class="account-tab active" data-profile-tab="profile">My Profile</button>
+          <button class="account-tab" data-profile-tab="orders">My Orders</button>
+        </div>
+
+        <!-- Profile Pane -->
+        <div class="account-pane active" id="profile-tab-profile">
+          <div class="account-card">
+            <div class="account-avatar" id="accountAvatar">R</div>
+            <div>
+              <h3 id="accountName">Customer</h3>
+              <p id="accountEmail">customer@email.com</p>
+              <p id="accountPhone"></p>
+            </div>
+          </div>
+          <div class="account-address" id="accountAddress"></div>
+          <button class="edit-profile-btn" id="editProfileToggleBtn">✏️ Edit Profile</button>
+          <div class="profile-edit-form" id="profileEditForm" style="display:none">
+            <div class="form-field"><label>Full Name</label><input id="editName" placeholder="Your name"></div>
+            <div class="form-field"><label>Phone</label><input id="editPhone" type="tel" placeholder="+91 98765 43210"></div>
+            <div class="form-field"><label>Address</label><textarea id="editAddress" rows="2" placeholder="Address"></textarea></div>
+            <div class="form-row-2">
+              <div class="form-field"><label>City</label><input id="editCity" placeholder="City"></div>
+              <div class="form-field"><label>PIN</label><input id="editPin" placeholder="PIN"></div>
+            </div>
+            <button class="account-primary-btn" id="saveProfileBtn">Save Changes</button>
+          </div>
+          <div class="account-actions">
+            <button class="account-primary-btn" id="accountCheckoutBtn">Continue Shopping</button>
+            <button class="account-secondary-btn" id="logoutBtn">Logout</button>
+          </div>
+        </div>
+
+        <!-- Orders Pane -->
+        <div class="account-pane" id="profile-tab-orders">
+          <div class="orders-loading" id="ordersLoadingState">Loading your orders...</div>
+          <div class="my-orders-list" id="myOrdersList"></div>
+        </div>
+      </div>
+
+      <div class="account-message" id="accountMessage"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL OVERLAY -->
+  <div class="modal-overlay admin-overlay" id="adminOverlay">
+    <div class="admin-panel" id="adminPanel">
+      <button class="modal-close" id="closeAdminPanel">&times;</button>
+
+      <!-- LOGIN -->
+      <div id="adminLoginScreen">
+        <div class="admin-login-box">
+          <div class="admin-login-icon">🔒</div>
+          <h3>Admin Panel</h3>
+          <p>Enter your password to manage RK Creation</p>
+          <input type="password" id="adminPassInput" class="admin-input" placeholder="Admin password">
+          <button class="admin-login-btn" id="adminLoginBtn">Login</button>
+          <div class="admin-err" id="adminErr"></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="adminDashboard" style="display:none">
+        <div class="admin-head">
+          <div class="admin-logo">⚙️ Admin Panel</div>
+          <button class="admin-logout-btn" id="adminLogoutBtn">Logout</button>
+        </div>
+        <div class="admin-tabs">
+          <button class="atab active" data-tab="banners">Banners</button>
+          <button class="atab" data-tab="announce">Announcement</button>
+          <button class="atab" data-tab="nav">Navigation</button>
+          <button class="atab" data-tab="categories">Categories</button>
+          <button class="atab" data-tab="products">Products</button>
+          <button class="atab" data-tab="orders">Orders</button>
+          <button class="atab" data-tab="reviews">⭐ Reviews</button>
+          <button class="atab" data-tab="coupons">🎟️ Coupons</button>
+        </div>
+        <div class="admin-tab-body">
+
+          <!-- BANNERS -->
+          <div class="tab-pane active" id="atab-banners">
+            <div class="admin-section-head">Manage Banners</div>
+            <div id="adminBannerList" class="admin-list"></div>
+            <div class="admin-form-card">
+              <div class="afc-title">Upload Banner Image</div>
+              <div class="form-field">
+                <label>Banner Image (Photo)</label>
+                <input type="hidden" id="bfImageUrl">
+                <input class="product-file-input" type="file" id="bfImageFile" accept="image/jpeg,image/png,image/webp">
+                <label class="product-upload-box" id="bannerUploadBox" for="bfImageFile">
+                  <span class="upload-icon">+</span>
+                  <span class="upload-title">Drop banner image here or choose file</span>
+                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                </label>
+                <div class="product-image-preview" id="bannerImagePreview" style="display:none">
+                  <img id="bfImagePreviewImg" alt="Banner preview">
+                  <button type="button" class="image-remove-btn" id="removeBannerImageBtn">Remove Image</button>
+                </div>
+                <div class="upload-status" id="bannerUploadStatus"></div>
+              </div>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="addBannerBtn">+ Add Banner</button>
+                <button class="admin-cancel-btn" id="cancelBannerBtn" style="display:none">Cancel Edit</button>
+              </div>
+              <div class="admin-ok" id="bannerOk">✅ Banner saved!</div>
+            </div>
+          </div>
+
+          <!-- ANNOUNCE -->
+          <div class="tab-pane" id="atab-announce">
+            <div class="admin-section-head">Announcement Bar</div>
+            <div class="admin-form-card">
+              <div class="form-field"><label>Announcement Text</label><input class="admin-input" id="afAnnounce" placeholder="Free shipping above ₹999..."></div>
+              <button class="admin-save-btn" id="saveAnnounceBtn">Save Announcement</button>
+              <div class="admin-ok" id="announceOk">✅ Saved!</div>
+            </div>
+          </div>
+
+          <!-- NAV -->
+          <div class="tab-pane" id="atab-nav">
+            <div class="admin-section-head">Navigation Links</div>
+            <div id="adminNavList" class="admin-list"></div>
+            <div class="admin-form-card">
+              <div class="afc-title">Add Nav Link</div>
+              <div class="form-row-3">
+                <div class="form-field"><label>Label *</label><input class="admin-input" id="nfLabel" placeholder="e.g. Resin"></div>
+                <div class="form-field"><label>Row</label><select class="admin-input" id="nfRow"><option value="1">Row 1</option><option value="2">Row 2</option><option value="3">Row 3</option></select></div>
+                <div class="form-field"><label>Style</label><select class="admin-input" id="nfFeat"><option value="false">Normal</option><option value="true">Featured (Red)</option></select></div>
+              </div>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="addNavBtn">+ Add Link</button>
+                <button class="admin-cancel-btn" id="cancelNavBtn" style="display:none">Cancel Edit</button>
+              </div>
+              <div class="admin-ok" id="navOk">✅ Link saved!</div>
+            </div>
+          </div>
+
+          <!-- CATEGORIES -->
+          <div class="tab-pane" id="atab-categories">
+            <div class="admin-section-head">Product Categories</div>
+            <div id="adminCatList" class="admin-list"></div>
+            <div class="admin-form-card">
+              <div class="afc-title">Add Category</div>
+              <div class="form-row-3">
+                <div class="form-field"><label>Name *</label><input class="admin-input" id="cfName" placeholder="e.g. Pigments"></div>
+                <div class="form-field"><label>Emoji</label><input class="admin-input" id="cfEmoji" placeholder="✨"></div>
+                <div class="form-field"><label>BG Color</label><input class="admin-input" type="color" id="cfColor" value="#EDE8FF"></div>
+              </div>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="addCatBtn">+ Add Category</button>
+                <button class="admin-cancel-btn" id="cancelCatBtn" style="display:none">Cancel Edit</button>
+              </div>
+              <div class="admin-ok" id="catOk">✅ Category saved!</div>
+            </div>
+          </div>
+
+          <!-- PRODUCTS -->
+          <div class="tab-pane" id="atab-products">
+            <div class="admin-section-head">
+              <span>Products</span>
+              <button class="refresh-btn" id="seedDemoProductsBtn" style="background:#0f766e;color:white;border:none;margin-left:auto;padding:5px 12px;border-radius:6px;font-weight:700;">⚡ Seed Sample Products</button>
+            </div>
+            <div id="adminProdList" class="admin-list"></div>
+            <div class="admin-form-card">
+              <div class="afc-title">Add Product</div>
+              <div class="form-row-2">
+                <div class="form-field"><label>Product Name *</label><input class="admin-input" id="pfName" placeholder="e.g. Rose Gold Mica 10g"></div>
+                <div class="form-field"><label>Category *</label><select class="admin-input" id="pfCat"></select></div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-field"><label>Price (₹) *</label><input class="admin-input" type="number" id="pfPrice" placeholder="199"></div>
+                <div class="form-field"><label>Original Price (₹)</label><input class="admin-input" type="number" id="pfOrig" placeholder="Optional"></div>
+                <div class="form-field"><label>Stock</label><input class="admin-input" type="number" id="pfStock" placeholder="50"></div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-field"><label>Badge</label><select class="admin-input" id="pfBadge"><option value="">None</option><option>New</option><option>Sale</option><option>Hot</option></select></div>
+                <div class="form-field"><label>Emoji</label><input class="admin-input" id="pfEmoji" placeholder="✨"></div>
+              </div>
+              <div class="form-field">
+                <label>Product Image</label>
+                <input type="hidden" id="pfImageUrl">
+                <input class="product-file-input" type="file" id="pfImageFile" accept="image/jpeg,image/png,image/webp">
+                <label class="product-upload-box" id="productUploadBox" for="pfImageFile">
+                  <span class="upload-icon">+</span>
+                  <span class="upload-title">Drop product image here or choose file</span>
+                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                </label>
+                <div class="product-image-preview" id="productImagePreview" style="display:none">
+                  <img id="pfImagePreviewImg" alt="Product preview">
+                  <button type="button" class="image-remove-btn" id="removeProductImageBtn">Remove Image</button>
+                </div>
+                <div class="upload-status" id="productUploadStatus"></div>
+              </div>
+              <div class="form-field"><label>Description</label><textarea class="admin-input" id="pfDesc" rows="2" placeholder="Product description..."></textarea></div>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="addProdBtn">+ Add Product</button>
+                <button class="admin-cancel-btn" id="cancelProdBtn" style="display:none">Cancel Edit</button>
+              </div>
+              <div class="admin-ok" id="prodOk">✅ Product saved!</div>
+            </div>
+          </div>
+
+          <!-- ORDERS -->
+          <div class="tab-pane" id="atab-orders">
+            <div class="admin-section-head">
+              Orders
+              <button class="refresh-btn" id="refreshOrdersBtn">↻ Refresh</button>
+            </div>
+            <div id="adminOrderList" class="admin-list" style="max-height:500px"></div>
+          </div>
+
+          <!-- REVIEWS -->
+          <div class="tab-pane" id="atab-reviews">
+            <div class="admin-section-head">
+              ⭐ Customer Reviews
+              <button class="refresh-btn" id="refreshReviewsBtn">↻ Refresh</button>
+            </div>
+            <div id="adminReviewList" class="admin-list" style="max-height:560px"></div>
+          </div>
+
+          <!-- COUPONS -->
+          <div class="tab-pane" id="atab-coupons">
+            <div class="admin-section-head">
+              🎟️ Discount Coupons
+              <button class="refresh-btn" id="refreshCouponsBtn">↻ Refresh</button>
+            </div>
+            <div id="adminCouponList" class="admin-list" style="max-height:480px"></div>
+            <div class="admin-form-card" style="margin-top:20px">
+              <div class="afc-title">Create New Promo Coupon</div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Coupon Code (e.g. WELCOME10)</label>
+                  <input type="text" class="admin-input" id="cfCode" placeholder="WELCOME10" style="text-transform:uppercase">
+                </div>
+                <div class="form-field">
+                  <label>Discount Type</label>
+                  <select class="admin-input" id="cfType">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed Amount (₹)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Discount Value</label>
+                  <input type="number" class="admin-input" id="cfValue" placeholder="10" min="1">
+                </div>
+                <div class="form-field">
+                  <label>Min Purchase Requirement (₹)</label>
+                  <input type="number" class="admin-input" id="cfMin" placeholder="299" min="0">
+                </div>
+              </div>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="addCouponBtn">+ Create Coupon</button>
+              </div>
+              <div class="admin-err" id="couponErr" style="margin-top:10px"></div>
+              <div class="admin-ok" id="couponOk" style="margin-top:10px">✅ Coupon created successfully!</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- WHATSAPP FLOAT -->
+  <!-- 📍 CHANGE WHATSAPP NUMBER HERE: Replace 918141994995 with your WhatsApp business number -->
+  <a href="https://wa.me/918141994995" target="_blank" class="wa-float" title="Chat on WhatsApp">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+  </a>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/wishlist.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
