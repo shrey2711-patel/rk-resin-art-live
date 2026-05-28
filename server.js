@@ -82,8 +82,54 @@ async function initMailer() {
   }
 }
 
+// Resend HTTPS API dispatcher for cloud deployments (Bypasses SMTP port blocking on Render)
+async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  if (RESEND_API_KEY) {
+    try {
+      console.log(`📡 Dispatched mail via Resend HTTPS API to ${to}...`);
+      
+      let targetEmail = to;
+      let finalSubject = subject;
+      
+      // Resend free tier sends to the account owner (rinkupatel3495@gmail.com) by default.
+      // We route customer copies to rinkupatel3495@gmail.com labelled with [CUSTOMER COPY]
+      const isSandboxSender = !process.env.RESEND_VERIFIED_DOMAIN;
+      if (isSandboxSender && to.toLowerCase() !== 'rinkupatel3495@gmail.com') {
+        targetEmail = 'rinkupatel3495@gmail.com';
+        finalSubject = `[CUSTOMER COPY TO: ${to}] ${subject}`;
+      }
+
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'RK Creation <onboarding@resend.dev>',
+          to: targetEmail,
+          subject: finalSubject,
+          html: htmlBody,
+          text: textBody
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Resend API error: ${response.status} ${await response.text()}`);
+      }
+      console.log(`✅ Mail successfully delivered via Resend HTTPS API to ${targetEmail}!`);
+      return true;
+    } catch (err) {
+      console.error('❌ Failed to send email via Resend HTTPS API:', err.message);
+      return false;
+    }
+  }
+  return false;
+}
+
 async function sendAdminEmailNotification(order) {
-  if (!mailTransporter) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing email...');
     return;
   }
@@ -291,6 +337,15 @@ GRAND TOTAL: Rs. ${order.grandTotal}
 RK Creation - Premium Craft Supplies
 `;
 
+    // Try to dispatch via Resend HTTPS API first for cloud compatibility
+    const sentViaResend = await sendEmailViaHTTPS(adminEmail, emailSubject, emailHTML, emailText);
+    if (sentViaResend) return;
+
+    if (!mailTransporter) {
+      console.log('⚠️ SMTP mail transporter not initialized. Skipping SMTP dispatch.');
+      return;
+    }
+
     // Dispatch the email
     const senderEmail = mailTransporter.options.auth.user;
     const mailOptions = {
@@ -315,7 +370,7 @@ RK Creation - Premium Craft Supplies
 }
 
 async function sendCustomerOrderConfirmation(order) {
-  if (!mailTransporter) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing customer email...');
     return;
   }
@@ -497,6 +552,15 @@ Need Help? Chat with our support team on WhatsApp: wa.me/918141994995
 RK Creation
 `;
 
+    // Try to dispatch via Resend HTTPS API first for cloud compatibility
+    const sentViaResend = await sendEmailViaHTTPS(customerEmail, emailSubject, emailHTML, emailText);
+    if (sentViaResend) return;
+
+    if (!mailTransporter) {
+      console.log('⚠️ SMTP mail transporter not initialized. Skipping SMTP dispatch.');
+      return;
+    }
+
     // Dispatch the email
     const senderEmail = mailTransporter.options.auth.user;
     const mailOptions = {
@@ -521,7 +585,7 @@ RK Creation
 }
 
 async function notifyWishlistSubscribers(product) {
-  if (!mailTransporter) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing wishlist notifications...');
     return;
   }
@@ -535,7 +599,7 @@ async function notifyWishlistSubscribers(product) {
 
     console.log(`📧 Sending ${subs.length} back-in-stock notification(s) for "${product.name}"...`);
 
-    const senderEmail = mailTransporter.options.auth.user;
+    const senderEmail = mailTransporter ? mailTransporter.options.auth.user : (process.env.SMTP_USER || 'onboarding@resend.dev');
 
     for (const sub of subs) {
       try {
@@ -614,21 +678,29 @@ Best regards,
 RK Creation
         `;
 
-        const mailOptions = {
-          from: `"RK Creation" <${senderEmail}>`,
-          to: sub.email,
-          subject: emailSubject,
-          text: emailText,
-          html: emailHTML
-        };
+        // Try to dispatch via Resend HTTPS API first for cloud compatibility
+        const sentViaResend = await sendEmailViaHTTPS(sub.email, emailSubject, emailHTML, emailText);
+        if (!sentViaResend) {
+          if (!mailTransporter) {
+            console.log(`⚠️ SMTP transporter not initialized. Skipping stock alert email for ${sub.email}.`);
+            continue;
+          }
+          const mailOptions = {
+            from: `"RK Creation" <${senderEmail}>`,
+            to: sub.email,
+            subject: emailSubject,
+            text: emailText,
+            html: emailHTML
+          };
 
-        const info = await mailTransporter.sendMail(mailOptions);
-        console.log(`📧 Wishlist Back-in-Stock email notification sent successfully to ${sub.email}!`);
-        const previewUrl = nodemailer.getTestMessageUrl(info);
-        if (previewUrl) {
-          console.log(`   Ethereal Notification Preview: ${previewUrl}`);
-          const logMsg = `[${new Date().toISOString()}] Stock Alert for "${product.name}" sent to ${sub.email}: Preview at ${previewUrl}\n`;
-          fs.appendFileSync(path.join(__dirname, 'data', 'notifications.log'), logMsg);
+          const info = await mailTransporter.sendMail(mailOptions);
+          console.log(`📧 Wishlist Back-in-Stock email notification sent successfully to ${sub.email}!`);
+          const previewUrl = nodemailer.getTestMessageUrl(info);
+          if (previewUrl) {
+            console.log(`   Ethereal Notification Preview: ${previewUrl}`);
+            const logMsg = `[${new Date().toISOString()}] Stock Alert for "${product.name}" sent to ${sub.email}: Preview at ${previewUrl}\n`;
+            fs.appendFileSync(path.join(__dirname, 'data', 'notifications.log'), logMsg);
+          }
         }
       } catch (err) {
         console.error(`⚠️ Failed to send stock alert email to ${sub.email}:`, err.message);
