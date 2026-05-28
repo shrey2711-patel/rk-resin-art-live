@@ -36,28 +36,38 @@ async function initMailer() {
     const smtpConf = db.settings.smtp || {};
 
     if (smtpConf.host && smtpConf.user && smtpConf.pass && smtpConf.pass !== 'PASTE_YOUR_GMAIL_APP_PASSWORD_HERE') {
-      mailTransporter = nodemailer.createTransport({
-        host: smtpConf.host,
-        port: Number(smtpConf.port) || 465,
-        secure: smtpConf.secure !== false,
-        family: 4, // Force IPv4 to prevent ENETUNREACH errors on cloud hosts
+      const transportConfig = {
         auth: {
           user: smtpConf.user,
           pass: smtpConf.pass
         }
-      });
+      };
+      if (smtpConf.host === 'smtp.gmail.com') {
+        transportConfig.service = 'gmail';
+      } else {
+        transportConfig.host = smtpConf.host;
+        transportConfig.port = Number(smtpConf.port) || 465;
+        transportConfig.secure = smtpConf.secure !== false;
+        transportConfig.family = 4;
+      }
+      mailTransporter = nodemailer.createTransport(transportConfig);
       console.log(`\n📧 SMTP Transporter initialized successfully for sender: ${smtpConf.user}`);
     } else if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      mailTransporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 465,
-        secure: process.env.SMTP_SECURE !== 'false',
-        family: 4, // Force IPv4 to prevent ENETUNREACH errors on cloud hosts
+      const envTransportConfig = {
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
         }
-      });
+      };
+      if (process.env.SMTP_HOST === 'smtp.gmail.com') {
+        envTransportConfig.service = 'gmail';
+      } else {
+        envTransportConfig.host = process.env.SMTP_HOST;
+        envTransportConfig.port = Number(process.env.SMTP_PORT) || 465;
+        envTransportConfig.secure = process.env.SMTP_SECURE !== 'false';
+        envTransportConfig.family = 4;
+      }
+      mailTransporter = nodemailer.createTransport(envTransportConfig);
       console.log(`\n📧 SMTP Transporter initialized successfully via environment variables.`);
     } else {
       console.log('\n📧 Creating Ethereal developer sandbox SMTP mail account...');
