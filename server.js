@@ -35,6 +35,7 @@ async function initMailer() {
         host: smtpConf.host,
         port: Number(smtpConf.port) || 465,
         secure: smtpConf.secure !== false,
+        family: 4, // Force IPv4 to prevent ENETUNREACH errors on cloud hosts
         auth: {
           user: smtpConf.user,
           pass: smtpConf.pass
@@ -46,6 +47,7 @@ async function initMailer() {
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 465,
         secure: process.env.SMTP_SECURE !== 'false',
+        family: 4, // Force IPv4 to prevent ENETUNREACH errors on cloud hosts
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
