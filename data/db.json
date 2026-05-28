@@ -5,8 +5,8 @@
     "adminEmail": "rinkupatel3495@gmail.com",
     "smtp": {
       "host": "smtp.gmail.com",
-      "port": 465,
-      "secure": true,
+      "port": 587,
+      "secure": false,
       "user": "rinkupatel3495@gmail.com",
       "pass": "rgxbhqlaawflvguy"
     }
