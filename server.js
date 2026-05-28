@@ -92,11 +92,12 @@ async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
       let targetEmail = to;
       let finalSubject = subject;
       
-      // Resend free tier sends to the account owner (rinkupatel3495@gmail.com) by default.
-      // We route customer copies to rinkupatel3495@gmail.com labelled with [CUSTOMER COPY]
+      // Resend free tier sends to the account owner (shreypatel00557@gmail.com) by default.
+      // We route customer copies to the owner labelled with [CUSTOMER COPY]
       const isSandboxSender = !process.env.RESEND_VERIFIED_DOMAIN;
-      if (isSandboxSender && to.toLowerCase() !== 'rinkupatel3495@gmail.com') {
-        targetEmail = 'rinkupatel3495@gmail.com';
+      const sandboxTarget = process.env.RESEND_SANDBOX_EMAIL || 'shreypatel00557@gmail.com';
+      if (isSandboxSender && to.toLowerCase() !== sandboxTarget.toLowerCase()) {
+        targetEmail = sandboxTarget;
         finalSubject = `[CUSTOMER COPY TO: ${to}] ${subject}`;
       }
 
