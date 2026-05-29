@@ -81,6 +81,83 @@ const App = {
     }
 
     this.setupPaymentSelector();
+    this.initRouter();
+  },
+
+  // ── Hash Router ───────────────────────────────────────────
+  initRouter() {
+    const route = () => {
+      const hash = window.location.hash;
+      const match = hash.match(/^#collection\/(.+)$/);
+      if (match) {
+        this.showCollectionPage(decodeURIComponent(match[1]));
+      } else if (hash === '' || hash === '#') {
+        this.showHomePage();
+      }
+    };
+    window.addEventListener('hashchange', route);
+    // Run on load (in case page is opened with a hash)
+    route();
+
+    // Back button in collection header
+    const backBtn = document.getElementById('collPageBack');
+    if (backBtn) backBtn.onclick = () => { window.location.hash = ''; };
+  },
+
+  showCollectionPage(catName) {
+    // Hide home-only sections
+    const banner = document.getElementById('bannerSection');
+    const colls  = document.getElementById('collectionsSection');
+    const header = document.getElementById('collectionPageHeader');
+    if (banner)  banner.style.display  = 'none';
+    if (colls)   colls.style.display   = 'none';
+    if (header)  header.style.display  = '';
+
+    // Update header text
+    const titleEl    = document.getElementById('collPageTitle');
+    const subtitleEl = document.getElementById('collPageSubtitle');
+    if (titleEl)    titleEl.textContent    = catName;
+    if (subtitleEl) subtitleEl.textContent = 'Browse all products in this collection';
+
+    // Update shop heading & load products
+    const shopHeading = document.getElementById('shopHeading');
+    if (shopHeading) shopHeading.textContent = catName;
+
+    this.state.activeCategory = catName;
+    this.state.searchQuery    = '';
+    this.state.page           = 1;
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
+
+    this.renderCatFilters(this.state.categories); // keep pills in sync
+    this.syncNavbarActiveState();
+    this.loadProducts();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  showHomePage() {
+    const banner = document.getElementById('bannerSection');
+    const colls  = document.getElementById('collectionsSection');
+    const header = document.getElementById('collectionPageHeader');
+    if (banner)  banner.style.display  = '';
+    if (colls)   colls.style.display   = '';
+    if (header)  header.style.display  = 'none';
+
+    const shopHeading = document.getElementById('shopHeading');
+    if (shopHeading) shopHeading.textContent = 'All Products';
+
+    this.state.activeCategory = 'All';
+    this.state.searchQuery    = '';
+    this.state.page           = 1;
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
+
+    this.renderCatFilters(this.state.categories);
+    this.syncNavbarActiveState();
+    this.loadProducts();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   productMedia(product, fallbackBg = '#f0eef8', size = 'card') {
@@ -672,20 +749,10 @@ const App = {
       };
     }
 
-    // Click: browse that category independently (no pill sync)
+    // Click: navigate to dedicated collection page via hash
     grid.querySelectorAll('.collection-card').forEach(card => {
       const handler = () => {
-        const name = card.dataset.coll;
-        // Update products & heading without touching the active pill
-        this.state.activeCategory = name;
-        this.state.searchQuery = '';
-        this.state.page = 1;
-        document.getElementById('searchInput').value = '';
-        const heading = document.getElementById('shopHeading');
-        if (heading) heading.textContent = name;
-        this.loadProducts();
-        const shopMain = document.getElementById('shopMain');
-        if (shopMain) shopMain.scrollIntoView({ behavior: 'smooth' });
+        window.location.hash = `#collection/${encodeURIComponent(card.dataset.coll)}`;
       };
       card.onclick = handler;
       card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') handler(); };
