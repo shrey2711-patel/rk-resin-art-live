@@ -19,7 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'rk-resin-art-secret-2024';
 const DB_PATH = path.join(__dirname, 'data', 'db.json');
-const UPLOAD_DIR = path.join(__dirname, 'uploads');
+const UPLOAD_DIR = path.join(__dirname, 'data', 'uploads');
 
 // Initialize Razorpay SDK using credentials
 const razorpay = new Razorpay({

@@ -12,3 +12,6 @@ yarn-error.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Live uploaded images
+data/uploads/
