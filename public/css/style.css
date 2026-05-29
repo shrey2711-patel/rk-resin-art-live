@@ -1106,7 +1106,7 @@ input, select, textarea { font-family: inherit; }
   .logo-text small { display: none; }
   .shop-main { padding: 0.5rem; }
   .modal-prod-thumb { height: 180px; }
-  .banner-section { aspect-ratio: 16 / 14; height: auto; max-height: 380px; }
+  .banner-section { aspect-ratio: 16 / 14; height: auto; max-height: 410px; }
   .banner-slide { height: 100%; }
   .bs-background-image { height: 100%; width: 100%; object-fit: cover; }
 }
