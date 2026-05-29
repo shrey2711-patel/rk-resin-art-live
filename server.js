@@ -788,11 +788,63 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 // ── DB helpers ──────────────────────────────────────────────
+async function initDatabase() {
+  if (process.env.FIREBASE_DB_URL) {
+    try {
+      console.log("🔄 Loading database from Firebase...");
+      const url = process.env.FIREBASE_DB_URL.endsWith('/')
+        ? `${process.env.FIREBASE_DB_URL}.json`
+        : `${process.env.FIREBASE_DB_URL}/.json`;
+
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          // Sync database locally so the app starts with latest cloud data
+          fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+          console.log("✅ Database successfully loaded and synced from Firebase!");
+          return;
+        }
+      }
+      console.warn("⚠️ Firebase returned empty or invalid data, using local db.json file");
+    } catch (e) {
+      console.error("❌ Failed to load database from Firebase, using local db.json file fallback:", e.message);
+    }
+  } else {
+    console.log("ℹ️ No FIREBASE_DB_URL set. Running in local storage mode.");
+  }
+}
+
 function readDB() {
   return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
 }
+
 function writeDB(data) {
+  // 1. Instant local write (ensures zero latency and consistency for immediate readDB calls)
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+
+  // 2. Async background push to Firebase
+  if (process.env.FIREBASE_DB_URL) {
+    const url = process.env.FIREBASE_DB_URL.endsWith('/')
+      ? `${process.env.FIREBASE_DB_URL}.json`
+      : `${process.env.FIREBASE_DB_URL}/.json`;
+
+    fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }).then(res => {
+      if (!res.ok) {
+        console.error(`❌ Firebase sync failed with status ${res.status}`);
+      } else {
+        console.log("☁️ Database background-synced to Firebase successfully!");
+      }
+    }).catch(err => {
+      console.error("❌ Firebase background sync error:", err);
+    });
+  }
 }
 function nextId(arr) {
   return arr.length ? Math.max(...arr.map(i => i.id)) + 1 : 1;
@@ -1426,7 +1478,7 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
 
 // PRODUCT IMAGE UPLOAD
 app.post('/api/admin/upload', requireAdmin, (req, res) => {
-  uploadProductImage.single('image')(req, res, (err) => {
+  uploadProductImage.single('image')(req, res, async (err) => {
     if (err) {
       const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
       const message = err.code === 'LIMIT_FILE_SIZE'
@@ -1436,6 +1488,54 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
     }
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
+    if (process.env.IMGBB_API_KEY) {
+      try {
+        const filePath = req.file.path;
+        const fileBuffer = fs.readFileSync(filePath);
+        const base64Image = fileBuffer.toString('base64');
+        
+        // Upload to ImgBB
+        const formData = new URLSearchParams();
+        formData.append('image', base64Image);
+        
+        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+        
+        if (!imgbbRes.ok) {
+          throw new Error(`ImgBB upload failed with status ${imgbbRes.status}`);
+        }
+        
+        const imgbbData = await imgbbRes.json();
+        
+        // Delete local temporary file since it is now stored in cloud
+        fs.unlinkSync(filePath);
+        
+        if (imgbbData && imgbbData.data && imgbbData.data.url) {
+          return res.json({
+            success: true,
+            url: imgbbData.data.url,
+            filename: req.file.filename
+          });
+        } else {
+          throw new Error('Invalid response from ImgBB');
+        }
+      } catch (uploadError) {
+        console.error("ImgBB upload failed, falling back to local file:", uploadError.message);
+        // Fallback to serving locally if upload fails
+        return res.json({
+          success: true,
+          url: `/uploads/${req.file.filename}`,
+          filename: req.file.filename
+        });
+      }
+    }
+
+    // Default local fallback when no API key is present
     res.json({
       success: true,
       url: `/uploads/${req.file.filename}`,
@@ -1639,17 +1739,24 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const server = app.listen(PORT, async () => {
-  console.log(`\n🎨 RK Creation server running at http://localhost:${PORT}`);
-  console.log(`   Admin password: rk2024\n`);
-  await initMailer();
-});
+async function startServer() {
+  // Sync database from Firebase Realtime Database before server starts
+  await initDatabase();
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`\n⚠️ Port ${PORT} is already in use. Please stop the process using that port or set PORT to a different value.`);
-    console.error('Example: set PORT=3001 && npm start');
-    process.exit(1);
-  }
-  throw err;
-});
+  const server = app.listen(PORT, async () => {
+    console.log(`\n🎨 RK Creation server running at http://localhost:${PORT}`);
+    console.log(`   Admin password: rk2024\n`);
+    await initMailer();
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n⚠️ Port ${PORT} is already in use. Please stop the process using that port or set PORT to a different value.`);
+      console.error('Example: set PORT=3001 && npm start');
+      process.exit(1);
+    }
+    throw err;
+  });
+}
+
+startServer();
