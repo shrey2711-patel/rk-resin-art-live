@@ -24,6 +24,7 @@ const App = {
     this.loadProducts();
     this.bindSearch();
     this.bindFooter();
+    this.bindMobileNav();
     Auth.init();
     // Coupon apply listener
     const applyBtn = document.getElementById('applyPromoBtn');
@@ -169,6 +170,8 @@ const App = {
   async loadNav() {
     try {
       const links = await API.getNav();
+      
+      // 1. Populate desktop rows
       [1, 2, 3].forEach(row => {
         const el = document.getElementById(`navRow${row}`);
         if (!el) return;
@@ -176,24 +179,88 @@ const App = {
           .filter(l => l.row === row)
           .map(l => `<button class="nav-link ${l.featured ? 'featured' : ''}" data-cat="${l.label}">${l.label}</button>`)
           .join('');
-        el.querySelectorAll('.nav-link').forEach(a => {
-          a.onclick = (e) => {
-            e.preventDefault();
-            const label = a.dataset.cat;
-            if (label === 'WhatsApp Community') {
-              window.open('https://wa.me/918141994995', '_blank');
-              return;
-            }
-            if (label === 'Contact Us') {
-              const footer = document.querySelector('.site-footer');
-              if (footer) footer.scrollIntoView({ behavior: 'smooth' });
-              return;
-            }
-            const resolved = this.resolveCategoryName(label);
-            this.filterByCategory(resolved);
-          };
-        });
       });
+
+      // 2. Populate mobile drawer
+      const mobileEl = document.getElementById('mobileNavItems');
+      if (mobileEl) {
+        let mobileHTML = '';
+        const row1Links = links.filter(l => l.row === 1);
+        const row2Links = links.filter(l => l.row === 2);
+        const row3Links = links.filter(l => l.row === 3);
+
+        mobileHTML += `
+          <div class="mobile-nav-section">
+            <h4 class="mn-section-title">✨ Featured Categories</h4>
+            <div class="mn-links-grid">
+              ${row1Links.map(l => `<button class="mn-link ${l.featured ? 'featured' : ''}" data-cat="${l.label}">${l.label}</button>`).join('')}
+            </div>
+          </div>
+          <div class="mobile-nav-section" style="margin-top: 20px;">
+            <h4 class="mn-section-title">🎨 Premium Supplies</h4>
+            <div class="mn-links-grid">
+              ${row2Links.map(l => `<button class="mn-link ${l.featured ? 'featured' : ''}" data-cat="${l.label}">${l.label}</button>`).join('')}
+            </div>
+          </div>
+          <div class="mobile-nav-section" style="margin-top: 20px;">
+            <h4 class="mn-section-title">💬 Connect & Support</h4>
+            <div class="mn-links-grid">
+              ${row3Links.map(l => `<button class="mn-link ${l.featured ? 'featured' : ''}" data-cat="${l.label}">${l.label}</button>`).join('')}
+            </div>
+          </div>
+          <div class="mobile-nav-section" style="margin-top: 25px; border-top: 1.5px dashed var(--border); padding-top: 15px;">
+            <button class="mn-admin-btn" id="mobileOpenAdminBtn">
+              ⚙️ Admin Control Panel
+            </button>
+          </div>
+        `;
+        mobileEl.innerHTML = mobileHTML;
+      }
+
+      // 3. Attach click handlers for all links (desktop + mobile)
+      const allNavLinks = document.querySelectorAll('.site-nav .nav-link, .mobile-nav-drawer .mn-link');
+      allNavLinks.forEach(a => {
+        a.onclick = (e) => {
+          e.preventDefault();
+          const label = a.dataset.cat;
+          
+          // Close mobile menu drawer automatically on link click
+          const drawer = document.getElementById('mobileNavDrawer');
+          const overlay = document.getElementById('drawerOverlay');
+          if (drawer) drawer.classList.remove('open');
+          const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
+          const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
+          if (!cartOpen && !wlOpen && overlay) overlay.classList.remove('open');
+
+          if (label === 'WhatsApp Community') {
+            window.open('https://wa.me/918141994995', '_blank');
+            return;
+          }
+          if (label === 'Contact Us') {
+            const footer = document.querySelector('.site-footer');
+            if (footer) footer.scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+          const resolved = this.resolveCategoryName(label);
+          this.filterByCategory(resolved);
+        };
+      });
+
+      // 4. Attach click event for mobile admin button
+      const mobAdminBtn = document.getElementById('mobileOpenAdminBtn');
+      if (mobAdminBtn) {
+        mobAdminBtn.onclick = () => {
+          const drawer = document.getElementById('mobileNavDrawer');
+          const overlay = document.getElementById('drawerOverlay');
+          if (drawer) drawer.classList.remove('open');
+          const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
+          const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
+          if (!cartOpen && !wlOpen && overlay) overlay.classList.remove('open');
+          
+          document.getElementById('adminOverlay').classList.add('open');
+        };
+      }
+
       this.syncNavbarActiveState();
     } catch {}
   },
@@ -217,7 +284,7 @@ const App = {
 
   syncNavbarActiveState() {
     const activeCat = this.state.activeCategory;
-    document.querySelectorAll('.site-nav .nav-link').forEach(a => {
+    document.querySelectorAll('.site-nav .nav-link, .mobile-nav-drawer .mn-link').forEach(a => {
       const label = a.dataset.cat;
       const linkCat = this.resolveCategoryName(label);
       a.classList.toggle('active', linkCat === activeCat);
@@ -697,6 +764,39 @@ const App = {
     });
     document.getElementById('footerCartBtn').onclick = () => Cart.openDrawer();
     document.getElementById('footerAccountBtn').onclick = () => Auth.open();
+  },
+
+  bindMobileNav() {
+    const openMobileNav = () => {
+      document.getElementById('mobileNavDrawer').classList.add('open');
+      document.getElementById('drawerOverlay').classList.add('open');
+    };
+
+    const closeMobileNav = () => {
+      document.getElementById('mobileNavDrawer').classList.remove('open');
+      // Only close overlay if both cart and wishlist are also closed
+      const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
+      const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
+      if (!cartOpen && !wlOpen) {
+        document.getElementById('drawerOverlay').classList.remove('open');
+      }
+    };
+
+    const toggleBtn = document.getElementById('mobileNavBtn');
+    if (toggleBtn) toggleBtn.onclick = openMobileNav;
+
+    const closeBtn = document.getElementById('closeMobileNav');
+    if (closeBtn) closeBtn.onclick = closeMobileNav;
+
+    // Shared backdrop overlay click logic
+    const overlay = document.getElementById('drawerOverlay');
+    if (overlay) {
+      const originalClick = overlay.onclick;
+      overlay.onclick = (e) => {
+        if (originalClick) originalClick(e);
+        closeMobileNav();
+      };
+    }
   }
 };
 
