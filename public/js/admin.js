@@ -281,6 +281,15 @@ const Admin = {
     if (btn) btn.textContent = '+ Add Product';
     if (cancel) cancel.style.display = 'none';
     this.editState = { section: null, id: null };
+    // Reset variants
+    const vlSel = document.getElementById('pfVariantLabel');
+    if (vlSel) vlSel.value = '';
+    const customInp = document.getElementById('pfVariantLabelCustom');
+    if (customInp) { customInp.value = ''; customInp.style.display = 'none'; }
+    const addBtn = document.getElementById('addVariantRowBtn');
+    if (addBtn) addBtn.style.display = 'none';
+    const rows = document.getElementById('pfVariantRows');
+    if (rows) rows.innerHTML = '';
   },
 
   setProductEdit(product) {
@@ -300,6 +309,30 @@ const Admin = {
     if (btn) btn.textContent = 'Update Product';
     if (cancel) cancel.style.display = '';
     this.editState = { section: 'product', id: product.id };
+    // Populate variants
+    const vlSel = document.getElementById('pfVariantLabel');
+    const customInp = document.getElementById('pfVariantLabelCustom');
+    const addBtn = document.getElementById('addVariantRowBtn');
+    const rowsEl = document.getElementById('pfVariantRows');
+    if (vlSel && rowsEl) {
+      rowsEl.innerHTML = '';
+      const knownLabels = ['Size','Weight','Grams','Litre','Volume','Pack','Colour'];
+      const vl = product.variantLabel || '';
+      if (!vl) {
+        vlSel.value = '';
+        if (customInp) { customInp.value = ''; customInp.style.display = 'none'; }
+        if (addBtn) addBtn.style.display = 'none';
+      } else if (knownLabels.includes(vl)) {
+        vlSel.value = vl;
+        if (customInp) customInp.style.display = 'none';
+        if (addBtn) addBtn.style.display = '';
+      } else {
+        vlSel.value = 'Custom';
+        if (customInp) { customInp.value = vl; customInp.style.display = ''; }
+        if (addBtn) addBtn.style.display = '';
+      }
+      (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price));
+    }
   },
 
   async saveBannerForm() {
@@ -378,6 +411,19 @@ const Admin = {
       return;
     }
 
+    // Read variants
+    const vlSel = document.getElementById('pfVariantLabel');
+    const customInp = document.getElementById('pfVariantLabelCustom');
+    let variantLabel = vlSel ? vlSel.value : '';
+    if (variantLabel === 'Custom') variantLabel = (customInp ? customInp.value.trim() : '') || '';
+    const variantRows = document.querySelectorAll('.admin-variant-row');
+    const variants = [];
+    variantRows.forEach(row => {
+      const lbl = row.querySelector('.vr-label')?.value.trim();
+      const prc = parseFloat(row.querySelector('.vr-price')?.value);
+      if (lbl) variants.push({ label: lbl, price: isNaN(prc) ? price : prc });
+    });
+
     const payload = {
       name,
       price,
@@ -387,7 +433,9 @@ const Admin = {
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',
       badge: document.getElementById('pfBadge').value,
       description: document.getElementById('pfDesc').value.trim(),
-      imageUrl
+      imageUrl,
+      variantLabel: variantLabel || null,
+      variants: variants.length ? variants : null,
     };
     if (this.editState.section === 'product' && this.editState.id) {
       await API.updateProduct(this.editState.id, payload);
@@ -416,6 +464,48 @@ const Admin = {
 
   cancelProductEdit() {
     this.resetProductForm();
+  },
+
+  initVariantBuilder() {
+    const vlSel = document.getElementById('pfVariantLabel');
+    const customInp = document.getElementById('pfVariantLabelCustom');
+    const addBtn = document.getElementById('addVariantRowBtn');
+    if (!vlSel) return;
+
+    vlSel.onchange = () => {
+      const val = vlSel.value;
+      if (!val) {
+        if (customInp) { customInp.style.display = 'none'; customInp.value = ''; }
+        if (addBtn) addBtn.style.display = 'none';
+        const rowsEl = document.getElementById('pfVariantRows');
+        if (rowsEl) rowsEl.innerHTML = '';
+      } else if (val === 'Custom') {
+        if (customInp) customInp.style.display = '';
+        if (addBtn) addBtn.style.display = '';
+      } else {
+        if (customInp) { customInp.style.display = 'none'; customInp.value = ''; }
+        if (addBtn) addBtn.style.display = '';
+      }
+    };
+
+    if (addBtn) {
+      addBtn.onclick = () => this.addVariantRow('', '');
+    }
+  },
+
+  addVariantRow(label = '', price = '') {
+    const rowsEl = document.getElementById('pfVariantRows');
+    if (!rowsEl) return;
+    const row = document.createElement('div');
+    row.className = 'admin-variant-row';
+    row.innerHTML = `
+      <span class="admin-variant-row-label">Option:</span>
+      <input class="vr-label" placeholder="e.g. 100g / Size 6 / Small" value="${label}" maxlength="50">
+      <span class="admin-variant-row-label">Price ₹:</span>
+      <input class="vr-price" type="number" placeholder="same as base" value="${price}" min="0" style="max-width:100px">
+      <button type="button" class="admin-remove-variant-btn" title="Remove">✕</button>`;
+    row.querySelector('.admin-remove-variant-btn').onclick = () => row.remove();
+    rowsEl.appendChild(row);
   },
 
   open() {
@@ -447,7 +537,9 @@ const Admin = {
     this.renderOrders();
     if (this.renderReviews) this.renderReviews();
     if (this.renderCoupons) this.renderCoupons();
+    this.initVariantBuilder();
   },
+
 
   async loadAll() {
     try {

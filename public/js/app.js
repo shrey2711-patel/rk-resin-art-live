@@ -994,6 +994,23 @@ const App = {
       ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
       : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
 
+    // Build variants HTML
+    const hasVariants = prod.variants && prod.variants.length > 0;
+    const variantLabel = prod.variantLabel || 'Variant';
+    const variantsHTML = hasVariants ? `
+      <div class="modal-variants-block">
+        <div class="modal-variants-title">${variantLabel}</div>
+        <div class="modal-variants-chips">
+          ${prod.variants.map((v, i) => `
+            <button class="variant-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" data-label="${v.label}" data-price="${v.price}" type="button">
+              ${v.label}
+              ${v.price !== prod.price ? `<span class="chip-price">₹${v.price}</span>` : ''}
+            </button>`).join('')}
+        </div>
+      </div>` : '';
+
+    const initPrice = hasVariants ? prod.variants[0].price : prod.price;
+
     document.getElementById('modalBody').innerHTML = `
       <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}">
         ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
@@ -1001,7 +1018,8 @@ const App = {
       <div class="modal-prod-cat">${prod.category}</div>
       ${badgeHTML}
       <h2 class="modal-prod-name">${prod.name}</h2>
-      <div class="modal-prod-price">₹${prod.price} ${origHTML}</div>
+      <div class="modal-prod-price" id="modalPriceDisplay">₹${initPrice} ${origHTML}</div>
+      ${variantsHTML}
 
       <!-- Modal Tabs -->
       <div class="modal-tabs">
@@ -1031,14 +1049,47 @@ const App = {
         <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
       </div>`;
 
+    // Track currently selected variant
+    let selectedVariant = hasVariants ? prod.variants[0] : null;
+
+    // Variant chip selection
+    if (hasVariants) {
+      document.querySelectorAll('.variant-chip').forEach(chip => {
+        chip.onclick = () => {
+          document.querySelectorAll('.variant-chip').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+          const vi = parseInt(chip.dataset.vi);
+          selectedVariant = prod.variants[vi];
+          const priceEl = document.getElementById('modalPriceDisplay');
+          if (priceEl) priceEl.innerHTML = `₹${selectedVariant.price} ${origHTML}`;
+        };
+      });
+    }
+
+    const getCartItem = () => {
+      const base = { ...prod, thumbBg: cat.color || '#f0eef8' };
+      if (selectedVariant) {
+        base.price = selectedVariant.price;
+        base.selectedVariant = selectedVariant.label;
+        base.name = `${prod.name} (${variantLabel}: ${selectedVariant.label})`;
+      }
+      return base;
+    };
+
     document.getElementById('modalAddBtn').onclick = () => {
-      Cart.add({ ...prod, thumbBg: cat.color || '#f0eef8' });
+      if (hasVariants && !selectedVariant) {
+        showToast(`Please select a ${variantLabel} first`, 'error'); return;
+      }
+      Cart.add(getCartItem());
       document.getElementById('productModalOverlay').classList.remove('open');
     };
 
     document.getElementById('modalBuyNowBtn').onclick = () => {
+      if (hasVariants && !selectedVariant) {
+        showToast(`Please select a ${variantLabel} first`, 'error'); return;
+      }
       document.getElementById('productModalOverlay').classList.remove('open');
-      this.openBuyNowCheckout(prod, cat);
+      this.openBuyNowCheckout(getCartItem(), cat);
     };
 
     document.getElementById('modalWishlistBtn').onclick = () => {

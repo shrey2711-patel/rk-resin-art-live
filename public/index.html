@@ -546,6 +546,30 @@
                 <div class="upload-status" id="productUploadStatus"></div>
               </div>
               <div class="form-field"><label>Description</label><textarea class="admin-input" id="pfDesc" rows="2" placeholder="Product description..."></textarea></div>
+
+              <!-- VARIANTS SECTION -->
+              <div class="admin-variants-section" id="adminVariantsSection">
+                <div class="admin-variants-header">
+                  <label class="admin-variants-label">Product Variants <span style="font-weight:400;color:var(--muted);font-size:0.78rem">(optional — e.g. Size: 6, 8 inch / Grams: 100g, 250g)</span></label>
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px">
+                    <select class="admin-input" id="pfVariantLabel" style="max-width:160px">
+                      <option value="">No Variants</option>
+                      <option value="Size">Size</option>
+                      <option value="Weight">Weight</option>
+                      <option value="Grams">Grams</option>
+                      <option value="Litre">Litre</option>
+                      <option value="Volume">Volume</option>
+                      <option value="Pack">Pack</option>
+                      <option value="Colour">Colour</option>
+                      <option value="Custom">Custom…</option>
+                    </select>
+                    <input class="admin-input" id="pfVariantLabelCustom" placeholder="Type label…" style="max-width:130px;display:none">
+                  </div>
+                </div>
+                <div id="pfVariantRows" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
+                <button type="button" class="admin-add-variant-btn" id="addVariantRowBtn" style="display:none">+ Add Option</button>
+              </div>
+
               <div class="admin-form-actions">
                 <button class="admin-save-btn" id="addProdBtn">+ Add Product</button>
                 <button class="admin-cancel-btn" id="cancelProdBtn" style="display:none">Cancel Edit</button>

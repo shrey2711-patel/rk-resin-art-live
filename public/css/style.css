@@ -1875,3 +1875,70 @@ body {
 .zoom-close-btn:hover {
   color: var(--teal);
 }
+
+/* ─── Admin Variants Builder ─────────────────────────────── */
+.admin-variants-section {
+  background: var(--surface); border: 1.5px dashed var(--border);
+  border-radius: 10px; padding: 14px 16px; margin-top: 14px;
+}
+.admin-variants-label {
+  font-size: 0.83rem; font-weight: 700; color: var(--ink); display: block;
+}
+.admin-variant-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.admin-variant-row input {
+  flex: 1; min-width: 80px; padding: 7px 10px;
+  border: 1.5px solid var(--border); border-radius: 7px;
+  font-size: 0.83rem; background: var(--white); color: var(--ink);
+  outline: none; transition: border-color 0.2s;
+}
+.admin-variant-row input:focus { border-color: var(--p); }
+.admin-variant-row input::placeholder { color: var(--muted); }
+.admin-variant-row-label {
+  font-size: 0.75rem; font-weight: 600; color: var(--muted);
+  white-space: nowrap;
+}
+.admin-remove-variant-btn {
+  background: none; border: none; color: var(--red); font-size: 1.1rem;
+  cursor: pointer; padding: 2px 6px; border-radius: 4px;
+  transition: background 0.15s;
+}
+.admin-remove-variant-btn:hover { background: #fee2e2; }
+.admin-add-variant-btn {
+  margin-top: 10px; display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 8px; border: 1.5px dashed var(--p);
+  background: none; color: var(--p); font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.admin-add-variant-btn:hover { background: #f0fdfb; }
+
+/* ─── Product Modal Variant Selector ─────────────────────── */
+.modal-variants-block {
+  margin: 14px 0 6px;
+}
+.modal-variants-title {
+  font-size: 0.82rem; font-weight: 700; color: var(--muted);
+  margin-bottom: 8px; letter-spacing: 0.02em; text-transform: uppercase;
+}
+.modal-variants-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.variant-chip {
+  padding: 7px 16px; border-radius: 8px; border: 2px solid var(--border);
+  background: var(--white); font-size: 0.85rem; font-weight: 700;
+  color: var(--ink); cursor: pointer; transition: all 0.18s;
+  line-height: 1.2;
+}
+.variant-chip span.chip-price {
+  display: block; font-size: 0.72rem; font-weight: 600;
+  color: var(--muted); margin-top: 2px;
+}
+.variant-chip:hover {
+  border-color: var(--p); color: var(--p);
+}
+.variant-chip.selected {
+  border-color: var(--p); background: var(--p); color: #fff;
+}
+.variant-chip.selected span.chip-price { color: rgba(255,255,255,0.8); }
+
