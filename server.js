@@ -771,7 +771,10 @@ const uploadProductImage = multer({
   storage: uploadStorage,
   limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (!allowedImageTypes.has(file.mimetype)) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const isAllowedExt = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
+    const isAllowedMime = allowedImageTypes.has(file.mimetype);
+    if (!isAllowedMime && !isAllowedExt) {
       return cb(new Error('Only JPG, PNG and WEBP images are allowed'));
     }
     cb(null, true);

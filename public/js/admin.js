@@ -34,9 +34,36 @@ const Admin = {
     }
   },
 
+  isValidImageType(file) {
+    if (!file) return false;
+    const type = (file.type || '').toLowerCase();
+    if (['image/jpeg', 'image/png', 'image/webp'].includes(type)) return true;
+    
+    // Fallback check on extension in case MIME type is missing or generic (e.g. on mobile/external folders)
+    const ext = (file.name || '').split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return true;
+    
+    return false;
+  },
+
+  isHeicImage(file) {
+    if (!file) return false;
+    const type = (file.type || '').toLowerCase();
+    if (type.includes('heic') || type.includes('heif')) return true;
+    const ext = (file.name || '').split('.').pop().toLowerCase();
+    if (['heic', 'heif'].includes(ext)) return true;
+    return false;
+  },
+
   async uploadBannerImage(file) {
     if (!file) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    
+    if (this.isHeicImage(file)) {
+      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
+      return;
+    }
+
+    if (!this.isValidImageType(file)) {
       showToast('Please choose a JPG, PNG or WEBP image', 'error');
       return;
     }
@@ -72,33 +99,60 @@ const Admin = {
   },
 
   async resizeImageForUpload(file) {
-    if (!file.type.startsWith('image/') || file.type === 'image/webp') return file;
+    // If it's webp or not an image type, we return it as is
+    if (file.type === 'image/webp') return file;
+    const ext = (file.name || '').split('.').pop().toLowerCase();
+    if (ext === 'webp') return file;
 
-    const imageUrl = URL.createObjectURL(file);
-    const img = new Image();
-    img.src = imageUrl;
-    await img.decode();
+    try {
+      const imageUrl = URL.createObjectURL(file);
+      const img = new Image();
+      
+      // Use onload/onerror standard events instead of decode() to prevent mobile browser crashes/timing issues
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = () => reject(new Error('Failed to load image for resize'));
+        img.src = imageUrl;
+      });
 
-    const scale = Math.min(1, this.maxUploadWidth / img.width);
-    if (scale === 1) {
+      const scale = Math.min(1, this.maxUploadWidth / img.width);
+      if (scale === 1) {
+        URL.revokeObjectURL(imageUrl);
+        return file;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(imageUrl);
+        return file; // Fail-safe: fallback to original file
+      }
+      
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(imageUrl);
-      return file;
+
+      const mimeType = file.type || 'image/jpeg';
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.95));
+      if (!blob) return file; // Fail-safe: fallback to original file
+      return new File([blob], file.name, { type: mimeType });
+    } catch (err) {
+      console.warn("Image resize failed, falling back to original file:", err);
+      return file; // Safety: upload original file if resizing fails
     }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(img.width * scale);
-    canvas.height = Math.round(img.height * scale);
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    URL.revokeObjectURL(imageUrl);
-
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, file.type, 0.98));
-    if (!blob) return file;
-    return new File([blob], file.name, { type: file.type });
   },
 
   async uploadProductImage(file) {
     if (!file) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    
+    if (this.isHeicImage(file)) {
+      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
+      return;
+    }
+
+    if (!this.isValidImageType(file)) {
       showToast('Please choose a JPG, PNG or WEBP image', 'error');
       return;
     }
