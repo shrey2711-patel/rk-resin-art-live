@@ -593,6 +593,7 @@ const App = {
       const cats = await API.getCategories();
       this.state.categories = cats;
       this.renderCatFilters(cats);
+      this.renderCollections(cats); // render collections grid
     } catch {}
   },
 
@@ -607,6 +608,42 @@ const App = {
     ).join('');
     row.querySelectorAll('.cat-pill').forEach(btn => {
       btn.onclick = () => this.filterByCategory(btn.dataset.name);
+    });
+  },
+
+  async renderCollections(cats) {
+    const grid = document.getElementById('collectionsGrid');
+    if (!grid || !cats.length) return;
+
+    // Fetch one product per category to get a cover image, in parallel
+    const entries = await Promise.all(cats.map(async cat => {
+      try {
+        const res = await API.getProducts({ category: cat.name, limit: 1, page: 1 });
+        const img = res.products && res.products[0] && res.products[0].imageUrl ? res.products[0].imageUrl : null;
+        return { cat, img };
+      } catch {
+        return { cat, img: null };
+      }
+    }));
+
+    grid.innerHTML = entries.map(({ cat, img }) => {
+      const thumb = img
+        ? `<img src="${img}" alt="${cat.name}" loading="lazy">`
+        : `<div class="coll-emoji-fallback" style="background:${cat.color || '#f0eef8'}">${cat.emoji || '📦'}</div>`;
+      return `
+        <div class="collection-card" data-coll="${cat.name}" title="Browse ${cat.name}" role="button" tabindex="0" aria-label="Browse ${cat.name} collection">
+          <div class="collection-img-wrap">${thumb}</div>
+          <div class="collection-label">
+            <span>${cat.name}</span>
+            <span class="coll-arrow">→</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.collection-card').forEach(card => {
+      const handler = () => this.filterByCategory(card.dataset.coll);
+      card.onclick = handler;
+      card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') handler(); };
     });
   },
 
