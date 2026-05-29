@@ -208,8 +208,8 @@ input, select, textarea { font-family: inherit; }
 /* ─── Banner Slider ─────────────────────────────────────── */
 .banner-section {
   position: relative; overflow: hidden; width: 100%; background: #0b0d14;
-  aspect-ratio: 16 / 8;
-  max-height: 720px;
+  aspect-ratio: 16 / 9;
+  max-height: 800px;
 }
 .banner-track { display: flex; height: 100%; transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94); }
 .banner-slide {
@@ -1052,7 +1052,7 @@ input, select, textarea { font-family: inherit; }
 
   .site-nav { display: none; }
 
-  .banner-section { aspect-ratio: 16 / 14; height: auto; max-height: 560px; }
+  .banner-section { aspect-ratio: 16 / 15; height: auto; max-height: 620px; }
   .banner-slide { height: 100%; }
   .bs-background-image { height: 100%; width: 100%; object-fit: cover; }
   .banner-arrow { width: 28px; height: 28px; font-size: 1rem; }
@@ -1106,7 +1106,7 @@ input, select, textarea { font-family: inherit; }
   .logo-text small { display: none; }
   .shop-main { padding: 0.5rem; }
   .modal-prod-thumb { height: 180px; }
-  .banner-section { aspect-ratio: 16 / 16; height: auto; max-height: 500px; }
+  .banner-section { aspect-ratio: 1 / 1; height: auto; max-height: 550px; }
   .banner-slide { height: 100%; }
   .bs-background-image { height: 100%; width: 100%; object-fit: cover; }
 }
