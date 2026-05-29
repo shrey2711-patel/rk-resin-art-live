@@ -136,7 +136,7 @@ const App = {
     const cur = this.state.bannerCur;
 
     track.innerHTML = banners.map(b => `
-      <div class="banner-slide">
+      <div class="banner-slide" style="cursor: zoom-in;">
         ${b.imageUrl ? `<img class="bs-background-image" src="${b.imageUrl}" alt="Banner">` : ''}
       </div>`).join('');
 
@@ -150,8 +150,18 @@ const App = {
       d.onclick = () => this.goBanner(Number(d.dataset.bi), banners);
     });
 
+    // Setup slide clicks for opening zoom modal
+    track.querySelectorAll('.banner-slide').forEach((slide, idx) => {
+      slide.onclick = () => {
+        const b = banners[idx];
+        if (b && b.imageUrl) {
+          this.openBannerZoom(b.imageUrl);
+        }
+      };
+    });
+
     clearTimeout(this.state.bannerTimer);
-    this.state.bannerTimer = setTimeout(() => this.goBanner((cur + 1) % banners.length, banners), 4500);
+    this.state.bannerTimer = setTimeout(() => this.goBanner((cur + 1) % banners.length, banners), 5000); // 5s Autoplay
 
     document.getElementById('bPrev').onclick = () => {
       this.goBanner((cur - 1 + banners.length) % banners.length, banners);
@@ -164,6 +174,107 @@ const App = {
   goBanner(n, banners) {
     this.state.bannerCur = n;
     this.renderBanners(banners);
+  },
+
+  openBannerZoom(url) {
+    const modal = document.getElementById('bannerZoomModal');
+    const img = document.getElementById('zoomModalImg');
+    if (!modal || !img) return;
+
+    img.src = url;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Lock background scroll
+
+    // Reset zoom and pan state
+    let scale = 1;
+    let lastScale = 1;
+    let startX = 0, startY = 0;
+    let translateX = 0, translateY = 0;
+    let lastTranslateX = 0, lastTranslateY = 0;
+    let isPanning = false;
+    let startDistance = 0;
+    let lastTap = 0;
+
+    img.style.transform = 'translate(0px, 0px) scale(1)';
+
+    const updateTransform = () => {
+      img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    };
+
+    // Remove existing listeners by cloning the image element to prevent leaks
+    const newImg = img.cloneNode(true);
+    img.parentNode.replaceChild(newImg, img);
+
+    // Touch events for mobile pinch-to-zoom and pan
+    newImg.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isPanning = true;
+        startX = e.touches[0].clientX - lastTranslateX;
+        startY = e.touches[0].clientY - lastTranslateY;
+      } else if (e.touches.length === 2) {
+        isPanning = false;
+        startDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    });
+
+    newImg.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1 && isPanning && scale > 1) {
+        e.preventDefault();
+        translateX = e.touches[0].clientX - startX;
+        translateY = e.touches[0].clientY - startY;
+        updateTransform();
+      } else if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        scale = Math.max(1, Math.min(4, lastScale * (dist / startDistance)));
+        updateTransform();
+      }
+    });
+
+    newImg.addEventListener('touchend', (e) => {
+      isPanning = false;
+      lastScale = scale;
+      lastTranslateX = translateX;
+      lastTranslateY = translateY;
+      
+      if (e.touches.length < 2) {
+        startDistance = 0;
+      }
+
+      // Double tap to zoom or reset
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        scale = scale > 1 ? 1 : 2.5;
+        translateX = 0;
+        translateY = 0;
+        lastScale = scale;
+        lastTranslateX = 0;
+        lastTranslateY = 0;
+        updateTransform();
+      }
+      lastTap = now;
+    });
+
+    // Close logic
+    const closeBtn = document.getElementById('closeZoomModal');
+    const closeModal = () => {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+      newImg.src = '';
+    };
+    
+    closeBtn.onclick = closeModal;
+    modal.onclick = (e) => {
+      if (e.target === modal || e.target === modal.querySelector('.zoom-modal-content')) {
+        closeModal();
+      }
+    };
   },
 
   // ── Navigation ────────────────────────────────────────────
