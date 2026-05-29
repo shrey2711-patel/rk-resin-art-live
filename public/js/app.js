@@ -305,6 +305,90 @@ const App = {
       lastTap = now;
     });
 
+    // Mouse events for laptop/desktop drag-to-pan when zoomed in
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseStartY = 0;
+
+    newImg.addEventListener('mousedown', (e) => {
+      if (scale > 1) {
+        e.preventDefault();
+        isMouseDown = true;
+        newImg.style.cursor = 'grabbing';
+        mouseStartX = e.clientX - translateX;
+        mouseStartY = e.clientY - translateY;
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isMouseDown && scale > 1) {
+        translateX = e.clientX - mouseStartX;
+        translateY = e.clientY - mouseStartY;
+        updateTransform();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isMouseDown) {
+        isMouseDown = false;
+        newImg.style.cursor = 'zoom-in';
+        lastTranslateX = translateX;
+        lastTranslateY = translateY;
+      }
+    });
+
+    // Wheel / Trackpad pinch-to-zoom for laptops and desktops
+    newImg.addEventListener('wheel', (e) => {
+      e.preventDefault(); // Stop standard page scroll
+      
+      const zoomFactor = 0.08;
+      const delta = -e.deltaY;
+      
+      newImg.style.transition = 'none'; // Smooth instant update
+      
+      if (delta > 0) {
+        scale = Math.min(4, scale + zoomFactor);
+      } else {
+        scale = Math.max(1, scale - zoomFactor);
+      }
+      
+      if (scale <= 1) {
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        lastTranslateX = 0;
+        lastTranslateY = 0;
+      }
+      
+      updateTransform();
+      lastScale = scale;
+      lastTranslateX = translateX;
+      lastTranslateY = translateY;
+    }, { passive: false });
+
+    // Single click handler for laptop/desktop click-to-zoom toggle
+    newImg.addEventListener('click', (e) => {
+      // If we just finished a mouse drag/pan, do not toggle zoom!
+      if (Math.abs(translateX - lastTranslateX) > 3 || Math.abs(translateY - lastTranslateY) > 3) {
+        return;
+      }
+      
+      newImg.style.transition = 'transform 0.25s ease-out';
+      if (scale > 1) {
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+      } else {
+        scale = 2.5;
+        translateX = 0;
+        translateY = 0;
+      }
+      lastScale = scale;
+      lastTranslateX = translateX;
+      lastTranslateY = translateY;
+      updateTransform();
+    });
+
     // Close logic
     const closeBtn = document.getElementById('closeZoomModal');
     const closeModal = () => {
