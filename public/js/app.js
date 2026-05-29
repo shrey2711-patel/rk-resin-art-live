@@ -150,9 +150,37 @@ const App = {
       d.onclick = () => this.goBanner(Number(d.dataset.bi), banners);
     });
 
-    // Setup slide clicks for opening zoom modal
+    // Setup touch-tap detection to separate slide drags from clicks on mobile
     track.querySelectorAll('.banner-slide').forEach((slide, idx) => {
-      slide.onclick = () => {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+
+      slide.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      }, { passive: true });
+
+      slide.addEventListener('touchend', (e) => {
+        const diffX = Math.abs(e.changedTouches[0].clientX - touchStartX);
+        const diffY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        const duration = Date.now() - touchStartTime;
+
+        // If moved less than 8px and tapped for less than 300ms, it is a genuine tap!
+        if (diffX < 8 && diffY < 8 && duration < 300) {
+          e.preventDefault();
+          const b = banners[idx];
+          if (b && b.imageUrl) {
+            this.openBannerZoom(b.imageUrl);
+          }
+        }
+      });
+
+      // Keep click handler for desktop mice clicks
+      slide.onclick = (e) => {
+        // Skip mouse click event if triggered by touch to avoid double triggers
+        if (e.pointerType === 'touch' || (e.clientX === 0 && e.clientY === 0)) return;
         const b = banners[idx];
         if (b && b.imageUrl) {
           this.openBannerZoom(b.imageUrl);
@@ -198,7 +226,7 @@ const App = {
     img.style.transform = 'translate(0px, 0px) scale(1)';
 
     const updateTransform = () => {
-      img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      newImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     };
 
     // Remove existing listeners by cloning the image element to prevent leaks
@@ -207,6 +235,7 @@ const App = {
 
     // Touch events for mobile pinch-to-zoom and pan
     newImg.addEventListener('touchstart', (e) => {
+      newImg.style.transition = 'none'; // Instant responsiveness during touch movements
       if (e.touches.length === 1) {
         isPanning = true;
         startX = e.touches[0].clientX - lastTranslateX;
@@ -227,13 +256,15 @@ const App = {
         translateY = e.touches[0].clientY - startY;
         updateTransform();
       } else if (e.touches.length === 2) {
-        e.preventDefault();
+        e.preventDefault(); // Block browser native viewport zooming
         const dist = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        scale = Math.max(1, Math.min(4, lastScale * (dist / startDistance)));
-        updateTransform();
+        if (startDistance > 0) {
+          scale = Math.max(1, Math.min(4, lastScale * (dist / startDistance)));
+          updateTransform();
+        }
       }
     });
 
@@ -247,15 +278,34 @@ const App = {
         startDistance = 0;
       }
 
-      // Double tap to zoom or reset
-      const now = Date.now();
-      if (now - lastTap < 300) {
-        scale = scale > 1 ? 1 : 2.5;
+      // If zoomed out, slide everything smoothly back to center coordinates
+      if (scale <= 1) {
+        newImg.style.transition = 'transform 0.25s ease-out';
+        scale = 1;
         translateX = 0;
         translateY = 0;
-        lastScale = scale;
+        lastScale = 1;
         lastTranslateX = 0;
         lastTranslateY = 0;
+        updateTransform();
+      }
+
+      // Double tap detected: reset or zoom directly to 2.5x
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        newImg.style.transition = 'transform 0.25s ease-out';
+        if (scale > 1) {
+          scale = 1;
+          translateX = 0;
+          translateY = 0;
+        } else {
+          scale = 2.5;
+          translateX = 0;
+          translateY = 0;
+        }
+        lastScale = scale;
+        lastTranslateX = translateX;
+        lastTranslateY = translateY;
         updateTransform();
       }
       lastTap = now;
