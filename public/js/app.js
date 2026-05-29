@@ -277,10 +277,12 @@ const App = {
           const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
           const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
           
-          // Zoom focus relative to the pinch centroid
+          // Zoom focus relative to the pinch centroid (center-relative calculations)
+          const Cx = window.innerWidth / 2;
+          const Cy = window.innerHeight / 2;
           const factor = scale / startScale;
-          translateX = midX - factor * (startMidX - startTx);
-          translateY = midY - factor * (startMidY - startTy);
+          translateX = (midX - Cx) - factor * (startMidX - Cx - startTx);
+          translateY = (midY - Cy) - factor * (startMidY - Cy - startTy);
           
           updateTransform();
         }
@@ -328,8 +330,10 @@ const App = {
           if (touch) {
             const tapX = touch.clientX;
             const tapY = touch.clientY;
-            translateX = tapX * (1 - scale);
-            translateY = tapY * (1 - scale);
+            const Cx = window.innerWidth / 2;
+            const Cy = window.innerHeight / 2;
+            translateX = (tapX - Cx) * (1 - scale);
+            translateY = (tapY - Cy) * (1 - scale);
           } else {
             translateX = 0;
             translateY = 0;
@@ -401,9 +405,11 @@ const App = {
         // Zoom relative to the exact cursor position on trackpads/mice
         const cursorX = e.clientX;
         const cursorY = e.clientY;
+        const Cx = window.innerWidth / 2;
+        const Cy = window.innerHeight / 2;
         const factor = scale / prevScale;
-        translateX = cursorX - factor * (cursorX - translateX);
-        translateY = cursorY - factor * (cursorY - translateY);
+        translateX = (cursorX - Cx) - factor * (cursorX - Cx - translateX);
+        translateY = (cursorY - Cy) - factor * (cursorY - Cy - translateY);
       }
       
       updateTransform();
@@ -429,8 +435,10 @@ const App = {
         // Center the zoom on click focus coordinates
         const clickX = e.clientX;
         const clickY = e.clientY;
-        translateX = clickX * (1 - scale);
-        translateY = clickY * (1 - scale);
+        const Cx = window.innerWidth / 2;
+        const Cy = window.innerHeight / 2;
+        translateX = (clickX - Cx) * (1 - scale);
+        translateY = (clickY - Cy) * (1 - scale);
       }
       lastScale = scale;
       lastTranslateX = translateX;
