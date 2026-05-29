@@ -9,6 +9,21 @@ const Admin = {
     if (!el) return;
     el.textContent = message;
     el.className = `upload-status ${type}`;
+
+    const saveBtn = document.getElementById('addProdBtn');
+    if (saveBtn) {
+      if (type === 'loading') {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.6';
+        saveBtn.style.cursor = 'not-allowed';
+        saveBtn.textContent = 'Uploading...';
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '';
+        saveBtn.style.cursor = '';
+        saveBtn.textContent = this.editState.section === 'product' ? 'Update Product' : '+ Add Product';
+      }
+    }
   },
 
   setBannerUploadStatus(message, type = '') {
@@ -16,6 +31,21 @@ const Admin = {
     if (!el) return;
     el.textContent = message;
     el.className = `upload-status ${type}`;
+
+    const saveBtn = document.getElementById('addBannerBtn');
+    if (saveBtn) {
+      if (type === 'loading') {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.6';
+        saveBtn.style.cursor = 'not-allowed';
+        saveBtn.textContent = 'Uploading...';
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '';
+        saveBtn.style.cursor = '';
+        saveBtn.textContent = this.editState.section === 'banner' ? 'Update Banner' : '+ Add Banner';
+      }
+    }
   },
 
   updateBannerImagePreview(url) {
@@ -275,6 +305,10 @@ const Admin = {
   async saveBannerForm() {
     const imageUrl = document.getElementById('bfImageUrl').value.trim();
     if (!imageUrl) { showToast('Please upload a banner image first', 'error'); return; }
+    if (imageUrl.startsWith('blob:')) {
+      showToast('Please wait for the banner image to finish uploading!', 'error');
+      return;
+    }
     const payload = {
       imageUrl
     };
@@ -337,6 +371,13 @@ const Admin = {
     const name = document.getElementById('pfName').value.trim();
     const price = parseFloat(document.getElementById('pfPrice').value);
     if (!name || isNaN(price)) { showToast('Product name and price are required', 'error'); return; }
+    
+    const imageUrl = document.getElementById('pfImageUrl').value.trim();
+    if (imageUrl.startsWith('blob:')) {
+      showToast('Please wait for the product image to finish uploading!', 'error');
+      return;
+    }
+
     const payload = {
       name,
       price,
@@ -346,7 +387,7 @@ const Admin = {
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',
       badge: document.getElementById('pfBadge').value,
       description: document.getElementById('pfDesc').value.trim(),
-      imageUrl: document.getElementById('pfImageUrl').value.trim()
+      imageUrl
     };
     if (this.editState.section === 'product' && this.editState.id) {
       await API.updateProduct(this.editState.id, payload);
