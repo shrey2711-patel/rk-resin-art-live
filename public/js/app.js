@@ -615,6 +615,8 @@ const App = {
     const grid = document.getElementById('collectionsGrid');
     if (!grid || !cats.length) return;
 
+    const MAX_VISIBLE = 8;
+
     // Fetch one product per category to get a cover image, in parallel
     const entries = await Promise.all(cats.map(async cat => {
       try {
@@ -626,22 +628,65 @@ const App = {
       }
     }));
 
-    grid.innerHTML = entries.map(({ cat, img }) => {
+    const buildCard = ({ cat, img }, hidden) => {
       const thumb = img
         ? `<img src="${img}" alt="${cat.name}" loading="lazy">`
         : `<div class="coll-emoji-fallback" style="background:${cat.color || '#f0eef8'}">${cat.emoji || '📦'}</div>`;
       return `
-        <div class="collection-card" data-coll="${cat.name}" title="Browse ${cat.name}" role="button" tabindex="0" aria-label="Browse ${cat.name} collection">
+        <div class="collection-card${hidden ? ' coll-hidden' : ''}" data-coll="${cat.name}" title="Browse ${cat.name}" role="button" tabindex="0" aria-label="Browse ${cat.name} collection">
           <div class="collection-img-wrap">${thumb}</div>
           <div class="collection-label">
             <span>${cat.name}</span>
             <span class="coll-arrow">→</span>
           </div>
         </div>`;
-    }).join('');
+    };
 
+    const hasMore = entries.length > MAX_VISIBLE;
+    grid.innerHTML = entries.map((e, i) => buildCard(e, i >= MAX_VISIBLE)).join('');
+
+    // "View all" button below the grid
+    const section = document.getElementById('collectionsSection');
+    const existing = section.querySelector('.coll-view-all-wrap');
+    if (existing) existing.remove();
+
+    if (hasMore) {
+      const wrap = document.createElement('div');
+      wrap.className = 'coll-view-all-wrap';
+      let expanded = false;
+      wrap.innerHTML = `<button class="coll-view-all-btn" id="collViewAllBtn">View all</button>`;
+      section.querySelector('.collections-inner').appendChild(wrap);
+
+      wrap.querySelector('#collViewAllBtn').onclick = () => {
+        expanded = !expanded;
+        grid.querySelectorAll('.coll-hidden').forEach(c => {
+          c.style.display = expanded ? '' : 'none';
+        });
+        // Remove display:none initially set by CSS
+        if (expanded) {
+          grid.querySelectorAll('.coll-hidden').forEach(c => c.classList.remove('coll-hidden'));
+          wrap.querySelector('#collViewAllBtn').textContent = 'Show less';
+        } else {
+          wrap.querySelector('#collViewAllBtn').textContent = 'View all';
+        }
+      };
+    }
+
+    // Click: browse that category independently (no pill sync)
     grid.querySelectorAll('.collection-card').forEach(card => {
-      const handler = () => this.filterByCategory(card.dataset.coll);
+      const handler = () => {
+        const name = card.dataset.coll;
+        // Update products & heading without touching the active pill
+        this.state.activeCategory = name;
+        this.state.searchQuery = '';
+        this.state.page = 1;
+        document.getElementById('searchInput').value = '';
+        const heading = document.getElementById('shopHeading');
+        if (heading) heading.textContent = name;
+        this.loadProducts();
+        const shopMain = document.getElementById('shopMain');
+        if (shopMain) shopMain.scrollIntoView({ behavior: 'smooth' });
+      };
       card.onclick = handler;
       card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') handler(); };
     });

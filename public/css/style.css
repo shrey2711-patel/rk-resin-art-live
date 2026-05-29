@@ -298,6 +298,27 @@ input, select, textarea { font-family: inherit; }
 }
 .collection-card:hover .coll-arrow { transform: translateX(4px); color: var(--p); }
 
+/* Hidden cards beyond max-visible */
+.coll-hidden { display: none; }
+
+/* View all button */
+.coll-view-all-wrap {
+  display: flex; justify-content: center;
+  margin-top: 1.6rem;
+}
+.coll-view-all-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 11px 36px; border-radius: 50px;
+  font-size: 0.9rem; font-weight: 700;
+  border: 2px solid var(--ink); background: transparent;
+  color: var(--ink); cursor: pointer;
+  transition: all 0.22s ease;
+  letter-spacing: 0.01em;
+}
+.coll-view-all-btn:hover {
+  background: var(--ink); color: var(--white);
+}
+
 /* Responsive */
 @media (max-width: 1100px) {
   .collections-grid { grid-template-columns: repeat(4, 1fr); }
