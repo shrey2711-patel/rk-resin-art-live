@@ -215,7 +215,7 @@ input, select, textarea { font-family: inherit; }
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; background: #0b0d14;
 }
 .bs-background-image {
-  position: relative; width: 100%; height: 100%; object-fit: contain; display: block; z-index: 1;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: block; z-index: 1;
 }
 .banner-arrow {
   position: absolute; top: 50%; transform: translateY(-50%);
@@ -1701,6 +1701,7 @@ body {
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
+  touch-action: none;
 }
 
 .zoom-modal-content {

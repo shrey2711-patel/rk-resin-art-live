@@ -217,6 +217,11 @@ const App = {
     let startDistance = 0;
     let lastTap = 0;
 
+    // Zoom focus tracking helper variables
+    let startScale = 1;
+    let startMidX = 0, startMidY = 0;
+    let startTx = 0, startTy = 0;
+
     img.style.transform = 'translate(0px, 0px) scale(1)';
 
     const updateTransform = () => {
@@ -226,6 +231,11 @@ const App = {
     // Remove existing listeners by cloning the image element to prevent leaks
     const newImg = img.cloneNode(true);
     img.parentNode.replaceChild(newImg, img);
+
+    // Prevent native page scrolling / pull-to-refresh when dragging or interacting inside the modal overlay
+    modal.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
 
     // Touch events for mobile pinch-to-zoom and pan
     newImg.addEventListener('touchstart', (e) => {
@@ -240,8 +250,13 @@ const App = {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
+        startMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        startMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        startTx = translateX;
+        startTy = translateY;
+        startScale = scale;
       }
-    });
+    }, { passive: false });
 
     newImg.addEventListener('touchmove', (e) => {
       if (e.touches.length === 1 && isPanning && scale > 1) {
@@ -256,11 +271,21 @@ const App = {
           e.touches[0].clientY - e.touches[1].clientY
         );
         if (startDistance > 0) {
-          scale = Math.max(1, Math.min(4, lastScale * (dist / startDistance)));
+          scale = Math.max(1, Math.min(4, startScale * (dist / startDistance)));
+          
+          // Calculate pinch midpoint
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          
+          // Zoom focus relative to the pinch centroid
+          const factor = scale / startScale;
+          translateX = midX - factor * (startMidX - startTx);
+          translateY = midY - factor * (startMidY - startTy);
+          
           updateTransform();
         }
       }
-    });
+    }, { passive: false });
 
     newImg.addEventListener('touchend', (e) => {
       isPanning = false;
@@ -268,7 +293,12 @@ const App = {
       lastTranslateX = translateX;
       lastTranslateY = translateY;
       
-      if (e.touches.length < 2) {
+      if (e.touches.length === 1) {
+        // Smoothly transition remaining finger to single-finger panning
+        isPanning = true;
+        startX = e.touches[0].clientX - lastTranslateX;
+        startY = e.touches[0].clientY - lastTranslateY;
+      } else if (e.touches.length < 2) {
         startDistance = 0;
       }
 
@@ -284,7 +314,7 @@ const App = {
         updateTransform();
       }
 
-      // Double tap detected: reset or zoom directly to 2.5x
+      // Double tap detected: reset or zoom directly to 2.5x at the tapped position
       const now = Date.now();
       if (now - lastTap < 300) {
         newImg.style.transition = 'transform 0.25s ease-out';
@@ -294,8 +324,16 @@ const App = {
           translateY = 0;
         } else {
           scale = 2.5;
-          translateX = 0;
-          translateY = 0;
+          const touch = e.changedTouches[0];
+          if (touch) {
+            const tapX = touch.clientX;
+            const tapY = touch.clientY;
+            translateX = tapX * (1 - scale);
+            translateY = tapY * (1 - scale);
+          } else {
+            translateX = 0;
+            translateY = 0;
+          }
         }
         lastScale = scale;
         lastTranslateX = translateX;
@@ -303,7 +341,7 @@ const App = {
         updateTransform();
       }
       lastTap = now;
-    });
+    }, { passive: false });
 
     // Mouse events for laptop/desktop drag-to-pan when zoomed in
     let isMouseDown = false;
@@ -346,6 +384,7 @@ const App = {
       
       newImg.style.transition = 'none'; // Smooth instant update
       
+      const prevScale = scale;
       if (delta > 0) {
         scale = Math.min(4, scale + zoomFactor);
       } else {
@@ -358,6 +397,13 @@ const App = {
         translateY = 0;
         lastTranslateX = 0;
         lastTranslateY = 0;
+      } else {
+        // Zoom relative to the exact cursor position on trackpads/mice
+        const cursorX = e.clientX;
+        const cursorY = e.clientY;
+        const factor = scale / prevScale;
+        translateX = cursorX - factor * (cursorX - translateX);
+        translateY = cursorY - factor * (cursorY - translateY);
       }
       
       updateTransform();
@@ -380,8 +426,11 @@ const App = {
         translateY = 0;
       } else {
         scale = 2.5;
-        translateX = 0;
-        translateY = 0;
+        // Center the zoom on click focus coordinates
+        const clickX = e.clientX;
+        const clickY = e.clientY;
+        translateX = clickX * (1 - scale);
+        translateY = clickY * (1 - scale);
       }
       lastScale = scale;
       lastTranslateX = translateX;
