@@ -150,37 +150,31 @@ const App = {
       d.onclick = () => this.goBanner(Number(d.dataset.bi), banners);
     });
 
-    // Setup touch-tap detection to separate slide drags from clicks on mobile
+    // Setup robust click-to-zoom that works perfectly on desktops, touchscreen laptops, and standard phones
     track.querySelectorAll('.banner-slide').forEach((slide, idx) => {
       let touchStartX = 0;
       let touchStartY = 0;
-      let touchStartTime = 0;
+      let isDrag = false;
 
       slide.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
-        touchStartTime = Date.now();
+        isDrag = false;
       }, { passive: true });
 
-      slide.addEventListener('touchend', (e) => {
-        const diffX = Math.abs(e.changedTouches[0].clientX - touchStartX);
-        const diffY = Math.abs(e.changedTouches[0].clientY - touchStartY);
-        const duration = Date.now() - touchStartTime;
-
-        // If moved less than 8px and tapped for less than 300ms, it is a genuine tap!
-        if (diffX < 8 && diffY < 8 && duration < 300) {
-          e.preventDefault();
-          const b = banners[idx];
-          if (b && b.imageUrl) {
-            this.openBannerZoom(b.imageUrl);
-          }
+      slide.addEventListener('touchmove', (e) => {
+        const moveX = Math.abs(e.touches[0].clientX - touchStartX);
+        const moveY = Math.abs(e.touches[0].clientY - touchStartY);
+        if (moveX > 10 || moveY > 10) {
+          isDrag = true;
         }
-      });
+      }, { passive: true });
 
-      // Keep click handler for desktop mice clicks
-      slide.onclick = (e) => {
-        // Skip mouse click event if triggered by touch to avoid double triggers
-        if (e.pointerType === 'touch' || (e.clientX === 0 && e.clientY === 0)) return;
+      slide.onclick = () => {
+        if (isDrag) {
+          isDrag = false;
+          return; // Dragging to slide, block zoom trigger
+        }
         const b = banners[idx];
         if (b && b.imageUrl) {
           this.openBannerZoom(b.imageUrl);
