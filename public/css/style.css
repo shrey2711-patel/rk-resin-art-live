@@ -581,12 +581,12 @@ input, select, textarea { font-family: inherit; }
 }
 .modal-body { padding: 2rem; }
 .modal-prod-thumb {
-  width: 100%; height: 280px; border-radius: 10px;
+  width: 100%; height: auto; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   font-size: 6rem; margin-bottom: 1.5rem; overflow: hidden;
 }
 .modal-prod-thumb .prod-image-wrap,
-.modal-prod-thumb .prod-emoji-fallback { border-radius: 10px; }
+.modal-prod-thumb .prod-emoji-fallback { border-radius: 10px; width: 100%; height: 100%; }
 .modal-prod-thumb .prod-image { object-fit: cover; width: 100%; height: 100%; }
 .modal-prod-thumb .prod-emoji-fallback { font-size: 6rem; }
 .modal-prod-cat { font-size: 0.72rem; font-weight: 700; color: var(--p); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }

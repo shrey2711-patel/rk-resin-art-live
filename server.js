@@ -1178,8 +1178,17 @@ app.post('/api/payment/create-order', (req, res) => {
     if (!prod) {
       return res.status(404).json({ error: `Product "${item.name}" not found` });
     }
-    if (prod.stock !== undefined && prod.stock < item.qty) {
-      return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
+    if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
+      const variant = prod.variants.find(v => v.label === item.selectedVariant);
+      if (variant) {
+        if (variant.stock !== undefined && variant.stock < item.qty) {
+          return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+        }
+      }
+    } else {
+      if (prod.stock !== undefined && prod.stock < item.qty) {
+        return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
+      }
     }
     subtotal += prod.price * item.qty;
   }
@@ -1256,11 +1265,24 @@ app.post('/api/payment/verify', (req, res) => {
       return res.status(400).json({ error: `Product "${item.name}" not found` });
     }
     const prod = db.products[prodIdx];
-    if (prod.stock !== undefined && prod.stock < item.qty) {
-      return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
-    }
-    if (prod.stock !== undefined) {
-      db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+    if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
+      const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
+      if (vIdx !== -1) {
+        const variant = prod.variants[vIdx];
+        if (variant.stock !== undefined && variant.stock < item.qty) {
+          return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+        }
+        if (variant.stock !== undefined) {
+          db.products[prodIdx].variants[vIdx].stock = Math.max(0, variant.stock - item.qty);
+        }
+      }
+    } else {
+      if (prod.stock !== undefined && prod.stock < item.qty) {
+        return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
+      }
+      if (prod.stock !== undefined) {
+        db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+      }
     }
   }
 
@@ -1330,14 +1352,27 @@ app.post('/api/orders', (req, res) => {
       return res.status(400).json({ error: `Product "${item.name}" not found` });
     }
     const prod = db.products[prodIdx];
-    if (prod.stock !== undefined && prod.stock < item.qty) {
-      return res.status(400).json({
-        error: `Sorry, only ${prod.stock} unit${prod.stock !== 1 ? 's' : ''} of "${prod.name}" in stock`
-      });
-    }
-    // Decrease stock
-    if (prod.stock !== undefined) {
-      db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+    if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
+      const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
+      if (vIdx !== -1) {
+        const variant = prod.variants[vIdx];
+        if (variant.stock !== undefined && variant.stock < item.qty) {
+          return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+        }
+        if (variant.stock !== undefined) {
+          db.products[prodIdx].variants[vIdx].stock = Math.max(0, variant.stock - item.qty);
+        }
+      }
+    } else {
+      if (prod.stock !== undefined && prod.stock < item.qty) {
+        return res.status(400).json({
+          error: `Sorry, only ${prod.stock} unit${prod.stock !== 1 ? 's' : ''} of "${prod.name}" in stock`
+        });
+      }
+      // Decrease stock
+      if (prod.stock !== undefined) {
+        db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+      }
     }
   }
 

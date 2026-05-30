@@ -8,7 +8,12 @@ const Cart = {
   },
 
   add(product) {
-    const existing = this.items.find(i => i.id === product.id);
+    const existing = this.items.find(i => i.id === product.id && i.selectedVariant === product.selectedVariant);
+    const currentQty = existing ? existing.qty : 0;
+    if (product.stock !== undefined && currentQty + 1 > product.stock) {
+      showToast(`Sorry, only ${product.stock} units available!`, 'error');
+      return;
+    }
     if (existing) {
       existing.qty += 1;
     } else {
@@ -19,17 +24,21 @@ const Cart = {
     showToast(`${product.name} added to cart 🛒`, 'success');
   },
 
-  remove(id) {
-    this.items = this.items.filter(i => i.id !== id);
+  remove(id, selectedVariant = null) {
+    this.items = this.items.filter(i => !(i.id === id && i.selectedVariant === selectedVariant));
     this.save();
     this.renderDrawer();
   },
 
-  updateQty(id, delta) {
-    const item = this.items.find(i => i.id === id);
+  updateQty(id, selectedVariant, delta) {
+    const item = this.items.find(i => i.id === id && i.selectedVariant === selectedVariant);
     if (!item) return;
+    if (delta > 0 && item.stock !== undefined && item.qty + delta > item.stock) {
+      showToast(`Only ${item.stock} units available!`, 'error');
+      return;
+    }
     item.qty += delta;
-    if (item.qty <= 0) return this.remove(id);
+    if (item.qty <= 0) return this.remove(id, selectedVariant);
     this.save();
     this.renderDrawer();
   },
@@ -78,7 +87,7 @@ const Cart = {
     if (totalEl) totalEl.textContent = `₹${this.total().toLocaleString('en-IN')}`;
 
     container.innerHTML = this.items.map(item => `
-      <div class="cart-item" data-id="${item.id}">
+      <div class="cart-item" data-id="${item.id}" data-variant="${item.selectedVariant || ''}">
         <div class="cart-item-thumb" style="background:${item.thumbBg || '#f0eef8'}">
           ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : (item.emoji || '📦')}
         </div>
@@ -86,23 +95,28 @@ const Cart = {
           <div class="cart-item-name">${item.name}</div>
           <div class="cart-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
           <div class="cart-item-controls">
-            <button class="qty-btn" data-action="dec" data-id="${item.id}">−</button>
+            <button class="qty-btn" data-action="dec" data-id="${item.id}" data-variant="${item.selectedVariant || ''}">−</button>
             <span class="qty-val">${item.qty}</span>
-            <button class="qty-btn" data-action="inc" data-id="${item.id}">+</button>
+            <button class="qty-btn" data-action="inc" data-id="${item.id}" data-variant="${item.selectedVariant || ''}">+</button>
           </div>
         </div>
-        <button class="remove-btn" data-remove="${item.id}" title="Remove">×</button>
+        <button class="remove-btn" data-remove="${item.id}" data-variant="${item.selectedVariant || ''}" title="Remove">×</button>
       </div>`).join('');
 
     // bind controls
     container.querySelectorAll('.qty-btn').forEach(btn => {
       btn.onclick = () => {
         const id = Number(btn.dataset.id);
-        Cart.updateQty(id, btn.dataset.action === 'inc' ? 1 : -1);
+        const variant = btn.dataset.variant || null;
+        Cart.updateQty(id, variant, btn.dataset.action === 'inc' ? 1 : -1);
       };
     });
     container.querySelectorAll('.remove-btn').forEach(btn => {
-      btn.onclick = () => Cart.remove(Number(btn.dataset.remove));
+      btn.onclick = () => {
+        const id = Number(btn.dataset.remove);
+        const variant = btn.dataset.variant || null;
+        Cart.remove(id, variant);
+      };
     });
   },
 

@@ -272,6 +272,8 @@ const Admin = {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    const ratioEl = document.getElementById('pfImgRatio');
+    if (ratioEl) ratioEl.value = '4:3';
     document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
     document.getElementById('pfImageFile').value = '';
     this.updateImagePreview('');
@@ -298,6 +300,8 @@ const Admin = {
     document.getElementById('pfPrice').value = product.price || '';
     document.getElementById('pfOrig').value = product.originalPrice || '';
     document.getElementById('pfStock').value = product.stock || '';
+    const ratioEl = document.getElementById('pfImgRatio');
+    if (ratioEl) ratioEl.value = product.imgRatio || '4:3';
     document.getElementById('pfEmoji').value = product.emoji || '';
     document.getElementById('pfBadge').value = product.badge || '';
     document.getElementById('pfDesc').value = product.description || '';
@@ -331,7 +335,7 @@ const Admin = {
         if (customInp) { customInp.value = vl; customInp.style.display = ''; }
         if (addBtn) addBtn.style.display = '';
       }
-      (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price));
+      (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock));
     }
   },
 
@@ -421,8 +425,17 @@ const Admin = {
     variantRows.forEach(row => {
       const lbl = row.querySelector('.vr-label')?.value.trim();
       const prc = parseFloat(row.querySelector('.vr-price')?.value);
-      if (lbl) variants.push({ label: lbl, price: isNaN(prc) ? price : prc });
+      const stk = parseInt(row.querySelector('.vr-stock')?.value);
+      if (lbl) {
+        variants.push({
+          label: lbl,
+          price: isNaN(prc) ? price : prc,
+          stock: isNaN(stk) ? 0 : stk
+        });
+      }
     });
+
+    const imgRatio = document.getElementById('pfImgRatio')?.value || '4:3';
 
     const payload = {
       name,
@@ -434,6 +447,7 @@ const Admin = {
       badge: document.getElementById('pfBadge').value,
       description: document.getElementById('pfDesc').value.trim(),
       imageUrl,
+      imgRatio,
       variantLabel: variantLabel || null,
       variants: variants.length ? variants : null,
     };
@@ -493,7 +507,7 @@ const Admin = {
     }
   },
 
-  addVariantRow(label = '', price = '') {
+  addVariantRow(label = '', price = '', stock = '') {
     const rowsEl = document.getElementById('pfVariantRows');
     if (!rowsEl) return;
     const row = document.createElement('div');
@@ -503,6 +517,8 @@ const Admin = {
       <input class="vr-label" placeholder="e.g. 100g / Size 6 / Small" value="${label}" maxlength="50">
       <span class="admin-variant-row-label">Price ₹:</span>
       <input class="vr-price" type="number" placeholder="same as base" value="${price}" min="0" style="max-width:100px">
+      <span class="admin-variant-row-label">Stock:</span>
+      <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:80px">
       <button type="button" class="admin-remove-variant-btn" title="Remove">✕</button>`;
     row.querySelector('.admin-remove-variant-btn').onclick = () => row.remove();
     rowsEl.appendChild(row);

@@ -161,13 +161,15 @@ const App = {
   },
 
   productMedia(product, fallbackBg = '#f0eef8', size = 'card') {
+    const ratio = product.imgRatio || '4:3';
+    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
     if (product.imageUrl) {
       return `
-        <div class="prod-image-wrap ${size}" style="background:${fallbackBg}">
+        <div class="prod-image-wrap ${size}" style="background:${fallbackBg}; ${aspectStyle}">
           <img class="prod-image" src="${product.imageUrl}" alt="${product.name}" loading="lazy">
         </div>`;
     }
-    return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}">${product.emoji || '📦'}</div>`;
+    return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;
   },
 
   setupPaymentSelector() {
@@ -692,7 +694,7 @@ const App = {
     const grid = document.getElementById('collectionsGrid');
     if (!grid || !cats.length) return;
 
-    const MAX_VISIBLE = 8;
+    const MAX_VISIBLE = 10;
 
     // Fetch one product per category to get a cover image, in parallel
     const entries = await Promise.all(cats.map(async cat => {
@@ -850,9 +852,12 @@ const App = {
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
       const wishlistCardBtnHTML = `<button class="wishlist-card-btn ${isWishlisted ? 'active' : ''}" data-pid="${p.id}" title="${isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}">${heartIcon}</button>`;
 
+      const ratio = p.imgRatio || '4:3';
+      const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
+
       return `
         <div class="prod-card" data-pid="${p.id}">
-          <div class="prod-thumb" style="background:${cat.color || '#f0eef8'}">
+          <div class="prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
             ${this.productMedia(p, cat.color || '#f0eef8')}
             ${wishlistCardBtnHTML}
             ${badgeHTML}
@@ -904,6 +909,10 @@ const App = {
         e.stopPropagation();
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
+          if (prod.variants && prod.variants.length > 0) {
+            this.openProductModal(prod.id, products);
+            return;
+          }
           const cat = catMap[prod.category] || {};
           Cart.add({ ...prod, thumbBg: cat.color || '#f0eef8' });
           btn.textContent = '✓ Added!';
@@ -919,6 +928,10 @@ const App = {
         e.stopPropagation();
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
+          if (prod.variants && prod.variants.length > 0) {
+            this.openProductModal(prod.id, products);
+            return;
+          }
           const cat = catMap[prod.category] || {};
           this.openBuyNowCheckout(prod, cat);
         }
@@ -1010,9 +1023,13 @@ const App = {
       </div>` : '';
 
     const initPrice = hasVariants ? prod.variants[0].price : prod.price;
+    const initStock = hasVariants ? (prod.variants[0].stock !== undefined ? prod.variants[0].stock : 0) : prod.stock;
+    const isOutOfStock = initStock === 0;
+    const ratio = prod.imgRatio || '4:3';
+    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
 
     document.getElementById('modalBody').innerHTML = `
-      <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}">
+      <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
         ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
       </div>
       <div class="modal-prod-cat">${prod.category}</div>
@@ -1030,12 +1047,12 @@ const App = {
       <!-- Info Pane -->
       <div class="modal-pane" id="modalPaneInfo">
         <p class="modal-prod-desc">${prod.description || ''}</p>
-        <div class="modal-prod-stock">${prod.stock > 0 ? `✅ In Stock (${prod.stock} units)` : '❌ Out of Stock'}</div>
+        <div class="modal-prod-stock" id="modalStockDisplay">${initStock > 0 ? `✅ In Stock (${initStock} units)` : '❌ Out of Stock'}</div>
         <div class="modal-btns">
-          <button class="modal-add-btn" id="modalAddBtn" ${prod.stock === 0 ? 'disabled' : ''}>
+          <button class="modal-add-btn" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
             🛒 Add to Cart
           </button>
-          <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${prod.stock === 0 ? 'disabled' : ''}>
+          <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
             ⚡ Buy Now
           </button>
           <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
@@ -1062,6 +1079,18 @@ const App = {
           selectedVariant = prod.variants[vi];
           const priceEl = document.getElementById('modalPriceDisplay');
           if (priceEl) priceEl.innerHTML = `₹${selectedVariant.price} ${origHTML}`;
+
+          // Update stock display and buttons
+          const stockEl = document.getElementById('modalStockDisplay');
+          const addBtn = document.getElementById('modalAddBtn');
+          const buyBtn = document.getElementById('modalBuyNowBtn');
+          const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
+          
+          if (stockEl) {
+            stockEl.innerHTML = vStock > 0 ? `✅ In Stock (${vStock} units)` : '❌ Out of Stock';
+          }
+          if (addBtn) addBtn.disabled = (vStock === 0);
+          if (buyBtn) buyBtn.disabled = (vStock === 0);
         };
       });
     }
@@ -1072,6 +1101,9 @@ const App = {
         base.price = selectedVariant.price;
         base.selectedVariant = selectedVariant.label;
         base.name = `${prod.name} (${variantLabel}: ${selectedVariant.label})`;
+        base.stock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
+      } else {
+        base.stock = prod.stock;
       }
       return base;
     };
