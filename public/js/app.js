@@ -1371,6 +1371,21 @@ const Auth = {
       btn.onclick = () => this.switchTab(btn.dataset.accountTab);
     });
 
+    const gotoReg = document.getElementById('gotoRegisterLink');
+    if (gotoReg) {
+      gotoReg.onclick = (e) => {
+        e.preventDefault();
+        this.switchTab('register');
+      };
+    }
+    const gotoLog = document.getElementById('gotoLoginLink');
+    if (gotoLog) {
+      gotoLog.onclick = (e) => {
+        e.preventDefault();
+        this.switchTab('login');
+      };
+    }
+
     // Profile inner tabs (Profile / My Orders)
     document.querySelectorAll('.account-tab[data-profile-tab]').forEach(btn => {
       btn.onclick = () => this.switchProfileTab(btn.dataset.profileTab);

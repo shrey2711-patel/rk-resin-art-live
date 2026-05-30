@@ -1049,12 +1049,12 @@
         {
           "label": "10 inch",
           "price": 100,
-          "stock": 20
+          "stock": 2
         },
         {
           "label": "6 inches",
           "price": 65,
-          "stock": 34
+          "stock": 0
         }
       ]
     }
@@ -2568,6 +2568,88 @@
       "paymentStatus": "Paid (Razorpay)",
       "paymentId": "pay_SuRXuuXqVJe5IH",
       "createdAt": "2026-05-27T15:48:30.437Z"
+    },
+    {
+      "id": 44,
+      "userId": null,
+      "items": [
+        {
+          "id": 71,
+          "stock": 34,
+          "name": "metal frame (Size: 6 inches)",
+          "price": 65,
+          "originalPrice": null,
+          "category": "Tools",
+          "emoji": "📦",
+          "badge": "",
+          "description": "",
+          "imageUrl": "/uploads/chatgpt-image-may-18-2026-09-24-10-pm-1780136085753-587675645.png",
+          "imgRatio": "4:3",
+          "variantLabel": "Size",
+          "variants": [
+            {
+              "label": "10 inch",
+              "price": 100,
+              "stock": 20
+            },
+            {
+              "label": "6 inches",
+              "price": 65,
+              "stock": 34
+            }
+          ],
+          "thumbBg": "#E8F5EE",
+          "selectedVariant": "6 inches",
+          "qty": 34
+        },
+        {
+          "id": 71,
+          "stock": 20,
+          "name": "metal frame (Size: 10 inch)",
+          "price": 100,
+          "originalPrice": null,
+          "category": "Tools",
+          "emoji": "📦",
+          "badge": "",
+          "description": "",
+          "imageUrl": "/uploads/chatgpt-image-may-18-2026-09-24-10-pm-1780136085753-587675645.png",
+          "imgRatio": "4:3",
+          "variantLabel": "Size",
+          "variants": [
+            {
+              "label": "10 inch",
+              "price": 100,
+              "stock": 20
+            },
+            {
+              "label": "6 inches",
+              "price": 65,
+              "stock": 34
+            }
+          ],
+          "thumbBg": "#E8F5EE",
+          "selectedVariant": "10 inch",
+          "qty": 18
+        }
+      ],
+      "customer": {
+        "firstName": "shrey",
+        "lastName": "Patel",
+        "phone": "+919824500557",
+        "email": "shreypatel00557@gmail.com",
+        "address": "18,Devnagar, Ratanpar, Shrendranagar",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 4010,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 0,
+      "grandTotal": 4010,
+      "status": "confirmed",
+      "paymentStatus": "Paid (Razorpay)",
+      "paymentId": "pay_SvXaXzj4BFZXiK",
+      "createdAt": "2026-05-30T10:21:55.436Z"
     }
   ],
   "cart": [],
