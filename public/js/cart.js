@@ -142,6 +142,12 @@ document.getElementById('drawerOverlay').onclick = () => Cart.closeDrawer();
 
 // Checkout button
 document.getElementById('checkoutBtn').onclick = () => {
+  if (typeof Auth !== 'undefined' && !Auth.user) {
+    showToast('🔒 Please login or register to proceed to checkout!', 'error');
+    Cart.closeDrawer();
+    Auth.open();
+    return;
+  }
   Cart.closeDrawer();
   openCheckoutModal();
 };

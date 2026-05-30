@@ -946,6 +946,11 @@ const App = {
 
   // ── Buy Now (direct checkout) ─────────────────────────────
   openBuyNowCheckout(prod, cat = {}) {
+    if (!Auth.user) {
+      showToast('🔒 Please login or register to buy products!', 'error');
+      Auth.open();
+      return;
+    }
     // Temporarily override cart with just this product
     const buyNowItems = [{ ...prod, thumbBg: cat.color || '#f0eef8', qty: 1 }];
 
@@ -1794,6 +1799,11 @@ document.getElementById('productModalOverlay').onclick = (e) => {
 
 // ── Checkout Modal ────────────────────────────────────────────
 function openCheckoutModal() {
+  if (!Auth.user) {
+    showToast('🔒 Please login or register to proceed to checkout!', 'error');
+    Auth.open();
+    return;
+  }
   if (!Cart.items.length) { showToast('Your cart is empty!', 'error'); return; }
   Auth.fillCheckout();
 
