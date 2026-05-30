@@ -2,7 +2,7 @@
 const BASE = '';  // same origin; change to http://localhost:3000 if separate
 
 const API = {
-  token: localStorage.getItem('rk_admin_token') || null,
+  token: null, // Admin token is in-memory only so page refresh automatically logs out for security
   userToken: localStorage.getItem('rk_user_token') || null,
 
   headers(auth = false) {
@@ -152,12 +152,10 @@ const API = {
   adminLogin: async (password) => {
     const res = await API.post('/api/admin/login', { password });
     API.token = res.token;
-    localStorage.setItem('rk_admin_token', res.token);
     return res;
   },
   adminLogout: () => {
     API.token = null;
-    localStorage.removeItem('rk_admin_token');
   },
   isAdminLoggedIn: () => !!API.token,
 
