@@ -853,9 +853,19 @@ function cleanDatabaseCategories() {
   try {
     const db = readDB();
     if (db.categories && Array.isArray(db.categories)) {
-      const unwanted = new Set(['pigments', 'colour', 'lighter', 'fire', 'hiug hjlvgvlv']);
+      const unwantedLower = new Set(['colour', 'lighter', 'fire', 'hiug hjlvgvlv']);
       const originalCount = db.categories.length;
-      db.categories = db.categories.filter(c => c && c.name && !unwanted.has(c.name.trim()));
+      
+      db.categories = db.categories.filter(c => {
+        if (!c || !c.name) return false;
+        const nameTrimmed = c.name.trim();
+        // Remove exact lowercase 'pigments' (protecting premium 'Pigments' category)
+        if (nameTrimmed === 'pigments') return false;
+        // Remove other test categories case-insensitively
+        if (unwantedLower.has(nameTrimmed.toLowerCase())) return false;
+        return true;
+      });
+
       if (db.categories.length !== originalCount) {
         console.log(`🧹 Cleaned up database categories! Removed ${originalCount - db.categories.length} unwanted category options.`);
         writeDB(db);
