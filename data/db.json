@@ -1033,6 +1033,34 @@
           "stock": 0
         }
       ]
+    },
+    {
+      "id": 72,
+      "stock": 8,
+      "name": "apple green mica color",
+      "price": 500,
+      "originalPrice": null,
+      "category": "Pigments",
+      "emoji": "📦",
+      "badge": "",
+      "description": "",
+      "imageUrl": "/uploads/screenshot-2026-05-30-172404-1780144702506-573464223.png",
+      "imgRatio": "4:3",
+      "variantLabel": "Weight",
+      "variants": [
+        {
+          "label": "100g",
+          "price": 500,
+          "stock": 2,
+          "imageUrl": "/uploads/screenshot-2026-05-30-172404-1780144702506-573464223.png"
+        },
+        {
+          "label": "500g",
+          "price": 568,
+          "stock": 6,
+          "imageUrl": "/uploads/screenshot-2026-05-30-172434-1780144714262-53195770.png"
+        }
+      ]
     }
   ],
   "orders": [

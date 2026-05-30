@@ -163,10 +163,17 @@ const App = {
   productMedia(product, fallbackBg = '#f0eef8', size = 'card') {
     const ratio = product.imgRatio || '4:3';
     const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
-    if (product.imageUrl) {
+    
+    // Fallback to first variant's image if product.imageUrl is not directly defined but variants exist
+    let displayImageUrl = product.imageUrl;
+    if (!displayImageUrl && product.variants && product.variants.length > 0) {
+      displayImageUrl = product.variants[0].imageUrl;
+    }
+
+    if (displayImageUrl) {
       return `
         <div class="prod-image-wrap ${size}" style="background:${fallbackBg}; ${aspectStyle}">
-          <img class="prod-image" src="${product.imageUrl}" alt="${product.name}" loading="lazy">
+          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy">
         </div>`;
     }
     return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;

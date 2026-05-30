@@ -288,6 +288,10 @@ const Admin = {
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
     if (basePriceStockContainer) basePriceStockContainer.style.display = '';
 
+    // Show base image container when resetting
+    const baseImageContainer = document.getElementById('pfBaseImageContainer');
+    if (baseImageContainer) baseImageContainer.style.display = '';
+
     // Reset variants
     const vlSel = document.getElementById('pfVariantLabel');
     if (vlSel) vlSel.value = '';
@@ -323,6 +327,12 @@ const Admin = {
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
     if (basePriceStockContainer) {
       basePriceStockContainer.style.display = product.variantLabel ? 'none' : '';
+    }
+
+    // Toggle base image container visibility based on variants
+    const baseImageContainer = document.getElementById('pfBaseImageContainer');
+    if (baseImageContainer) {
+      baseImageContainer.style.display = product.variantLabel ? 'none' : '';
     }
 
     // Populate variants
@@ -420,8 +430,8 @@ const Admin = {
     const name = document.getElementById('pfName').value.trim();
     if (!name) { showToast('Product name is required', 'error'); return; }
 
-    const imageUrl = document.getElementById('pfImageUrl').value.trim();
-    if (imageUrl.startsWith('blob:')) {
+    const pfBaseImageUrl = document.getElementById('pfImageUrl').value.trim();
+    if (pfBaseImageUrl.startsWith('blob:')) {
       showToast('Please wait for the product image to finish uploading!', 'error');
       return;
     }
@@ -449,9 +459,17 @@ const Admin = {
       }
     });
 
+    // Check if any variant image is still uploading (blob:)
+    const stillUploading = variants.some(v => v.imageUrl && v.imageUrl.startsWith('blob:'));
+    if (stillUploading) {
+      showToast('Please wait for all variant images to finish uploading!', 'error');
+      return;
+    }
+
     let price = 0;
     let originalPrice = null;
     let stock = 0;
+    let imageUrl = '';
 
     if (variants.length > 0) {
       // Derive base price and stock dynamically
@@ -467,12 +485,16 @@ const Admin = {
       });
       originalPrice = null;
       stock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+      
+      // Auto-assign the base product's main imageUrl to the first variant's image
+      imageUrl = variants[0].imageUrl || '';
     } else {
       // Normal simple product
       price = parseFloat(document.getElementById('pfPrice').value);
       if (isNaN(price)) { showToast('Product price is required', 'error'); return; }
       originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
       stock = parseInt(document.getElementById('pfStock').value) || 0;
+      imageUrl = pfBaseImageUrl;
     }
 
     const imgRatio = document.getElementById('pfImgRatio')?.value || '4:3';
@@ -526,6 +548,7 @@ const Admin = {
     const customInp = document.getElementById('pfVariantLabelCustom');
     const addBtn = document.getElementById('addVariantRowBtn');
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
+    const baseImageContainer = document.getElementById('pfBaseImageContainer');
     if (!vlSel) return;
 
     vlSel.onchange = () => {
@@ -536,6 +559,7 @@ const Admin = {
         const rowsEl = document.getElementById('pfVariantRows');
         if (rowsEl) rowsEl.innerHTML = '';
         if (basePriceStockContainer) basePriceStockContainer.style.display = '';
+        if (baseImageContainer) baseImageContainer.style.display = '';
       } else {
         if (val === 'Custom') {
           if (customInp) customInp.style.display = '';
@@ -544,6 +568,7 @@ const Admin = {
         }
         if (addBtn) addBtn.style.display = '';
         if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
+        if (baseImageContainer) baseImageContainer.style.display = 'none';
       }
     };
 
