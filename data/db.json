@@ -1031,6 +1031,32 @@
       "stock": 58,
       "description": "Premium cosmetic-grade Wine Mica Powder. Ultra-fine particles with high shimmer and metallic luster finish. Ideal for epoxy resin pours, candles, cosmetics, and slime crafts. Non-toxic and easily dispersible.",
       "imageUrl": "/uploads/wine.jpg"
+    },
+    {
+      "id": 71,
+      "stock": 3,
+      "name": "metal frame",
+      "price": 65,
+      "originalPrice": null,
+      "category": "Tools",
+      "emoji": "📦",
+      "badge": "",
+      "description": "",
+      "imageUrl": "/uploads/chatgpt-image-may-18-2026-09-24-10-pm-1780136085753-587675645.png",
+      "imgRatio": "4:3",
+      "variantLabel": "Size",
+      "variants": [
+        {
+          "label": "10 inch",
+          "price": 100,
+          "stock": 20
+        },
+        {
+          "label": "6 inches",
+          "price": 65,
+          "stock": 34
+        }
+      ]
     }
   ],
   "orders": [

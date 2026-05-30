@@ -839,7 +839,10 @@ const App = {
       const cat = catMap[p.category] || {};
       const badgeHTML = p.badge ? `<div class="prod-badge badge-${p.badge.toLowerCase()}">${p.badge}</div>` : '';
       const origHTML = p.originalPrice ? `<s>₹${p.originalPrice}</s>` : '';
-      const stockHTML = p.stock > 0 && p.stock <= 10 ? `<div class="stock-low">⚡ Only ${p.stock} left!</div>` : '';
+      const totalStock = (p.variants && p.variants.length > 0)
+        ? p.variants.reduce((sum, v) => sum + (v.stock !== undefined ? Number(v.stock) : 0), 0)
+        : (p.stock !== undefined ? Number(p.stock) : 0);
+      const stockHTML = totalStock > 0 && totalStock <= 10 ? `<div class="stock-low">⚡ Only ${totalStock} left!</div>` : '';
       const avgRating = p._avgRating || 0;
       const ratingCount = p._ratingCount || 0;
       const starsHTML = avgRating > 0
@@ -1017,7 +1020,6 @@ const App = {
           ${prod.variants.map((v, i) => `
             <button class="variant-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" data-label="${v.label}" data-price="${v.price}" type="button">
               ${v.label}
-              ${v.price !== prod.price ? `<span class="chip-price">₹${v.price}</span>` : ''}
             </button>`).join('')}
         </div>
       </div>` : '';
