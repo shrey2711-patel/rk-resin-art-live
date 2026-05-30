@@ -748,6 +748,40 @@ RK Creation
   }
 }
 
+async function sendAdminReviewNotification(review, product) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) return;
+  try {
+    const adminEmail = 'rinkupatel3495@gmail.com';
+    const emailSubject = `⭐ New Product Review Submitted for "${product.name}"`;
+    const emailHTML = `
+      <div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:25px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <h2 style="color:#0f766e;margin:0 0 16px 0;font-size:20px;border-bottom:2px solid #0f766e;padding-bottom:10px;">⭐ New Product Review Received</h2>
+        <p style="margin:6px 0;font-size:14px;color:#1e293b;"><strong>Product:</strong> ${product.name} (ID: ${product.id})</p>
+        <p style="margin:6px 0;font-size:14px;color:#1e293b;"><strong>Submitted By:</strong> ${review.userName} (User ID: ${review.userId})</p>
+        <p style="margin:6px 0;font-size:14px;color:#1e293b;"><strong>Rating:</strong> ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)} (${review.rating}/5)</p>
+        <div style="background:#ffffff;border-left:4px solid #0f766e;padding:15px;margin:15px 0;font-style:italic;border-radius:0 8px 8px 0;box-shadow:inset 0 1px 3px rgba(0,0,0,0.02);color:#334155;font-size:14px;line-height:1.6;">
+          "${review.comment}"
+        </div>
+        <p style="font-size:11px;color:#64748b;margin:15px 0 0 0;">Submitted at: ${new Date(review.createdAt).toLocaleString('en-IN')}</p>
+      </div>`;
+    
+    const emailText = `New Product Review\nProduct: ${product.name}\nBy: ${review.userName}\nRating: ${review.rating}/5\nComment: "${review.comment}"`;
+
+    const sentViaResend = await sendEmailViaHTTPS(adminEmail, emailSubject, emailHTML, emailText);
+    if (!sentViaResend && mailTransporter) {
+      await mailTransporter.sendMail({
+        from: `"RK Creation" <${mailTransporter.options.auth.user}>`,
+        to: adminEmail,
+        subject: emailSubject,
+        html: emailHTML,
+        text: emailText
+      });
+    }
+  } catch (err) {
+    console.error('⚠️ Failed to send review notification:', err.message);
+  }
+}
+
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
@@ -923,7 +957,7 @@ function getUserFromRequest(req) {
 
   try {
     const decoded = jwt.verify(parts[1], JWT_SECRET);
-    if (decoded.role !== 'user') return null;
+    if (decoded.role !== 'user' && decoded.role !== 'admin') return null;
     return decoded;
   } catch {
     return null;
@@ -1478,6 +1512,7 @@ app.post('/api/products/:id/reviews', requireUser, (req, res) => {
   };
   db.reviews.push(review);
   writeDB(db);
+  sendAdminReviewNotification(review, product);
   res.status(201).json(review);
 });
 
