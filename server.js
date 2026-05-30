@@ -849,6 +849,23 @@ async function initDatabase() {
   }
 }
 
+function cleanDatabaseCategories() {
+  try {
+    const db = readDB();
+    if (db.categories && Array.isArray(db.categories)) {
+      const unwanted = new Set(['pigments', 'colour', 'lighter', 'fire', 'hiug hjlvgvlv']);
+      const originalCount = db.categories.length;
+      db.categories = db.categories.filter(c => c && c.name && !unwanted.has(c.name.trim()));
+      if (db.categories.length !== originalCount) {
+        console.log(`🧹 Cleaned up database categories! Removed ${originalCount - db.categories.length} unwanted category options.`);
+        writeDB(db);
+      }
+    }
+  } catch (err) {
+    console.error("⚠️ Failed to perform category database cleanup:", err.message);
+  }
+}
+
 function readDB() {
   return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
 }
@@ -1812,6 +1829,9 @@ app.get('*', (req, res) => {
 async function startServer() {
   // Sync database from Firebase Realtime Database before server starts
   await initDatabase();
+
+  // Clean up any test/unwanted categories
+  cleanDatabaseCategories();
 
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Creation server running at http://localhost:${PORT}`);

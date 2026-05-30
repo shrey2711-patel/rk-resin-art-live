@@ -203,30 +203,6 @@
       "name": "Stickers",
       "emoji": "🏷",
       "color": "#E8FFF0"
-    },
-    {
-      "id": 11,
-      "name": "pigments",
-      "emoji": "📦",
-      "color": "#ede8ff"
-    },
-    {
-      "id": 12,
-      "name": "colour",
-      "emoji": "📦",
-      "color": "#ede8ff"
-    },
-    {
-      "id": 13,
-      "name": "lighter",
-      "emoji": "📦",
-      "color": "#f3852b"
-    },
-    {
-      "id": 14,
-      "name": "fire",
-      "emoji": "📦",
-      "color": "#f3852b"
     }
   ],
   "products": [
