@@ -1078,6 +1078,12 @@ const App = {
 
     // Variant chip selection
     if (hasVariants) {
+      // Show initial first variant's image if it has one
+      if (prod.variants[0] && prod.variants[0].imageUrl) {
+        const mainThumb = document.querySelector('#modalBody .modal-prod-thumb img.prod-image');
+        if (mainThumb) mainThumb.src = prod.variants[0].imageUrl;
+      }
+
       document.querySelectorAll('.variant-chip').forEach(chip => {
         chip.onclick = () => {
           document.querySelectorAll('.variant-chip').forEach(c => c.classList.remove('selected'));
@@ -1098,6 +1104,28 @@ const App = {
           }
           if (addBtn) addBtn.disabled = (vStock === 0);
           if (buyBtn) buyBtn.disabled = (vStock === 0);
+
+          // Update modal image if variant has a specific image
+          const mainThumbContainer = document.querySelector('#modalBody .modal-prod-thumb');
+          if (mainThumbContainer) {
+            const variantImg = selectedVariant.imageUrl;
+            const fallbackImg = prod.imageUrl;
+            const finalImg = variantImg || fallbackImg;
+            
+            if (finalImg) {
+              let imgEl = mainThumbContainer.querySelector('.prod-image');
+              if (imgEl) {
+                imgEl.src = finalImg;
+              } else {
+                mainThumbContainer.innerHTML = `
+                  <div class="prod-image-wrap modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
+                    <img class="prod-image" src="${finalImg}" alt="${prod.name}">
+                  </div>`;
+              }
+            } else {
+              mainThumbContainer.innerHTML = `<div class="prod-emoji-fallback modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">${prod.emoji || '📦'}</div>`;
+            }
+          }
         };
       });
     }
@@ -1109,6 +1137,9 @@ const App = {
         base.selectedVariant = selectedVariant.label;
         base.name = `${prod.name} (${variantLabel}: ${selectedVariant.label})`;
         base.stock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
+        if (selectedVariant.imageUrl) {
+          base.imageUrl = selectedVariant.imageUrl;
+        }
       } else {
         base.stock = prod.stock;
       }

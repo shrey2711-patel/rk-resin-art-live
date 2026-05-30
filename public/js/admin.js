@@ -283,6 +283,11 @@ const Admin = {
     if (btn) btn.textContent = '+ Add Product';
     if (cancel) cancel.style.display = 'none';
     this.editState = { section: null, id: null };
+    
+    // Show base price/stock container when resetting
+    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
+    if (basePriceStockContainer) basePriceStockContainer.style.display = '';
+
     // Reset variants
     const vlSel = document.getElementById('pfVariantLabel');
     if (vlSel) vlSel.value = '';
@@ -313,6 +318,13 @@ const Admin = {
     if (btn) btn.textContent = 'Update Product';
     if (cancel) cancel.style.display = '';
     this.editState = { section: 'product', id: product.id };
+    
+    // Toggle base price/stock inputs visibility based on variants
+    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
+    if (basePriceStockContainer) {
+      basePriceStockContainer.style.display = product.variantLabel ? 'none' : '';
+    }
+
     // Populate variants
     const vlSel = document.getElementById('pfVariantLabel');
     const customInp = document.getElementById('pfVariantLabelCustom');
@@ -335,7 +347,7 @@ const Admin = {
         if (customInp) { customInp.value = vl; customInp.style.display = ''; }
         if (addBtn) addBtn.style.display = '';
       }
-      (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock));
+      (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || ''));
     }
   },
 
@@ -406,9 +418,8 @@ const Admin = {
 
   async saveProductForm() {
     const name = document.getElementById('pfName').value.trim();
-    const price = parseFloat(document.getElementById('pfPrice').value);
-    if (!name || isNaN(price)) { showToast('Product name and price are required', 'error'); return; }
-    
+    if (!name) { showToast('Product name is required', 'error'); return; }
+
     const imageUrl = document.getElementById('pfImageUrl').value.trim();
     if (imageUrl.startsWith('blob:')) {
       showToast('Please wait for the product image to finish uploading!', 'error');
@@ -420,29 +431,58 @@ const Admin = {
     const customInp = document.getElementById('pfVariantLabelCustom');
     let variantLabel = vlSel ? vlSel.value : '';
     if (variantLabel === 'Custom') variantLabel = (customInp ? customInp.value.trim() : '') || '';
+    
     const variantRows = document.querySelectorAll('.admin-variant-row');
     const variants = [];
     variantRows.forEach(row => {
       const lbl = row.querySelector('.vr-label')?.value.trim();
       const prc = parseFloat(row.querySelector('.vr-price')?.value);
       const stk = parseInt(row.querySelector('.vr-stock')?.value);
+      const img = row.querySelector('.vr-image')?.value.trim() || null;
       if (lbl) {
         variants.push({
           label: lbl,
-          price: isNaN(prc) ? price : prc,
-          stock: isNaN(stk) ? 0 : stk
+          price: isNaN(prc) ? null : prc,
+          stock: isNaN(stk) ? 0 : stk,
+          imageUrl: img
         });
       }
     });
+
+    let price = 0;
+    let originalPrice = null;
+    let stock = 0;
+
+    if (variants.length > 0) {
+      // Derive base price and stock dynamically
+      const firstPrice = variants[0].price;
+      if (firstPrice === null || isNaN(firstPrice)) {
+        showToast('Please specify a price for at least your first variant option!', 'error');
+        return;
+      }
+      price = firstPrice;
+      // Populate base price for other variants if left blank
+      variants.forEach(v => {
+        if (v.price === null) v.price = price;
+      });
+      originalPrice = null;
+      stock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+    } else {
+      // Normal simple product
+      price = parseFloat(document.getElementById('pfPrice').value);
+      if (isNaN(price)) { showToast('Product price is required', 'error'); return; }
+      originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
+      stock = parseInt(document.getElementById('pfStock').value) || 0;
+    }
 
     const imgRatio = document.getElementById('pfImgRatio')?.value || '4:3';
 
     const payload = {
       name,
       price,
-      originalPrice: parseFloat(document.getElementById('pfOrig').value) || null,
+      originalPrice,
       category: document.getElementById('pfCat').value,
-      stock: parseInt(document.getElementById('pfStock').value) || 0,
+      stock,
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',
       badge: document.getElementById('pfBadge').value,
       description: document.getElementById('pfDesc').value.trim(),
@@ -451,6 +491,7 @@ const Admin = {
       variantLabel: variantLabel || null,
       variants: variants.length ? variants : null,
     };
+
     if (this.editState.section === 'product' && this.editState.id) {
       await API.updateProduct(this.editState.id, payload);
       showToast('Product updated', 'success');
@@ -484,6 +525,7 @@ const Admin = {
     const vlSel = document.getElementById('pfVariantLabel');
     const customInp = document.getElementById('pfVariantLabelCustom');
     const addBtn = document.getElementById('addVariantRowBtn');
+    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
     if (!vlSel) return;
 
     vlSel.onchange = () => {
@@ -493,12 +535,15 @@ const Admin = {
         if (addBtn) addBtn.style.display = 'none';
         const rowsEl = document.getElementById('pfVariantRows');
         if (rowsEl) rowsEl.innerHTML = '';
-      } else if (val === 'Custom') {
-        if (customInp) customInp.style.display = '';
-        if (addBtn) addBtn.style.display = '';
+        if (basePriceStockContainer) basePriceStockContainer.style.display = '';
       } else {
-        if (customInp) { customInp.style.display = 'none'; customInp.value = ''; }
+        if (val === 'Custom') {
+          if (customInp) customInp.style.display = '';
+        } else {
+          if (customInp) { customInp.style.display = 'none'; customInp.value = ''; }
+        }
         if (addBtn) addBtn.style.display = '';
+        if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
       }
     };
 
@@ -507,21 +552,101 @@ const Admin = {
     }
   },
 
-  addVariantRow(label = '', price = '', stock = '') {
+  addVariantRow(label = '', price = '', stock = '', imageUrl = '') {
     const rowsEl = document.getElementById('pfVariantRows');
     if (!rowsEl) return;
     const row = document.createElement('div');
     row.className = 'admin-variant-row';
+    
+    const thumbHtml = imageUrl
+      ? `<img class="vr-thumb-img" src="${imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
+      : `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
+
     row.innerHTML = `
       <span class="admin-variant-row-label">Option:</span>
-      <input class="vr-label" placeholder="e.g. 100g / Size 6 / Small" value="${label}" maxlength="50">
+      <input class="vr-label" placeholder="e.g. Size 6 / 100g" value="${label}" maxlength="50">
       <span class="admin-variant-row-label">Price ₹:</span>
-      <input class="vr-price" type="number" placeholder="same as base" value="${price}" min="0" style="max-width:100px">
+      <input class="vr-price" type="number" placeholder="same as base" value="${price}" min="0" style="max-width:90px">
       <span class="admin-variant-row-label">Stock:</span>
-      <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:80px">
+      <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:70px">
+      
+      <!-- Variant Image Controls -->
+      <div class="vr-image-section" style="display:inline-flex; align-items:center; gap:6px;">
+        <div class="vr-thumb-wrap" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
+          ${thumbHtml}
+        </div>
+        <input class="vr-image" type="hidden" value="${imageUrl}">
+        <button type="button" class="vr-upload-trigger-btn" style="padding:4px 8px; font-size:0.72rem; border-radius:4px; background:var(--pl); border:1px solid var(--border); color:var(--text); cursor:pointer;">📷 Upload</button>
+        <input class="vr-file-input" type="file" accept="image/*" style="display:none">
+      </div>
+      
       <button type="button" class="admin-remove-variant-btn" title="Remove">✕</button>`;
+
+    // Wire events
+    row.querySelector('.vr-upload-trigger-btn').onclick = () => {
+      row.querySelector('.vr-file-input').click();
+    };
+
+    row.querySelector('.vr-file-input').onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        this.uploadVariantImage(file, row);
+      }
+    };
+
     row.querySelector('.admin-remove-variant-btn').onclick = () => row.remove();
     rowsEl.appendChild(row);
+  },
+
+  async uploadVariantImage(file, row) {
+    if (!file) return;
+
+    if (this.isHeicImage(file)) {
+      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
+      return;
+    }
+
+    if (!this.isValidImageType(file)) {
+      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      return;
+    }
+
+    const thumbWrap = row.querySelector('.vr-thumb-wrap');
+    const uploadBtn = row.querySelector('.vr-upload-trigger-btn');
+    const hiddenInput = row.querySelector('.vr-image');
+
+    if (thumbWrap) thumbWrap.innerHTML = `<span style="font-size:0.75rem; color:var(--muted);">...</span>`;
+    if (uploadBtn) {
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = '...';
+      uploadBtn.style.opacity = '0.6';
+    }
+
+    try {
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      
+      if (hiddenInput) hiddenInput.value = result.url;
+      if (thumbWrap) {
+        thumbWrap.innerHTML = `<img class="vr-thumb-img" src="${result.url}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`;
+      }
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = '📷 Upload';
+        uploadBtn.style.opacity = '';
+      }
+      showToast('Variant image uploaded!', 'success');
+    } catch (e) {
+      if (thumbWrap) {
+        thumbWrap.innerHTML = `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
+      }
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = '📷 Upload';
+        uploadBtn.style.opacity = '';
+      }
+      showToast('Variant image upload failed', 'error');
+    }
   },
 
   open() {

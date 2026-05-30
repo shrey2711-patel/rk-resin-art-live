@@ -1942,3 +1942,19 @@ body {
 }
 .variant-chip.selected span.chip-price { color: rgba(255,255,255,0.8); }
 
+/* Variant Row Image Upload Styling */
+.vr-image-section {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+}
+.vr-upload-trigger-btn {
+  transition: all 0.2s;
+}
+.vr-upload-trigger-btn:hover {
+  background: var(--p) !important;
+  color: white !important;
+  border-color: var(--p) !important;
+}
+
