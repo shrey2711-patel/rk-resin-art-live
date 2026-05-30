@@ -1061,6 +1061,56 @@
           "imageUrl": "/uploads/screenshot-2026-05-30-172434-1780144714262-53195770.png"
         }
       ]
+    },
+    {
+      "id": 73,
+      "stock": 8,
+      "name": "apple",
+      "price": 200,
+      "originalPrice": null,
+      "category": "Stickers",
+      "emoji": "📦",
+      "badge": "",
+      "description": "",
+      "imageUrl": "/uploads/screenshot-2026-05-30-172434-1780145424669-962487508.png",
+      "imgRatio": "16:9",
+      "variantLabel": "Pack",
+      "variants": [
+        {
+          "label": "6",
+          "price": 200,
+          "stock": 4,
+          "imageUrl": "/uploads/screenshot-2026-05-30-172434-1780145424669-962487508.png"
+        },
+        {
+          "label": "3",
+          "price": 165,
+          "stock": 4,
+          "imageUrl": "/uploads/screenshot-2026-05-30-172404-1780145444945-80916278.png"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "stock": 3,
+      "name": "sdfbdfb",
+      "price": 453,
+      "originalPrice": null,
+      "category": "Stickers",
+      "emoji": "📦",
+      "badge": "",
+      "description": "",
+      "imageUrl": "/uploads/chatgpt-image-may-23-2026-11-36-29-pm-1780145540988-309759102.png",
+      "imgRatio": "4:3",
+      "variantLabel": "Volume",
+      "variants": [
+        {
+          "label": "400 litr",
+          "price": 453,
+          "stock": 3,
+          "imageUrl": "/uploads/chatgpt-image-may-23-2026-11-36-29-pm-1780145540988-309759102.png"
+        }
+      ]
     }
   ],
   "orders": [

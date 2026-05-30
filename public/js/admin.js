@@ -284,13 +284,11 @@ const Admin = {
     if (cancel) cancel.style.display = 'none';
     this.editState = { section: null, id: null };
     
-    // Show base price/stock container when resetting
+    // Keep base Price/Stock/Image containers hidden
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
-    if (basePriceStockContainer) basePriceStockContainer.style.display = '';
-
-    // Show base image container when resetting
+    if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
     const baseImageContainer = document.getElementById('pfBaseImageContainer');
-    if (baseImageContainer) baseImageContainer.style.display = '';
+    if (baseImageContainer) baseImageContainer.style.display = 'none';
 
     // Reset variants
     const vlSel = document.getElementById('pfVariantLabel');
@@ -301,6 +299,7 @@ const Admin = {
     if (addBtn) addBtn.style.display = 'none';
     const rows = document.getElementById('pfVariantRows');
     if (rows) rows.innerHTML = '';
+    this.addVariantRow('Standard', '', '');
   },
 
   setProductEdit(product) {
@@ -323,17 +322,11 @@ const Admin = {
     if (cancel) cancel.style.display = '';
     this.editState = { section: 'product', id: product.id };
     
-    // Toggle base price/stock inputs visibility based on variants
+    // Keep base Price/Stock/Image containers hidden
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
-    if (basePriceStockContainer) {
-      basePriceStockContainer.style.display = product.variantLabel ? 'none' : '';
-    }
-
-    // Toggle base image container visibility based on variants
+    if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
     const baseImageContainer = document.getElementById('pfBaseImageContainer');
-    if (baseImageContainer) {
-      baseImageContainer.style.display = product.variantLabel ? 'none' : '';
-    }
+    if (baseImageContainer) baseImageContainer.style.display = 'none';
 
     // Populate variants
     const vlSel = document.getElementById('pfVariantLabel');
@@ -348,16 +341,18 @@ const Admin = {
         vlSel.value = '';
         if (customInp) { customInp.value = ''; customInp.style.display = 'none'; }
         if (addBtn) addBtn.style.display = 'none';
+        this.addVariantRow('Standard', product.price, product.stock, product.imageUrl || '');
       } else if (knownLabels.includes(vl)) {
         vlSel.value = vl;
         if (customInp) customInp.style.display = 'none';
         if (addBtn) addBtn.style.display = '';
+        (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || ''));
       } else {
         vlSel.value = 'Custom';
         if (customInp) { customInp.value = vl; customInp.style.display = ''; }
         if (addBtn) addBtn.style.display = '';
+        (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || ''));
       }
-      (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || ''));
     }
   },
 
@@ -472,29 +467,22 @@ const Admin = {
     let imageUrl = '';
 
     if (variants.length > 0) {
-      // Derive base price and stock dynamically
       const firstPrice = variants[0].price;
       if (firstPrice === null || isNaN(firstPrice)) {
-        showToast('Please specify a price for at least your first variant option!', 'error');
+        showToast('Please specify a price!', 'error');
         return;
       }
       price = firstPrice;
-      // Populate base price for other variants if left blank
+      // Populate price for other options if left blank
       variants.forEach(v => {
         if (v.price === null) v.price = price;
       });
-      originalPrice = null;
+      originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
       stock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
-      
-      // Auto-assign the base product's main imageUrl to the first variant's image
       imageUrl = variants[0].imageUrl || '';
     } else {
-      // Normal simple product
-      price = parseFloat(document.getElementById('pfPrice').value);
-      if (isNaN(price)) { showToast('Product price is required', 'error'); return; }
-      originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
-      stock = parseInt(document.getElementById('pfStock').value) || 0;
-      imageUrl = pfBaseImageUrl;
+      showToast('Please add at least one option!', 'error');
+      return;
     }
 
     const imgRatio = document.getElementById('pfImgRatio')?.value || '4:3';
@@ -511,7 +499,7 @@ const Admin = {
       imageUrl,
       imgRatio,
       variantLabel: variantLabel || null,
-      variants: variants.length ? variants : null,
+      variants: variantLabel ? variants : null,
     };
 
     if (this.editState.section === 'product' && this.editState.id) {
@@ -547,8 +535,6 @@ const Admin = {
     const vlSel = document.getElementById('pfVariantLabel');
     const customInp = document.getElementById('pfVariantLabelCustom');
     const addBtn = document.getElementById('addVariantRowBtn');
-    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
-    const baseImageContainer = document.getElementById('pfBaseImageContainer');
     if (!vlSel) return;
 
     vlSel.onchange = () => {
@@ -558,8 +544,7 @@ const Admin = {
         if (addBtn) addBtn.style.display = 'none';
         const rowsEl = document.getElementById('pfVariantRows');
         if (rowsEl) rowsEl.innerHTML = '';
-        if (basePriceStockContainer) basePriceStockContainer.style.display = '';
-        if (baseImageContainer) baseImageContainer.style.display = '';
+        this.addVariantRow('Standard', '', '');
       } else {
         if (val === 'Custom') {
           if (customInp) customInp.style.display = '';
@@ -567,8 +552,11 @@ const Admin = {
           if (customInp) { customInp.style.display = 'none'; customInp.value = ''; }
         }
         if (addBtn) addBtn.style.display = '';
-        if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
-        if (baseImageContainer) baseImageContainer.style.display = 'none';
+        const rowsEl = document.getElementById('pfVariantRows');
+        if (rowsEl) {
+          rowsEl.innerHTML = '';
+          this.addVariantRow('', '', '');
+        }
       }
     };
 
@@ -583,15 +571,21 @@ const Admin = {
     const row = document.createElement('div');
     row.className = 'admin-variant-row';
     
+    const vlSel = document.getElementById('pfVariantLabel');
+    const hasLabel = vlSel && vlSel.value;
+    const labelStyle = hasLabel ? '' : 'display:none;';
+    const labelVal = hasLabel ? label : 'Standard';
+    const removeBtnStyle = hasLabel ? '' : 'display:none;';
+
     const thumbHtml = imageUrl
       ? `<img class="vr-thumb-img" src="${imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
       : `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
 
     row.innerHTML = `
-      <span class="admin-variant-row-label">Option:</span>
-      <input class="vr-label" placeholder="e.g. Size 6 / 100g" value="${label}" maxlength="50">
+      <span class="admin-variant-row-label" style="${labelStyle}">Option:</span>
+      <input class="vr-label" placeholder="e.g. Size 6 / 100g" value="${labelVal}" maxlength="50" style="${labelStyle}">
       <span class="admin-variant-row-label">Price ₹:</span>
-      <input class="vr-price" type="number" placeholder="same as base" value="${price}" min="0" style="max-width:90px">
+      <input class="vr-price" type="number" placeholder="Price" value="${price}" min="0" style="max-width:90px">
       <span class="admin-variant-row-label">Stock:</span>
       <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:70px">
       
@@ -605,7 +599,7 @@ const Admin = {
         <input class="vr-file-input" type="file" accept="image/*" style="display:none">
       </div>
       
-      <button type="button" class="admin-remove-variant-btn" title="Remove">✕</button>`;
+      <button type="button" class="admin-remove-variant-btn" title="Remove" style="${removeBtnStyle}">✕</button>`;
 
     // Wire events
     row.querySelector('.vr-upload-trigger-btn').onclick = () => {
