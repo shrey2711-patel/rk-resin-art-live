@@ -844,6 +844,37 @@ const App = {
 
     meta.textContent = `${total} product${total !== 1 ? 's' : ''} found`;
 
+    // Dynamic JSON-LD Product Schema for SEO Search Rich Results
+    try {
+      let schemaScript = document.getElementById('product-schema-ld');
+      if (!schemaScript) {
+        schemaScript = document.createElement('script');
+        schemaScript.id = 'product-schema-ld';
+        schemaScript.type = 'application/ld+json';
+        document.head.appendChild(schemaScript);
+      }
+      const schemaData = {
+        "@context": "https://schema.org",
+        "@graph": products.map(p => ({
+          "@type": "Product",
+          "@id": `https://rkresinart.com/#product-${p.id}`,
+          "name": p.name,
+          "image": p.image || (p.images && p.images[0]) || "https://rkresinart.com/logo.png",
+          "description": p.description || `Buy ${p.name} online from RK Creation. High quality ${p.category || 'craft supplies'} at best price.`,
+          "offers": {
+            "@type": "Offer",
+            "price": p.price,
+            "priceCurrency": "INR",
+            "availability": "https://schema.org/InStock",
+            "url": `https://rkresinart.com/?product=${p.id}`
+          }
+        }))
+      };
+      schemaScript.textContent = JSON.stringify(schemaData);
+    } catch (err) {
+      console.error("SEO schema error: ", err);
+    }
+
     if (!products.length) {
       grid.innerHTML = `<div class="no-results"><div class="nr-icon">🔍</div><p>No products found</p><small>Try a different category or search term</small></div>`;
       document.getElementById('pagination').innerHTML = '';

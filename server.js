@@ -18,8 +18,16 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'rk-resin-art-secret-2024';
-const DB_PATH = path.join(__dirname, 'data', 'db.json');
-const UPLOAD_DIR = path.join(__dirname, 'data', 'uploads');
+const PERSISTENT_DIR = process.env.PERSISTENT_DISK_PATH || path.join(__dirname, 'data');
+if (!fs.existsSync(PERSISTENT_DIR)) {
+  fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
+}
+
+const DB_PATH = path.join(PERSISTENT_DIR, 'db.json');
+const UPLOAD_DIR = path.join(PERSISTENT_DIR, 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 // Initialize Razorpay SDK using credentials
 const razorpay = new Razorpay({
@@ -1971,6 +1979,58 @@ app.post('/api/admin/orders/:id/notify-shipping', requireAdmin, async (req, res)
   } catch (err) {
     console.error('Failed to send shipping email:', err.message);
     res.status(500).json({ error: 'Failed to send email: ' + err.message });
+  }
+});
+
+// GET sitemap.xml dynamically generated for search crawlers (SEO)
+app.get('/sitemap.xml', (req, res) => {
+  try {
+    const db = readDB();
+    const products = db.products || [];
+    const categories = db.categories || [];
+    
+    res.header('Content-Type', 'application/xml');
+    
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    
+    // Add home page
+    xml += `  <url>\n`;
+    xml += `    <loc>https://rkresinart.com/</loc>\n`;
+    xml += `    <changefreq>daily</changefreq>\n`;
+    xml += `    <priority>1.0</priority>\n`;
+    xml += `  </url>\n`;
+    
+    // Add static track page link
+    xml += `  <url>\n`;
+    xml += `    <loc>https://rkresinart.com/?page=track</loc>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.6</priority>\n`;
+    xml += `  </url>\n`;
+    
+    // Add categories
+    categories.forEach(cat => {
+      xml += `  <url>\n`;
+      xml += `    <loc>https://rkresinart.com/?category=${encodeURIComponent(cat.name)}</loc>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
+      xml += `  </url>\n`;
+    });
+    
+    // Add dynamic products
+    products.forEach(p => {
+      xml += `  <url>\n`;
+      xml += `    <loc>https://rkresinart.com/?product=${p.id}</loc>\n`;
+      xml += `    <changefreq>daily</changefreq>\n`;
+      xml += `    <priority>0.9</priority>\n`;
+      xml += `  </url>\n`;
+    });
+    
+    xml += `</urlset>`;
+    res.send(xml);
+  } catch (err) {
+    console.error("Failed to generate sitemap.xml: ", err);
+    res.status(500).send("Error generating sitemap");
   }
 });
 

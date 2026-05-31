@@ -2,16 +2,29 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --p: #e5383b;            /* strawberry-red */
-  --pd: #ba181b;           /* mahogany-red-2 */
-  --pl: #f5f3f4;           /* white-smoke */
-  --ink: #0b090a;          /* onyx */
-  --muted: #b1a7a6;        /* silver */
-  --border: #d3d3d3;       /* dust-grey */
-  --bg: #f5f3f4;           /* white-smoke */
-  --white: #ffffff;        /* white */
-  --card: #ffffff;
-  --red: #e5383b;          /* strawberry-red */
+  /* Exact custom hex variables requested by user */
+  --onyx: #0b090aff;
+  --carbon-black: #161a1dff;
+  --dark-garnet: #660708ff;
+  --mahogany-red: #a4161aff;
+  --mahogany-red-2: #ba181bff;
+  --strawberry-red: #e5383bff;
+  --silver: #b1a7a6ff;
+  --dust-grey: #d3d3d3ff;
+  --white-smoke: #f5f3f4ff;
+  --white-color: #ffffffff;
+
+  /* Global Theme System Mappings - Light Theme */
+  --p: var(--strawberry-red);
+  --pd: var(--mahogany-red-2);
+  --pl: var(--white-smoke);
+  --ink: var(--onyx);
+  --muted: var(--silver);
+  --border: var(--dust-grey);
+  --bg: var(--white-smoke);
+  --white: var(--white-color);
+  --card: var(--white-color);
+  --red: var(--strawberry-red);
   --green: #10b981;
   --gold: #f59e0b;
   --shadow: 0 8px 30px rgba(11, 9, 10, 0.04);
@@ -22,24 +35,26 @@
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
-  --bg: #0b090a;           /* onyx */
-  --white: #161a1d;        /* carbon-black */
-  --card: #22262a;         /* dark charcoal carbon */
-  --ink: #f5f3f4;          /* white-smoke */
-  --muted: #b1a7a6;        /* silver */
-  --border: #2c353c;       /* dark carbon border */
-  --p: #e5383b;            /* strawberry-red */
-  --pd: #ba181b;
-  --pl: #660708;           /* dark-garnet */
-  --red: #e5383b;
+  /* Global Theme System Mappings - Dark Theme */
+  --bg: var(--onyx);
+  --white: var(--carbon-black);
+  --card: #1f2327;         /* sleek dark charcoal carbon slightly lighter than carbon black for visual depth */
+  --ink: var(--white-smoke);
+  --muted: var(--silver);
+  --border: #2c353c;       /* sleek carbon border */
+  --p: var(--strawberry-red);
+  --pd: var(--mahogany-red-2);
+  --pl: var(--dark-garnet);
+  --red: var(--strawberry-red);
   --green: #34d399;
   --shadow: 0 10px 30px rgba(0,0,0,0.5);
   --shadow-lg: 0 18px 44px rgba(0,0,0,0.6);
 }
+
 [data-theme="dark"] body { background: var(--bg); }
-[data-theme="dark"] .header { background: var(--white); border-color: var(--border); }
-[data-theme="dark"] .announce-bar { background: var(--bg); }
-[data-theme="dark"] .site-nav { background: var(--white); }
+[data-theme="dark"] .header { background: var(--white); border-bottom: 2px solid var(--dark-garnet); }
+[data-theme="dark"] .announce-bar { background: var(--dark-garnet); border-bottom: 2px solid var(--mahogany-red); }
+[data-theme="dark"] .site-nav { background: var(--white); border-top: 1px solid var(--dark-garnet); }
 [data-theme="dark"] .banner-section, [data-theme="dark"] .banner-dots { background: var(--bg); }
 [data-theme="dark"] .cart-drawer { background: var(--white); }
 [data-theme="dark"] .product-modal,
@@ -56,7 +71,7 @@
 [data-theme="dark"] .prod-card { background: var(--card); border-color: var(--border); }
 [data-theme="dark"] .search-field { background: var(--card); color: var(--ink); border-color: var(--border); }
 [data-theme="dark"] .drawer-footer { background: var(--card); }
-[data-theme="dark"] .site-footer { background: var(--bg); }
+[data-theme="dark"] .site-footer { background: var(--onyx) !important; }
 [data-theme="dark"] .account-card { background: var(--card); }
 [data-theme="dark"] .account-address { background: var(--card); }
 [data-theme="dark"] .order-card { background: var(--card); }
@@ -73,7 +88,10 @@ input, select, textarea { font-family: inherit; }
 /* ─── Announce Bar ──────────────────────────────────────── */
 .announce-bar {
   width: 100%; overflow: hidden; white-space: nowrap;
-  background: var(--pd); color: white; padding: 10px 0; position: relative;
+  background: var(--dark-garnet); color: var(--white-smoke); padding: 10px 0; position: relative;
+  border-bottom: 2px solid var(--mahogany-red-2);
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 .announce-track {
   display: inline-block; padding-left: 100%;
@@ -1020,18 +1038,19 @@ input, select, textarea { font-family: inherit; }
 
 /* ─── Footer ────────────────────────────────────────────── */
 .site-footer {
-  background: #0b090a; color: rgba(255,255,255,0.78);
-  padding: 42px 2rem 18px; margin-top: 2rem;
+  background: var(--onyx) !important; color: var(--silver);
+  padding: 42px 2rem 18px; margin-top: 3rem;
+  border-top: 4px solid var(--dark-garnet);
 }
 .footer-grid {
   max-width: 1200px; margin: 0 auto;
   display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px;
 }
-.footer-brand { color: #fff; font-size: 1.2rem; font-weight: 900; margin-bottom: 8px; }
-.site-footer h4 { color: #fff; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-.site-footer p, .site-footer a, .footer-link { color: rgba(255,255,255,0.74); font-size: 0.86rem; line-height: 1.7; text-decoration: none; }
-.footer-link { display: block; background: none; border: none; padding: 0; text-align: left; cursor: pointer; }
-.site-footer a:hover, .footer-link:hover { color: #fff; }
+.footer-brand { color: var(--white-smoke); font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.02em; }
+.site-footer h4 { color: var(--white); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.site-footer p, .site-footer a, .footer-link { color: var(--silver); font-size: 0.86rem; line-height: 1.7; text-decoration: none; }
+.footer-link { display: block; background: none; border: none; padding: 0; text-align: left; cursor: pointer; transition: color 0.2s; }
+.site-footer a:hover, .footer-link:hover { color: var(--strawberry-red); }
 
 /* footer contact section premium contrast styling */
 .footer-contact-list {
@@ -1043,7 +1062,7 @@ input, select, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--silver);
   font-size: 0.86rem;
   line-height: 1.6;
 }
@@ -1051,7 +1070,7 @@ input, select, textarea { font-family: inherit; }
   align-items: flex-start;
 }
 .footer-contact-item svg {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--silver);
   flex-shrink: 0;
   transition: color 0.2s;
 }
@@ -1059,22 +1078,22 @@ input, select, textarea { font-family: inherit; }
   margin-top: 4px;
 }
 .footer-contact-item:hover svg {
-  color: #ffffff;
+  color: var(--white-smoke);
 }
 .footer-contact-item a {
-  color: #5eead4 !important; /* bright contrast mint-teal */
+  color: var(--strawberry-red) !important;
   font-weight: 700;
   text-decoration: none;
   transition: color 0.2s, text-decoration 0.2s;
 }
 .footer-contact-item a:hover {
-  color: #ffffff !important;
+  color: var(--white-smoke) !important;
   text-decoration: underline;
 }
 .footer-bottom {
   max-width: 1200px; margin: 26px auto 0; padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.13);
-  color: rgba(255,255,255,0.55); font-size: 0.78rem;
+  border-top: 1px solid rgba(177, 167, 166, 0.15);
+  color: var(--silver); font-size: 0.78rem;
 }
 
 /* ─── Payment Methods Selector ──────────────────────────── */
