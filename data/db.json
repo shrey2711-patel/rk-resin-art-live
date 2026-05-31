@@ -2703,12 +2703,12 @@
       "couponCode": null,
       "shipping": 0,
       "grandTotal": 4010,
-      "status": "confirmed",
+      "status": "shipped",
       "paymentStatus": "Paid (Razorpay)",
       "paymentId": "pay_SvXaXzj4BFZXiK",
       "createdAt": "2026-05-30T10:21:55.436Z",
-      "courierName": "",
-      "trackingId": ""
+      "courierName": "sgdg",
+      "trackingId": "12345654321`"
     }
   ],
   "cart": [],
