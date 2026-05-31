@@ -2745,6 +2745,33 @@
       "pin": "363020",
       "passwordHash": "$2a$10$OdxkZbuPlBiUvqOYsAuqdur0XMjit2ALgy8jeYT/ab6Ooq2kFuCbW",
       "createdAt": "2026-05-27T08:40:47.004Z"
+    },
+    {
+      "id": 4,
+      "name": "Shrey Patel",
+      "email": "shrey_test_1780254905763@email.com",
+      "phone": "+91 9999999999",
+      "address": "Umiyanagar",
+      "city": "Surendranagar",
+      "pin": "363020",
+      "passwordHash": "$2a$10$78WVWdMrMJ0ANhqsiraTWOUXobYtniRG4ouVSTWh1LtCJDLOoV2DK",
+      "createdAt": "2026-05-31T19:15:05.956Z",
+      "cart": [
+        {
+          "id": 10,
+          "name": "Crystal UV Resin 250g",
+          "price": 699,
+          "qty": 2,
+          "selectedVariant": "250g"
+        },
+        {
+          "id": 15,
+          "name": "Silicon Jewellery Mould",
+          "price": 199,
+          "qty": 1,
+          "selectedVariant": null
+        }
+      ]
     }
   ],
   "reviews": [

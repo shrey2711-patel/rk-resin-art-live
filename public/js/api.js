@@ -147,6 +147,8 @@ const API = {
   getProfile: () => API.userGet('/api/auth/me'),
   updateProfile: (data) => API.userPut('/api/auth/profile', data),
   getUserOrders: () => API.userGet('/api/auth/orders'),
+  getCart: () => API.userGet('/api/auth/cart'),
+  updateCart: (cart) => API.userPut('/api/auth/cart', { cart }),
 
   // ── Admin auth ────────────────────────────────────────────
   adminLogin: async (password) => {

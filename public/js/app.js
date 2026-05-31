@@ -26,6 +26,7 @@ const App = {
     this.bindFooter();
     this.bindMobileNav();
     Auth.init();
+    if (typeof Cart !== 'undefined') Cart.syncWithServer();
     // Coupon apply listener
     const applyBtn = document.getElementById('applyPromoBtn');
     if (applyBtn) {
@@ -1635,6 +1636,9 @@ const Auth = {
       if (typeof Wishlist !== 'undefined') {
         Wishlist.syncAllSubscriptions();
       }
+      if (typeof Cart !== 'undefined') {
+        Cart.syncWithServer();
+      }
     } catch {
       this.message('Invalid email or password.', 'error');
     }
@@ -1662,6 +1666,9 @@ const Auth = {
       if (typeof Wishlist !== 'undefined') {
         Wishlist.syncAllSubscriptions();
       }
+      if (typeof Cart !== 'undefined') {
+        Cart.syncWithServer();
+      }
     } catch (e) {
       this.message(e.message || 'Could not create account.', 'error');
     }
@@ -1673,6 +1680,9 @@ const Auth = {
     this.render();
     this.message('Logged out.', 'success');
     showToast('Logged out', 'success');
+    if (typeof Cart !== 'undefined') {
+      Cart.clear();
+    }
   }
 };
 

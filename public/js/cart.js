@@ -5,10 +5,13 @@ const Cart = {
   save() {
     localStorage.setItem('rk_cart', JSON.stringify(this.items));
     this.updateBadge();
+    if (typeof API !== 'undefined' && API.isUserLoggedIn()) {
+      API.updateCart(this.items).catch(() => {});
+    }
   },
 
   add(product) {
-    const existing = this.items.find(i => i.id === product.id && i.selectedVariant === product.selectedVariant);
+    const existing = this.items.find(i => i.id === product.id && (i.selectedVariant || null) === (product.selectedVariant || null));
     const currentQty = existing ? existing.qty : 0;
     if (product.stock !== undefined && currentQty + 1 > product.stock) {
       showToast(`Sorry, only ${product.stock} units available!`, 'error');
@@ -25,13 +28,13 @@ const Cart = {
   },
 
   remove(id, selectedVariant = null) {
-    this.items = this.items.filter(i => !(i.id === id && i.selectedVariant === selectedVariant));
+    this.items = this.items.filter(i => !(i.id === id && (i.selectedVariant || null) === (selectedVariant || null)));
     this.save();
     this.renderDrawer();
   },
 
   updateQty(id, selectedVariant, delta) {
-    const item = this.items.find(i => i.id === id && i.selectedVariant === selectedVariant);
+    const item = this.items.find(i => i.id === id && (i.selectedVariant || null) === (selectedVariant || null));
     if (!item) return;
     if (delta > 0 && item.stock !== undefined && item.qty + delta > item.stock) {
       showToast(`Only ${item.stock} units available!`, 'error');
@@ -129,6 +132,27 @@ const Cart = {
   closeDrawer() {
     document.getElementById('cartDrawer').classList.remove('open');
     document.getElementById('drawerOverlay').classList.remove('open');
+  },
+
+  async syncWithServer() {
+    if (typeof API !== 'undefined' && API.isUserLoggedIn()) {
+      try {
+        const res = await API.getCart();
+        if (res && Array.isArray(res.cart)) {
+          const serverItems = res.cart;
+          if (serverItems.length > 0) {
+            this.items = serverItems;
+            localStorage.setItem('rk_cart', JSON.stringify(this.items));
+            this.updateBadge();
+            this.renderDrawer();
+          } else if (this.items.length > 0) {
+            await API.updateCart(this.items);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to sync cart with server:', err);
+      }
+    }
   }
 };
 

@@ -1311,6 +1311,25 @@ app.put('/api/auth/profile', requireUser, (req, res) => {
   res.json({ user: publicUser(db.users[idx]) });
 });
 
+// GET customer cart (sync from db)
+app.get('/api/auth/cart', requireUser, (req, res) => {
+  const db = readDB();
+  const user = (db.users || []).find(u => u.id === req.user.userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json({ cart: user.cart || [] });
+});
+
+// PUT customer cart (sync to db)
+app.put('/api/auth/cart', requireUser, (req, res) => {
+  const db = readDB();
+  const idx = db.users.findIndex(u => u.id === req.user.userId);
+  if (idx === -1) return res.status(404).json({ error: 'User not found' });
+  
+  db.users[idx].cart = req.body.cart || [];
+  writeDB(db);
+  res.json({ success: true, cart: db.users[idx].cart });
+});
+
 // GET my orders (customer)
 app.get('/api/auth/orders', requireUser, (req, res) => {
   const db = readDB();
