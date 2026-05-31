@@ -26,7 +26,13 @@ const App = {
     this.bindFooter();
     this.bindMobileNav();
     Auth.init();
-    if (typeof Cart !== 'undefined') Cart.syncWithServer();
+    if (typeof Cart !== 'undefined') {
+      Cart.syncWithServer();
+      // Start real-time cross-device cart synchronization every 4 seconds
+      setInterval(() => {
+        Cart.syncWithServer(true);
+      }, 4000);
+    }
     // Coupon apply listener
     const applyBtn = document.getElementById('applyPromoBtn');
     if (applyBtn) {

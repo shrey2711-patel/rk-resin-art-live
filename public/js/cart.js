@@ -2,10 +2,10 @@
 const Cart = {
   items: JSON.parse(localStorage.getItem('rk_cart') || '[]'),
 
-  save() {
+  save(syncWithServer = true) {
     localStorage.setItem('rk_cart', JSON.stringify(this.items));
     this.updateBadge();
-    if (typeof API !== 'undefined' && API.isUserLoggedIn()) {
+    if (syncWithServer && typeof API !== 'undefined' && API.isUserLoggedIn()) {
       API.updateCart(this.items).catch(() => {});
     }
   },
@@ -134,19 +134,28 @@ const Cart = {
     document.getElementById('drawerOverlay').classList.remove('open');
   },
 
-  async syncWithServer() {
+  async syncWithServer(forceOverwrite = false) {
     if (typeof API !== 'undefined' && API.isUserLoggedIn()) {
       try {
         const res = await API.getCart();
         if (res && Array.isArray(res.cart)) {
           const serverItems = res.cart;
-          if (serverItems.length > 0) {
-            this.items = serverItems;
-            localStorage.setItem('rk_cart', JSON.stringify(this.items));
-            this.updateBadge();
-            this.renderDrawer();
-          } else if (this.items.length > 0) {
-            await API.updateCart(this.items);
+          if (forceOverwrite) {
+            const localStr = JSON.stringify(this.items);
+            const serverStr = JSON.stringify(serverItems);
+            if (localStr !== serverStr) {
+              this.items = serverItems;
+              this.save(false);
+              this.renderDrawer();
+            }
+          } else {
+            if (serverItems.length > 0) {
+              this.items = serverItems;
+              this.save(false);
+              this.renderDrawer();
+            } else if (this.items.length > 0) {
+              this.save(true);
+            }
           }
         }
       } catch (err) {
