@@ -895,9 +895,6 @@ const Admin = {
 
       // Build WhatsApp notification message for customer
       const discountLine = o.discount && o.discount > 0 ? `🎟️ Discount (${o.couponCode}): -₹${Number(o.discount).toLocaleString('en-IN')}\n` : '';
-      const trackingText = o.courierName && o.trackingNumber
-        ? `\n\n🚚 SHIPMENT DETAILS:\nCourier: ${o.courierName}\nTracking No: ${o.trackingNumber}\nTrack here: https://www.google.com/search?q=${encodeURIComponent(o.courierName + ' tracking ' + o.trackingNumber)}`
-        : '';
       const waMsg = encodeURIComponent(
         `Hello ${fullName}! 👋\n\n` +
         `Your RK Creation order #${o.id} has been *${(o.status || 'confirmed').toUpperCase()}*! 🎉\n\n` +
@@ -906,28 +903,13 @@ const Admin = {
         `Subtotal: ₹${Number(o.total || (o.grandTotal + (o.discount || 0) - o.shipping)).toLocaleString('en-IN')}\n` +
         discountLine +
         `🚚 Shipping: ${o.shipping === 0 ? 'FREE' : `₹${o.shipping}`}\n` +
-        `*Grand Total: ₹${Number(o.grandTotal).toLocaleString('en-IN')}*` +
-        trackingText + `\n\n` +
+        `*Grand Total: ₹${Number(o.grandTotal).toLocaleString('en-IN')}*\n\n` +
         `Thank you for shopping with RK Creation! 🙏\n` +
         `If you have any questions, just reply to this message.`
       );
       const cleanPhone = hasPhone ? c.phone.replace(/[^0-9]/g, '') : '';
       const waLink = hasPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${waMsg}` : '#';
 
-      const shipmentDetailsHtml = `
-      <div class="order-shipment-details" style="margin-top: 10px; padding: 10px; background: var(--bg); border-radius: 8px;">
-        <div style="display: flex; gap: 10px;">
-          <div style="flex: 1;">
-            <label style="font-size: 0.7rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px;">Courier Name</label>
-            <input type="text" class="admin-input order-courier-input" data-oid="${o.id}" placeholder="e.g. DTDC, Delhivery" value="${o.courierName || ''}" style="padding: 6px 10px; font-size: 0.82rem; height: auto; background: var(--white); color: var(--ink);">
-          </div>
-          <div style="flex: 1;">
-            <label style="font-size: 0.7rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px;">Tracking Number / AWB</label>
-            <input type="text" class="admin-input order-tracking-input" data-oid="${o.id}" placeholder="e.g. AWB12345" value="${o.trackingNumber || ''}" style="padding: 6px 10px; font-size: 0.82rem; height: auto; background: var(--white); color: var(--ink);">
-          </div>
-        </div>
-      </div>`;
- 
       return `
       <div class="order-card" data-oid="${o.id}">
         <div class="order-head">
@@ -940,7 +922,6 @@ const Admin = {
         <div class="order-customer">👤 <strong>${fullName}</strong> | 📞 ${c.phone || '—'} | ${c.city || ''}</div>
         ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.pin].filter(Boolean).join(', ')}</div>` : ''}
         <div class="order-items-list">${itemsSummary}</div>
-        ${shipmentDetailsHtml}
         <div class="order-footer">
           <span class="order-total">₹${Number(o.grandTotal).toLocaleString('en-IN')}</span>
           <div class="order-actions">
@@ -960,25 +941,15 @@ const Admin = {
         </div>
       </div>`;
     }).join('');
- 
+
     // Save status
     list.querySelectorAll('[data-save-oid]').forEach(btn => {
       btn.onclick = async () => {
         const oid = Number(btn.dataset.saveOid);
         const sel = list.querySelector(`.order-status-select[data-oid="${oid}"]`);
-        const courierInput = list.querySelector(`.order-courier-input[data-oid="${oid}"]`);
-        const trackingInput = list.querySelector(`.order-tracking-input[data-oid="${oid}"]`);
         if (!sel) return;
-
-        const courierName = courierInput ? courierInput.value.trim() : '';
-        const trackingNumber = trackingInput ? trackingInput.value.trim() : '';
-
         try {
-          await API.updateOrder(oid, { 
-            status: sel.value,
-            courierName: courierName,
-            trackingNumber: trackingNumber
-          });
+          await API.updateOrder(oid, { status: sel.value });
           await this.loadAll();
           this.renderOrders();
           showToast('Order status updated ✓', 'success');

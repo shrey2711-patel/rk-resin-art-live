@@ -81,7 +81,6 @@ const App = {
     }
 
     this.setupPaymentSelector();
-    this.initOrderTracking();
     this.initRouter();
   },
 
@@ -198,133 +197,6 @@ const App = {
       this.state.paymentMethod = 'cod';
       document.getElementById('placeOrderBtn').textContent = 'Send Inquiry on WhatsApp';
     };
-  },
-
-  // ── Order Tracking ─────────────────────────────────────────
-  initOrderTracking() {
-    const openBtn = document.getElementById('openTrackOrderBtn');
-    const footerBtn = document.getElementById('footerTrackBtn');
-    const closeBtn = document.getElementById('closeTrackOrder');
-    const overlay = document.getElementById('trackOrderModalOverlay');
-    const searchBtn = document.getElementById('searchTrackBtn');
-    
-    if (openBtn) openBtn.onclick = () => overlay.classList.add('active');
-    if (footerBtn) footerBtn.onclick = () => overlay.classList.add('active');
-    if (closeBtn) closeBtn.onclick = () => {
-      overlay.classList.remove('active');
-      this.resetTrackingModal();
-    };
-    
-    if (overlay) {
-      overlay.onclick = (e) => {
-        if (e.target === overlay) {
-          overlay.classList.remove('active');
-          this.resetTrackingModal();
-        }
-      };
-    }
-
-    if (searchBtn) {
-      searchBtn.onclick = async () => {
-        const orderId = document.getElementById('trOrderId').value.trim();
-        const phone = document.getElementById('trPhone').value.trim();
-        const resultContainer = document.getElementById('trackResultContainer');
-        const errorEl = document.getElementById('trackErrorMsg');
-        
-        if (!orderId || !phone) {
-          errorEl.textContent = 'Please enter both Order ID and Phone Number.';
-          errorEl.style.display = 'block';
-          resultContainer.style.display = 'none';
-          return;
-        }
-
-        searchBtn.disabled = true;
-        searchBtn.textContent = 'Searching...';
-        errorEl.style.display = 'none';
-        resultContainer.style.display = 'none';
-
-        try {
-          const res = await API.trackOrder(Number(orderId), phone);
-          searchBtn.disabled = false;
-          searchBtn.textContent = 'Track Status';
-          
-          this.renderTrackingResult(res);
-        } catch (err) {
-          searchBtn.disabled = false;
-          searchBtn.textContent = 'Track Status';
-          errorEl.textContent = err.message || 'Verification failed. Please check details.';
-          errorEl.style.display = 'block';
-        }
-      };
-    }
-  },
-
-  resetTrackingModal() {
-    document.getElementById('trOrderId').value = '';
-    document.getElementById('trPhone').value = '';
-    const container = document.getElementById('trackResultContainer');
-    const errorEl = document.getElementById('trackErrorMsg');
-    if (container) container.style.display = 'none';
-    if (errorEl) errorEl.style.display = 'none';
-  },
-
-  renderTrackingResult(order) {
-    const container = document.getElementById('trackResultContainer');
-    if (!container) return;
-
-    const steps = ['pending', 'confirmed', 'shipped', 'delivered'];
-    const currentIdx = steps.indexOf((order.status || 'pending').toLowerCase());
-
-    const stepLabel = {
-      pending: 'Placed',
-      confirmed: 'Confirmed',
-      shipped: 'Shipped',
-      delivered: 'Delivered'
-    };
-
-    const timelineHtml = steps.map((s, idx) => {
-      let cls = '';
-      if (idx < currentIdx) cls = 'completed';
-      else if (idx === currentIdx) cls = 'active';
-      return `
-        <div class="tracking-step ${cls}">
-          <div class="tracking-step-circle">${idx + 1}</div>
-          <div class="tracking-step-label">${stepLabel[s]}</div>
-        </div>`;
-    }).join('');
-
-    const trackingLink = order.trackingNumber ? `
-      <div style="margin-top: 15px; text-align: center;">
-        <a href="https://www.google.com/search?q=${encodeURIComponent(order.courierName + ' tracking ' + order.trackingNumber)}" target="_blank" class="checkout-btn" style="display: inline-block; text-decoration: none; padding: 10px 20px; font-size: 0.88rem; width: auto; border-radius: 8px;">
-          🚚 Track via ${order.courierName || 'Courier'}
-        </a>
-      </div>
-    ` : '';
-
-    container.innerHTML = `
-      <div class="tracking-timeline">
-        ${timelineHtml}
-      </div>
-      <div style="background: var(--bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border); font-size: 0.88rem; line-height: 1.6; color: var(--ink);">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--muted);">Order Status:</span>
-          <strong class="order-status-badge status-${order.status}" style="font-size: 0.82rem; padding: 2px 8px; border-radius: 4px;">
-            ${(order.status || 'Pending').toUpperCase()}
-          </strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--muted);">Courier:</span>
-          <strong>${order.courierName || 'Not yet shipped'}</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--muted);">Tracking Number:</span>
-          <strong>${order.trackingNumber || 'Pending'}</strong>
-        </div>
-        ${trackingLink}
-      </div>
-    `;
-
-    container.style.display = 'block';
   },
 
   // ── Settings / Announce ───────────────────────────────────
@@ -1677,25 +1549,6 @@ const Auth = {
         const date = new Date(o.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(', ');
         const statusClass = `status-${(o.status || 'pending').toLowerCase()}`;
-        
-        const trackingHtml = o.courierName && o.trackingNumber ? `
-          <div class="my-order-tracking-info" style="margin-top: 10px; padding: 10px; background: var(--bg); border-radius: 8px; font-size: 0.82rem; border: 1px solid var(--border); line-height: 1.5;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-              <span style="color: var(--muted);">Courier:</span>
-              <strong style="color: var(--ink);">${o.courierName}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-              <span style="color: var(--muted);">Tracking Number:</span>
-              <strong style="color: var(--ink);">${o.trackingNumber}</strong>
-            </div>
-            <div style="text-align: right;">
-              <a href="https://www.google.com/search?q=${encodeURIComponent(o.courierName + ' tracking ' + o.trackingNumber)}" target="_blank" style="display: inline-block; background: var(--p); color: white; text-decoration: none; padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; transition: background 0.2s;">
-                🚚 Track Order
-              </a>
-            </div>
-          </div>
-        ` : '';
-
         return `
           <div class="my-order-card">
             <div class="my-order-head">
@@ -1703,7 +1556,6 @@ const Auth = {
               <span class="my-order-date">${date}</span>
             </div>
             <div class="my-order-items">${itemsSummary}</div>
-            ${trackingHtml}
             <div class="my-order-footer">
               <span class="my-order-total">₹${Number(o.grandTotal).toLocaleString('en-IN')}</span>
               <span class="my-order-status ${statusClass}">${(o.status || 'Pending').charAt(0).toUpperCase() + (o.status || 'pending').slice(1)}</span>

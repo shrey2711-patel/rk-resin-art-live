@@ -1064,40 +1064,6 @@ app.post('/api/wishlist/subscribe', (req, res) => {
   res.json({ success: true, message: 'Subscribed to stock alert!' });
 });
 
-// Public Order Tracking Lookup
-app.post('/api/orders/track', (req, res) => {
-  const db = readDB();
-  const { orderId, phone } = req.body;
-
-  if (!orderId || !phone) {
-    return res.status(400).json({ error: 'Order ID and Phone Number are required.' });
-  }
-
-  const order = db.orders.find(o => o.id === Number(orderId));
-  if (!order) {
-    return res.status(404).json({ error: 'Order not found. Please check your Order ID.' });
-  }
-
-  // Normalize phone matching
-  const dbPhone = (order.customer && order.customer.phone) ? order.customer.phone.replace(/[^0-9]/g, '') : '';
-  const searchPhone = phone.replace(/[^0-9]/g, '');
-
-  if (!dbPhone || dbPhone.slice(-10) !== searchPhone.slice(-10)) {
-    return res.status(401).json({ error: 'Phone number does not match the record for this Order ID.' });
-  }
-
-  res.json({
-    id: order.id,
-    status: order.status || 'pending',
-    createdAt: order.createdAt,
-    grandTotal: order.grandTotal,
-    shipping: order.shipping,
-    courierName: order.courierName || null,
-    trackingNumber: order.trackingNumber || null,
-    items: (order.items || []).map(i => ({ name: i.name, qty: i.qty }))
-  });
-});
-
 // GET site settings (announce bar etc.)
 app.get('/api/settings', (req, res) => {
   const db = readDB();
