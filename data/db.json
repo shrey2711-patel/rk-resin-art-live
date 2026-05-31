@@ -216,7 +216,7 @@
       "badge": "",
       "emoji": "🟪",
       "swatchColor": "",
-      "stock": 35,
+      "stock": 33,
       "description": "Beautiful wave spiral silicone mould for candle making. 7cm x 6cm size."
     },
     {
@@ -2709,6 +2709,33 @@
       "createdAt": "2026-05-30T10:21:55.436Z",
       "courierName": "sgdg",
       "trackingId": "12345654321`"
+    },
+    {
+      "id": 45,
+      "userId": null,
+      "items": [
+        {
+          "id": 1,
+          "name": "Wave Spiral Candle Mould",
+          "price": 220,
+          "qty": 2
+        }
+      ],
+      "customer": {
+        "name": "Jane Doe",
+        "email": "jane@example.com",
+        "phone": "9876543210",
+        "address": "123 Art Lane",
+        "city": "Creative City",
+        "pincode": "400001"
+      },
+      "total": 440,
+      "discount": 44,
+      "couponCode": "ART10",
+      "shipping": 60,
+      "grandTotal": 456,
+      "status": "pending",
+      "createdAt": "2026-05-31T21:20:04.674Z"
     }
   ],
   "cart": [],
@@ -2783,6 +2810,33 @@
       "pin": "363020",
       "passwordHash": "$2a$10$HSoC1b3cOVjXKPwudSXpWOY1SoyTCvoloNzmPDRt0/R81LFEXhzky",
       "createdAt": "2026-05-31T19:23:55.008Z",
+      "cart": [
+        {
+          "id": 10,
+          "name": "Crystal UV Resin 250g",
+          "price": 699,
+          "qty": 2,
+          "selectedVariant": "250g"
+        },
+        {
+          "id": 15,
+          "name": "Silicon Jewellery Mould",
+          "price": 199,
+          "qty": 1,
+          "selectedVariant": null
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Shrey Patel",
+      "email": "shrey_test_1780262214723@email.com",
+      "phone": "+91 9999999999",
+      "address": "Umiyanagar",
+      "city": "Surendranagar",
+      "pin": "363020",
+      "passwordHash": "$2a$10$jJqPU5gBI16VLitdjOSGs.tgFUkYxpG8VmAHHJNFdfm9n9/3bxrRq",
+      "createdAt": "2026-05-31T21:16:54.926Z",
       "cart": [
         {
           "id": 10,
