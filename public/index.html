@@ -65,6 +65,9 @@
 
 
 
+        <button class="admin-btn" id="openTrackOrderBtn" style="background: transparent; color: var(--ink); border: 1.5px solid var(--border);" title="Track Order" aria-label="Track Order">
+          🚚 Track Order
+        </button>
         <button class="admin-btn" id="openAdminBtn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
           Admin
@@ -150,6 +153,7 @@
         <a href="https://wa.me/918141994995" target="_blank">WhatsApp Support</a>
         <button class="footer-link" id="footerAccountBtn">My Account</button>
         <button class="footer-link" id="footerCartBtn">View Cart</button>
+        <button class="footer-link" id="footerTrackBtn">🚚 Track Order</button>
       </div>
       <div>
         <h4>Contact</h4>
@@ -413,6 +417,32 @@
       </div>
 
       <div class="account-message" id="accountMessage"></div>
+    </div>
+  </div>
+
+  <!-- PUBLIC ORDER TRACKING MODAL -->
+  <div class="modal-overlay" id="trackOrderModalOverlay">
+    <div class="checkout-modal" style="max-width: 500px;">
+      <button class="modal-close" id="closeTrackOrder">&times;</button>
+      <h2 class="modal-title">🚚 Track Your Order</h2>
+      <div class="checkout-body" style="display: block; padding: 20px;">
+        <p style="font-size: 0.88rem; color: var(--muted); margin-bottom: 20px; text-align: center;">Enter your Order ID and phone number to fetch live tracking details.</p>
+        
+        <div class="form-field">
+          <label>Order ID *</label>
+          <input type="number" id="trOrderId" placeholder="e.g. 1002" style="border: 1.5px solid var(--border); border-radius: 8px; padding: 10px; width: 100%; box-sizing: border-box; background: var(--white); color: var(--ink);">
+        </div>
+        
+        <div class="form-field" style="margin-top: 15px;">
+          <label>Phone Number *</label>
+          <input type="tel" id="trPhone" placeholder="e.g. 9876543210" style="border: 1.5px solid var(--border); border-radius: 8px; padding: 10px; width: 100%; box-sizing: border-box; background: var(--white); color: var(--ink);">
+        </div>
+        
+        <button class="place-order-btn" id="searchTrackBtn" style="margin-top: 20px; width: 100%; font-weight: bold; background: var(--p);">Track Status</button>
+        
+        <div id="trackResultContainer" style="display: none; margin-top: 25px; padding-top: 20px; border-top: 1.5px solid var(--border);"></div>
+        <div id="trackErrorMsg" style="display: none; color: var(--red); font-weight: bold; text-align: center; margin-top: 15px; font-size: 0.88rem;"></div>
+      </div>
     </div>
   </div>
 

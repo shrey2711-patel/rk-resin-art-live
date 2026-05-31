@@ -2075,3 +2075,69 @@ body.cart-disabled #modalAddBtn {
 body.cart-disabled .prod-card-btns {
   grid-template-columns: 1fr;
 }
+
+/* ─── Shipment Tracking Stepper & Timeline ──────────────── */
+.tracking-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 30px 0;
+  padding: 0 10px;
+}
+.tracking-timeline::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 25px;
+  right: 25px;
+  height: 4px;
+  background: var(--border);
+  z-index: 1;
+}
+.tracking-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  text-align: center;
+}
+.tracking-step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--muted);
+  transition: all 0.3s;
+}
+.tracking-step-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.tracking-step.completed .tracking-step-circle {
+  background: var(--p);
+  border-color: var(--p);
+  color: white;
+}
+.tracking-step.completed .tracking-step-label {
+  color: var(--p);
+}
+.tracking-step.active .tracking-step-circle {
+  background: white;
+  border-color: var(--p);
+  color: var(--p);
+  box-shadow: 0 0 10px rgba(15,118,110,0.3);
+}
+.tracking-step.active .tracking-step-label {
+  color: var(--p);
+  font-weight: 800;
+}
