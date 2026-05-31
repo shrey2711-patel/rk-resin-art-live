@@ -185,6 +185,7 @@ const API = {
   // ── Admin orders ──────────────────────────────────────────
   getOrders: () => API.get('/api/admin/orders', true),
   updateOrder: (id, data) => API.put(`/api/admin/orders/${id}`, data, true),
+  notifyShipping: (id) => API.post(`/api/admin/orders/${id}/notify-shipping`, {}, true),
 
   // ── Reviews (customer) ─────────────────────────────────
   getProductReviews: (productId) => API.get(`/api/products/${productId}/reviews`),

@@ -1549,6 +1549,13 @@ const Auth = {
         const date = new Date(o.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         const itemsSummary = (o.items || []).map(i => `${i.name} ×${i.qty}`).join(', ');
         const statusClass = `status-${(o.status || 'pending').toLowerCase()}`;
+        
+        // Build tracking button if available
+        const trackingLink = o.trackingId ? (o.trackingId.startsWith('http') ? o.trackingId : `https://www.google.com/search?q=${encodeURIComponent((o.courierName || 'courier') + ' tracking ' + o.trackingId)}`) : '';
+        const trackingBtn = trackingLink ? `
+          <a href="${trackingLink}" target="_blank" class="my-order-track-btn" style="text-decoration:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; font-weight:700; background:var(--p); color:white; border:none; cursor:pointer; margin-right:8px; display:inline-block; transition: all 0.2s;">🚚 Track Order</a>
+        ` : '';
+
         return `
           <div class="my-order-card">
             <div class="my-order-head">
@@ -1559,7 +1566,10 @@ const Auth = {
             <div class="my-order-footer">
               <span class="my-order-total">₹${Number(o.grandTotal).toLocaleString('en-IN')}</span>
               <span class="my-order-status ${statusClass}">${(o.status || 'Pending').charAt(0).toUpperCase() + (o.status || 'pending').slice(1)}</span>
-              <button class="my-order-invoice-btn" data-order-id="${o.id}" data-order='${JSON.stringify(o)}'>📄 Invoice</button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px; width: 100%; justify-content: flex-end;">
+                ${trackingBtn}
+                <button class="my-order-invoice-btn" data-order-id="${o.id}" data-order='${JSON.stringify(o)}'>📄 Invoice</button>
+              </div>
             </div>
           </div>`;
       }).join('');

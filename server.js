@@ -617,6 +617,111 @@ RK Creation
   }
 }
 
+async function sendCustomerShippingNotification(order) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
+    console.log('⚠️ Mail transporter not initialized. Postponing customer shipping email...');
+    return;
+  }
+  try {
+    const customer = order.customer || {};
+    const customerEmail = customer.email;
+    if (!customerEmail) {
+      console.log(`⚠️ No customer email provided for Order #${order.id}. Skipping shipping email alert.`);
+      return;
+    }
+
+    const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
+    const courierName = order.courierName || 'Our Shipping Partner';
+    const trackingId = order.trackingId || '';
+    const trackingLink = trackingId ? (trackingId.startsWith('http') ? trackingId : `https://www.google.com/search?q=${encodeURIComponent(courierName + ' tracking ' + trackingId)}`) : '#';
+
+    const emailSubject = `🚚 Your Order #${order.id} has Shipped! [RK Creation]`;
+
+    const emailHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Order Shipped</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f6f8; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f8; padding: 20px 0;">
+          <tr>
+            <td align="center">
+              <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+                
+                <!-- BRAND HEADER -->
+                <tr>
+                  <td align="center" style="background-color: #0f766e; padding: 30px 20px; text-align: center;">
+                    <h1 style="margin: 0; font-family: Helvetica, Arial, sans-serif; font-size: 24px; color: #ffffff; font-weight: bold; letter-spacing: 0.5px;">🚚 YOUR ORDER HAS SHIPPED!</h1>
+                    <p style="margin: 8px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #ccfbf1;">Order ID: #${order.id} | Date: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                  </td>
+                </tr>
+
+                <!-- SHIPPING MSG -->
+                <tr>
+                  <td style="padding: 24px 30px 10px 30px; font-family: Helvetica, Arial, sans-serif; line-height: 1.6;">
+                    <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f766e; font-weight: bold;">Hello ${fullName},</h2>
+                    <p style="margin: 0 0 15px 0; font-size: 14px; color: #334155;">
+                      Great news! Your premium resin art supplies are on the way. We have handed over your parcel to <strong>${courierName}</strong>.
+                    </p>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-radius: 8px; padding: 15px; border: 1px solid #dcfce7; font-family: Helvetica, Arial, sans-serif; margin-bottom: 20px;">
+                      <tr>
+                        <td style="font-size: 14px; color: #166534; font-family: Helvetica, Arial, sans-serif;">
+                          <strong>Courier Partner:</strong> ${courierName}<br>
+                          <strong>Tracking Number:</strong> ${trackingId}<br>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    ${trackingId ? `
+                    <div style="text-align: center; margin: 25px 0;">
+                      <a href="${trackingLink}" target="_blank" style="background-color: #0f766e; color: #ffffff; padding: 12px 24px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 8px; display: inline-block; box-shadow: 0 3px 6px rgba(15,118,110,0.3);">🚚 Track Your Order Live</a>
+                    </div>
+                    ` : ''}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding: 0 30px 30px 30px; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #64748b; line-height: 1.5; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                    Thank you for shopping with RK Creation! We hope you love your premium supplies. If you have any inquiries, feel free to contact us via WhatsApp Support.
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const emailText = `Your RK Creation order #${order.id} has been shipped!\nCourier Name: ${courierName}\nTracking Number: ${trackingId}\nTrack here: ${trackingLink}`;
+
+    const sentViaResend = await sendEmailViaHTTPS(customerEmail, emailSubject, emailHTML, emailText);
+    if (!sentViaResend && mailTransporter) {
+      const senderEmail = mailTransporter.options.auth.user;
+      const info = await mailTransporter.sendMail({
+        from: `"RK Creation" <${senderEmail}>`,
+        to: customerEmail,
+        subject: emailSubject,
+        html: emailHTML,
+        text: emailText
+      });
+      console.log(`📧 Customer Shipping email dispatched successfully to ${customerEmail}!`);
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        console.log(`   Ethereal Customer Shipping Preview URL: ${previewUrl}`);
+        const logMsg = `[${new Date().toISOString()}] Order #${order.id} Customer Shipping: Preview email at ${previewUrl}\n`;
+        fs.appendFileSync(path.join(__dirname, 'data', 'notifications.log'), logMsg);
+      }
+    }
+  } catch (err) {
+    console.error('⚠️ Failed to dispatch customer shipping email:', err.message);
+  }
+}
+
 async function notifyWishlistSubscribers(product) {
   if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
     console.log('⚠️ Mail transporter not initialized. Postponing wishlist notifications...');
@@ -1833,6 +1938,21 @@ app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
   db.orders[idx] = { ...db.orders[idx], ...req.body };
   writeDB(db);
   res.json(db.orders[idx]);
+});
+
+// POST send shipping email notification to customer (admin)
+app.post('/api/admin/orders/:id/notify-shipping', requireAdmin, async (req, res) => {
+  const db = readDB();
+  const order = db.orders.find(o => o.id === Number(req.params.id));
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+
+  try {
+    await sendCustomerShippingNotification(order);
+    res.json({ success: true, message: 'Shipping confirmation email sent successfully!' });
+  } catch (err) {
+    console.error('Failed to send shipping email:', err.message);
+    res.status(500).json({ error: 'Failed to send email: ' + err.message });
+  }
 });
 
 // Serve index.html for all other routes (SPA)

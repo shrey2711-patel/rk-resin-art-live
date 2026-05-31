@@ -922,6 +922,30 @@ const Admin = {
         <div class="order-customer">👤 <strong>${fullName}</strong> | 📞 ${c.phone || '—'} | ${c.city || ''}</div>
         ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.pin].filter(Boolean).join(', ')}</div>` : ''}
         <div class="order-items-list">${itemsSummary}</div>
+
+        <!-- Courier & Tracking Info Panel -->
+        <div class="order-shipping-details" style="margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1.5px solid var(--border);">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+            <div style="flex: 1; min-width: 130px;">
+              <label style="font-size: 0.7rem; font-weight: bold; color: var(--muted); display: block; margin-bottom: 3px;">Courier Name</label>
+              <input type="text" class="admin-input order-courier-name" data-oid="${o.id}" value="${o.courierName || ''}" placeholder="e.g. Delhivery, DTDC" style="padding: 6px 10px; font-size: 0.8rem; height: 32px; width: 100%; box-sizing: border-box;">
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+              <label style="font-size: 0.7rem; font-weight: bold; color: var(--muted); display: block; margin-bottom: 3px;">Tracking ID / URL</label>
+              <input type="text" class="admin-input order-tracking-id" data-oid="${o.id}" value="${o.trackingId || ''}" placeholder="e.g. 1234567890" style="padding: 6px 10px; font-size: 0.8rem; height: 32px; width: 100%; box-sizing: border-box;">
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+            <button class="order-shipping-notify-btn" data-notify-oid="${o.id}" style="padding: 6px 12px; font-size: 0.75rem; font-weight: bold; border-radius: 6px; background: #0369a1; color: white; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;">
+              🚚 Email Courier Info
+            </button>
+            ${hasPhone
+              ? `<button class="order-shipping-wa-btn" data-wa-oid="${o.id}" style="padding: 6px 12px; font-size: 0.75rem; font-weight: bold; border-radius: 6px; background: #15803d; color: white; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;">📲 WhatsApp Courier Info</button>`
+              : ''
+            }
+          </div>
+        </div>
+
         <div class="order-footer">
           <span class="order-total">₹${Number(o.grandTotal).toLocaleString('en-IN')}</span>
           <div class="order-actions">
@@ -948,13 +972,112 @@ const Admin = {
         const oid = Number(btn.dataset.saveOid);
         const sel = list.querySelector(`.order-status-select[data-oid="${oid}"]`);
         if (!sel) return;
+
+        // Read courier inputs
+        const courierInput = list.querySelector(`.order-courier-name[data-oid="${oid}"]`);
+        const trackingInput = list.querySelector(`.order-tracking-id[data-oid="${oid}"]`);
+        const courierName = courierInput ? courierInput.value.trim() : '';
+        const trackingId = trackingInput ? trackingInput.value.trim() : '';
+
         try {
-          await API.updateOrder(oid, { status: sel.value });
+          await API.updateOrder(oid, { 
+            status: sel.value,
+            courierName,
+            trackingId
+          });
           await this.loadAll();
           this.renderOrders();
           showToast('Order status updated ✓', 'success');
         } catch (e) {
           showToast('Failed to update: ' + e.message, 'error');
+        }
+      };
+    });
+
+    // Shipping Notify Email
+    list.querySelectorAll('.order-shipping-notify-btn').forEach(btn => {
+      btn.onclick = async () => {
+        const oid = Number(btn.dataset.notifyOid);
+        const courierInput = list.querySelector(`.order-courier-name[data-oid="${oid}"]`);
+        const trackingInput = list.querySelector(`.order-tracking-id[data-oid="${oid}"]`);
+        const courierName = courierInput ? courierInput.value.trim() : '';
+        const trackingId = trackingInput ? trackingInput.value.trim() : '';
+
+        if (!courierName || !trackingId) {
+          showToast('Please enter Courier Name and Tracking ID first', 'error');
+          return;
+        }
+
+        try {
+          btn.disabled = true;
+          const origText = btn.textContent;
+          btn.textContent = '⏱ Sending...';
+          // First, save the tracking info and status to shipped
+          await API.updateOrder(oid, { courierName, trackingId, status: 'shipped' });
+          // Second, send the shipping confirmation email
+          await API.notifyShipping(oid);
+          await this.loadAll();
+          this.renderOrders();
+          showToast('Shipping email confirmation sent successfully!', 'success');
+        } catch (e) {
+          showToast('Failed to notify customer: ' + e.message, 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      };
+    });
+
+    // Shipping Notify WhatsApp
+    list.querySelectorAll('.order-shipping-wa-btn').forEach(btn => {
+      btn.onclick = async () => {
+        const oid = Number(btn.dataset.waOid);
+        const courierInput = list.querySelector(`.order-courier-name[data-oid="${oid}"]`);
+        const trackingInput = list.querySelector(`.order-tracking-id[data-oid="${oid}"]`);
+        const courierName = courierInput ? courierInput.value.trim() : '';
+        const trackingId = trackingInput ? trackingInput.value.trim() : '';
+
+        if (!courierName || !trackingId) {
+          showToast('Please enter Courier Name and Tracking ID first', 'error');
+          return;
+        }
+
+        // Get phone number from order data
+        const order = this.data.orders.find(o => o.id === oid);
+        if (!order) return;
+        const c = order.customer || {};
+        const hasPhone = c.phone && c.phone.trim();
+        if (!hasPhone) {
+          showToast('No customer phone number available', 'error');
+          return;
+        }
+
+        const fullName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Customer';
+        const trackingLink = trackingId.startsWith('http') ? trackingId : `https://www.google.com/search?q=${encodeURIComponent(courierName + ' tracking ' + trackingId)}`;
+
+        // Build pre-filled shipping WhatsApp message
+        const waMsg = encodeURIComponent(
+          `Hello ${fullName}! 👋\n\n` +
+          `Your RK Creation order #${oid} has been *SHIPPED*! 🚚✨\n\n` +
+          `📦 *SHIPPING DETAILS*:\n` +
+          `• Courier: ${courierName}\n` +
+          `• Tracking Number: ${trackingId}\n\n` +
+          `🔗 *TRACK HERE LIVE*:\n${trackingLink}\n\n` +
+          `Thank you for shopping with RK Creation! 🙏`
+        );
+        const cleanPhone = c.phone.replace(/[^0-9]/g, '');
+        const waUrl = `https://wa.me/91${cleanPhone.slice(-10)}?text=${waMsg}`;
+
+        try {
+          // Save the courier details first and status to shipped
+          await API.updateOrder(oid, { courierName, trackingId, status: 'shipped' });
+          await this.loadAll();
+          this.renderOrders();
+          
+          // Open WhatsApp link
+          window.open(waUrl, '_blank');
+          showToast('Courier saved. Opening WhatsApp message...', 'success');
+        } catch (e) {
+          showToast('Failed to save courier: ' + e.message, 'error');
         }
       };
     });
