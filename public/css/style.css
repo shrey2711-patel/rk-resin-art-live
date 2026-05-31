@@ -2,39 +2,55 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --p: #0d9488;
-  --pd: #0f766e;
-  --pl: #ccfbf1;
-  --ink: #0f172a;
-  --muted: #475569;
-  --border: #e2e8f0;
-  --bg: #f8fafc;
+  /* User Custom Palette */
+  --parchment: #edede9;
+  --dust-grey: #d6ccc2;
+  --linen: #f5ebe0;
+  --powder-petal: #e3d5ca;
+  --almond-silk: #d5bdaf;
+
+  /* Theme Mappings */
+  --p: var(--almond-silk);
+  --pd: #bd9e8c; /* Rich Toasted Almond */
+  --pl: var(--powder-petal);
+  --ink: #433d39; /* Deep Espresso Ink */
+  --muted: #8e847c; /* Warm Sand Muted */
+  --border: var(--dust-grey);
+  --bg: var(--linen);
   --white: #ffffff;
   --card: #ffffff;
-  --red: #f43f5e;
-  --green: #10b981;
-  --gold: #f59e0b;
-  --shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 16px 48px rgba(15, 23, 42, 0.08);
+  --red: #d45c5c; /* Warm Brick Red */
+  --green: #8fa882; /* Muted Sage Green */
+  --gold: #bca085; /* Muted Gold */
+  --shadow: 0 8px 30px rgba(67, 61, 57, 0.05);
+  --shadow-lg: 0 16px 48px rgba(67, 61, 57, 0.09);
   --radius: 10px;
   --header-h: 130px;
 }
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
-  --bg: #0b0f19;
-  --white: #111827;
-  --card: #1f2937;
-  --ink: #f8fafc;
-  --muted: #9ca3af;
-  --border: #1f2937;
-  --p: #14b8a6;
-  --pd: #0d9488;
-  --pl: #2dd4bf;
+  /* User Custom Palette in Dark */
+  --parchment: #edede9;
+  --dust-grey: #d6ccc2;
+  --linen: #f5ebe0;
+  --powder-petal: #e3d5ca;
+  --almond-silk: #d5bdaf;
+
+  /* Dark Espresso Theme Mappings */
+  --bg: #1c1917; /* Midnight Espresso */
+  --white: #262220; /* Dark Coffee Bean */
+  --card: #332e2a; /* Warm Roasted Coffee Card */
+  --ink: var(--linen); /* Soft Linen Text */
+  --muted: var(--powder-petal);
+  --border: #3d3733;
+  --p: var(--almond-silk);
+  --pd: var(--powder-petal);
+  --pl: var(--parchment);
   --red: #fb7185;
-  --green: #34d399;
-  --shadow: 0 10px 30px rgba(0,0,0,0.5);
-  --shadow-lg: 0 18px 44px rgba(0,0,0,0.6);
+  --green: #a7c09c;
+  --shadow: 0 10px 30px rgba(0,0,0,0.55);
+  --shadow-lg: 0 18px 44px rgba(0,0,0,0.65);
 }
 [data-theme="dark"] body { background: var(--bg); }
 [data-theme="dark"] .header { background: var(--white); border-color: var(--border); }
