@@ -2,55 +2,39 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* User Custom Palette */
-  --parchment: #edede9;
-  --dust-grey: #d6ccc2;
-  --linen: #f5ebe0;
-  --powder-petal: #e3d5ca;
-  --almond-silk: #d5bdaf;
-
-  /* Theme Mappings */
-  --p: var(--almond-silk);
-  --pd: #bd9e8c; /* Rich Toasted Almond */
-  --pl: var(--powder-petal);
-  --ink: #433d39; /* Deep Espresso Ink */
-  --muted: #8e847c; /* Warm Sand Muted */
-  --border: var(--dust-grey);
-  --bg: var(--linen);
+  --p: #9b3353;
+  --pd: #7e223c;
+  --pl: #ffaeae;
+  --ink: #2d0b1a;
+  --muted: #937482;
+  --border: #f0e4ea;
+  --bg: #fcf9f5;
   --white: #ffffff;
   --card: #ffffff;
-  --red: #d45c5c; /* Warm Brick Red */
-  --green: #8fa882; /* Muted Sage Green */
-  --gold: #bca085; /* Muted Gold */
-  --shadow: 0 8px 30px rgba(67, 61, 57, 0.05);
-  --shadow-lg: 0 16px 48px rgba(67, 61, 57, 0.09);
+  --red: #db6b7c;
+  --green: #10b981;
+  --gold: #f59e0b;
+  --shadow: 0 8px 30px rgba(45, 11, 26, 0.04);
+  --shadow-lg: 0 16px 48px rgba(45, 11, 26, 0.08);
   --radius: 10px;
   --header-h: 130px;
 }
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
-  /* User Custom Palette in Dark */
-  --parchment: #edede9;
-  --dust-grey: #d6ccc2;
-  --linen: #f5ebe0;
-  --powder-petal: #e3d5ca;
-  --almond-silk: #d5bdaf;
-
-  /* Dark Espresso Theme Mappings */
-  --bg: #1c1917; /* Midnight Espresso */
-  --white: #262220; /* Dark Coffee Bean */
-  --card: #332e2a; /* Warm Roasted Coffee Card */
-  --ink: var(--linen); /* Soft Linen Text */
-  --muted: var(--powder-petal);
-  --border: #3d3733;
-  --p: var(--almond-silk);
-  --pd: var(--powder-petal);
-  --pl: var(--parchment);
-  --red: #fb7185;
-  --green: #a7c09c;
-  --shadow: 0 10px 30px rgba(0,0,0,0.55);
-  --shadow-lg: 0 18px 44px rgba(0,0,0,0.65);
+  --bg: #250512;
+  --white: #35091c;
+  --card: #4a122a;
+  --ink: #fbe3cc;
+  --muted: #c29ba9;
+  --border: #4a122a;
+  --p: #db6b7c;
+  --pd: #9b3353;
+  --pl: #ffaeae;
+  --red: #ff8595;
+  --green: #34d399;
+  --shadow: 0 10px 30px rgba(0,0,0,0.5);
+  --shadow-lg: 0 18px 44px rgba(0,0,0,0.6);
 }
 [data-theme="dark"] body { background: var(--bg); }
 [data-theme="dark"] .header { background: var(--white); border-color: var(--border); }
