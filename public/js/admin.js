@@ -1006,13 +1006,16 @@ document.getElementById('cancelBannerBtn').onclick = () => {
   Admin.cancelBannerEdit();
 };
 
-// Save Announce
+// Save Announce & Settings
 document.getElementById('saveAnnounceBtn').onclick = async () => {
   const text = document.getElementById('afAnnounce').value.trim();
-  if (!text) return;
-  await API.updateSettings({ announce: text });
+  const cartEnabled = document.getElementById('afCartEnabled').checked;
+  await API.updateSettings({ announce: text, cartEnabled: cartEnabled });
   document.getElementById('announceText').textContent = text;
   showOk('announceOk');
+  if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
+    await App.loadSettings();
+  }
 };
 
 // Add / Update Nav
@@ -1300,12 +1303,14 @@ document.querySelectorAll('.atab[data-tab]').forEach(btn => {
   }
 });
 
-// Load announce into admin field when admin opens
+// Load announce and settings into admin fields when admin opens
 document.getElementById('openAdminBtn').addEventListener('click', async () => {
   try {
     const s = await API.getSettings();
     const el = document.getElementById('afAnnounce');
     if (el) el.value = s.announce;
+    const cartEl = document.getElementById('afCartEnabled');
+    if (cartEl) cartEl.checked = s.cartEnabled !== false;
   } catch {}
 });
 

@@ -1067,7 +1067,10 @@ app.post('/api/wishlist/subscribe', (req, res) => {
 // GET site settings (announce bar etc.)
 app.get('/api/settings', (req, res) => {
   const db = readDB();
-  res.json({ announce: db.settings.announce });
+  res.json({
+    announce: db.settings.announce,
+    cartEnabled: db.settings.cartEnabled !== false
+  });
 });
 
 // GET banners
@@ -1569,6 +1572,7 @@ app.get('/api/admin/reviews', requireAdmin, (req, res) => {
 app.put('/api/admin/settings', requireAdmin, (req, res) => {
   const db = readDB();
   if (req.body.announce !== undefined) db.settings.announce = req.body.announce;
+  if (req.body.cartEnabled !== undefined) db.settings.cartEnabled = !!req.body.cartEnabled;
   writeDB(db);
   res.json({ success: true });
 });
