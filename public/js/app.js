@@ -1687,9 +1687,9 @@ const Invoice = {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(200, 240, 235);
-      doc.text('Premium Craft Supplies', 15, 25);
-      doc.text('Phone: +91 81419 94995', 15, 31);
-      doc.text('WhatsApp: wa.me/918141994995', 15, 37);
+      doc.text('Premium Craft Supplies', 15, 24);
+      doc.text('Umiyanagar, Nr. Old Darshan School, Ratanpar, Surendranagar - 363020', 15, 30);
+      doc.text('Phone: +91 81419 94995 | WhatsApp: wa.me/918141994995', 15, 36);
 
       // INVOICE label on right
       doc.setFont('helvetica', 'bold');

@@ -950,6 +950,17 @@ input, select, textarea { font-family: inherit; }
 }
 .wa-float:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,211,102,0.55); }
 
+.ig-float {
+  position: fixed; bottom: 82px; right: 20px;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff;
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(220,39,67,0.4);
+  text-decoration: none; z-index: 150;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.ig-float:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(220,39,67,0.5); }
+
 /* ─── No Results ────────────────────────────────────────── */
 .no-results {
   grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--muted);
@@ -1692,6 +1703,13 @@ body {
     height: 48px;
     right: 14px;
     bottom: 14px;
+  }
+
+  .ig-float {
+    width: 48px;
+    height: 48px;
+    right: 14px;
+    bottom: 70px;
   }
 }
 
