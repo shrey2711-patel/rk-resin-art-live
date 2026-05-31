@@ -200,8 +200,6 @@ const App = {
     };
   },
 
-  },
-
   // ── Order Tracking ─────────────────────────────────────────
   initOrderTracking() {
     const openBtn = document.getElementById('openTrackOrderBtn');
