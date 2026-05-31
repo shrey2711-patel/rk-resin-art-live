@@ -204,6 +204,10 @@ const App = {
     try {
       const s = await API.getSettings();
       document.getElementById('announceText').textContent = s.announce;
+      
+      // Update cart enabled state site-wide
+      const cartEnabled = s.cartEnabled !== false;
+      document.body.classList.toggle('cart-disabled', !cartEnabled);
     } catch {}
   },
 

@@ -2015,3 +2015,13 @@ body {
   border-color: var(--p) !important;
 }
 
+/* ─── Catalog Mode / Store Cart Toggle ────────────────── */
+body.cart-disabled #cartBtn,
+body.cart-disabled #footerCartBtn,
+body.cart-disabled .add-to-cart-btn,
+body.cart-disabled #modalAddBtn {
+  display: none !important;
+}
+body.cart-disabled .prod-card-btns {
+  grid-template-columns: 1fr;
+}
