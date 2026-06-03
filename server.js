@@ -1980,7 +1980,34 @@ app.post('/api/admin/orders/:id/notify-shipping', requireAdmin, async (req, res)
     console.error('Failed to send shipping email:', err.message);
     res.status(500).json({ error: 'Failed to send email: ' + err.message });
   }
+// POST dangerously reset database tables (admin trigger to start fresh)
+app.post('/api/admin/dangerously-reset-db', (req, res) => {
+  const { password } = req.body;
+  
+  // Read database setting config to fetch password
+  const db = readDB();
+  const adminPass = (db.settings && db.settings.adminPassword) || 'rk2024';
+  
+  if (password !== adminPass) {
+    return res.status(403).json({ error: 'Incorrect password' });
+  }
+
+  // Clear specific tables requested
+  db.products = [];
+  db.orders = [];
+  db.users = [];
+  db.cart = [];
+  db.reviews = [];
+  db.wishlistSubscriptions = [];
+  db.coupons = [];
+
+  // Write changes locally and sync automatically to Firebase
+  writeDB(db);
+  
+  console.log("🧹 Database cleared (products, orders, users, reviews, coupons, cart, wishlistSubscriptions) successfully!");
+  res.json({ success: true, message: 'Database cleared and synced successfully!' });
 });
+
 
 // GET sitemap.xml dynamically generated for search crawlers (SEO)
 app.get('/sitemap.xml', (req, res) => {
