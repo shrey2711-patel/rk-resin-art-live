@@ -12,16 +12,7 @@
     },
     "cartEnabled": true
   },
-  "banners": [
-    {
-      "id": 3,
-      "imageUrl": "/uploads/whatsapp-image-2026-05-22-at-3-40-23-pm-1779788968756-739371757.jpeg"
-    },
-    {
-      "id": 4,
-      "imageUrl": "/uploads/white-and-green-modern-elegant-promotion-1779795221390-194378854.png"
-    }
-  ],
+  "banners": [],
   "navLinks": [
     {
       "id": 1,

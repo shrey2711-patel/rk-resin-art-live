@@ -986,6 +986,18 @@ function cleanDatabaseCategories() {
     }
   } catch (err) {
     console.error("⚠️ Failed to perform category database cleanup:", err.message);
+}
+
+function cleanDatabaseBanners() {
+  try {
+    const db = readDB();
+    if (db.banners && db.banners.length > 0) {
+      db.banners = [];
+      writeDB(db);
+      console.log("🧹 Banners cleared from database successfully!");
+    }
+  } catch (err) {
+    console.error("⚠️ Failed to perform banner database cleanup:", err.message);
   }
 }
 
@@ -2046,6 +2058,9 @@ async function startServer() {
 
   // Clean up any test/unwanted categories
   cleanDatabaseCategories();
+
+  // Clear any existing banners once if they exist, so admin can upload fresh
+  cleanDatabaseBanners();
 
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Creation server running at http://localhost:${PORT}`);
