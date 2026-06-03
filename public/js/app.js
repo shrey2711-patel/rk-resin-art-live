@@ -1731,9 +1731,9 @@ const Invoice = {
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
       // Colors
-      const brandColor = [15, 118, 110]; // teal
-      const darkColor = [31, 41, 51];
-      const mutedColor = [105, 117, 134];
+      const brandColor = [17, 17, 17]; // pure high-contrast black
+      const darkColor = [17, 17, 17];
+      const mutedColor = [85, 85, 85];
 
       // Header bg
       doc.setFillColor(...brandColor);
@@ -1747,7 +1747,7 @@ const Invoice = {
 
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(200, 240, 235);
+      doc.setTextColor(240, 240, 240);
       doc.text('Premium Craft Supplies', 15, 24);
       doc.text('Umiyanagar, Nr. Old Darshan School, Ratanpar, Surendranagar - 363020', 15, 30);
       doc.text('Phone: +91 81419 94995 | WhatsApp: wa.me/918141994995', 15, 36);
@@ -1771,7 +1771,7 @@ const Invoice = {
       doc.text(`Status: ${(order.status || 'Pending').toUpperCase()}`, 15, 56);
 
       // Customer details box
-      doc.setFillColor(247, 245, 240);
+      doc.setFillColor(245, 245, 245);
       doc.roundedRect(15, 62, 85, 38, 3, 3, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
@@ -1791,7 +1791,7 @@ const Invoice = {
       }
 
       // Order info box
-      doc.setFillColor(247, 245, 240);
+      doc.setFillColor(245, 245, 245);
       doc.roundedRect(110, 62, 85, 38, 3, 3, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
@@ -1820,7 +1820,7 @@ const Invoice = {
       // Table rows
       let y = tableTop + 8;
       (order.items || []).forEach((item, idx) => {
-        const rowBg = idx % 2 === 0 ? [255, 253, 248] : [247, 245, 240];
+        const rowBg = idx % 2 === 0 ? [255, 255, 255] : [245, 245, 245];
         doc.setFillColor(...rowBg);
         doc.rect(15, y, 180, 9, 'F');
         doc.setFont('helvetica', 'normal');
@@ -1842,7 +1842,7 @@ const Invoice = {
       const boxHeight = hasDiscount ? 35 : 28;
       const grandTotalOffset = hasDiscount ? 25 : 18;
 
-      doc.setFillColor(247, 245, 240);
+      doc.setFillColor(245, 245, 245);
       doc.rect(120, y, 75, boxHeight, 'F');
       
       doc.setFont('helvetica', 'normal');
@@ -1855,7 +1855,7 @@ const Invoice = {
       
       // Discount
       if (hasDiscount) {
-        doc.setTextColor(185, 28, 28); // red
+        doc.setTextColor(17, 17, 17); // charcoal grayscale
         doc.setFont('helvetica', 'bold');
         doc.text(`Discount (${order.couponCode}):`, 125, y + 14);
         doc.text(`-Rs. ${Number(order.discount).toLocaleString('en-IN')}`, 193, y + 14, { align: 'right' });

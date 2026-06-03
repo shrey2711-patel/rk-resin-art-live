@@ -2,28 +2,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Exact custom hex variables requested by user */
-  --tea-green: #ccd5aeff;
-  --beige: #e9edc9ff;
-  --cornsilk: #fefae0ff;
-  --papaya-whip: #faedcdff;
-  --light-bronze: #d4a373ff;
+  /* Exact custom hex variables for Black and White Monochrome theme */
+  --tea-green: #e5e7eb;
+  --beige: #f9fafb;
+  --cornsilk: #ffffff;
+  --papaya-whip: #f3f4f6;
+  --light-bronze: #000000;
 
   /* Global Theme System Mappings - Light Theme */
-  --p: var(--light-bronze);
-  --pd: #b98758;           /* rich medium bronze for hover state */
-  --pl: var(--cornsilk);
-  --ink: #4f3d2f;          /* elegant deep bronze-charcoal for text */
-  --muted: #8e7a68;        /* soft earth bronze-grey for secondary text */
-  --border: var(--tea-green);
-  --bg: var(--beige);
-  --white: var(--cornsilk);
-  --card: var(--cornsilk);
-  --red: #c05c3c;          /* warm terra-cotta for alerts/wishlists */
-  --green: #8fa87b;        /* natural herbal green */
-  --gold: #e2b467;
-  --shadow: 0 8px 30px rgba(79, 61, 47, 0.05);
-  --shadow-lg: 0 16px 48px rgba(79, 61, 47, 0.09);
+  --p: #000000;            /* High-contrast pure black */
+  --pd: #222222;           /* Dark graphite for hover states */
+  --pl: #ffffff;           /* Crisp pure white */
+  --ink: #111111;          /* Pitch black for main text */
+  --muted: #555555;        /* Neutral gray for secondary text */
+  --border: #e5e7eb;       /* Clean light gray border */
+  --bg: #f9fafb;           /* Clean soft white page background */
+  --white: #ffffff;        /* Pure white for containers/modal base */
+  --card: #ffffff;         /* Pure white card backgrounds */
+  --red: #111111;          /* Black active state (wishlist / alerts) */
+  --green: #555555;        /* Medium gray for success states */
+  --gold: #888888;         /* Silver gray for accents */
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
   --radius: 10px;
   --header-h: 130px;
 }
@@ -31,19 +31,19 @@
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
   /* Global Theme System Mappings - Dark Theme */
-  --bg: #2d3126;           /* deep olive carbon background */
-  --white: #383d30;        /* rich forest container surface */
-  --card: #434839;         /* slightly lighter card surface */
-  --ink: var(--cornsilk);
-  --muted: var(--tea-green);
-  --border: #4d5342;       /* subtle deep olive border */
-  --p: var(--light-bronze);
-  --pd: var(--papaya-whip);
-  --pl: #383d30;
-  --red: #e07a5f;          /* vibrant coral for dark alerts */
-  --green: #a7c997;
-  --shadow: 0 10px 30px rgba(0,0,0,0.4);
-  --shadow-lg: 0 18px 44px rgba(0,0,0,0.5);
+  --bg: #000000;           /* Pitch black background */
+  --white: #121212;        /* Sleek dark graphite containers */
+  --card: #1c1c1e;         /* Modern dark grey card backgrounds */
+  --ink: #ffffff;          /* Clean white text */
+  --muted: #888888;        /* Soft gray for secondary text */
+  --border: #2c2c2e;       /* Deep gray borders */
+  --p: #ffffff;            /* High-contrast pure white */
+  --pd: #e5e7eb;           /* Light silver gray for hover states */
+  --pl: #111111;           /* Contrast black background */
+  --red: #ffffff;          /* White active state (wishlist / alerts) */
+  --green: #aaaaaa;        /* Muted gray success state */
+  --shadow: 0 10px 30px rgba(0,0,0,0.6);
+  --shadow-lg: 0 18px 44px rgba(0,0,0,0.7);
 }
 
 [data-theme="dark"] body { background: var(--bg); }
@@ -66,7 +66,7 @@
 [data-theme="dark"] .prod-card { background: var(--card); border-color: var(--border); }
 [data-theme="dark"] .search-field { background: var(--card); color: var(--ink); border-color: var(--border); }
 [data-theme="dark"] .drawer-footer { background: var(--card); }
-[data-theme="dark"] .site-footer { background: #32362b !important; }
+[data-theme="dark"] .site-footer { background: #000000 !important; }
 [data-theme="dark"] .account-card { background: var(--card); }
 [data-theme="dark"] .account-address { background: var(--card); }
 [data-theme="dark"] .order-card { background: var(--card); }
@@ -243,7 +243,7 @@ input, select, textarea { font-family: inherit; }
 .banner-arrow.prev { left: 12px; }
 .banner-arrow.next { right: 12px; }
 .banner-dots {
-  display: flex; justify-content: center; gap: 6px; padding: 10px; background: #123c38;
+  display: flex; justify-content: center; gap: 6px; padding: 10px; background: var(--bg);
 }
 .bdot {
   width: 7px; height: 7px; border-radius: 50%;
@@ -349,7 +349,7 @@ input, select, textarea { font-family: inherit; }
 
 /* ─── Collection Page Header ─────────────────────────────── */
 .coll-page-header {
-  background: linear-gradient(135deg, var(--p) 0%, #1a5c54 100%);
+  background: linear-gradient(135deg, var(--p) 0%, var(--pd) 100%);
   padding: 1.4rem 2rem;
   position: sticky; top: 0; z-index: 50;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -435,12 +435,12 @@ input, select, textarea { font-family: inherit; }
   display: flex; flex-direction: column;
 }
 .prod-card:hover {
-  border-color: rgba(15,118,110,0.28);
+  border-color: var(--p);
   box-shadow: var(--shadow-lg);
 }
 .prod-thumb {
   aspect-ratio: 4 / 3.6;
-  background: #f3efe7;
+  background: var(--bg);
   display: flex; align-items: center; justify-content: center;
   font-size: 0;
   position: relative; overflow: hidden;
@@ -457,7 +457,7 @@ input, select, textarea { font-family: inherit; }
 .prod-card:hover .prod-image { transform: scale(1.045); }
 .prod-emoji-fallback {
   font-size: 3.8rem;
-  background: linear-gradient(135deg, rgba(255,255,255,0.54), rgba(255,255,255,0)), #f3efe7;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0)), var(--bg);
 }
 .prod-badge {
   position: absolute; top: 10px; left: 10px;
@@ -1033,7 +1033,7 @@ input, select, textarea { font-family: inherit; }
 
 /* ─── Footer ────────────────────────────────────────────── */
 .site-footer {
-  background: #3e3328 !important; color: var(--pl);
+  background: #111111 !important; color: var(--pl);
   padding: 42px 2rem 18px; margin-top: 3rem;
   border-top: 4px solid var(--p);
 }
@@ -1087,7 +1087,7 @@ input, select, textarea { font-family: inherit; }
 }
 .footer-bottom {
   max-width: 1200px; margin: 26px auto 0; padding-top: 16px;
-  border-top: 1px solid rgba(254, 250, 224, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   color: var(--muted); font-size: 0.78rem;
 }
 
