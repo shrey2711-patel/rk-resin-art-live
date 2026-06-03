@@ -429,23 +429,23 @@ async function sendCustomerOrderConfirmation(order) {
     // Format order items table rows
     let itemsHTML = '';
     (order.items || []).forEach((item, index) => {
-      const rowBg = index % 2 === 0 ? '#ffffff' : '#f8fafc';
+      const rowBg = index % 2 === 0 ? '#ffffff' : '#f9fafb';
       const amount = item.price * item.qty;
       itemsHTML += `
         <tr style="background-color: ${rowBg};">
-          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b;">${index + 1}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; font-weight: bold;">
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333;">${index + 1}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #111111; font-weight: bold;">
             ${item.name}
-            <div style="font-size: 11px; color: #64748b; font-weight: normal; margin-top: 2px;">Category: ${item.category || 'Product'}</div>
+            <div style="font-size: 11px; color: #555555; font-weight: normal; margin-top: 2px;">Category: ${item.category || 'Product'}</div>
           </td>
-          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; text-align: center;">${item.qty}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; text-align: right;">₹${Number(item.price).toLocaleString('en-IN')}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #1e293b; text-align: right; font-weight: bold;">₹${amount.toLocaleString('en-IN')}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; text-align: center;">${item.qty}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; text-align: right;">₹${Number(item.price).toLocaleString('en-IN')}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #111111; text-align: right; font-weight: bold;">₹${amount.toLocaleString('en-IN')}</td>
         </tr>
       `;
     });
 
-    const emailSubject = `💖 Order Confirmed! #${order.id} [RK Creation]`;
+    const emailSubject = `📄 Order Receipt - #${order.id} [RK Creation]`;
 
     const emailHTML = `
       <!DOCTYPE html>
@@ -453,44 +453,66 @@ async function sendCustomerOrderConfirmation(order) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Order Confirmed</title>
+        <title>Invoice #${order.id}</title>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #f4f6f8; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f8; padding: 20px 0;">
+      <body style="margin: 0; padding: 0; background-color: #f3f4f6; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f3f4f6; padding: 40px 0;">
           <tr>
             <td align="center">
-              <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+              <!-- A4 Invoice Sheet Container -->
+              <table border="0" cellpadding="0" cellspacing="0" width="650" style="background-color: #ffffff; border: 1px solid #d1d5db; box-shadow: 0 4px 6px rgba(0,0,0,0.04); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; text-align: left;">
                 
-                <!-- BRAND HEADER -->
+                <!-- TOP HEADER BLOCK -->
                 <tr>
-                  <td align="center" style="background-color: #0f766e; padding: 30px 20px; text-align: center;">
-                    <h1 style="margin: 0; font-family: Helvetica, Arial, sans-serif; font-size: 24px; color: #ffffff; font-weight: bold; letter-spacing: 0.5px;">💖 THANK YOU FOR YOUR PURCHASE!</h1>
-                    <p style="margin: 8px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #ccfbf1;">Order ID: #${order.id} | Date: ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
-                  </td>
-                </tr>
-
-                <!-- REASSURING NOTE -->
-                <tr>
-                  <td style="padding: 24px 30px 10px 30px; font-family: Helvetica, Arial, sans-serif; line-height: 1.6;">
-                    <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f766e; font-weight: bold;">Hello ${fullName},</h2>
-                    <p style="margin: 0; font-size: 14px; color: #334155;">
-                      ${order.paymentStatus === 'Paid (Razorpay)'
-                        ? 'Your order has been successfully placed and paid online via Razorpay. We are already preparing your premium craft supplies for dispatch!'
-                        : 'Your order has been successfully placed! This is a <strong>Cash on Delivery</strong> order. Our team will contact you on WhatsApp to confirm delivery details.'}
-                    </p>
-                  </td>
-                </tr>
-
-                <!-- CUSTOMER SHIPPING DETAILS -->
-                <tr>
-                  <td style="padding: 10px 30px 15px 30px;">
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; padding: 15px; border: 1px solid #f1f5f9; font-family: Helvetica, Arial, sans-serif;">
+                  <td style="padding: 40px 40px 20px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td>
-                          <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #0f766e; font-weight: bold;">📍 Delivery Details</h3>
-                          <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.5;">
-                            <strong>Delivery Address:</strong> ${fullAddress}<br>
-                            <strong>Phone Number:</strong> ${customer.phone || 'N/A'}
+                          <h1 style="margin: 0; font-size: 26px; font-weight: 800; color: #111111; letter-spacing: 1px; text-transform: uppercase;">INVOICE</h1>
+                          <p style="margin: 4px 0 0 0; font-size: 13px; color: #555555;">Order ID: #${order.id}</p>
+                        </td>
+                        <td align="right" style="text-align: right;">
+                          <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #111111;">RK Creation</h2>
+                          <p style="margin: 4px 0 0 0; font-size: 12px; color: #555555; line-height: 1.4;">
+                            Umiyanagar, Ratanpar<br>
+                            Surendranagar, Gujarat - 363020<br>
+                            Phone: +91 81419 94995
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- DIVIDER -->
+                <tr>
+                  <td style="padding: 0 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #e5e7eb;">
+                      <tr><td></td></tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- BILLING / INFO DOUBLE COLUMN -->
+                <tr>
+                  <td style="padding: 25px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="50%" valign="top">
+                          <h3 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; color: #111111; text-transform: uppercase; letter-spacing: 0.5px;">Bill To:</h3>
+                          <p style="margin: 0; font-size: 13px; color: #333333; line-height: 1.5;">
+                            <strong>${fullName}</strong><br>
+                            ${fullAddress}<br>
+                            Phone: ${customer.phone || 'N/A'}<br>
+                            Email: ${customer.email || 'N/A'}
+                          </p>
+                        </td>
+                        <td width="50%" valign="top" align="right" style="text-align: right;">
+                          <h3 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; color: #111111; text-transform: uppercase; letter-spacing: 0.5px;">Invoice Details:</h3>
+                          <p style="margin: 0; font-size: 13px; color: #333333; line-height: 1.5;">
+                            <strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}<br>
+                            <strong>Status:</strong> ${order.paymentStatus === 'Paid (Razorpay)' ? 'Paid' : 'Pending COD'}<br>
+                            <strong>Method:</strong> ${order.paymentStatus === 'Paid (Razorpay)' ? 'Prepaid Online' : 'Cash on Delivery (COD)'}
                           </p>
                         </td>
                       </tr>
@@ -500,16 +522,15 @@ async function sendCustomerOrderConfirmation(order) {
 
                 <!-- ITEMS TABLE -->
                 <tr>
-                  <td style="padding: 10px 30px 20px 30px;">
-                    <h3 style="margin: 0 0 12px 0; font-family: Helvetica, Arial, sans-serif; font-size: 15px; color: #0f766e; font-weight: bold;">📦 Items in Your Order</h3>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; min-width: 100%;">
+                  <td style="padding: 10px 40px 20px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
                       <thead>
-                        <tr style="background-color: #0f766e; color: #ffffff;">
-                          <th style="padding: 10px 8px; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-align: left; border-radius: 4px 0 0 4px;">#</th>
-                          <th style="padding: 10px 8px; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-align: left;">Product</th>
-                          <th style="padding: 10px 8px; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-align: center;">Qty</th>
-                          <th style="padding: 10px 8px; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-align: right;">Rate</th>
-                          <th style="padding: 10px 8px; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-align: right; border-radius: 0 4px 4px 0;">Amount</th>
+                        <tr style="border-bottom: 2px solid #111111;">
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: left; text-transform: uppercase; width: 5%;">#</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: left; text-transform: uppercase; width: 55%;">Product Description</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: center; text-transform: uppercase; width: 10%;">Qty</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: right; text-transform: uppercase; width: 15%;">Rate</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: right; text-transform: uppercase; width: 15%;">Amount</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -521,25 +542,25 @@ async function sendCustomerOrderConfirmation(order) {
 
                 <!-- TOTALS SECTION -->
                 <tr>
-                  <td style="padding: 0 30px 30px 30px;" align="right">
-                    <table border="0" cellpadding="0" cellspacing="0" width="280" style="font-family: Helvetica, Arial, sans-serif; border-top: 2px dashed #e2e8f0; padding-top: 15px; line-height: 1.6;">
+                  <td style="padding: 0 40px 40px 40px;" align="right">
+                    <table border="0" cellpadding="0" cellspacing="0" width="280" style="line-height: 1.8;">
                       <tr>
-                        <td style="font-size: 14px; color: #64748b; padding: 4px 0;">Subtotal:</td>
-                        <td align="right" style="font-size: 14px; color: #1e293b; font-weight: bold; padding: 4px 0;">₹${Number(order.total).toLocaleString('en-IN')}</td>
+                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Subtotal:</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.total).toLocaleString('en-IN')}</td>
                       </tr>
                       ${order.discount > 0 ? `
                       <tr>
-                        <td style="font-size: 14px; color: #b91c1c; padding: 4px 0; font-weight: bold;">Discount (${order.couponCode}):</td>
-                        <td align="right" style="font-size: 14px; color: #b91c1c; font-weight: bold; padding: 4px 0;">-₹${Number(order.discount).toLocaleString('en-IN')}</td>
+                        <td style="font-size: 13px; color: #111111; padding: 4px 0; font-weight: bold;">Discount (${order.couponCode}):</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">-₹${Number(order.discount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
                       <tr>
-                        <td style="font-size: 14px; color: #64748b; padding: 4px 0;">Shipping:</td>
-                        <td align="right" style="font-size: 14px; color: #1e293b; font-weight: bold; padding: 4px 0;">${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</td>
+                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Shipping:</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</td>
                       </tr>
-                      <tr style="background-color: #f0fdfa;">
-                        <td style="font-size: 15px; color: #0f766e; font-weight: bold; padding: 8px 10px; border-radius: 6px 0 0 6px;">GRAND TOTAL:</td>
-                        <td align="right" style="font-size: 16px; color: #0f766e; font-weight: bold; padding: 8px 10px; border-radius: 0 6px 6px 0;">₹${Number(order.grandTotal).toLocaleString('en-IN')}</td>
+                      <tr style="border-top: 1px solid #111111; border-bottom: 2px double #111111;">
+                        <td style="font-size: 14px; font-weight: 800; color: #111111; padding: 8px 0; text-transform: uppercase;">Total:</td>
+                        <td align="right" style="font-size: 15px; font-weight: 800; color: #111111; padding: 8px 0; text-align: right;">₹${Number(order.grandTotal).toLocaleString('en-IN')}</td>
                       </tr>
                     </table>
                   </td>
@@ -547,10 +568,10 @@ async function sendCustomerOrderConfirmation(order) {
 
                 <!-- FOOTER BRANDING & HELP -->
                 <tr>
-                  <td align="center" style="background-color: #f8fafc; border-top: 1px solid #edf2f7; padding: 25px; text-align: center; font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0; font-weight: bold; color: #0f766e; font-size: 14px;">RK Creation</p>
-                    <p style="margin: 0 0 10px 0;">For any queries about your order, feel free to chat with our support team.</p>
-                    <p style="margin: 0;"><a href="https://wa.me/918141994995" style="background-color: #0f766e; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">💬 Chat with Support</a></p>
+                  <td align="center" style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 30px; text-align: center; font-size: 12px; color: #555555; line-height: 1.6;">
+                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #111111; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">RK Creation</p>
+                    <p style="margin: 0 0 15px 0;">For queries or support regarding this invoice, please chat with our support team on WhatsApp.</p>
+                    <p style="margin: 0;"><a href="https://wa.me/918141994995" style="border: 1px solid #111111; background-color: #111111; color: #ffffff; padding: 8px 18px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">💬 Chat on WhatsApp</a></p>
                   </td>
                 </tr>
 
@@ -639,11 +660,31 @@ async function sendCustomerShippingNotification(order) {
     }
 
     const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
+    const fullAddress = [customer.address, customer.city, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
     const courierName = order.courierName || 'Our Shipping Partner';
     const trackingId = order.trackingId || '';
     const trackingLink = trackingId ? (trackingId.startsWith('http') ? trackingId : `https://www.google.com/search?q=${encodeURIComponent(courierName + ' tracking ' + trackingId)}`) : '#';
 
-    const emailSubject = `🚚 Your Order #${order.id} has Shipped! [RK Creation]`;
+    // Format order items table rows for packing list / invoice
+    let itemsHTML = '';
+    (order.items || []).forEach((item, index) => {
+      const rowBg = index % 2 === 0 ? '#ffffff' : '#f9fafb';
+      const amount = item.price * item.qty;
+      itemsHTML += `
+        <tr style="background-color: ${rowBg};">
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333;">${index + 1}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #111111; font-weight: bold;">
+            ${item.name}
+            <div style="font-size: 11px; color: #555555; font-weight: normal; margin-top: 2px;">Category: ${item.category || 'Product'}</div>
+          </td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; text-align: center;">${item.qty}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; text-align: right;">₹${Number(item.price).toLocaleString('en-IN')}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #111111; text-align: right; font-weight: bold;">₹${amount.toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    });
+
+    const emailSubject = `🚚 Shipping Invoice & Tracking - #${order.id} [RK Creation]`;
 
     const emailHTML = `
       <!DOCTYPE html>
@@ -651,49 +692,153 @@ async function sendCustomerShippingNotification(order) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Order Shipped</title>
+        <title>Shipping Invoice #${order.id}</title>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #f4f6f8; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f8; padding: 20px 0;">
+      <body style="margin: 0; padding: 0; background-color: #f3f4f6; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f3f4f6; padding: 40px 0;">
           <tr>
             <td align="center">
-              <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+              <!-- A4 Invoice Sheet Container -->
+              <table border="0" cellpadding="0" cellspacing="0" width="650" style="background-color: #ffffff; border: 1px solid #d1d5db; box-shadow: 0 4px 6px rgba(0,0,0,0.04); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; text-align: left;">
                 
-                <!-- BRAND HEADER -->
+                <!-- TOP HEADER BLOCK -->
                 <tr>
-                  <td align="center" style="background-color: #0f766e; padding: 30px 20px; text-align: center;">
-                    <h1 style="margin: 0; font-family: Helvetica, Arial, sans-serif; font-size: 24px; color: #ffffff; font-weight: bold; letter-spacing: 0.5px;">🚚 YOUR ORDER HAS SHIPPED!</h1>
-                    <p style="margin: 8px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #ccfbf1;">Order ID: #${order.id} | Date: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
-                  </td>
-                </tr>
-
-                <!-- SHIPPING MSG -->
-                <tr>
-                  <td style="padding: 24px 30px 10px 30px; font-family: Helvetica, Arial, sans-serif; line-height: 1.6;">
-                    <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #0f766e; font-weight: bold;">Hello ${fullName},</h2>
-                    <p style="margin: 0 0 15px 0; font-size: 14px; color: #334155;">
-                      Great news! Your premium resin art supplies are on the way. We have handed over your parcel to <strong>${courierName}</strong>.
-                    </p>
-                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border-radius: 8px; padding: 15px; border: 1px solid #dcfce7; font-family: Helvetica, Arial, sans-serif; margin-bottom: 20px;">
+                  <td style="padding: 40px 40px 20px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="font-size: 14px; color: #166534; font-family: Helvetica, Arial, sans-serif;">
-                          <strong>Courier Partner:</strong> ${courierName}<br>
-                          <strong>Tracking Number:</strong> ${trackingId}<br>
+                        <td>
+                          <h1 style="margin: 0; font-size: 26px; font-weight: 800; color: #111111; letter-spacing: 1px; text-transform: uppercase;">SHIPPING INVOICE</h1>
+                          <p style="margin: 4px 0 0 0; font-size: 13px; color: #555555;">Order ID: #${order.id}</p>
+                        </td>
+                        <td align="right" style="text-align: right;">
+                          <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #111111;">RK Creation</h2>
+                          <p style="margin: 4px 0 0 0; font-size: 12px; color: #555555; line-height: 1.4;">
+                            Umiyanagar, Ratanpar<br>
+                            Surendranagar, Gujarat - 363020<br>
+                            Phone: +91 81419 94995
+                          </p>
                         </td>
                       </tr>
                     </table>
-                    
-                    ${trackingId ? `
-                    <div style="text-align: center; margin: 25px 0;">
-                      <a href="${trackingLink}" target="_blank" style="background-color: #0f766e; color: #ffffff; padding: 12px 24px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 8px; display: inline-block; box-shadow: 0 3px 6px rgba(15,118,110,0.3);">🚚 Track Your Order Live</a>
-                    </div>
-                    ` : ''}
                   </td>
                 </tr>
 
+                <!-- DIVIDER -->
                 <tr>
-                  <td style="padding: 0 30px 30px 30px; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #64748b; line-height: 1.5; border-top: 1px solid #f1f5f9; padding-top: 20px;">
-                    Thank you for shopping with RK Creation! We hope you love your premium supplies. If you have any inquiries, feel free to contact us via WhatsApp Support.
+                  <td style="padding: 0 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #e5e7eb;">
+                      <tr><td></td></tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- BILLING / INFO DOUBLE COLUMN -->
+                <tr>
+                  <td style="padding: 25px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="50%" valign="top">
+                          <h3 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; color: #111111; text-transform: uppercase; letter-spacing: 0.5px;">Ship To:</h3>
+                          <p style="margin: 0; font-size: 13px; color: #333333; line-height: 1.5;">
+                            <strong>${fullName}</strong><br>
+                            ${fullAddress}<br>
+                            Phone: ${customer.phone || 'N/A'}<br>
+                            Email: ${customer.email || 'N/A'}
+                          </p>
+                        </td>
+                        <td width="50%" valign="top" align="right" style="text-align: right;">
+                          <h3 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; color: #111111; text-transform: uppercase; letter-spacing: 0.5px;">Shipping Details:</h3>
+                          <p style="margin: 0; font-size: 13px; color: #333333; line-height: 1.5;">
+                            <strong>Courier:</strong> ${courierName}<br>
+                            <strong>Tracking ID:</strong> ${trackingId || 'N/A'}<br>
+                            <strong>Date Shipped:</strong> ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}<br>
+                            <strong>Status:</strong> Shipped
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- DIVIDER -->
+                <tr>
+                  <td style="padding: 0 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #e5e7eb;">
+                      <tr><td></td></tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- TRACKING CALL-TO-ACTION (ONLY IF TRACKING ID EXISTS) -->
+                ${trackingId ? `
+                <tr>
+                  <td style="padding: 25px 40px 10px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; text-align: center; border-radius: 4px;">
+                      <tr>
+                        <td>
+                          <p style="margin: 0 0 12px 0; font-size: 14px; color: #333333; line-height: 1.5;">
+                            Your package has been dispatched. Track your delivery status using the link below:
+                          </p>
+                          <a href="${trackingLink}" target="_blank" style="background-color: #111111; border: 1px solid #111111; color: #ffffff; padding: 10px 22px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 4px;">🚚 Track Your Order Live</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                ` : ''}
+
+                <!-- ITEMS TABLE -->
+                <tr>
+                  <td style="padding: 15px 40px 20px 40px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                      <thead>
+                        <tr style="border-bottom: 2px solid #111111;">
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: left; text-transform: uppercase; width: 5%;">#</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: left; text-transform: uppercase; width: 55%;">Product Description</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: center; text-transform: uppercase; width: 10%;">Qty</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: right; text-transform: uppercase; width: 15%;">Rate</th>
+                          <th style="padding: 10px 0; font-size: 12px; font-weight: 800; color: #111111; text-align: right; text-transform: uppercase; width: 15%;">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${itemsHTML}
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- TOTALS SECTION -->
+                <tr>
+                  <td style="padding: 0 40px 40px 40px;" align="right">
+                    <table border="0" cellpadding="0" cellspacing="0" width="280" style="line-height: 1.8;">
+                      <tr>
+                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Subtotal:</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.total).toLocaleString('en-IN')}</td>
+                      </tr>
+                      ${order.discount > 0 ? `
+                      <tr>
+                        <td style="font-size: 13px; color: #111111; padding: 4px 0; font-weight: bold;">Discount (${order.couponCode}):</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">-₹${Number(order.discount).toLocaleString('en-IN')}</td>
+                      </tr>
+                      ` : ''}
+                      <tr>
+                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Shipping:</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</td>
+                      </tr>
+                      <tr style="border-top: 1px solid #111111; border-bottom: 2px double #111111;">
+                        <td style="font-size: 14px; font-weight: 800; color: #111111; padding: 8px 0; text-transform: uppercase;">Total:</td>
+                        <td align="right" style="font-size: 15px; font-weight: 800; color: #111111; padding: 8px 0; text-align: right;">₹${Number(order.grandTotal).toLocaleString('en-IN')}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- FOOTER BRANDING & HELP -->
+                <tr>
+                  <td align="center" style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 30px; text-align: center; font-size: 12px; color: #555555; line-height: 1.6;">
+                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #111111; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">RK Creation</p>
+                    <p style="margin: 0 0 15px 0;">For queries or support regarding this shipment, please chat with our support team on WhatsApp.</p>
+                    <p style="margin: 0;"><a href="https://wa.me/918141994995" style="border: 1px solid #111111; background-color: #111111; color: #ffffff; padding: 8px 18px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">💬 Chat on WhatsApp</a></p>
                   </td>
                 </tr>
 
@@ -705,7 +850,38 @@ async function sendCustomerShippingNotification(order) {
       </html>
     `;
 
-    const emailText = `Your RK Creation order #${order.id} has been shipped!\nCourier Name: ${courierName}\nTracking Number: ${trackingId}\nTrack here: ${trackingLink}`;
+    const itemsText = (order.items || []).map((i, index) => 
+      `${index + 1}. ${i.name} [Qty: ${i.qty}] - Rate: Rs. ${i.price} - Total: Rs. ${i.price * i.qty}`
+    ).join('\n');
+
+    const emailText = `
+🚚 YOUR ORDER HAS SHIPPED! - ORDER #${order.id}
+
+Hello ${fullName},
+
+Great news! Your premium resin art supplies are on the way. We have handed over your parcel to ${courierName}.
+
+--- SHIPPING DETAILS ---
+Courier Partner: ${courierName}
+Tracking ID: ${trackingId}
+Track Live: ${trackingLink}
+
+--- DELIVERY ADDRESS ---
+Delivery Address: ${fullAddress}
+Phone Number: ${customer.phone || 'N/A'}
+
+--- ITEMS SHIPPED ---
+${itemsText}
+
+--- FINANCIAL SUMMARY ---
+Subtotal: Rs. ${order.total}
+${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
+GRAND TOTAL: Rs. ${order.grandTotal}
+
+---
+Need Help? Chat with our support team on WhatsApp: wa.me/918141994995
+RK Creation
+`;
 
     const sentViaResend = await sendEmailViaHTTPS(customerEmail, emailSubject, emailHTML, emailText);
     if (!sentViaResend && mailTransporter) {
