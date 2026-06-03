@@ -1980,6 +1980,8 @@ app.post('/api/admin/orders/:id/notify-shipping', requireAdmin, async (req, res)
     console.error('Failed to send shipping email:', err.message);
     res.status(500).json({ error: 'Failed to send email: ' + err.message });
   }
+});
+
 // POST dangerously reset database tables (admin trigger to start fresh)
 app.post('/api/admin/dangerously-reset-db', (req, res) => {
   const { password } = req.body;
