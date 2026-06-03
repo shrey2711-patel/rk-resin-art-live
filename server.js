@@ -986,6 +986,7 @@ function cleanDatabaseCategories() {
     }
   } catch (err) {
     console.error("⚠️ Failed to perform category database cleanup:", err.message);
+  }
 }
 
 function cleanDatabaseBanners() {
