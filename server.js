@@ -1003,7 +1003,39 @@ function cleanDatabaseBanners() {
 }
 
 function readDB() {
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  try {
+    const data = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+    
+    // Self-healing database structure initialization
+    if (!data.settings) data.settings = {};
+    if (!data.banners) data.banners = [];
+    if (!data.navLinks) data.navLinks = [];
+    if (!data.categories) data.categories = [];
+    if (!data.products) data.products = [];
+    if (!data.orders) data.orders = [];
+    if (!data.cart) data.cart = [];
+    if (!data.users) data.users = [];
+    if (!data.reviews) data.reviews = [];
+    if (!data.wishlistSubscriptions) data.wishlistSubscriptions = [];
+    if (!data.coupons) data.coupons = [];
+    
+    return data;
+  } catch (err) {
+    console.error("❌ Failed to parse DB file, returning empty structure:", err.message);
+    return {
+      settings: {},
+      banners: [],
+      navLinks: [],
+      categories: [],
+      products: [],
+      orders: [],
+      cart: [],
+      users: [],
+      reviews: [],
+      wishlistSubscriptions: [],
+      coupons: []
+    };
+  }
 }
 
 function writeDB(data) {
