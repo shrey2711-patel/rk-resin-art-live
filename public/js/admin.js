@@ -201,6 +201,71 @@ const Admin = {
     }
   },
 
+  updateCategoryImagePreview(url) {
+    const hidden = document.getElementById('cfImageUrl');
+    const wrap = document.getElementById('categoryImagePreview');
+    const img = document.getElementById('cfImagePreviewImg');
+    if (hidden) hidden.value = url || '';
+    if (!wrap || !img) return;
+
+    if (url) {
+      img.src = url;
+      wrap.style.display = '';
+    } else {
+      img.removeAttribute('src');
+      wrap.style.display = 'none';
+    }
+  },
+
+  setCategoryUploadStatus(message, type = '') {
+    const el = document.getElementById('categoryUploadStatus');
+    if (!el) return;
+    el.textContent = message;
+    el.className = `upload-status ${type}`;
+
+    const saveBtn = document.getElementById('addCatBtn');
+    if (saveBtn) {
+      if (type === 'loading') {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.6';
+        saveBtn.style.cursor = 'not-allowed';
+        saveBtn.textContent = 'Uploading...';
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '';
+        saveBtn.style.cursor = '';
+        saveBtn.textContent = this.editState.section === 'category' ? 'Update Category' : '+ Add Category';
+      }
+    }
+  },
+
+  async uploadCategoryImage(file) {
+    if (!file) return;
+    
+    if (this.isHeicImage(file)) {
+      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
+      return;
+    }
+
+    if (!this.isValidImageType(file)) {
+      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      return;
+    }
+
+    this.updateCategoryImagePreview(URL.createObjectURL(file));
+    this.setCategoryUploadStatus('Uploading image...', 'loading');
+    try {
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      this.updateCategoryImagePreview(result.url);
+      this.setCategoryUploadStatus('Image uploaded and ready to save.', 'success');
+    } catch (e) {
+      this.updateCategoryImagePreview('');
+      this.setCategoryUploadStatus('Upload failed. Try a smaller JPG, PNG or WEBP.', 'error');
+      showToast('Image upload failed', 'error');
+    }
+  },
+
   resetBannerForm() {
     document.getElementById('bfImageFile').value = '';
     this.updateBannerImagePreview('');
@@ -249,6 +314,9 @@ const Admin = {
     document.getElementById('cfName').value = '';
     document.getElementById('cfEmoji').value = '';
     document.getElementById('cfColor').value = '#EDE8FF';
+    document.getElementById('cfImageFile').value = '';
+    this.updateCategoryImagePreview('');
+    this.setCategoryUploadStatus('');
     const btn = document.getElementById('addCatBtn');
     const cancel = document.getElementById('cancelCatBtn');
     if (btn) btn.textContent = '+ Add Category';
@@ -260,6 +328,9 @@ const Admin = {
     document.getElementById('cfName').value = category.name || '';
     document.getElementById('cfEmoji').value = category.emoji || '';
     document.getElementById('cfColor').value = category.color || '#EDE8FF';
+    document.getElementById('cfImageFile').value = '';
+    this.updateCategoryImagePreview(category.imageUrl || '');
+    this.setCategoryUploadStatus(category.imageUrl ? 'Current category image loaded.' : '');
     const btn = document.getElementById('addCatBtn');
     const cancel = document.getElementById('cancelCatBtn');
     if (btn) btn.textContent = 'Update Category';
@@ -433,10 +504,18 @@ const Admin = {
   async saveCategoryForm() {
     const name = document.getElementById('cfName').value.trim();
     if (!name) { showToast('Category name is required', 'error'); return; }
+    
+    const imageUrl = document.getElementById('cfImageUrl').value.trim();
+    if (imageUrl.startsWith('blob:')) {
+      showToast('Please wait for the category image to finish uploading!', 'error');
+      return;
+    }
+
     const payload = {
       name,
       emoji: document.getElementById('cfEmoji').value.trim() || '📦',
-      color: document.getElementById('cfColor').value
+      color: document.getElementById('cfColor').value,
+      imageUrl: imageUrl || null
     };
     if (this.editState.section === 'category' && this.editState.id) {
       await API.updateCategory(this.editState.id, payload);
@@ -1238,6 +1317,38 @@ document.getElementById('addCatBtn').onclick = async () => {
 document.getElementById('cancelCatBtn').onclick = () => {
   Admin.cancelCategoryEdit();
 };
+
+// Category Image upload events
+document.getElementById('cfImageFile').onchange = async (e) => {
+  await Admin.uploadCategoryImage(e.target.files[0]);
+};
+
+document.getElementById('removeCategoryImageBtn').onclick = () => {
+  document.getElementById('cfImageFile').value = '';
+  Admin.updateCategoryImagePreview('');
+  Admin.setCategoryUploadStatus('Image removed. Save category to keep this change.', 'success');
+};
+
+const categoryUploadBox = document.getElementById('categoryUploadBox');
+if (categoryUploadBox) {
+  ['dragenter', 'dragover'].forEach(eventName => {
+    categoryUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      categoryUploadBox.classList.add('dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    categoryUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      categoryUploadBox.classList.remove('dragging');
+    });
+  });
+  categoryUploadBox.addEventListener('drop', async (e) => {
+    const file = e.dataTransfer.files[0];
+    document.getElementById('cfImageFile').files = e.dataTransfer.files;
+    await Admin.uploadCategoryImage(file);
+  });
+}
 
 // Add / Update Product
 document.getElementById('pfImageFile').onchange = async (e) => {

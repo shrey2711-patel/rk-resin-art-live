@@ -715,8 +715,11 @@ const App = {
 
     const MAX_VISIBLE = 10;
 
-    // Fetch one product per category to get a cover image, in parallel
+    // Fetch one product per category to get a cover image fallback, in parallel (unless category has custom image)
     const entries = await Promise.all(cats.map(async cat => {
+      if (cat.imageUrl) {
+        return { cat, img: cat.imageUrl };
+      }
       try {
         const res = await API.getProducts({ category: cat.name, limit: 1, page: 1 });
         const img = res.products && res.products[0] && res.products[0].imageUrl ? res.products[0].imageUrl : null;
