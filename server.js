@@ -1433,7 +1433,9 @@ app.get('/api/settings', (req, res) => {
   const db = readDB();
   res.json({
     announce: db.settings.announce,
-    cartEnabled: db.settings.cartEnabled !== false
+    cartEnabled: db.settings.cartEnabled !== false,
+    shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
+    shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999
   });
 });
 
@@ -1660,7 +1662,9 @@ app.post('/api/payment/create-order', (req, res) => {
     }
   }
 
-  const shipping = subtotal >= 999 ? 0 : 60;
+  const shippingRate = db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60;
+  const shippingThreshold = db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999;
+  const shipping = subtotal >= shippingThreshold ? 0 : shippingRate;
   const grandTotal = Math.max(0, subtotal - discount) + shipping;
 
   const options = {
@@ -1758,7 +1762,9 @@ app.post('/api/payment/verify', (req, res) => {
     }
   }
 
-  const shipping = itemTotal >= 999 ? 0 : 60;
+  const shippingRate = db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60;
+  const shippingThreshold = db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999;
+  const shipping = itemTotal >= shippingThreshold ? 0 : shippingRate;
   const grandTotal = Math.max(0, itemTotal - discount) + shipping;
 
   const order = {
@@ -1849,7 +1855,9 @@ app.post('/api/orders', (req, res) => {
     }
   }
 
-  const shipping = itemTotal >= 999 ? 0 : 60;
+  const shippingRate = db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60;
+  const shippingThreshold = db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999;
+  const shipping = itemTotal >= shippingThreshold ? 0 : shippingRate;
   const grandTotal = Math.max(0, itemTotal - discount) + shipping;
 
   const order = {
@@ -1963,11 +1971,13 @@ app.get('/api/admin/reviews', requireAdmin, (req, res) => {
 // ADMIN ROUTES (protected)
 // ══════════════════════════════════════════════════════════
 
-// UPDATE announce bar
+// UPDATE announce bar & settings
 app.put('/api/admin/settings', requireAdmin, (req, res) => {
   const db = readDB();
   if (req.body.announce !== undefined) db.settings.announce = req.body.announce;
   if (req.body.cartEnabled !== undefined) db.settings.cartEnabled = !!req.body.cartEnabled;
+  if (req.body.shippingRate !== undefined) db.settings.shippingRate = Number(req.body.shippingRate);
+  if (req.body.shippingThreshold !== undefined) db.settings.shippingThreshold = Number(req.body.shippingThreshold);
   writeDB(db);
   res.json({ success: true });
 });

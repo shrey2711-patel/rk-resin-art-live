@@ -11,6 +11,8 @@ const App = {
     paymentMethod: 'online', // online (Razorpay) or cod (WhatsApp)
     appliedCoupon: null, // active coupon metadata
     sortBy: '',
+    shippingRate: 60,
+    shippingThreshold: 999,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -216,6 +218,9 @@ const App = {
       // Update cart enabled state site-wide
       const cartEnabled = s.cartEnabled !== false;
       document.body.classList.toggle('cart-disabled', !cartEnabled);
+
+      if (s.shippingRate !== undefined) this.state.shippingRate = Number(s.shippingRate);
+      if (s.shippingThreshold !== undefined) this.state.shippingThreshold = Number(s.shippingThreshold);
     } catch {}
   },
 
@@ -1970,7 +1975,7 @@ App.recalculateCheckout = function() {
   const items = isBuyNow ? btn._buyNowItems : Cart.items;
 
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const shipping = subtotal >= 999 ? 0 : 60;
+  const shipping = subtotal >= App.state.shippingThreshold ? 0 : App.state.shippingRate;
 
   let discount = 0;
   let promoHTML = '';
@@ -2037,7 +2042,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
     : Cart.items.map(item => ({ ...item }));
 
   const cartSubtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
-  const shipping = cartSubtotal >= 999 ? 0 : 60;
+  const shipping = cartSubtotal >= App.state.shippingThreshold ? 0 : App.state.shippingRate;
   const grandTotal = cartSubtotal + shipping;
 
   const isOnline = App.state.paymentMethod === 'online';
