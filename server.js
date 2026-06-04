@@ -1123,7 +1123,7 @@ async function initDatabase() {
       if (res.ok) {
         const data = await res.json();
         if (data && typeof data === 'object') {
-          // Check: if local db.json exists, has products, and Firebase has NO products,
+          // Check: if local db.json exists, has products, and Firebase has NO products OR fewer products,
           // push our local db.json to Firebase instead of overwriting it!
           let localDB = null;
           if (fs.existsSync(DB_PATH)) {
@@ -1133,10 +1133,13 @@ async function initDatabase() {
           }
           
           const localHasProducts = localDB && Array.isArray(localDB.products) && localDB.products.length > 0;
-          const firebaseHasNoProducts = !data.products || !Array.isArray(data.products) || data.products.length === 0;
+          const firebaseProducts = data.products && Array.isArray(data.products) ? data.products : [];
           
-          if (localHasProducts && firebaseHasNoProducts) {
-            console.log("📡 Local database has products but Firebase is empty. Syncing local db.json to Firebase...");
+          const firebaseHasNoProducts = firebaseProducts.length === 0;
+          const localHasMoreProducts = localDB && Array.isArray(localDB.products) && localDB.products.length > firebaseProducts.length;
+          
+          if (localHasProducts && (firebaseHasNoProducts || localHasMoreProducts)) {
+            console.log(`📡 Local database has products (${localDB.products.length}) and Firebase has fewer/none (${firebaseProducts.length}). Syncing local db.json to Firebase...`);
             const syncRes = await fetch(url, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
