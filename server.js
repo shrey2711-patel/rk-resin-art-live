@@ -31,8 +31,8 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 
 // Initialize Razorpay SDK using credentials
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ'
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_Sxd93Ggxto91CQ',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || '6SvE4BJP5Faykc30EuBci25Q'
 });
 
 // ── Email Mailer Initialization & Dispatcher Helpers ─────────
@@ -1686,7 +1686,7 @@ app.post('/api/payment/create-order', (req, res) => {
     }
     res.json({
       success: true,
-      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB',
+      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_Sxd93Ggxto91CQ',
       order
     });
   });
