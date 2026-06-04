@@ -779,6 +779,7 @@ const Admin = {
     if (this.renderReviews) this.renderReviews();
     if (this.renderCoupons) this.renderCoupons();
     this.initVariantBuilder();
+    this.resetProductForm();
   },
 
 
