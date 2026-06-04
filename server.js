@@ -1452,11 +1452,11 @@ app.get('/api/categories', (req, res) => {
   res.json(readDB().categories);
 });
 
-// GET products (with optional ?category=xxx&search=xxx&badge=xxx&page=1&limit=12)
+// GET products (with optional ?category=xxx&search=xxx&badge=xxx&sortBy=xxx&page=1&limit=12)
 app.get('/api/products', (req, res) => {
   const db = readDB();
   let prods = [...db.products];
-  const { category, search, badge, page = 1, limit = 24 } = req.query;
+  const { category, search, badge, sortBy, page = 1, limit = 24 } = req.query;
 
   if (category && category !== 'All') {
     prods = prods.filter(p => p.category === category);
@@ -1471,6 +1471,18 @@ app.get('/api/products', (req, res) => {
       p.category.toLowerCase().includes(q) ||
       (p.description || '').toLowerCase().includes(q)
     );
+  }
+
+  if (sortBy) {
+    if (sortBy === 'nameAsc') {
+      prods.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'en', { sensitivity: 'base' }));
+    } else if (sortBy === 'nameDesc') {
+      prods.sort((a, b) => (b.name || '').localeCompare(a.name || '', 'en', { sensitivity: 'base' }));
+    } else if (sortBy === 'priceAsc') {
+      prods.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+    } else if (sortBy === 'priceDesc') {
+      prods.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+    }
   }
 
   const total = prods.length;

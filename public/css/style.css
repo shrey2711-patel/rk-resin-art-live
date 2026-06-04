@@ -390,6 +390,15 @@ input, select, textarea { font-family: inherit; }
 }
 .shop-heading { font-size: 1.2rem; font-weight: 800; color: var(--ink); }
 .shop-meta { font-size: 0.82rem; color: var(--muted); }
+.sort-select {
+  padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+  font-size: 0.8rem; font-weight: 700; color: var(--ink);
+  background: var(--white); outline: none; cursor: pointer;
+  transition: all 0.2s;
+}
+.sort-select:hover, .sort-select:focus {
+  border-color: var(--p);
+}
 
 /* ─── Category Filters ──────────────────────────────────── */
 .cat-filter-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1.5rem; }

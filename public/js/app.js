@@ -10,6 +10,7 @@ const App = {
     lastOrderData: null, // store last order for invoice
     paymentMethod: 'online', // online (Razorpay) or cod (WhatsApp)
     appliedCoupon: null, // active coupon metadata
+    sortBy: '',
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -810,6 +811,7 @@ const App = {
         else params.category = this.state.activeCategory;
       }
       if (this.state.searchQuery) params.search = this.state.searchQuery;
+      if (this.state.sortBy) params.sortBy = this.state.sortBy;
 
       const [res, allReviews] = await Promise.all([
         API.getProducts(params),
@@ -1368,6 +1370,15 @@ const App = {
     };
     document.getElementById('searchBtn').onclick = doSearch;
     document.getElementById('searchInput').onkeydown = e => { if (e.key === 'Enter') doSearch(); };
+
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+      sortSelect.onchange = () => {
+        this.state.sortBy = sortSelect.value;
+        this.state.page = 1;
+        this.loadProducts();
+      };
+    }
   },
 
   bindFooter() {

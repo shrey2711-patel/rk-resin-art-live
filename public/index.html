@@ -131,7 +131,16 @@
   <main class="shop-main" id="shopMain">
     <div class="shop-toolbar">
       <div class="shop-heading" id="shopHeading">All Products</div>
-      <div class="shop-meta" id="shopMeta"></div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div class="shop-meta" id="shopMeta"></div>
+        <select class="sort-select" id="sortSelect">
+          <option value="">Sort: Default</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+          <option value="nameAsc">Name: A to Z</option>
+          <option value="nameDesc">Name: Z to A</option>
+        </select>
+      </div>
     </div>
 
     <div class="cat-filter-row" id="catFilterRow"></div>
