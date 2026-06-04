@@ -1123,6 +1123,33 @@ async function initDatabase() {
       if (res.ok) {
         const data = await res.json();
         if (data && typeof data === 'object') {
+          // Check: if local db.json exists, has products, and Firebase has NO products,
+          // push our local db.json to Firebase instead of overwriting it!
+          let localDB = null;
+          if (fs.existsSync(DB_PATH)) {
+            try {
+              localDB = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+            } catch (e) {}
+          }
+          
+          const localHasProducts = localDB && Array.isArray(localDB.products) && localDB.products.length > 0;
+          const firebaseHasNoProducts = !data.products || !Array.isArray(data.products) || data.products.length === 0;
+          
+          if (localHasProducts && firebaseHasNoProducts) {
+            console.log("📡 Local database has products but Firebase is empty. Syncing local db.json to Firebase...");
+            const syncRes = await fetch(url, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(localDB)
+            });
+            if (syncRes.ok) {
+              console.log("✅ Successfully synced local db.json products directly to Firebase!");
+              return; // Keep local db.json as it is!
+            } else {
+              console.error("❌ Failed to sync local database to Firebase:", syncRes.statusText);
+            }
+          }
+
           // Sync database locally so the app starts with latest cloud data
           fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
           console.log("✅ Database successfully loaded and synced from Firebase!");
