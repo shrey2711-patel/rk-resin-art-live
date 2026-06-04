@@ -599,8 +599,15 @@
               </div>
               <div class="form-field"><label>Description</label><textarea class="admin-input" id="pfDesc" rows="2" placeholder="Product description..."></textarea></div>
 
+              <div class="form-field" style="margin: 15px 0 10px 0;">
+                <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; cursor: pointer; color: var(--ink);">
+                  <input type="checkbox" id="pfMultiVariant" style="width: 16px; height: 16px; accent-color: var(--p);">
+                  Multi Variant Product
+                </label>
+              </div>
+
               <!-- VARIANTS SECTION -->
-              <div class="admin-variants-section" id="adminVariantsSection">
+              <div class="admin-variants-section" id="adminVariantsSection" style="display:none;">
                 <div class="admin-variants-header">
                   <label class="admin-variants-label">Product Variants <span style="font-weight:400;color:var(--muted);font-size:0.78rem">(optional — e.g. Size: 6, 8 inch / Grams: 100g, 250g)</span></label>
                   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px">
