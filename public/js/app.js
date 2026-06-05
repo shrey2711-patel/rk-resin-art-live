@@ -11,8 +11,10 @@ const App = {
     paymentMethod: 'online', // online (Razorpay) or cod (WhatsApp)
     appliedCoupon: null, // active coupon metadata
     sortBy: '',
+    gstRate: 0,
     shippingRate: 60,
     shippingThreshold: 999,
+    otherCharges: 0,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -219,8 +221,10 @@ const App = {
       const cartEnabled = s.cartEnabled !== false;
       document.body.classList.toggle('cart-disabled', !cartEnabled);
 
+      if (s.gstRate !== undefined) this.state.gstRate = Number(s.gstRate);
       if (s.shippingRate !== undefined) this.state.shippingRate = Number(s.shippingRate);
       if (s.shippingThreshold !== undefined) this.state.shippingThreshold = Number(s.shippingThreshold);
+      if (s.otherCharges !== undefined) this.state.otherCharges = Number(s.otherCharges);
     } catch {}
   },
 
@@ -1858,8 +1862,11 @@ const Invoice = {
       // Totals
       y += 6;
       const hasDiscount = order.discount && order.discount > 0;
-      const boxHeight = hasDiscount ? 35 : 28;
-      const grandTotalOffset = hasDiscount ? 25 : 18;
+      const hasGst = order.gstAmount && order.gstAmount > 0;
+      const hasOther = order.otherCharges && order.otherCharges > 0;
+      
+      const grandTotalOffset = 18 + (hasDiscount ? 7 : 0) + (hasGst ? 7 : 0) + (hasOther ? 7 : 0);
+      const boxHeight = grandTotalOffset + 10;
 
       doc.setFillColor(245, 245, 245);
       doc.rect(120, y, 75, boxHeight, 'F');
@@ -1868,24 +1875,42 @@ const Invoice = {
       doc.setFontSize(8.5);
       doc.setTextColor(...mutedColor);
       
+      let currentY = y + 7;
+      
       // Subtotal
-      doc.text('Subtotal:', 125, y + 7);
-      doc.text(`Rs. ${Number(order.total).toLocaleString('en-IN')}`, 193, y + 7, { align: 'right' });
+      doc.text('Subtotal:', 125, currentY);
+      doc.text(`Rs. ${Number(order.total).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
+      currentY += 7;
       
       // Discount
       if (hasDiscount) {
         doc.setTextColor(17, 17, 17); // charcoal grayscale
         doc.setFont('helvetica', 'bold');
-        doc.text(`Discount (${order.couponCode}):`, 125, y + 14);
-        doc.text(`-Rs. ${Number(order.discount).toLocaleString('en-IN')}`, 193, y + 14, { align: 'right' });
+        doc.text(`Discount (${order.couponCode}):`, 125, currentY);
+        doc.text(`-Rs. ${Number(order.discount).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...mutedColor);
+        currentY += 7;
+      }
+      
+      // GST
+      if (hasGst) {
+        doc.text(`GST (${order.gstRate}%):`, 125, currentY);
+        doc.text(`Rs. ${Number(order.gstAmount).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
+        currentY += 7;
       }
       
       // Shipping
-      const shippingY = hasDiscount ? y + 21 : y + 14;
-      doc.text('Shipping:', 125, shippingY);
-      doc.text(order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`, 193, shippingY, { align: 'right' });
+      doc.text('Shipping:', 125, currentY);
+      doc.text(order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`, 193, currentY, { align: 'right' });
+      currentY += 7;
+      
+      // Other Charges
+      if (hasOther) {
+        doc.text('Other Charges:', 125, currentY);
+        doc.text(`Rs. ${Number(order.otherCharges).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
+        currentY += 7;
+      }
 
       // Grand total
       doc.setFillColor(...brandColor);
@@ -1897,7 +1922,7 @@ const Invoice = {
       doc.text(`Rs. ${Number(order.grandTotal).toLocaleString('en-IN')}`, 193, y + grandTotalOffset + 6.5, { align: 'right' });
 
       // Thank you note
-      y += 42;
+      y += (grandTotalOffset + 17);
       doc.setFont('helvetica', 'italic');
       doc.setFontSize(9);
       doc.setTextColor(...mutedColor);
@@ -1997,6 +2022,11 @@ App.recalculateCheckout = function() {
     `;
   }
 
+  const taxableAmount = Math.max(0, subtotal - discount);
+  const gst = Math.round(taxableAmount * (App.state.gstRate / 100));
+  const otherCharges = App.state.otherCharges;
+  const grandTotal = taxableAmount + gst + shipping + otherCharges;
+
   // Draw checkout summary lists
   document.getElementById('ckOrderItems').innerHTML = items.map(i =>
     `<div class="ck-order-item">
@@ -2007,7 +2037,29 @@ App.recalculateCheckout = function() {
 
   document.getElementById('ckSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
   document.getElementById('ckShipping').textContent = shipping === 0 ? 'FREE' : `₹${shipping}`;
-  document.getElementById('ckTotal').textContent = `₹${Math.max(0, subtotal - discount + shipping).toLocaleString('en-IN')}`;
+  
+  const gstRow = document.getElementById('ckGstRow');
+  if (gstRow) {
+    if (App.state.gstRate > 0) {
+      gstRow.style.display = 'flex';
+      document.getElementById('ckGstRateLabel').textContent = App.state.gstRate;
+      document.getElementById('ckGst').textContent = `₹${gst.toLocaleString('en-IN')}`;
+    } else {
+      gstRow.style.display = 'none';
+    }
+  }
+
+  const otherRow = document.getElementById('ckOtherRow');
+  if (otherRow) {
+    if (App.state.otherCharges > 0) {
+      otherRow.style.display = 'flex';
+      document.getElementById('ckOther').textContent = `₹${otherCharges.toLocaleString('en-IN')}`;
+    } else {
+      otherRow.style.display = 'none';
+    }
+  }
+
+  document.getElementById('ckTotal').textContent = `₹${Math.max(0, grandTotal).toLocaleString('en-IN')}`;
 };
 
 document.getElementById('closeCheckout').onclick = () => {
@@ -2092,6 +2144,8 @@ document.getElementById('placeOrderBtn').onclick = async () => {
             }
             const verifyRes = await API.verifyPayment(verifyPayload);
 
+            App.state.lastOrderData = verifyRes.order;
+
             if (!isBuyNow) Cart.clear();
 
             btn.textContent = 'Pay securely with Razorpay';
@@ -2119,6 +2173,10 @@ document.getElementById('placeOrderBtn').onclick = async () => {
             
             const discountAmount = verifyRes.order.discount || 0;
             const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
+            const gstAmount = verifyRes.order.gstAmount || 0;
+            const gstLine = gstAmount > 0 ? `GST (${verifyRes.order.gstRate}%): ₹${gstAmount.toLocaleString('en-IN')}\n` : '';
+            const otherCharges = verifyRes.order.otherCharges || 0;
+            const otherLine = otherCharges > 0 ? `Other Charges: ₹${otherCharges.toLocaleString('en-IN')}\n` : '';
 
             const msg = encodeURIComponent(
               `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
@@ -2130,8 +2188,10 @@ document.getElementById('placeOrderBtn').onclick = async () => {
               `💰 PAYMENT SUMMARY\n` +
               `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
               discountLine +
+              gstLine +
               `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
-              `Grand Total: ₹${Number(verifyRes.grandTotal || grandTotal).toLocaleString('en-IN')}\n\n` +
+              otherLine +
+              `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
               `👤 CUSTOMER DETAILS\n` +
               `Name: ${fullName}\n` +
               `Phone: ${phone}\n` +
@@ -2175,6 +2235,8 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       }
       const res = await API.placeOrder(orderPayload);
 
+      App.state.lastOrderData = res.order;
+
       if (!isBuyNow) Cart.clear();
 
       btn.textContent = 'Send Inquiry on WhatsApp';
@@ -2202,6 +2264,10 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       
       const discountAmount = res.order.discount || 0;
       const discountLine = discountAmount > 0 ? `Discount (${res.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
+      const gstAmount = res.order.gstAmount || 0;
+      const gstLine = gstAmount > 0 ? `GST (${res.order.gstRate}%): ₹${gstAmount.toLocaleString('en-IN')}\n` : '';
+      const otherCharges = res.order.otherCharges || 0;
+      const otherLine = otherCharges > 0 ? `Other Charges: ₹${otherCharges.toLocaleString('en-IN')}\n` : '';
 
       const msg = encodeURIComponent(
         `🛍️ *New Order Inquiry from RK Resin Art Website!*\n\n` +
@@ -2211,8 +2277,10 @@ document.getElementById('placeOrderBtn').onclick = async () => {
         `💰 *PAYMENT SUMMARY*\n` +
         `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
         discountLine +
+        gstLine +
         `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
-        `*Grand Total: ₹${Math.max(0, cartSubtotal - discountAmount + shipping).toLocaleString('en-IN')}*\n\n` +
+        otherLine +
+        `*Grand Total: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}*\n\n` +
         `👤 *CUSTOMER DETAILS*\n` +
         `Name: ${fullName}\n` +
         `Phone: ${phone}\n` +

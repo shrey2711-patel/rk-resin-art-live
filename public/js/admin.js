@@ -1294,17 +1294,32 @@ document.getElementById('cancelBannerBtn').onclick = () => {
 document.getElementById('saveAnnounceBtn').onclick = async () => {
   const text = document.getElementById('afAnnounce').value.trim();
   const cartEnabled = document.getElementById('afCartEnabled').checked;
-  const shippingRate = parseFloat(document.getElementById('afShippingRate').value) || 0;
-  const shippingThreshold = parseFloat(document.getElementById('afShippingThreshold').value) || 0;
 
   await API.updateSettings({ 
     announce: text, 
-    cartEnabled: cartEnabled,
-    shippingRate: shippingRate,
-    shippingThreshold: shippingThreshold
+    cartEnabled: cartEnabled
   });
   document.getElementById('announceText').textContent = text;
   showOk('announceOk');
+  if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
+    await App.loadSettings();
+  }
+};
+
+// Save Billing & Charges Settings
+document.getElementById('saveBillingSettingsBtn').onclick = async () => {
+  const gstRate = parseFloat(document.getElementById('afGstRate').value) || 0;
+  const shippingRate = parseFloat(document.getElementById('afShippingRate').value) || 0;
+  const shippingThreshold = parseFloat(document.getElementById('afShippingThreshold').value) || 0;
+  const otherCharges = parseFloat(document.getElementById('afOtherCharges').value) || 0;
+
+  await API.updateSettings({
+    gstRate: gstRate,
+    shippingRate: shippingRate,
+    shippingThreshold: shippingThreshold,
+    otherCharges: otherCharges
+  });
+  showOk('billingSettingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();
   }
@@ -1636,10 +1651,14 @@ document.getElementById('openAdminBtn').addEventListener('click', async () => {
     const cartEl = document.getElementById('afCartEnabled');
     if (cartEl) cartEl.checked = s.cartEnabled !== false;
 
+    const gstEl = document.getElementById('afGstRate');
+    if (gstEl) gstEl.value = s.gstRate !== undefined ? s.gstRate : 0;
     const rateEl = document.getElementById('afShippingRate');
     if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
     const threshEl = document.getElementById('afShippingThreshold');
     if (threshEl) threshEl.value = s.shippingThreshold !== undefined ? s.shippingThreshold : 999;
+    const otherEl = document.getElementById('afOtherCharges');
+    if (otherEl) otherEl.value = s.otherCharges !== undefined ? s.otherCharges : 0;
   } catch {}
 });
 
