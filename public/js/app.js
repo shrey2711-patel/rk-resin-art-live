@@ -11,10 +11,10 @@ const App = {
     paymentMethod: 'online', // online (Razorpay) or cod (WhatsApp)
     appliedCoupon: null, // active coupon metadata
     sortBy: '',
-    gstRate: 0,
     shippingRate: 60,
     shippingThreshold: 999,
     otherCharges: 0,
+    otherChargesType: 'flat',
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -221,10 +221,10 @@ const App = {
       const cartEnabled = s.cartEnabled !== false;
       document.body.classList.toggle('cart-disabled', !cartEnabled);
 
-      if (s.gstRate !== undefined) this.state.gstRate = Number(s.gstRate);
       if (s.shippingRate !== undefined) this.state.shippingRate = Number(s.shippingRate);
       if (s.shippingThreshold !== undefined) this.state.shippingThreshold = Number(s.shippingThreshold);
       if (s.otherCharges !== undefined) this.state.otherCharges = Number(s.otherCharges);
+      if (s.otherChargesType !== undefined) this.state.otherChargesType = s.otherChargesType;
     } catch {}
   },
 
@@ -1862,10 +1862,11 @@ const Invoice = {
       // Totals
       y += 6;
       const hasDiscount = order.discount && order.discount > 0;
-      const hasGst = order.gstAmount && order.gstAmount > 0;
-      const hasOther = order.otherCharges && order.otherCharges > 0;
+      const hasOther = order.otherChargesAmount !== undefined 
+        ? order.otherChargesAmount > 0 
+        : (order.otherCharges && order.otherCharges > 0);
       
-      const grandTotalOffset = 18 + (hasDiscount ? 7 : 0) + (hasGst ? 7 : 0) + (hasOther ? 7 : 0);
+      const grandTotalOffset = 18 + (hasDiscount ? 7 : 0) + (hasOther ? 7 : 0);
       const boxHeight = grandTotalOffset + 10;
 
       doc.setFillColor(245, 245, 245);
@@ -1893,13 +1894,6 @@ const Invoice = {
         currentY += 7;
       }
       
-      // GST
-      if (hasGst) {
-        doc.text(`GST (${order.gstRate}%):`, 125, currentY);
-        doc.text(`Rs. ${Number(order.gstAmount).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
-        currentY += 7;
-      }
-      
       // Shipping
       doc.text('Shipping:', 125, currentY);
       doc.text(order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`, 193, currentY, { align: 'right' });
@@ -1907,8 +1901,14 @@ const Invoice = {
       
       // Other Charges
       if (hasOther) {
-        doc.text('Other Charges:', 125, currentY);
-        doc.text(`Rs. ${Number(order.otherCharges).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
+        const otherLabel = order.otherChargesType === 'percentage' 
+          ? `Other Charges (${order.otherCharges}%):` 
+          : 'Other Charges:';
+        const otherAmount = order.otherChargesAmount !== undefined 
+          ? order.otherChargesAmount 
+          : order.otherCharges;
+        doc.text(otherLabel, 125, currentY);
+        doc.text(`Rs. ${Number(otherAmount).toLocaleString('en-IN')}`, 193, currentY, { align: 'right' });
         currentY += 7;
       }
 
@@ -2023,9 +2023,12 @@ App.recalculateCheckout = function() {
   }
 
   const taxableAmount = Math.max(0, subtotal - discount);
-  const gst = Math.round(taxableAmount * (App.state.gstRate / 100));
   const otherCharges = App.state.otherCharges;
-  const grandTotal = taxableAmount + gst + shipping + otherCharges;
+  const otherChargesType = App.state.otherChargesType || 'flat';
+  const otherChargesAmount = otherChargesType === 'percentage' 
+    ? Math.round(taxableAmount * (otherCharges / 100)) 
+    : otherCharges;
+  const grandTotal = taxableAmount + shipping + otherChargesAmount;
 
   // Draw checkout summary lists
   document.getElementById('ckOrderItems').innerHTML = items.map(i =>
@@ -2038,22 +2041,13 @@ App.recalculateCheckout = function() {
   document.getElementById('ckSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
   document.getElementById('ckShipping').textContent = shipping === 0 ? 'FREE' : `₹${shipping}`;
   
-  const gstRow = document.getElementById('ckGstRow');
-  if (gstRow) {
-    if (App.state.gstRate > 0) {
-      gstRow.style.display = 'flex';
-      document.getElementById('ckGstRateLabel').textContent = App.state.gstRate;
-      document.getElementById('ckGst').textContent = `₹${gst.toLocaleString('en-IN')}`;
-    } else {
-      gstRow.style.display = 'none';
-    }
-  }
-
   const otherRow = document.getElementById('ckOtherRow');
   if (otherRow) {
-    if (App.state.otherCharges > 0) {
+    if (otherCharges > 0) {
       otherRow.style.display = 'flex';
-      document.getElementById('ckOther').textContent = `₹${otherCharges.toLocaleString('en-IN')}`;
+      const typeLabel = otherChargesType === 'percentage' ? ` (${otherCharges}%)` : '';
+      document.getElementById('ckOtherLabelExtra').textContent = typeLabel;
+      document.getElementById('ckOther').textContent = `₹${otherChargesAmount.toLocaleString('en-IN')}`;
     } else {
       otherRow.style.display = 'none';
     }
@@ -2173,10 +2167,8 @@ document.getElementById('placeOrderBtn').onclick = async () => {
             
             const discountAmount = verifyRes.order.discount || 0;
             const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
-            const gstAmount = verifyRes.order.gstAmount || 0;
-            const gstLine = gstAmount > 0 ? `GST (${verifyRes.order.gstRate}%): ₹${gstAmount.toLocaleString('en-IN')}\n` : '';
-            const otherCharges = verifyRes.order.otherCharges || 0;
-            const otherLine = otherCharges > 0 ? `Other Charges: ₹${otherCharges.toLocaleString('en-IN')}\n` : '';
+            const otherChargesAmount = verifyRes.order.otherChargesAmount || 0;
+            const otherLine = otherChargesAmount > 0 ? `Other Charges${verifyRes.order.otherChargesType === 'percentage' ? ' (' + verifyRes.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
 
             const msg = encodeURIComponent(
               `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
@@ -2188,7 +2180,6 @@ document.getElementById('placeOrderBtn').onclick = async () => {
               `💰 PAYMENT SUMMARY\n` +
               `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
               discountLine +
-              gstLine +
               `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
               otherLine +
               `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
@@ -2264,10 +2255,8 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       
       const discountAmount = res.order.discount || 0;
       const discountLine = discountAmount > 0 ? `Discount (${res.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
-      const gstAmount = res.order.gstAmount || 0;
-      const gstLine = gstAmount > 0 ? `GST (${res.order.gstRate}%): ₹${gstAmount.toLocaleString('en-IN')}\n` : '';
-      const otherCharges = res.order.otherCharges || 0;
-      const otherLine = otherCharges > 0 ? `Other Charges: ₹${otherCharges.toLocaleString('en-IN')}\n` : '';
+      const otherChargesAmount = res.order.otherChargesAmount || 0;
+      const otherLine = otherChargesAmount > 0 ? `Other Charges${res.order.otherChargesType === 'percentage' ? ' (' + res.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
 
       const msg = encodeURIComponent(
         `🛍️ *New Order Inquiry from RK Resin Art Website!*\n\n` +
@@ -2277,7 +2266,6 @@ document.getElementById('placeOrderBtn').onclick = async () => {
         `💰 *PAYMENT SUMMARY*\n` +
         `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
         discountLine +
-        gstLine +
         `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
         otherLine +
         `*Grand Total: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}*\n\n` +

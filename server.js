@@ -318,20 +318,14 @@ async function sendAdminEmailNotification(order) {
                         <td align="right" style="font-size: 14px; color: #b91c1c; font-weight: bold; padding: 4px 0;">-₹${Number(order.discount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
-                      ${order.gstAmount > 0 ? `
-                      <tr>
-                        <td style="font-size: 14px; color: #64748b; padding: 4px 0;">GST (${order.gstRate}%):</td>
-                        <td align="right" style="font-size: 14px; color: #1e293b; font-weight: bold; padding: 4px 0;">₹${Number(order.gstAmount).toLocaleString('en-IN')}</td>
-                      </tr>
-                      ` : ''}
                       <tr>
                         <td style="font-size: 14px; color: #64748b; padding: 4px 0;">Shipping:</td>
                         <td align="right" style="font-size: 14px; color: #1e293b; font-weight: bold; padding: 4px 0;">${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</td>
                       </tr>
-                      ${order.otherCharges > 0 ? `
+                      ${order.otherChargesAmount > 0 ? `
                       <tr>
-                        <td style="font-size: 14px; color: #64748b; padding: 4px 0;">Other Charges:</td>
-                        <td align="right" style="font-size: 14px; color: #1e293b; font-weight: bold; padding: 4px 0;">₹${Number(order.otherCharges).toLocaleString('en-IN')}</td>
+                        <td style="font-size: 14px; color: #64748b; padding: 4px 0;">Other Charges${order.otherChargesType === 'percentage' ? ' (' + order.otherCharges + '%)' : ''}:</td>
+                        <td align="right" style="font-size: 14px; color: #1e293b; font-weight: bold; padding: 4px 0;">₹${Number(order.otherChargesAmount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
                       <tr style="background-color: #f0fdfa;">
@@ -383,8 +377,8 @@ ${itemsText}
 
 --- FINANCIAL SUMMARY ---
 Subtotal: Rs. ${order.total}
-${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}${order.gstAmount > 0 ? `GST (${order.gstRate}%): Rs. ${order.gstAmount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
-${order.otherCharges > 0 ? `Other Charges: Rs. ${order.otherCharges}\n` : ''}GRAND TOTAL: Rs. ${order.grandTotal}
+${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
+${order.otherChargesAmount > 0 ? `Other Charges${order.otherChargesType === 'percentage' ? ' (' + order.otherCharges + '%)' : ''}: Rs. ${order.otherChargesAmount}\n` : ''}GRAND TOTAL: Rs. ${order.grandTotal}
 
 ---
 RK Resin Art - Premium Craft Supplies
@@ -566,20 +560,14 @@ async function sendCustomerOrderConfirmation(order) {
                         <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">-₹${Number(order.discount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
-                      ${order.gstAmount > 0 ? `
-                      <tr>
-                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">GST (${order.gstRate}%):</td>
-                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.gstAmount).toLocaleString('en-IN')}</td>
-                      </tr>
-                      ` : ''}
                       <tr>
                         <td style="font-size: 13px; color: #555555; padding: 4px 0;">Shipping:</td>
                         <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</td>
                       </tr>
-                      ${order.otherCharges > 0 ? `
+                      ${order.otherChargesAmount > 0 ? `
                       <tr>
-                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Other Charges:</td>
-                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.otherCharges).toLocaleString('en-IN')}</td>
+                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Other Charges${order.otherChargesType === 'percentage' ? ' (' + order.otherCharges + '%)' : ''}:</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.otherChargesAmount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
                       <tr style="border-top: 1px solid #111111; border-bottom: 2px double #111111;">
@@ -630,8 +618,8 @@ ${itemsText}
 
 --- FINANCIAL SUMMARY ---
 Subtotal: Rs. ${order.total}
-${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}${order.gstAmount > 0 ? `GST (${order.gstRate}%): Rs. ${order.gstAmount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
-${order.otherCharges > 0 ? `Other Charges: Rs. ${order.otherCharges}\n` : ''}GRAND TOTAL: Rs. ${order.grandTotal}
+${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
+${order.otherChargesAmount > 0 ? `Other Charges${order.otherChargesType === 'percentage' ? ' (' + order.otherCharges + '%)' : ''}: Rs. ${order.otherChargesAmount}\n` : ''}GRAND TOTAL: Rs. ${order.grandTotal}
 
 ---
 Need Help? Chat with our support team on WhatsApp: wa.me/918141994995
@@ -845,20 +833,14 @@ async function sendCustomerShippingNotification(order) {
                         <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">-₹${Number(order.discount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
-                      ${order.gstAmount > 0 ? `
-                      <tr>
-                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">GST (${order.gstRate}%):</td>
-                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.gstAmount).toLocaleString('en-IN')}</td>
-                      </tr>
-                      ` : ''}
                       <tr>
                         <td style="font-size: 13px; color: #555555; padding: 4px 0;">Shipping:</td>
                         <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">${order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</td>
                       </tr>
-                      ${order.otherCharges > 0 ? `
+                      ${order.otherChargesAmount > 0 ? `
                       <tr>
-                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Other Charges:</td>
-                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.otherCharges).toLocaleString('en-IN')}</td>
+                        <td style="font-size: 13px; color: #555555; padding: 4px 0;">Other Charges${order.otherChargesType === 'percentage' ? ' (' + order.otherCharges + '%)' : ''}:</td>
+                        <td align="right" style="font-size: 13px; color: #111111; font-weight: bold; padding: 4px 0; text-align: right;">₹${Number(order.otherChargesAmount).toLocaleString('en-IN')}</td>
                       </tr>
                       ` : ''}
                       <tr style="border-top: 1px solid #111111; border-bottom: 2px double #111111;">
@@ -911,8 +893,8 @@ ${itemsText}
 
 --- FINANCIAL SUMMARY ---
 Subtotal: Rs. ${order.total}
-${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}${order.gstAmount > 0 ? `GST (${order.gstRate}%): Rs. ${order.gstAmount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
-${order.otherCharges > 0 ? `Other Charges: Rs. ${order.otherCharges}\n` : ''}GRAND TOTAL: Rs. ${order.grandTotal}
+${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n` : ''}Shipping: ${order.shipping === 0 ? 'FREE' : `Rs. ${order.shipping}`}
+${order.otherChargesAmount > 0 ? `Other Charges${order.otherChargesType === 'percentage' ? ' (' + order.otherCharges + '%)' : ''}: Rs. ${order.otherChargesAmount}\n` : ''}GRAND TOTAL: Rs. ${order.grandTotal}
 
 ---
 Need Help? Chat with our support team on WhatsApp: wa.me/918141994995
@@ -1472,8 +1454,8 @@ app.get('/api/settings', (req, res) => {
     cartEnabled: db.settings.cartEnabled !== false,
     shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
-    gstRate: db.settings.gstRate !== undefined ? Number(db.settings.gstRate) : 0,
-    otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0
+    otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
+    otherChargesType: db.settings.otherChargesType || 'flat'
   });
 });
 
@@ -1705,10 +1687,12 @@ app.post('/api/payment/create-order', (req, res) => {
   const shipping = subtotal >= shippingThreshold ? 0 : shippingRate;
   
   const taxableAmount = Math.max(0, subtotal - discount);
-  const gstRate = db.settings.gstRate !== undefined ? Number(db.settings.gstRate) : 0;
-  const gst = Math.round(taxableAmount * (gstRate / 100));
   const otherCharges = db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0;
-  const grandTotal = taxableAmount + gst + shipping + otherCharges;
+  const otherChargesType = db.settings.otherChargesType || 'flat';
+  const otherChargesAmount = otherChargesType === 'percentage' 
+    ? Math.round(taxableAmount * (otherCharges / 100)) 
+    : otherCharges;
+  const grandTotal = taxableAmount + shipping + otherChargesAmount;
 
   const options = {
     amount: grandTotal * 100, // amount in paisa
@@ -1811,10 +1795,12 @@ app.post('/api/payment/verify', (req, res) => {
   const shipping = itemTotal >= shippingThreshold ? 0 : shippingRate;
   
   const taxableAmount = Math.max(0, itemTotal - discount);
-  const gstRate = db.settings.gstRate !== undefined ? Number(db.settings.gstRate) : 0;
-  const gstAmount = Math.round(taxableAmount * (gstRate / 100));
   const otherCharges = db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0;
-  const grandTotal = taxableAmount + gstAmount + shipping + otherCharges;
+  const otherChargesType = db.settings.otherChargesType || 'flat';
+  const otherChargesAmount = otherChargesType === 'percentage' 
+    ? Math.round(taxableAmount * (otherCharges / 100)) 
+    : otherCharges;
+  const grandTotal = taxableAmount + shipping + otherChargesAmount;
 
   const order = {
     id: nextId(db.orders),
@@ -1825,9 +1811,9 @@ app.post('/api/payment/verify', (req, res) => {
     discount,
     couponCode: appliedCoupon ? appliedCoupon.code : null,
     shipping,
-    gstRate,
-    gstAmount,
     otherCharges,
+    otherChargesType,
+    otherChargesAmount,
     grandTotal,
     status: 'confirmed', // immediately confirmed since paid!
     paymentStatus: 'Paid (Razorpay)',
@@ -1912,10 +1898,12 @@ app.post('/api/orders', (req, res) => {
   const shipping = itemTotal >= shippingThreshold ? 0 : shippingRate;
   
   const taxableAmount = Math.max(0, itemTotal - discount);
-  const gstRate = db.settings.gstRate !== undefined ? Number(db.settings.gstRate) : 0;
-  const gstAmount = Math.round(taxableAmount * (gstRate / 100));
   const otherCharges = db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0;
-  const grandTotal = taxableAmount + gstAmount + shipping + otherCharges;
+  const otherChargesType = db.settings.otherChargesType || 'flat';
+  const otherChargesAmount = otherChargesType === 'percentage' 
+    ? Math.round(taxableAmount * (otherCharges / 100)) 
+    : otherCharges;
+  const grandTotal = taxableAmount + shipping + otherChargesAmount;
 
   const order = {
     id: nextId(db.orders),
@@ -1926,9 +1914,9 @@ app.post('/api/orders', (req, res) => {
     discount,
     couponCode: appliedCoupon ? appliedCoupon.code : null,
     shipping,
-    gstRate,
-    gstAmount,
     otherCharges,
+    otherChargesType,
+    otherChargesAmount,
     grandTotal,
     status: 'pending',
     createdAt: new Date().toISOString()
@@ -2038,8 +2026,8 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   if (req.body.cartEnabled !== undefined) db.settings.cartEnabled = !!req.body.cartEnabled;
   if (req.body.shippingRate !== undefined) db.settings.shippingRate = Number(req.body.shippingRate);
   if (req.body.shippingThreshold !== undefined) db.settings.shippingThreshold = Number(req.body.shippingThreshold);
-  if (req.body.gstRate !== undefined) db.settings.gstRate = Number(req.body.gstRate);
   if (req.body.otherCharges !== undefined) db.settings.otherCharges = Number(req.body.otherCharges);
+  if (req.body.otherChargesType !== undefined) db.settings.otherChargesType = req.body.otherChargesType;
   writeDB(db);
   res.json({ success: true });
 });
