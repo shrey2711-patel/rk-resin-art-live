@@ -31,8 +31,8 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 
 // Initialize Razorpay SDK using credentials
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_SxdC06anu58n2G',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || '8m0Op3xxTMFZ0N9c11IGzxaf'
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_live_Sxt90ic2gGedPQ',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'f39yr3pDV0TtAAUuVgPorv5m'
 });
 
 // ── Email Mailer Initialization & Dispatcher Helpers ─────────
@@ -1686,7 +1686,7 @@ app.post('/api/payment/create-order', (req, res) => {
     }
     res.json({
       success: true,
-      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_live_SxdC06anu58n2G',
+      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_live_Sxt90ic2gGedPQ',
       order
     });
   });
@@ -1710,7 +1710,7 @@ app.post('/api/payment/verify', (req, res) => {
   }
 
   // Cryptographic SHA-256 HMAC verification
-  const keySecret = process.env.RAZORPAY_KEY_SECRET || '8m0Op3xxTMFZ0N9c11IGzxaf';
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || 'f39yr3pDV0TtAAUuVgPorv5m';
   const hmac = crypto.createHmac('sha256', keySecret);
   hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
   const generatedSignature = hmac.digest('hex');
