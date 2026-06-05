@@ -1090,8 +1090,9 @@ input, select, textarea { font-family: inherit; }
   text-decoration: none;
   transition: color 0.2s, text-decoration 0.2s;
 }
-.footer-contact-item a:hover {
-  color: var(--p) !important;
+.footer-contact-item a:hover,
+.footer-contact-item a:active {
+  color: #ffffff !important;
   text-decoration: underline;
 }
 .footer-bottom {
