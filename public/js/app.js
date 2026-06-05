@@ -870,7 +870,7 @@ const App = {
           "@id": `https://rkresinart.com/#product-${p.id}`,
           "name": p.name,
           "image": p.image || (p.images && p.images[0]) || "https://rkresinart.com/logo.png",
-          "description": p.description || `Buy ${p.name} online from RK Creation. High quality ${p.category || 'craft supplies'} at best price.`,
+          "description": p.description || `Buy ${p.name} online from RK Resin Art. High quality ${p.category || 'craft supplies'} at best price.`,
           "offers": {
             "@type": "Offer",
             "price": p.price,
@@ -1718,7 +1718,7 @@ const Auth = {
       this.user = res.user;
       this.render();
       this.message('Account created successfully!', 'success');
-      showToast('Welcome to RK Creation! 🎉', 'success');
+      showToast('Welcome to RK Resin Art! 🎉', 'success');
       if (typeof Wishlist !== 'undefined') {
         Wishlist.syncAllSubscriptions();
       }
@@ -1762,7 +1762,7 @@ const Invoice = {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(22);
       doc.setTextColor(255, 255, 255);
-      doc.text('RK Creation', 15, 18);
+      doc.text('RK Resin Art', 15, 18);
 
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
@@ -1901,7 +1901,7 @@ const Invoice = {
       doc.setFont('helvetica', 'italic');
       doc.setFontSize(9);
       doc.setTextColor(...mutedColor);
-      doc.text('Thank you for shopping with RK Creation!', 105, y, { align: 'center' });
+      doc.text('Thank you for shopping with RK Resin Art!', 105, y, { align: 'center' });
       doc.text('For any queries, contact us on WhatsApp: +91 81419 94995', 105, y + 6, { align: 'center' });
 
       // Footer line
@@ -1911,9 +1911,9 @@ const Invoice = {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7);
       doc.setTextColor(...mutedColor);
-      doc.text('RK Creation — Premium Craft Supplies | This is a computer generated invoice.', 105, 280, { align: 'center' });
+      doc.text('RK Resin Art — Premium Craft Supplies | This is a computer generated invoice.', 105, 280, { align: 'center' });
 
-      doc.save(`RKCreation_Invoice_Order${order.id}.pdf`);
+      doc.save(`RKResinArt_Invoice_Order${order.id}.pdf`);
       showToast('Invoice downloaded! 📄', 'success');
     } catch (e) {
       showToast('Could not generate invoice: ' + e.message, 'error');
@@ -2066,7 +2066,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
         key: keyId,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
-        name: 'RK Creation',
+        name: 'RK Resin Art',
         description: 'Premium Craft Supplies Order',
         order_id: razorpayOrder.id,
         prefill: {
@@ -2121,7 +2121,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
             const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
 
             const msg = encodeURIComponent(
-              `🛍 New ONLINE Order from RK Creation Website!\n\n` +
+              `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
               `Order ID: #${verifyRes.orderId}\n` +
               `Payment Status: Paid online via Razorpay\n` +
               `Payment ID: ${response.razorpay_payment_id}\n` +
@@ -2204,7 +2204,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       const discountLine = discountAmount > 0 ? `Discount (${res.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
 
       const msg = encodeURIComponent(
-        `🛍️ *New Order Inquiry from RK Creation Website!*\n\n` +
+        `🛍️ *New Order Inquiry from RK Resin Art Website!*\n\n` +
         `📋 *Order ID:* #${res.orderId}\n` +
         `📅 *Date:* ${new Date().toLocaleDateString('en-IN')}\n\n` +
         `📦 *ORDER DETAILS*\n${orderLines}\n\n` +

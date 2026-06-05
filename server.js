@@ -106,7 +106,7 @@ async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          sender: { name: 'RK Creation', email: 'rinkupatel3495@gmail.com' },
+          sender: { name: 'RK Resin Art', email: 'rinkupatel3495@gmail.com' },
           to: [{ email: to }],
           subject: subject,
           htmlContent: htmlBody,
@@ -148,7 +148,7 @@ async function sendEmailViaHTTPS(to, subject, htmlBody, textBody) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: process.env.RESEND_FROM_EMAIL || 'RK Creation <onboarding@resend.dev>',
+          from: process.env.RESEND_FROM_EMAIL || 'RK Resin Art <onboarding@resend.dev>',
           to: targetEmail,
           subject: finalSubject,
           html: htmlBody,
@@ -210,7 +210,7 @@ async function sendAdminEmailNotification(order) {
       ? `<p style="margin: 4px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #64748b;"><strong>Razorpay Payment ID:</strong> ${order.paymentId}</p>`
       : '';
 
-    const emailSubject = `🛒 New Order #${order.id} Placed - ${isOnline ? 'PAID' : 'COD'} [RK Creation]`;
+    const emailSubject = `🛒 New Order #${order.id} Placed - ${isOnline ? 'PAID' : 'COD'} [RK Resin Art]`;
 
     const emailHTML = `
       <!DOCTYPE html>
@@ -333,7 +333,7 @@ async function sendAdminEmailNotification(order) {
                 <!-- FOOTER BRANDING -->
                 <tr>
                   <td align="center" style="background-color: #f8fafc; border-top: 1px solid #edf2f7; padding: 20px; text-align: center; font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #64748b;">
-                    <p style="margin: 0 0 6px 0; font-weight: bold; color: #0f766e;">RK Creation — Premium Craft Supplies</p>
+                    <p style="margin: 0 0 6px 0; font-weight: bold; color: #0f766e;">RK Resin Art — Premium Craft Supplies</p>
                     <p style="margin: 0 0 10px 0;">This is an automated order alert dispatched by your e-commerce engine.</p>
                     <p style="margin: 0;"><a href="https://wa.me/918141994995" style="color: #0f766e; text-decoration: underline; font-weight: bold;">Quick Admin WhatsApp Chat</a></p>
                   </td>
@@ -375,7 +375,7 @@ ${order.discount > 0 ? `Discount (${order.couponCode}): -Rs. ${order.discount}\n
 GRAND TOTAL: Rs. ${order.grandTotal}
 
 ---
-RK Creation - Premium Craft Supplies
+RK Resin Art - Premium Craft Supplies
 `;
 
     // Try to dispatch via Resend HTTPS API first for cloud compatibility
@@ -390,7 +390,7 @@ RK Creation - Premium Craft Supplies
     // Dispatch the email
     const senderEmail = mailTransporter.options.auth.user;
     const mailOptions = {
-      from: `"RK Creation Admin Alerts" <${senderEmail}>`,
+      from: `"RK Resin Art Admin Alerts" <${senderEmail}>`,
       to: adminEmail,
       subject: emailSubject,
       text: emailText,
@@ -445,7 +445,7 @@ async function sendCustomerOrderConfirmation(order) {
       `;
     });
 
-    const emailSubject = `📄 Order Receipt - #${order.id} [RK Creation]`;
+    const emailSubject = `📄 Order Receipt - #${order.id} [RK Resin Art]`;
 
     const emailHTML = `
       <!DOCTYPE html>
@@ -472,7 +472,7 @@ async function sendCustomerOrderConfirmation(order) {
                           <p style="margin: 4px 0 0 0; font-size: 13px; color: #555555;">Order ID: #${order.id}</p>
                         </td>
                         <td align="right" style="text-align: right;">
-                          <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #111111;">RK Creation</h2>
+                          <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #111111;">RK Resin Art</h2>
                           <p style="margin: 4px 0 0 0; font-size: 12px; color: #555555; line-height: 1.4;">
                             Umiyanagar, Ratanpar<br>
                             Surendranagar, Gujarat - 363020<br>
@@ -569,7 +569,7 @@ async function sendCustomerOrderConfirmation(order) {
                 <!-- FOOTER BRANDING & HELP -->
                 <tr>
                   <td align="center" style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 30px; text-align: center; font-size: 12px; color: #555555; line-height: 1.6;">
-                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #111111; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">RK Creation</p>
+                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #111111; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">RK Resin Art</p>
                     <p style="margin: 0 0 15px 0;">For queries or support regarding this invoice, please chat with our support team on WhatsApp.</p>
                     <p style="margin: 0;"><a href="https://wa.me/918141994995" style="border: 1px solid #111111; background-color: #111111; color: #ffffff; padding: 8px 18px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">💬 Chat on WhatsApp</a></p>
                   </td>
@@ -611,7 +611,7 @@ GRAND TOTAL: Rs. ${order.grandTotal}
 
 ---
 Need Help? Chat with our support team on WhatsApp: wa.me/918141994995
-RK Creation
+RK Resin Art
 `;
 
     // Try to dispatch via Resend HTTPS API first for cloud compatibility
@@ -626,7 +626,7 @@ RK Creation
     // Dispatch the email
     const senderEmail = mailTransporter.options.auth.user;
     const mailOptions = {
-      from: `"RK Creation" <${senderEmail}>`,
+      from: `"RK Resin Art" <${senderEmail}>`,
       to: customerEmail,
       subject: emailSubject,
       text: emailText,
@@ -684,7 +684,7 @@ async function sendCustomerShippingNotification(order) {
       `;
     });
 
-    const emailSubject = `🚚 Shipping Invoice & Tracking - #${order.id} [RK Creation]`;
+    const emailSubject = `🚚 Shipping Invoice & Tracking - #${order.id} [RK Resin Art]`;
 
     const emailHTML = `
       <!DOCTYPE html>
@@ -711,7 +711,7 @@ async function sendCustomerShippingNotification(order) {
                           <p style="margin: 4px 0 0 0; font-size: 13px; color: #555555;">Order ID: #${order.id}</p>
                         </td>
                         <td align="right" style="text-align: right;">
-                          <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #111111;">RK Creation</h2>
+                          <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: #111111;">RK Resin Art</h2>
                           <p style="margin: 4px 0 0 0; font-size: 12px; color: #555555; line-height: 1.4;">
                             Umiyanagar, Ratanpar<br>
                             Surendranagar, Gujarat - 363020<br>
@@ -836,7 +836,7 @@ async function sendCustomerShippingNotification(order) {
                 <!-- FOOTER BRANDING & HELP -->
                 <tr>
                   <td align="center" style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; padding: 30px; text-align: center; font-size: 12px; color: #555555; line-height: 1.6;">
-                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #111111; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">RK Creation</p>
+                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #111111; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">RK Resin Art</p>
                     <p style="margin: 0 0 15px 0;">For queries or support regarding this shipment, please chat with our support team on WhatsApp.</p>
                     <p style="margin: 0;"><a href="https://wa.me/918141994995" style="border: 1px solid #111111; background-color: #111111; color: #ffffff; padding: 8px 18px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">💬 Chat on WhatsApp</a></p>
                   </td>
@@ -880,14 +880,14 @@ GRAND TOTAL: Rs. ${order.grandTotal}
 
 ---
 Need Help? Chat with our support team on WhatsApp: wa.me/918141994995
-RK Creation
+RK Resin Art
 `;
 
     const sentViaResend = await sendEmailViaHTTPS(customerEmail, emailSubject, emailHTML, emailText);
     if (!sentViaResend && mailTransporter) {
       const senderEmail = mailTransporter.options.auth.user;
       const info = await mailTransporter.sendMail({
-        from: `"RK Creation" <${senderEmail}>`,
+        from: `"RK Resin Art" <${senderEmail}>`,
         to: customerEmail,
         subject: emailSubject,
         html: emailHTML,
@@ -925,7 +925,7 @@ async function notifyWishlistSubscribers(product) {
 
     for (const sub of subs) {
       try {
-        const emailSubject = `🎉 Great News! "${product.name}" is Back in Stock! [RK Creation]`;
+        const emailSubject = `🎉 Great News! "${product.name}" is Back in Stock! [RK Resin Art]`;
 
         const emailHTML = `
           <!DOCTYPE html>
@@ -957,7 +957,7 @@ async function notifyWishlistSubscribers(product) {
                         <p style="margin: 0 0 16px 0; font-size: 14px; color: #64748b;">Category: ${product.category || 'Supplies'}</p>
                         
                         <div style="display: inline-block; background-color: #f0fdfa; border: 1px dashed #0f766e; border-radius: 8px; padding: 12px 24px; margin-bottom: 20px;">
-                          <span style="font-size: 18px; color: #0f766e; font-weight: bold;">Only ₹${product.price}</span>
+                           <span style="font-size: 18px; color: #0f766e; font-weight: bold;">Only ₹${product.price}</span>
                           <span style="display: block; font-size: 11px; color: #0d9488; margin-top: 4px; font-weight: bold;">Available stock: ${product.stock} unit(s)</span>
                         </div>
                         
@@ -965,14 +965,14 @@ async function notifyWishlistSubscribers(product) {
                           This item was on your wishlist, and it is now ready to order! Complete your resin art kit today.
                         </p>
 
-                        <a href="http://localhost:3000" style="background-color: #0f766e; color: #ffffff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">🛒 Buy Now at RK Creation</a>
+                        <a href="http://localhost:3000" style="background-color: #0f766e; color: #ffffff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; display: inline-block;">🛒 Buy Now at RK Resin Art</a>
                       </td>
                     </tr>
 
                     <!-- FOOTER -->
                     <tr>
                       <td align="center" style="background-color: #f8fafc; border-top: 1px solid #edf2f7; padding: 20px; text-align: center; font-size: 11px; color: #64748b;">
-                        <p style="margin: 0 0 4px 0; font-weight: bold; color: #0f766e; font-size: 12px;">RK Creation</p>
+                        <p style="margin: 0 0 4px 0; font-weight: bold; color: #0f766e; font-size: 12px;">RK Resin Art</p>
                         <p style="margin: 0;">You received this back-in-stock notification because this item was added to your wishlist.</p>
                       </td>
                     </tr>
@@ -986,7 +986,7 @@ async function notifyWishlistSubscribers(product) {
         `;
 
         const emailText = `
-🎉 Great News! "${product.name}" is Back in Stock at RK Creation!
+🎉 Great News! "${product.name}" is Back in Stock at RK Resin Art!
 
 You asked, we listened! The product you wishlisted is now available.
 
@@ -997,7 +997,7 @@ Available Stock: ${product.stock} units
 Shop now: http://localhost:3000
 
 Best regards,
-RK Creation
+RK Resin Art
         `;
 
         // Try to dispatch via Resend HTTPS API first for cloud compatibility
@@ -1008,7 +1008,7 @@ RK Creation
             continue;
           }
           const mailOptions = {
-            from: `"RK Creation" <${senderEmail}>`,
+            from: `"RK Resin Art" <${senderEmail}>`,
             to: sub.email,
             subject: emailSubject,
             text: emailText,
@@ -1059,7 +1059,7 @@ async function sendAdminReviewNotification(review, product) {
     const sentViaResend = await sendEmailViaHTTPS(adminEmail, emailSubject, emailHTML, emailText);
     if (!sentViaResend && mailTransporter) {
       await mailTransporter.sendMail({
-        from: `"RK Creation" <${mailTransporter.options.auth.user}>`,
+        from: `"RK Resin Art" <${mailTransporter.options.auth.user}>`,
         to: adminEmail,
         subject: emailSubject,
         html: emailHTML,
@@ -1377,17 +1377,17 @@ app.get('/api/test-email', async (req, res) => {
     const senderEmail = mailTransporter.options.auth.user;
     const targetEmail = req.query.to || db.settings.adminEmail || senderEmail;
     const info = await mailTransporter.sendMail({
-      from: `"RK Creation" <${senderEmail}>`,
+      from: `"RK Resin Art" <${senderEmail}>`,
       to: targetEmail,
-      subject: '✅ RK Creation — SMTP Test Email',
+      subject: '✅ RK Resin Art — SMTP Test Email',
       html: `
         <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:30px;background:#f0fdfa;border-radius:12px;border:1px solid #0f766e;">
           <h2 style="color:#0f766e;margin:0 0 12px 0;">✅ Email is working!</h2>
-          <p style="color:#334155;font-size:15px;">This is a test email from your <strong>RK Creation</strong> store.</p>
+          <p style="color:#334155;font-size:15px;">This is a test email from your <strong>RK Resin Art</strong> store.</p>
           <p style="color:#64748b;font-size:13px;">Sent via: <strong>${senderEmail}</strong><br>Sent to: <strong>${targetEmail}</strong><br>Time: ${new Date().toLocaleString('en-IN')}</p>
           <p style="color:#0f766e;font-weight:bold;margin-top:20px;">Your email notifications are set up correctly 🎉</p>
         </div>`,
-      text: `RK Creation SMTP Test\nEmail is working!\nSent via: ${senderEmail}\nSent to: ${targetEmail}\nTime: ${new Date().toLocaleString('en-IN')}`
+      text: `RK Resin Art SMTP Test\nEmail is working!\nSent via: ${senderEmail}\nSent to: ${targetEmail}\nTime: ${new Date().toLocaleString('en-IN')}`
     });
     const preview = nodemailer.getTestMessageUrl(info);
     console.log(`📧 Test email dispatched successfully to ${targetEmail}!`);
@@ -2325,7 +2325,7 @@ async function startServer() {
   cleanDatabaseBanners();
 
   const server = app.listen(PORT, async () => {
-    console.log(`\n🎨 RK Creation server running at http://localhost:${PORT}`);
+    console.log(`\n🎨 RK Resin Art server running at http://localhost:${PORT}`);
     console.log(`   Admin password: rk2024\n`);
     await initMailer();
   });

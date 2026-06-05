@@ -1058,14 +1058,14 @@ const Admin = {
       const discountLine = o.discount && o.discount > 0 ? `🎟️ Discount (${o.couponCode}): -₹${Number(o.discount).toLocaleString('en-IN')}\n` : '';
       const waMsg = encodeURIComponent(
         `Hello ${fullName}! 👋\n\n` +
-        `Your RK Creation order #${o.id} has been *${(o.status || 'confirmed').toUpperCase()}*! 🎉\n\n` +
+        `Your RK Resin Art order #${o.id} has been *${(o.status || 'confirmed').toUpperCase()}*! 🎉\n\n` +
         `📦 Order Summary:\n${(o.items || []).map(i => `• ${i.name} ×${i.qty} — ₹${Number(i.price * i.qty).toLocaleString('en-IN')}`).join('\n')}\n\n` +
         `💰 *PAYMENT SUMMARY*\n` +
         `Subtotal: ₹${Number(o.total || (o.grandTotal + (o.discount || 0) - o.shipping)).toLocaleString('en-IN')}\n` +
         discountLine +
         `🚚 Shipping: ${o.shipping === 0 ? 'FREE' : `₹${o.shipping}`}\n` +
         `*Grand Total: ₹${Number(o.grandTotal).toLocaleString('en-IN')}*\n\n` +
-        `Thank you for shopping with RK Creation! 🙏\n` +
+        `Thank you for shopping with RK Resin Art! 🙏\n` +
         `If you have any questions, just reply to this message.`
       );
       const cleanPhone = hasPhone ? c.phone.replace(/[^0-9]/g, '') : '';
@@ -1218,12 +1218,12 @@ const Admin = {
         // Build pre-filled shipping WhatsApp message
         const waMsg = encodeURIComponent(
           `Hello ${fullName}! 👋\n\n` +
-          `Your RK Creation order #${oid} has been *SHIPPED*! 🚚✨\n\n` +
+          `Your RK Resin Art order #${oid} has been *SHIPPED*! 🚚✨\n\n` +
           `📦 *SHIPPING DETAILS*:\n` +
           `• Courier: ${courierName}\n` +
           `• Tracking Number: ${trackingId}\n\n` +
           `🔗 *TRACK HERE LIVE*:\n${trackingLink}\n\n` +
-          `Thank you for shopping with RK Creation! 🙏`
+          `Thank you for shopping with RK Resin Art! 🙏`
         );
         const cleanPhone = c.phone.replace(/[^0-9]/g, '');
         const waUrl = `https://wa.me/91${cleanPhone.slice(-10)}?text=${waMsg}`;
