@@ -2375,9 +2375,10 @@ async function startServer() {
 
   // Temporary: force clear products on startup to sync Firebase
   const db = readDB();
-  if (db.products && db.products.length > 0) {
+  if (db.products && db.products.length > 0 && !db.firebaseCleared) {
     console.log(`🧹 Temporary cleanup: Clearing all ${db.products.length} products from database...`);
     db.products = [];
+    db.firebaseCleared = true;
     writeDB(db);
   }
 
