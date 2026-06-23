@@ -20,6 +20,16 @@ const App = {
   // ── Boot ──────────────────────────────────────────────────
   async init() {
     ThemeManager.init();
+    
+    // Check if we are on the dedicated admin route
+    if (window.location.pathname === '/admin') {
+      document.body.classList.add('admin-page-active');
+      if (typeof Admin !== 'undefined') {
+        Admin.open();
+      }
+      return;
+    }
+
     await Promise.all([
       this.loadSettings(),
       this.loadBanners(),
@@ -652,7 +662,8 @@ const App = {
       // 4. Attach click event for mobile admin button
       const mobAdminBtn = document.getElementById('mobileOpenAdminBtn');
       if (mobAdminBtn) {
-        mobAdminBtn.onclick = () => {
+        mobAdminBtn.onclick = (e) => {
+          if (e) e.preventDefault();
           const drawer = document.getElementById('mobileNavDrawer');
           const overlay = document.getElementById('drawerOverlay');
           if (drawer) drawer.classList.remove('open');
@@ -660,7 +671,7 @@ const App = {
           const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
           if (!cartOpen && !wlOpen && overlay) overlay.classList.remove('open');
           
-          document.getElementById('adminOverlay').classList.add('open');
+          window.open('/admin', '_blank');
         };
       }
 

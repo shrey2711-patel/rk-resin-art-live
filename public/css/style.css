@@ -2099,3 +2099,56 @@ body.cart-disabled #modalAddBtn {
 body.cart-disabled .prod-card-btns {
   grid-template-columns: 1fr;
 }
+
+/* ─── Admin Full Page Mode ────────────────────────── */
+body.admin-page-active {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+}
+
+body.admin-page-active #adminOverlay {
+  display: flex !important;
+  position: static !important;
+  background: var(--white) !important;
+  padding: 2.5rem 1.5rem !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  box-sizing: border-box;
+}
+
+body.admin-page-active .admin-panel {
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 1000px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid var(--border) !important;
+}
+
+[data-theme="dark"].admin-page-active #adminOverlay {
+  background: #121212 !important;
+}
+
+[data-theme="dark"].admin-page-active .admin-panel {
+  background: #1a1a1a !important;
+  border-color: #333 !important;
+}
+
+body.admin-page-active #closeAdminPanel {
+  display: none !important;
+}
+
+body.admin-page-active > :not(#adminOverlay):not(#toast) {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  body.admin-page-active #adminOverlay {
+    padding: 0 !important;
+  }
+  body.admin-page-active .admin-panel {
+    border-radius: 0 !important;
+    border: none !important;
+    min-height: 100vh !important;
+  }
+}

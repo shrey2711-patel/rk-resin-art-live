@@ -2373,6 +2373,14 @@ async function startServer() {
   // Clear any existing banners once if they exist, so admin can upload fresh
   cleanDatabaseBanners();
 
+  // Temporary: force clear products on startup to sync Firebase
+  const db = readDB();
+  if (db.products && db.products.length > 0) {
+    console.log(`🧹 Temporary cleanup: Clearing all ${db.products.length} products from database...`);
+    db.products = [];
+    writeDB(db);
+  }
+
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Resin Art server running at http://localhost:${PORT}`);
     console.log(`   Admin password: rk2024\n`);
