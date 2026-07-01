@@ -208,17 +208,17 @@ const App = {
     if (!onlineOpt || !codOpt) return;
 
     onlineOpt.onclick = () => {
-      if (this.state.razorpayEnabled === false) return;
+      if (App.state.razorpayEnabled === false) return;
       onlineOpt.classList.add('active');
       codOpt.classList.remove('active');
-      this.state.paymentMethod = 'online';
+      App.state.paymentMethod = 'online';
       document.getElementById('placeOrderBtn').textContent = 'Pay securely with Razorpay';
     };
 
     codOpt.onclick = () => {
       codOpt.classList.add('active');
       onlineOpt.classList.remove('active');
-      this.state.paymentMethod = 'cod';
+      App.state.paymentMethod = 'cod';
       document.getElementById('placeOrderBtn').textContent = 'Send Inquiry on WhatsApp';
     };
   },
