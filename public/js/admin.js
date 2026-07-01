@@ -876,6 +876,33 @@ const Admin = {
     this.renderOrders();
     if (this.renderReviews) this.renderReviews();
     if (this.renderCoupons) this.renderCoupons();
+
+    // Populate settings from loadAll
+    if (this.data.settings) {
+      const s = this.data.settings;
+      const announceEl = document.getElementById('afAnnounce');
+      if (announceEl) announceEl.value = s.announce || '';
+      const cartEl = document.getElementById('afCartEnabled');
+      if (cartEl) cartEl.checked = s.cartEnabled !== false;
+      
+      const rateEl = document.getElementById('afShippingRate');
+      if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
+      const threshEl = document.getElementById('afShippingThreshold');
+      if (threshEl) threshEl.value = s.shippingThreshold !== undefined ? s.shippingThreshold : 999;
+      const otherEl = document.getElementById('afOtherCharges');
+      if (otherEl) otherEl.value = s.otherCharges !== undefined ? s.otherCharges : 0;
+      const typeEl = document.getElementById('afOtherChargesType');
+      if (typeEl) typeEl.value = s.otherChargesType || 'flat';
+      
+      // Populate Payments settings
+      const rzEl = document.getElementById('afRazorpayEnabled');
+      if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
+      const rzKeyEl = document.getElementById('afRazorpayKeyId');
+      if (rzKeyEl) rzKeyEl.value = s.razorpayKeyId || '';
+      const rzSecEl = document.getElementById('afRazorpayKeySecret');
+      if (rzSecEl) rzSecEl.value = s.razorpayKeySecret || '';
+    }
+
     this.initVariantBuilder();
     this.resetProductForm();
   },
@@ -883,13 +910,14 @@ const Admin = {
 
   async loadAll() {
     try {
-      const [banners, nav, cats, prodRes, orders, coupons] = await Promise.all([
+      const [banners, nav, cats, prodRes, orders, coupons, settings] = await Promise.all([
         API.getBanners(),
         API.getNav(),
         API.getCategories(),
         API.getProducts({ limit: 200 }),
         API.getOrders(),
-        API.getCoupons().catch(() => [])
+        API.getCoupons().catch(() => []),
+        API.getAdminSettings().catch(() => null)
       ]);
       this.data.banners = banners;
       this.data.nav = nav;
@@ -897,6 +925,7 @@ const Admin = {
       this.data.products = prodRes.products;
       this.data.orders = orders;
       this.data.coupons = coupons;
+      this.data.settings = settings;
     } catch (e) {
       showToast('Error loading admin data', 'error');
     }
@@ -1343,6 +1372,23 @@ document.getElementById('saveBillingSettingsBtn').onclick = async () => {
     otherChargesType: otherChargesType
   });
   showOk('billingSettingsOk');
+  if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
+    await App.loadSettings();
+  }
+};
+
+// Save Payment Settings
+document.getElementById('savePaymentSettingsBtn').onclick = async () => {
+  const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
+  const razorpayKeyId = document.getElementById('afRazorpayKeyId').value.trim();
+  const razorpayKeySecret = document.getElementById('afRazorpayKeySecret').value.trim();
+
+  await API.updateSettings({
+    razorpayEnabled: razorpayEnabled,
+    razorpayKeyId: razorpayKeyId,
+    razorpayKeySecret: razorpayKeySecret
+  });
+  showOk('paymentSettingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();
   }

@@ -162,6 +162,7 @@ const API = {
   isAdminLoggedIn: () => !!API.token,
 
   // ── Admin settings ────────────────────────────────────────
+  getAdminSettings: () => API.get('/api/admin/settings', true),
   updateSettings: (data) => API.put('/api/admin/settings', data, true),
 
   // ── Admin banners ─────────────────────────────────────────

@@ -471,6 +471,7 @@
           <button class="atab active" data-tab="banners">Banners</button>
           <button class="atab" data-tab="announce">Announcement</button>
           <button class="atab" data-tab="billing-settings">🧾 Billing &amp; Charges</button>
+          <button class="atab" data-tab="payment-settings">💳 Payments</button>
           <button class="atab" data-tab="nav">Navigation</button>
           <button class="atab" data-tab="categories">Categories</button>
           <button class="atab" data-tab="products">Products</button>
@@ -555,6 +556,32 @@
               </div>
               <button class="admin-save-btn" id="saveBillingSettingsBtn">Save Billing Settings</button>
               <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved!</div>
+            </div>
+          </div>
+
+          <!-- PAYMENTS -->
+          <div class="tab-pane" id="atab-payment-settings">
+            <div class="admin-section-head">Payment Gateway Settings</div>
+            <div class="admin-form-card">
+              <div class="form-field" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="afRazorpayEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
+                <label for="afRazorpayEnabled" style="font-weight: bold; cursor: pointer; margin-bottom: 0;">Enable Razorpay (Online Payments)</label>
+              </div>
+              <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--border); padding: 10px 15px; font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; border-radius: 4px;">
+                💡 If Razorpay is disabled (unchecked), checkout will automatically default to <strong>WhatsApp COD</strong> payments only and hide the online payment selection.
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Razorpay Key ID</label>
+                  <input class="admin-input" type="text" id="afRazorpayKeyId" placeholder="rzp_live_...">
+                </div>
+                <div class="form-field">
+                  <label>Razorpay Key Secret</label>
+                  <input class="admin-input" type="password" id="afRazorpayKeySecret" placeholder="••••••••">
+                </div>
+              </div>
+              <button class="admin-save-btn" id="savePaymentSettingsBtn">Save Payment Settings</button>
+              <div class="admin-ok" id="paymentSettingsOk">✅ Payment settings saved!</div>
             </div>
           </div>
 

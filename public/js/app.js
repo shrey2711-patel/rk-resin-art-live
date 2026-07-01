@@ -15,6 +15,7 @@ const App = {
     shippingThreshold: 999,
     otherCharges: 0,
     otherChargesType: 'flat',
+    razorpayEnabled: true,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -207,6 +208,7 @@ const App = {
     if (!onlineOpt || !codOpt) return;
 
     onlineOpt.onclick = () => {
+      if (this.state.razorpayEnabled === false) return;
       onlineOpt.classList.add('active');
       codOpt.classList.remove('active');
       this.state.paymentMethod = 'online';
@@ -219,6 +221,35 @@ const App = {
       this.state.paymentMethod = 'cod';
       document.getElementById('placeOrderBtn').textContent = 'Send Inquiry on WhatsApp';
     };
+  },
+
+  resetPaymentSelector() {
+    const onlineOpt = document.getElementById('payOnlineOpt');
+    const codOpt = document.getElementById('payCodOpt');
+    const btn = document.getElementById('placeOrderBtn');
+    const paymentField = document.querySelector('.payment-method-field');
+    
+    const razorpayEnabled = this.state.razorpayEnabled !== false;
+    
+    if (paymentField) {
+      paymentField.style.display = razorpayEnabled ? '' : 'none';
+    }
+    
+    if (!razorpayEnabled) {
+      this.state.paymentMethod = 'cod';
+      if (onlineOpt && codOpt) {
+        onlineOpt.classList.remove('active');
+        codOpt.classList.add('active');
+      }
+      if (btn) btn.textContent = 'Send Inquiry on WhatsApp';
+    } else {
+      this.state.paymentMethod = 'online';
+      if (onlineOpt && codOpt) {
+        onlineOpt.classList.add('active');
+        codOpt.classList.remove('active');
+      }
+      if (btn) btn.textContent = 'Pay securely with Razorpay';
+    }
   },
 
   // ── Settings / Announce ───────────────────────────────────
@@ -235,6 +266,9 @@ const App = {
       if (s.shippingThreshold !== undefined) this.state.shippingThreshold = Number(s.shippingThreshold);
       if (s.otherCharges !== undefined) this.state.otherCharges = Number(s.otherCharges);
       if (s.otherChargesType !== undefined) this.state.otherChargesType = s.otherChargesType;
+      
+      this.state.razorpayEnabled = s.razorpayEnabled !== false;
+      this.resetPaymentSelector();
     } catch {}
   },
 
@@ -1034,18 +1068,11 @@ const App = {
     document.getElementById('invoiceDownloadBtn').style.display = 'none';
     document.getElementById('checkoutModalOverlay').classList.add('open');
 
-    // Reset payment selector to default (Online)
-    this.state.paymentMethod = 'online';
-    const onlineOpt = document.getElementById('payOnlineOpt');
-    const codOpt = document.getElementById('payCodOpt');
-    if (onlineOpt && codOpt) {
-      onlineOpt.classList.add('active');
-      codOpt.classList.remove('active');
-    }
+    // Reset payment selector based on config
+    this.resetPaymentSelector();
 
     // Override placeOrderBtn for this buy-now flow
     const btn = document.getElementById('placeOrderBtn');
-    btn.textContent = 'Pay securely with Razorpay';
     btn._buyNowItems = buyNowItems;
     btn._isBuyNow = true;
 
@@ -1979,17 +2006,10 @@ function openCheckoutModal() {
   document.getElementById('checkoutTitle').textContent = 'Checkout';
   document.getElementById('invoiceDownloadBtn').style.display = 'none';
 
-  // Reset payment selector to default (Online)
-  App.state.paymentMethod = 'online';
-  const onlineOpt = document.getElementById('payOnlineOpt');
-  const codOpt = document.getElementById('payCodOpt');
-  if (onlineOpt && codOpt) {
-    onlineOpt.classList.add('active');
-    codOpt.classList.remove('active');
-  }
+  // Reset payment selector based on config
+  App.resetPaymentSelector();
 
   const btn = document.getElementById('placeOrderBtn');
-  btn.textContent = 'Pay securely with Razorpay';
   btn._isBuyNow = false;
   btn._buyNowItems = null;
 

@@ -29,11 +29,13 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
-// Initialize Razorpay SDK using credentials
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ'
-});
+// Initialize Razorpay SDK helper dynamically
+function getRazorpayClient() {
+  const db = readDB();
+  const key_id = db.settings.razorpayKeyId || process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB';
+  const key_secret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ';
+  return new Razorpay({ key_id, key_secret });
+}
 
 // ── Email Mailer Initialization & Dispatcher Helpers ─────────
 let mailTransporter = null;
@@ -1455,7 +1457,8 @@ app.get('/api/settings', (req, res) => {
     shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
-    otherChargesType: db.settings.otherChargesType || 'flat'
+    otherChargesType: db.settings.otherChargesType || 'flat',
+    razorpayEnabled: db.settings.razorpayEnabled !== false
   });
 });
 
@@ -1700,7 +1703,8 @@ app.post('/api/payment/create-order', (req, res) => {
     receipt: `receipt_order_${Date.now()}`
   };
 
-  razorpay.orders.create(options, (err, order) => {
+  const client = getRazorpayClient();
+  client.orders.create(options, (err, order) => {
     if (err) {
       console.error("Razorpay Order Creation Error Object:", err);
       let errMsg = 'Unknown error';
@@ -1713,7 +1717,7 @@ app.post('/api/payment/create-order', (req, res) => {
     }
     res.json({
       success: true,
-      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB',
+      keyId: db.settings.razorpayKeyId || process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB',
       order
     });
   });
@@ -1737,7 +1741,7 @@ app.post('/api/payment/verify', (req, res) => {
   }
 
   // Cryptographic SHA-256 HMAC verification
-  const keySecret = process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ';
+  const keySecret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ';
   const hmac = crypto.createHmac('sha256', keySecret);
   hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
   const generatedSignature = hmac.digest('hex');
@@ -2019,6 +2023,22 @@ app.get('/api/admin/reviews', requireAdmin, (req, res) => {
 // ADMIN ROUTES (protected)
 // ══════════════════════════════════════════════════════════
 
+// GET all settings (including private keys for admin panel)
+app.get('/api/admin/settings', requireAdmin, (req, res) => {
+  const db = readDB();
+  res.json({
+    announce: db.settings.announce || '',
+    cartEnabled: db.settings.cartEnabled !== false,
+    shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
+    shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
+    otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
+    otherChargesType: db.settings.otherChargesType || 'flat',
+    razorpayEnabled: db.settings.razorpayEnabled !== false,
+    razorpayKeyId: db.settings.razorpayKeyId || '',
+    razorpayKeySecret: db.settings.razorpayKeySecret || ''
+  });
+});
+
 // UPDATE announce bar & settings
 app.put('/api/admin/settings', requireAdmin, (req, res) => {
   const db = readDB();
@@ -2028,6 +2048,9 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   if (req.body.shippingThreshold !== undefined) db.settings.shippingThreshold = Number(req.body.shippingThreshold);
   if (req.body.otherCharges !== undefined) db.settings.otherCharges = Number(req.body.otherCharges);
   if (req.body.otherChargesType !== undefined) db.settings.otherChargesType = req.body.otherChargesType;
+  if (req.body.razorpayEnabled !== undefined) db.settings.razorpayEnabled = !!req.body.razorpayEnabled;
+  if (req.body.razorpayKeyId !== undefined) db.settings.razorpayKeyId = String(req.body.razorpayKeyId);
+  if (req.body.razorpayKeySecret !== undefined) db.settings.razorpayKeySecret = String(req.body.razorpayKeySecret);
   writeDB(db);
   res.json({ success: true });
 });
