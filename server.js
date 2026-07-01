@@ -2033,9 +2033,7 @@ app.get('/api/admin/settings', requireAdmin, (req, res) => {
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
     otherChargesType: db.settings.otherChargesType || 'flat',
-    razorpayEnabled: db.settings.razorpayEnabled !== false,
-    razorpayKeyId: db.settings.razorpayKeyId || '',
-    razorpayKeySecret: db.settings.razorpayKeySecret || ''
+    razorpayEnabled: db.settings.razorpayEnabled !== false
   });
 });
 
@@ -2049,8 +2047,6 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   if (req.body.otherCharges !== undefined) db.settings.otherCharges = Number(req.body.otherCharges);
   if (req.body.otherChargesType !== undefined) db.settings.otherChargesType = req.body.otherChargesType;
   if (req.body.razorpayEnabled !== undefined) db.settings.razorpayEnabled = !!req.body.razorpayEnabled;
-  if (req.body.razorpayKeyId !== undefined) db.settings.razorpayKeyId = String(req.body.razorpayKeyId);
-  if (req.body.razorpayKeySecret !== undefined) db.settings.razorpayKeySecret = String(req.body.razorpayKeySecret);
   writeDB(db);
   res.json({ success: true });
 });

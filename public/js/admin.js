@@ -897,10 +897,6 @@ const Admin = {
       // Populate Payments settings
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
-      const rzKeyEl = document.getElementById('afRazorpayKeyId');
-      if (rzKeyEl) rzKeyEl.value = s.razorpayKeyId || '';
-      const rzSecEl = document.getElementById('afRazorpayKeySecret');
-      if (rzSecEl) rzSecEl.value = s.razorpayKeySecret || '';
     }
 
     this.initVariantBuilder();
@@ -1380,13 +1376,9 @@ document.getElementById('saveBillingSettingsBtn').onclick = async () => {
 // Save Payment Settings
 document.getElementById('savePaymentSettingsBtn').onclick = async () => {
   const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
-  const razorpayKeyId = document.getElementById('afRazorpayKeyId').value.trim();
-  const razorpayKeySecret = document.getElementById('afRazorpayKeySecret').value.trim();
 
   await API.updateSettings({
-    razorpayEnabled: razorpayEnabled,
-    razorpayKeyId: razorpayKeyId,
-    razorpayKeySecret: razorpayKeySecret
+    razorpayEnabled: razorpayEnabled
   });
   showOk('paymentSettingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
