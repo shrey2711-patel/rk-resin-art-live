@@ -16,6 +16,7 @@ const App = {
     otherCharges: 0,
     otherChargesType: 'flat',
     razorpayEnabled: true,
+    cartEnabled: true,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -229,7 +230,7 @@ const App = {
     const btn = document.getElementById('placeOrderBtn');
     const paymentField = document.querySelector('.payment-method-field');
     
-    const razorpayEnabled = this.state.razorpayEnabled !== false;
+    const razorpayEnabled = this.state.razorpayEnabled !== false && this.state.cartEnabled !== false;
     
     if (paymentField) {
       paymentField.style.display = razorpayEnabled ? '' : 'none';
@@ -260,6 +261,7 @@ const App = {
       
       // Update cart enabled state site-wide
       const cartEnabled = s.cartEnabled !== false;
+      this.state.cartEnabled = cartEnabled;
       document.body.classList.toggle('cart-disabled', !cartEnabled);
 
       if (s.shippingRate !== undefined) this.state.shippingRate = Number(s.shippingRate);
@@ -983,7 +985,7 @@ const App = {
             ${stockHTML}
             <div class="prod-card-btns">
               <button class="add-to-cart-btn" data-pid="${p.id}">Add to Cart</button>
-              <button class="buy-now-btn" data-pid="${p.id}">Buy Now</button>
+              <button class="buy-now-btn" data-pid="${p.id}">${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}</button>
             </div>
           </div>
         </div>`;
@@ -1055,7 +1057,8 @@ const App = {
   // ── Buy Now (direct checkout) ─────────────────────────────
   openBuyNowCheckout(prod, cat = {}) {
     if (!Auth.user) {
-      showToast('🔒 Please login or register to buy products!', 'error');
+      const actionText = this.state.cartEnabled !== false ? 'buy products' : 'enquire about products';
+      showToast(`🔒 Please login or register to ${actionText}!`, 'error');
       Auth.open();
       return;
     }
@@ -1064,7 +1067,9 @@ const App = {
 
     Auth.fillCheckout();
 
-    document.getElementById('checkoutTitle').textContent = 'Buy Now — Quick Checkout';
+    document.getElementById('checkoutTitle').textContent = this.state.cartEnabled !== false
+      ? 'Buy Now — Quick Checkout'
+      : 'Enquire Now — Quick Inquiry';
     document.getElementById('invoiceDownloadBtn').style.display = 'none';
     document.getElementById('checkoutModalOverlay').classList.add('open');
 
@@ -1161,7 +1166,7 @@ const App = {
             🛒 Add to Cart
           </button>
           <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
-            ⚡ Buy Now
+            ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
           </button>
           <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
             ${wlIcon}
