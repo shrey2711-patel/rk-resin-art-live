@@ -1188,45 +1188,7 @@ async function initDatabase() {
   }
 }
 
-function cleanDatabaseCategories() {
-  try {
-    const db = readDB();
-    if (db.categories && Array.isArray(db.categories)) {
-      const unwantedLower = new Set(['colour', 'lighter', 'fire', 'hiug hjlvgvlv']);
-      const originalCount = db.categories.length;
-      
-      db.categories = db.categories.filter(c => {
-        if (!c || !c.name) return false;
-        const nameTrimmed = c.name.trim();
-        // Remove exact lowercase 'pigments' (protecting premium 'Pigments' category)
-        if (nameTrimmed === 'pigments') return false;
-        // Remove other test categories case-insensitively
-        if (unwantedLower.has(nameTrimmed.toLowerCase())) return false;
-        return true;
-      });
 
-      if (db.categories.length !== originalCount) {
-        console.log(`🧹 Cleaned up database categories! Removed ${originalCount - db.categories.length} unwanted category options.`);
-        writeDB(db);
-      }
-    }
-  } catch (err) {
-    console.error("⚠️ Failed to perform category database cleanup:", err.message);
-  }
-}
-
-function cleanDatabaseBanners() {
-  try {
-    const db = readDB();
-    if (db.banners && db.banners.length > 0) {
-      db.banners = [];
-      writeDB(db);
-      console.log("🧹 Banners cleared from database successfully!");
-    }
-  } catch (err) {
-    console.error("⚠️ Failed to perform banner database cleanup:", err.message);
-  }
-}
 
 function readDB() {
   try {
@@ -2385,21 +2347,6 @@ app.get('*', (req, res) => {
 async function startServer() {
   // Sync database from Firebase Realtime Database before server starts
   await initDatabase();
-
-  // Clean up any test/unwanted categories
-  cleanDatabaseCategories();
-
-  // Clear any existing banners once if they exist, so admin can upload fresh
-  cleanDatabaseBanners();
-
-  // Temporary: force clear products on startup to sync Firebase
-  const db = readDB();
-  if (db.products && db.products.length > 0 && !db.firebaseCleared) {
-    console.log(`🧹 Temporary cleanup: Clearing all ${db.products.length} products from database...`);
-    db.products = [];
-    db.firebaseCleared = true;
-    writeDB(db);
-  }
 
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Resin Art server running at http://localhost:${PORT}`);
