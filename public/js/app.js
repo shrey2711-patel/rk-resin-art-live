@@ -1159,7 +1159,7 @@ const App = {
 
       <!-- Info Pane -->
       <div class="modal-pane" id="modalPaneInfo">
-        <p class="modal-prod-desc">${prod.description || ''}</p>
+        <div class="modal-prod-desc">${parseMarkdown(prod.description) || ''}</div>
         <div class="modal-prod-stock" id="modalStockDisplay">${initStock > 0 ? `✅ In Stock (${initStock} units)` : '❌ Out of Stock'}</div>
         <div class="modal-btns">
           <button class="modal-add-btn" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
@@ -2335,6 +2335,54 @@ function showToast(msg, type = '') {
   t.textContent = msg;
   t.className = `toast ${type} show`;
   setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Markdown Parser for descriptions ──────────────────────────
+function parseMarkdown(text) {
+  if (!text) return '';
+  
+  // Escape HTML to prevent XSS
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+    
+  // Convert Headings: ## Heading -> <h3>Heading</h3>, # Heading -> <h2>Heading</h2>
+  html = html.replace(/^##\s+(.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^#\s+(.+)$/gm, '<h2>$1</h2>');
+  
+  // Convert Bold: **text** -> <strong>text</strong>
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Convert Bullet lists: * item or - item -> <li>item</li>
+  let lines = html.split('\n');
+  let inList = false;
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
+    if (line.startsWith('* ') || line.startsWith('- ')) {
+      let content = line.substring(2).trim();
+      if (!inList) {
+        lines[i] = '<ul><li>' + content + '</li>';
+        inList = true;
+      } else {
+        lines[i] = '<li>' + content + '</li>';
+      }
+    } else {
+      if (inList) {
+        lines[i - 1] += '</ul>';
+        inList = false;
+      }
+      // Wrap non-empty, non-heading/list lines in <p> to preserve paragraph spacing
+      if (line && !line.startsWith('<h') && !line.startsWith('<ul') && !line.startsWith('</ul') && !line.startsWith('<li')) {
+        lines[i] = `<p>${lines[i]}</p>`;
+      }
+    }
+  }
+  if (inList) {
+    lines[lines.length - 1] += '</ul>';
+  }
+  
+  return lines.join('\n');
 }
 
 // ── Admin ok helper ───────────────────────────────────────────
