@@ -99,8 +99,12 @@ if (!fs.existsSync(PERSISTENT_DIR)) {
 
 const DB_PATH = path.join(PERSISTENT_DIR, 'db.json');
 const UPLOAD_DIR = path.join(PERSISTENT_DIR, 'uploads');
+const DB_BACKUP_DIR = path.join(PERSISTENT_DIR, 'backups');
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+if (!fs.existsSync(DB_BACKUP_DIR)) {
+  fs.mkdirSync(DB_BACKUP_DIR, { recursive: true });
 }
 
 // Initialize Razorpay SDK helper dynamically
@@ -1248,6 +1252,99 @@ async function initDatabase() {
 
 
 
+function getFirebaseDbUrl() {
+  return process.env.FIREBASE_DB_URL ||
+    process.env.FIREBASE_DATABASE_URL ||
+    process.env.FIREBASE_RTDB_URL ||
+    process.env.FIREBASE_REALTIME_DATABASE_URL ||
+    null;
+}
+
+function firebaseRestUrl() {
+  const dbUrl = getFirebaseDbUrl();
+  if (!dbUrl) return null;
+  return dbUrl.endsWith('/') ? `${dbUrl}.json` : `${dbUrl}/.json`;
+}
+
+function getImgBbApiKey() {
+  return process.env.IMGBB_API_KEY ||
+    process.env.IMGBB_KEY ||
+    process.env.IMG_BB_API_KEY ||
+    process.env.IMG_BB_KEY ||
+    null;
+}
+
+function hasLiveStoreData(data) {
+  if (!data || typeof data !== 'object') return false;
+  return Boolean(
+    (Array.isArray(data.products) && data.products.length > 0) ||
+    (Array.isArray(data.orders) && data.orders.length > 0) ||
+    (Array.isArray(data.users) && data.users.length > 0) ||
+    (Array.isArray(data.banners) && data.banners.length > 0)
+  );
+}
+
+function backupDatabaseSnapshot(data, reason = 'write') {
+  try {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const safeReason = String(reason).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+    const backupPath = path.join(DB_BACKUP_DIR, `db-${safeReason}-${timestamp}.json`);
+    fs.writeFileSync(backupPath, JSON.stringify(data, null, 2));
+    return backupPath;
+  } catch (err) {
+    console.error('Failed to create DB backup:', err.message);
+    return null;
+  }
+}
+
+async function initPersistentDatabase() {
+  const firebaseUrl = firebaseRestUrl();
+  if (!firebaseUrl) {
+    console.log('No Firebase database URL set. Running in local storage mode.');
+    return;
+  }
+
+  try {
+    console.log('Loading database from Firebase...');
+    const res = await fetch(firebaseUrl);
+    if (!res.ok) {
+      console.error(`Firebase load failed with status ${res.status}. Falling back to local db.json.`);
+      return;
+    }
+
+    const data = await res.json();
+    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+      fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+      backupDatabaseSnapshot(data, 'firebase-load');
+      console.log('Database successfully loaded and synced from Firebase.');
+      return;
+    }
+
+    console.log('Firebase database is empty.');
+    if (!fs.existsSync(DB_PATH)) return;
+
+    const localData = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    if (!hasLiveStoreData(localData) && process.env.ALLOW_EMPTY_FIREBASE_SEED !== 'true') {
+      console.warn('Refusing to seed Firebase with an empty local store. Restore products locally first, or set ALLOW_EMPTY_FIREBASE_SEED=true intentionally.');
+      return;
+    }
+
+    const syncRes = await fetch(firebaseUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(localData)
+    });
+    if (syncRes.ok) {
+      console.log('Successfully seeded Firebase database from local db.json.');
+    } else {
+      console.error(`Firebase seed failed with status ${syncRes.status}`);
+    }
+  } catch (e) {
+    console.error('Failed to load/sync database from Firebase:', e.message);
+    console.warn('Continuing with local db.json instead of crashing.');
+  }
+}
+
 function readDB() {
   try {
     const data = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
@@ -1285,16 +1382,29 @@ function readDB() {
 }
 
 function writeDB(data) {
+  try {
+    if (fs.existsSync(DB_PATH)) {
+      const previousData = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+      const previousProducts = Array.isArray(previousData.products) ? previousData.products.length : 0;
+      const nextProducts = Array.isArray(data.products) ? data.products.length : 0;
+      if (previousProducts > 0 && nextProducts === 0) {
+        const backupPath = backupDatabaseSnapshot(previousData, 'before-empty-products');
+        console.warn(`Product list is being written as empty. Previous DB backup saved: ${backupPath || 'backup failed'}`);
+      } else if (previousProducts !== nextProducts || nextProducts > 0) {
+        backupDatabaseSnapshot(previousData, 'before-write');
+      }
+    }
+  } catch (err) {
+    console.error('Could not create pre-write DB backup:', err.message);
+  }
+
   // 1. Instant local write (ensures zero latency and consistency for immediate readDB calls)
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 
   // 2. Async background push to Firebase
-  if (process.env.FIREBASE_DB_URL) {
-    const url = process.env.FIREBASE_DB_URL.endsWith('/')
-      ? `${process.env.FIREBASE_DB_URL}.json`
-      : `${process.env.FIREBASE_DB_URL}/.json`;
-
-    fetch(url, {
+  const firebaseUrl = firebaseRestUrl();
+  if (firebaseUrl) {
+    fetch(firebaseUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -1471,8 +1581,8 @@ app.post('/api/wishlist/subscribe', (req, res) => {
 // Diagnostic DB Endpoint
 app.get('/api/debug-db', (req, res) => {
   res.json({
-    firebaseConfigured: !!process.env.FIREBASE_DB_URL,
-    imgbbConfigured: !!process.env.IMGBB_API_KEY,
+    firebaseConfigured: !!getFirebaseDbUrl(),
+    imgbbConfigured: !!getImgBbApiKey(),
     nodeEnv: process.env.NODE_ENV || 'development',
     persistentDisk: !!process.env.PERSISTENT_DISK_PATH
   });
@@ -2093,7 +2203,8 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
     }
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
-    if (process.env.IMGBB_API_KEY) {
+    const imgbbApiKey = getImgBbApiKey();
+    if (imgbbApiKey) {
       try {
         const filePath = req.file.path;
         const fileBuffer = fs.readFileSync(filePath);
@@ -2103,7 +2214,7 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
         const formData = new URLSearchParams();
         formData.append('image', base64Image);
         
-        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_API_KEY}`, {
+        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
           method: 'POST',
           body: formData,
           headers: {
@@ -2415,7 +2526,7 @@ app.get('*', (req, res) => {
 async function startServer() {
   try {
     // Sync database from Firebase Realtime Database before server starts
-    await initDatabase();
+    await initPersistentDatabase();
   } catch (err) {
     console.error("💥 Server failed to start due to database synchronization error:", err.message);
     process.exit(1);
@@ -2426,15 +2537,15 @@ async function startServer() {
     console.log(`   Admin password: rk2024\n`);
 
     if (process.env.RENDER) {
-      if (!process.env.FIREBASE_DB_URL) {
+      if (!getFirebaseDbUrl()) {
         console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but FIREBASE_DB_URL is not configured!`);
         console.warn(`   All uploaded products, orders, and settings will be DELETED on your next deploy or restart.`);
-        console.warn(`   Please configure FIREBASE_DB_URL in your Render dashboard under Settings -> Environment Variables.\n`);
+        console.warn(`   Please configure FIREBASE_DB_URL or FIREBASE_DATABASE_URL in your Render dashboard under Settings -> Environment Variables.\n`);
       }
-      if (!process.env.IMGBB_API_KEY) {
+      if (!getImgBbApiKey()) {
         console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but IMGBB_API_KEY is not configured!`);
         console.warn(`   Uploaded product and banner images will be lost on your next deploy.`);
-        console.warn(`   Please configure IMGBB_API_KEY in your Render dashboard to save images permanently on the cloud.\n`);
+        console.warn(`   Please configure IMGBB_API_KEY or IMGBB_KEY in your Render dashboard to save images permanently on the cloud.\n`);
       }
     }
 
