@@ -598,23 +598,66 @@ input, select, textarea { font-family: inherit; }
 /* Product Modal */
 .product-modal {
   background: var(--white); border-radius: 16px;
-  max-width: 580px; width: 100%; position: relative;
+  max-width: 900px; width: 100%; position: relative;
   overflow-y: auto; max-height: 90vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 .modal-body { padding: 2rem; }
+
+.modal-content-grid {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 2.25rem;
+}
+
+.modal-grid-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-grid-right {
+  display: flex;
+  flex-direction: column;
+}
+
 .modal-prod-thumb {
-  width: 100%; height: auto; border-radius: 10px;
+  width: 100%; height: auto; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 6rem; margin-bottom: 1.5rem; overflow: hidden;
+  margin-bottom: 0; overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .modal-prod-thumb .prod-image-wrap,
-.modal-prod-thumb .prod-emoji-fallback { border-radius: 10px; width: 100%; height: 100%; }
+.modal-prod-thumb .prod-emoji-fallback { border-radius: 12px; width: 100%; height: 100%; }
 .modal-prod-thumb .prod-image { object-fit: cover; width: 100%; height: 100%; }
 .modal-prod-thumb .prod-emoji-fallback { font-size: 6rem; }
+
 .modal-prod-cat { font-size: 0.72rem; font-weight: 700; color: var(--p); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.modal-prod-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ink); margin-bottom: 10px; }
-.modal-prod-price { font-size: 1.2rem; font-weight: 800; color: var(--red); margin-bottom: 8px; }
+.modal-prod-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--ink); margin-bottom: 12px; line-height: 1.3; }
+
+/* Amazon style Price Display */
+.modal-prod-price-block {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.price-discount {
+  color: #CC0C39; /* Amazon red */
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.modal-prod-price {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--ink);
+}
 .modal-prod-price s { font-size: 0.9rem; color: #aaa; font-weight: 400; }
+.modal-prod-mrp {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .modal-prod-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; white-space: pre-wrap; max-height: 240px; overflow-y: auto; padding-right: 8px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
 .modal-prod-desc::-webkit-scrollbar { width: 5px; }
 .modal-prod-desc::-webkit-scrollbar-track { background: transparent; }
@@ -626,22 +669,87 @@ input, select, textarea { font-family: inherit; }
 .modal-prod-desc p { margin-bottom: 10px; margin-top: 0; }
 .modal-prod-desc ul { margin-bottom: 14px; padding-left: 20px; list-style-type: disc; }
 .modal-prod-desc li { margin-bottom: 4px; }
-.modal-prod-stock { font-size: 0.78rem; color: var(--green); font-weight: 600; margin-bottom: 16px; }
-.modal-btns { display: flex; gap: 10px; }
+
+.modal-stock-delivery-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.modal-prod-stock { color: var(--green); font-weight: 600; margin-bottom: 0; }
+.modal-delivery-info { color: var(--muted); font-weight: 500; }
+
+.modal-variants-block {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-variants-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.modal-variants-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.variant-chip {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.variant-chip:hover {
+  border-color: #FFA41C;
+  background: #FFF8F0;
+}
+.variant-chip.selected {
+  border-color: #FFA41C;
+  background: #FFF8F0;
+  box-shadow: 0 0 0 1px #FFA41C;
+}
+
+.modal-btns { display: flex; gap: 12px; align-items: center; }
 .modal-add-btn {
   flex: 1; padding: 12px;
-  background: var(--white); color: var(--ink); border: 1.5px solid var(--border);
-  border-radius: 10px; font-size: 0.95rem; font-weight: 800;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  background: #FFD814; color: #0F1111; border: 1px solid #FCD200;
+  border-radius: 24px; font-size: 0.92rem; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 5px rgba(213,217,217,0.5);
 }
-.modal-add-btn:hover { background: var(--p); color: #fff; border-color: var(--p); }
+.modal-add-btn:hover { background: #F7CA00; border-color: #F2C200; }
+.modal-add-btn:disabled, .modal-buy-now-btn:disabled {
+  background: #f0f0f0 !important; border-color: #d0d0d0 !important; color: #a0a0a0 !important;
+  cursor: not-allowed; box-shadow: none !important;
+}
 .modal-buy-now-btn {
   flex: 1; padding: 12px;
-  background: var(--p); color: #fff; border: none;
-  border-radius: 10px; font-size: 0.95rem; font-weight: 800;
-  transition: background 0.2s, transform 0.15s;
+  background: #FFA41C; color: #0F1111; border: 1px solid #FF8F00;
+  border-radius: 24px; font-size: 0.92rem; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 5px rgba(213,217,217,0.5);
 }
-.modal-buy-now-btn:hover { background: var(--pd); transform: translateY(-1px); }
+.modal-buy-now-btn:hover { background: #FA8900; border-color: #FA8200; }
+.modal-wishlist-btn {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 50%; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; padding: 0; flex-shrink: 0;
+  cursor: pointer;
+}
+.modal-wishlist-btn:hover { background: #F0F2F2; border-color: #D5D9D9; }
 
 /* Product Modal Tabs */
 .modal-tabs {

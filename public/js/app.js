@@ -1142,41 +1142,63 @@ const App = {
     const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
 
     document.getElementById('modalBody').innerHTML = `
-      <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-        ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
-      </div>
-      <div class="modal-prod-cat">${prod.category}</div>
-      ${badgeHTML}
-      <h2 class="modal-prod-name">${prod.name}</h2>
-      <div class="modal-prod-price" id="modalPriceDisplay">₹${initPrice} ${origHTML}</div>
-      ${variantsHTML}
-
-      <!-- Modal Tabs -->
-      <div class="modal-tabs">
-        <button class="modal-tab active" id="modalTabInfo">📦 Product Info</button>
-        <button class="modal-tab" id="modalTabReviews">⭐ Reviews &amp; Ratings</button>
-      </div>
-
-      <!-- Info Pane -->
-      <div class="modal-pane" id="modalPaneInfo">
-        <div class="modal-prod-desc">${parseMarkdown(prod.description) || ''}</div>
-        <div class="modal-prod-stock" id="modalStockDisplay">${initStock > 0 ? `✅ In Stock (${initStock} units)` : '❌ Out of Stock'}</div>
-        <div class="modal-btns">
-          <button class="modal-add-btn" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
-            🛒 Add to Cart
-          </button>
-          <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
-            ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
-          </button>
-          <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
-            ${wlIcon}
-          </button>
+      <div class="modal-content-grid">
+        <!-- Left Column: Media Preview -->
+        <div class="modal-grid-left">
+          <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
+            ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+          </div>
         </div>
-      </div>
-
-      <!-- Reviews Pane -->
-      <div class="modal-pane" id="modalPaneReviews" style="display:none">
-        <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
+        
+        <!-- Right Column: Product Actions & Specs -->
+        <div class="modal-grid-right">
+          <div class="modal-prod-cat">${prod.category}</div>
+          ${badgeHTML}
+          <h2 class="modal-prod-name">${prod.name}</h2>
+          
+          <div class="modal-prod-price-block">
+            <div class="modal-prod-price" id="modalPriceDisplay">₹${initPrice} ${origHTML}</div>
+          </div>
+          
+          ${variantsHTML}
+    
+          <!-- Modal Tabs -->
+          <div class="modal-tabs">
+            <button class="modal-tab active" id="modalTabInfo">📦 Product Info</button>
+            <button class="modal-tab" id="modalTabReviews">⭐ Reviews &amp; Ratings</button>
+          </div>
+    
+          <!-- Info Pane -->
+          <div class="modal-pane" id="modalPaneInfo">
+            <div class="modal-prod-desc">${parseMarkdown(prod.description) || ''}</div>
+            
+            <div class="modal-stock-delivery-row">
+              <span class="modal-prod-stock" id="modalStockDisplay">
+                ${initStock > 0 ? `✅ In Stock (${initStock} units)` : '❌ Out of Stock'}
+              </span>
+              <span class="modal-delivery-info">
+                🚚 Free Delivery above ₹999
+              </span>
+            </div>
+            
+            <div class="modal-btns">
+              <button class="modal-add-btn" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
+                🛒 Add to Cart
+              </button>
+              <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
+                ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
+              </button>
+              <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
+                ${wlIcon}
+              </button>
+            </div>
+          </div>
+    
+          <!-- Reviews Pane -->
+          <div class="modal-pane" id="modalPaneReviews" style="display:none">
+            <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
+          </div>
+        </div>
       </div>`;
 
     // Track currently selected variant
