@@ -1140,6 +1140,9 @@ const App = {
     const isOutOfStock = initStock === 0;
     const ratio = prod.imgRatio || '4:3';
     const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
+    const descHTML = (prod.description && prod.description.trim())
+      ? `<div class="modal-prod-desc">${parseMarkdown(prod.description)}</div>`
+      : '';
 
     document.getElementById('modalBody').innerHTML = `
       <div class="modal-content-grid">
@@ -1170,7 +1173,7 @@ const App = {
     
           <!-- Info Pane -->
           <div class="modal-pane" id="modalPaneInfo">
-            <div class="modal-prod-desc">${parseMarkdown(prod.description) || ''}</div>
+            ${descHTML}
             
             <div class="modal-stock-delivery-row">
               <span class="modal-prod-stock" id="modalStockDisplay">

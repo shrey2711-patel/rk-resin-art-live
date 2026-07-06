@@ -632,7 +632,7 @@ input, select, textarea { font-family: inherit; }
 .modal-prod-thumb .prod-emoji-fallback { font-size: 6rem; }
 
 .modal-prod-cat { font-size: 0.72rem; font-weight: 700; color: var(--p); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.modal-prod-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--ink); margin-bottom: 12px; line-height: 1.3; }
+.modal-prod-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--ink); margin-bottom: 12px; line-height: 1.3; text-transform: capitalize; }
 
 /* Amazon style Price Display */
 .modal-prod-price-block {
