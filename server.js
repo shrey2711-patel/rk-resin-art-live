@@ -1165,6 +1165,7 @@ async function initDatabase() {
       }
     } catch (e) {
       console.error("❌ Failed to load/sync database from Firebase:", e.message);
+      throw e;
     }
   } else {
     console.log("ℹ️ No FIREBASE_DB_URL set. Running in local storage mode.");
@@ -2328,12 +2329,31 @@ app.get('*', (req, res) => {
 });
 
 async function startServer() {
-  // Sync database from Firebase Realtime Database before server starts
-  await initDatabase();
+  try {
+    // Sync database from Firebase Realtime Database before server starts
+    await initDatabase();
+  } catch (err) {
+    console.error("💥 Server failed to start due to database synchronization error:", err.message);
+    process.exit(1);
+  }
 
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Resin Art server running at http://localhost:${PORT}`);
     console.log(`   Admin password: rk2024\n`);
+
+    if (process.env.RENDER) {
+      if (!process.env.FIREBASE_DB_URL) {
+        console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but FIREBASE_DB_URL is not configured!`);
+        console.warn(`   All uploaded products, orders, and settings will be DELETED on your next deploy or restart.`);
+        console.warn(`   Please configure FIREBASE_DB_URL in your Render dashboard under Settings -> Environment Variables.\n`);
+      }
+      if (!process.env.IMGBB_API_KEY) {
+        console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but IMGBB_API_KEY is not configured!`);
+        console.warn(`   Uploaded product and banner images will be lost on your next deploy.`);
+        console.warn(`   Please configure IMGBB_API_KEY in your Render dashboard to save images permanently on the cloud.\n`);
+      }
+    }
+
     await initMailer();
   });
 
