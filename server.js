@@ -1394,6 +1394,16 @@ app.post('/api/wishlist/subscribe', (req, res) => {
   res.json({ success: true, message: 'Subscribed to stock alert!' });
 });
 
+// Diagnostic DB Endpoint
+app.get('/api/debug-db', (req, res) => {
+  res.json({
+    firebaseConfigured: !!process.env.FIREBASE_DB_URL,
+    imgbbConfigured: !!process.env.IMGBB_API_KEY,
+    nodeEnv: process.env.NODE_ENV || 'development',
+    persistentDisk: !!process.env.PERSISTENT_DISK_PATH
+  });
+});
+
 // GET site settings (announce bar etc.)
 app.get('/api/settings', (req, res) => {
   const db = readDB();
