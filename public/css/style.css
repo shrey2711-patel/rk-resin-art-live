@@ -615,7 +615,11 @@ input, select, textarea { font-family: inherit; }
 .modal-prod-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ink); margin-bottom: 10px; }
 .modal-prod-price { font-size: 1.2rem; font-weight: 800; color: var(--red); margin-bottom: 8px; }
 .modal-prod-price s { font-size: 0.9rem; color: #aaa; font-weight: 400; }
-.modal-prod-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; white-space: pre-wrap; }
+.modal-prod-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; white-space: pre-wrap; max-height: 240px; overflow-y: auto; padding-right: 8px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.modal-prod-desc::-webkit-scrollbar { width: 5px; }
+.modal-prod-desc::-webkit-scrollbar-track { background: transparent; }
+.modal-prod-desc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.modal-prod-desc::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 .modal-prod-desc h2, .modal-prod-desc h3 { font-family: 'Playfair Display', serif; color: var(--ink); margin-top: 14px; margin-bottom: 6px; }
 .modal-prod-desc h2 { font-size: 1.15rem; }
 .modal-prod-desc h3 { font-size: 1.02rem; }
