@@ -3,6 +3,80 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder('ipv4first');
 }
 
+// Global fetch polyfill for older Node.js versions (e.g. Node 14/16)
+if (!global.fetch) {
+  const https = require('https');
+  const http = require('http');
+  const { URL } = require('url');
+
+  global.fetch = function (url, options = {}) {
+    return new Promise((resolve, reject) => {
+      const parsedUrl = new URL(url);
+      const protocol = parsedUrl.protocol === 'https:' ? https : http;
+      
+      const headers = options.headers || {};
+      let bodyData = null;
+      
+      if (options.body) {
+        if (typeof options.body === 'string') {
+          bodyData = options.body;
+        } else if (options.body instanceof URLSearchParams || (options.body && options.body.constructor && options.body.constructor.name === 'URLSearchParams')) {
+          bodyData = options.body.toString();
+          headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        } else if (options.body instanceof Buffer) {
+          bodyData = options.body;
+        } else {
+          bodyData = JSON.stringify(options.body);
+          if (!headers['Content-Type']) {
+            headers['Content-Type'] = 'application/json';
+          }
+        }
+      }
+
+      if (bodyData && !headers['Content-Length']) {
+        headers['Content-Length'] = Buffer.byteLength(bodyData);
+      }
+
+      const reqOptions = {
+        method: options.method || 'GET',
+        headers: headers
+      };
+
+      const req = protocol.request(parsedUrl, reqOptions, (res) => {
+        const chunks = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => {
+          const buffer = Buffer.concat(chunks);
+          const response = {
+            ok: res.statusCode >= 200 && res.statusCode < 300,
+            status: res.statusCode,
+            statusText: res.statusMessage,
+            headers: {
+              get: (name) => res.headers[name.toLowerCase()]
+            },
+            text: () => Promise.resolve(buffer.toString('utf8')),
+            json: () => {
+              try {
+                return Promise.resolve(JSON.parse(buffer.toString('utf8')));
+              } catch (e) {
+                return Promise.reject(new Error(`Invalid JSON: ${e.message}`));
+              }
+            }
+          };
+          resolve(response);
+        });
+      });
+
+      req.on('error', (err) => reject(err));
+
+      if (bodyData) {
+        req.write(bodyData);
+      }
+      req.end();
+    });
+  };
+}
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
