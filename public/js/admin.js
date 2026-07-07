@@ -339,7 +339,7 @@ const Admin = {
   },
 
   resetProductForm() {
-    ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl'].forEach(id => {
+    ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfUnit'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -386,6 +386,8 @@ const Admin = {
     document.getElementById('pfEmoji').value = product.emoji || '';
     document.getElementById('pfBadge').value = product.badge || '';
     document.getElementById('pfDesc').value = product.description || '';
+    const unitEl = document.getElementById('pfUnit');
+    if (unitEl) unitEl.value = product.unit || '';
     document.getElementById('pfImageFile').value = '';
 
     const btn = document.getElementById('addProdBtn');
@@ -630,6 +632,7 @@ const Admin = {
       imgRatio,
       variantLabel,
       variants,
+      unit: document.getElementById('pfUnit')?.value.trim() || '',
     };
 
     if (this.editState.section === 'product' && this.editState.id) {

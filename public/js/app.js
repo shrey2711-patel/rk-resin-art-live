@@ -1158,6 +1158,7 @@ const App = {
           <div class="modal-prod-cat">${prod.category}</div>
           ${badgeHTML}
           <h2 class="modal-prod-name">${prod.name}</h2>
+          ${prod.unit ? `<div class="modal-prod-unit">${prod.unit}</div>` : ''}
           
           <div class="modal-prod-price-block">
             <div class="modal-prod-price" id="modalPriceDisplay">₹${initPrice} ${origHTML}</div>
