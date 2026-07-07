@@ -1208,49 +1208,6 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
-// ── DB helpers ──────────────────────────────────────────────
-async function initDatabase() {
-  if (process.env.FIREBASE_DB_URL) {
-    try {
-      console.log("🔄 Loading database from Firebase...");
-      const url = process.env.FIREBASE_DB_URL.endsWith('/')
-        ? `${process.env.FIREBASE_DB_URL}.json`
-        : `${process.env.FIREBASE_DB_URL}/.json`;
-
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        // If Firebase database exists and is populated, sync it locally
-        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-          fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-          console.log("✅ Database successfully loaded and synced from Firebase!");
-          return;
-        }
-        
-        // If Firebase is empty/null, seed it with the local db.json file
-        console.log("📡 Firebase database is empty. Seeding it with local db.json...");
-        if (fs.existsSync(DB_PATH)) {
-          const localData = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-          const syncRes = await fetch(url, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(localData)
-          });
-          if (syncRes.ok) {
-            console.log("✅ Successfully seeded Firebase database from local db.json!");
-          }
-        }
-      }
-    } catch (e) {
-      console.error("❌ Failed to load/sync database from Firebase:", e.message);
-      throw e;
-    }
-  } else {
-    console.log("ℹ️ No FIREBASE_DB_URL set. Running in local storage mode.");
-  }
-}
-
-
 
 function getFirebaseDbUrl() {
   return process.env.FIREBASE_DB_URL ||
@@ -1308,8 +1265,7 @@ async function initPersistentDatabase() {
     console.log('Loading database from Firebase...');
     const res = await fetch(firebaseUrl);
     if (!res.ok) {
-      console.error(`Firebase load failed with status ${res.status}. Falling back to local db.json.`);
-      return;
+      throw new Error(`Firebase load failed with status ${res.status}`);
     }
 
     const data = await res.json();
@@ -1337,11 +1293,11 @@ async function initPersistentDatabase() {
     if (syncRes.ok) {
       console.log('Successfully seeded Firebase database from local db.json.');
     } else {
-      console.error(`Firebase seed failed with status ${syncRes.status}`);
+      throw new Error(`Firebase seed failed with status ${syncRes.status}`);
     }
   } catch (e) {
-    console.error('Failed to load/sync database from Firebase:', e.message);
-    console.warn('Continuing with local db.json instead of crashing.');
+    console.error('💥 Failed to load/sync database from Firebase:', e.message);
+    throw e; // Crash server startup to prevent running with blank local data
   }
 }
 
