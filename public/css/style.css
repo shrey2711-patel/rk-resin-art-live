@@ -2334,3 +2334,161 @@ body.admin-page-active > :not(#adminOverlay):not(#toast) {
     padding: 0 16px;
   }
 }
+
+/* Skeleton Loading Styles */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, rgba(0,0,0,0.06) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton-image { width: 100%; aspect-ratio: 4 / 3; }
+.skeleton-text { height: 16px; margin-bottom: 12px; }
+.skeleton-title { height: 32px; width: 80%; margin-bottom: 16px; }
+.skeleton-price { height: 24px; width: 40%; margin-bottom: 24px; }
+.skeleton-btn { height: 48px; border-radius: 12px; }
+
+/* Quantity Selector */
+.product-qty-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.product-qty-selector label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.qty-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+.qty-btn {
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qty-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+.qty-input {
+  border: none;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  width: 44px;
+  height: 36px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: none;
+  outline: none;
+}
+
+/* Thumbnail Gallery Strip */
+.product-gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.product-thumbnails {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+.thumb-item {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb-item.active {
+  border-color: var(--p);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Magnifier Hover Zoom */
+.modal-prod-thumb {
+  position: relative;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.modal-prod-thumb img.prod-image {
+  transition: transform 0.1s ease-out;
+  transform-origin: center center;
+}
+
+/* WhatsApp Inquiry Button */
+.modal-whatsapp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.15);
+  margin-top: 10px;
+}
+.modal-whatsapp-btn:hover {
+  background: #128C7E;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* Related Products Section */
+.related-products-section {
+  margin-top: 60px;
+  border-top: 1px solid var(--border);
+  padding-top: 40px;
+}
+.related-products-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--ink);
+  margin-bottom: 24px;
+}

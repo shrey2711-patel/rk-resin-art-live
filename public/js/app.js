@@ -304,12 +304,36 @@ const App = {
     if (colls) colls.style.display = 'none';
     if (header) header.style.display = 'none';
     if (shopMain) shopMain.style.display = 'none';
+
+    // Hide related products grid while loading new product
+    const relSec = document.getElementById('relatedProductsSection');
+    if (relSec) relSec.style.display = 'none';
+
     prodPage.style.display = '';
 
     prodContent.innerHTML = `
-      <div class="loading-state" style="padding: 100px 0;">
-        <div class="spinner"></div>
-        <p>Loading product details...</p>
+      <div class="modal-content-grid">
+        <!-- Left Column: Image Gallery Skeleton -->
+        <div class="modal-grid-left">
+          <div class="skeleton skeleton-image"></div>
+          <div class="product-thumbnails">
+            <div class="skeleton" style="width:64px; height:64px; border-radius:8px;"></div>
+            <div class="skeleton" style="width:64px; height:64px; border-radius:8px;"></div>
+            <div class="skeleton" style="width:64px; height:64px; border-radius:8px;"></div>
+          </div>
+        </div>
+        
+        <!-- Right Column: Details Skeleton -->
+        <div class="modal-grid-right">
+          <div class="skeleton" style="width: 120px; height: 16px; margin-bottom: 16px;"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-text" style="width: 200px;"></div>
+          <div class="skeleton skeleton-price"></div>
+          <div class="skeleton skeleton-text" style="width: 150px; margin-bottom: 30px;"></div>
+          <div class="skeleton" style="height: 120px; margin-bottom: 24px;"></div>
+          <div class="skeleton skeleton-btn" style="margin-bottom: 12px;"></div>
+          <div class="skeleton skeleton-btn"></div>
+        </div>
       </div>`;
 
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -360,12 +384,34 @@ const App = {
         ? `<svg class="wl-heart filled" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
         : `<svg class="wl-heart" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
 
+      // Build image gallery list
+      const images = [prod.imageUrl].concat((prod.variants || []).map(v => v.imageUrl)).filter(url => url && url.trim() !== '');
+      const uniqImages = [...new Set(images)];
+
+      const getWhatsAppLink = (p, variant = null) => {
+        const phone = "918141994995";
+        let text = `Hi, I am interested in purchasing "${p.name}"`;
+        if (p.unit) text += ` (${p.unit})`;
+        if (variant) text += ` (Selected Option: ${variant.label})`;
+        text += ` priced at ₹${variant ? variant.price : p.price}. Is it available?`;
+        return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      };
+
       prodContent.innerHTML = `
         <div class="modal-content-grid">
-          <!-- Left Column: Media Preview -->
+          <!-- Left Column: Media Preview with Amazon Zoom & Thumbnails -->
           <div class="modal-grid-left">
-            <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-              ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+            <div class="product-gallery-container">
+              <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
+                ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+              </div>
+              ${uniqImages.length > 1 ? `
+                <div class="product-thumbnails">
+                  ${uniqImages.map((imgUrl, i) => `
+                    <div class="thumb-item${i === 0 ? ' active' : ''}" data-img-url="${imgUrl}">
+                      <img src="${imgUrl}" alt="Thumbnail ${i + 1}" loading="lazy">
+                    </div>`).join('')}
+                </div>` : ''}
             </div>
           </div>
           
@@ -400,6 +446,16 @@ const App = {
                   🚚 Free Delivery above ₹999
                 </span>
               </div>
+
+              <!-- Quantity Selector -->
+              <div class="product-qty-selector">
+                <label>Quantity:</label>
+                <div class="qty-controls">
+                  <button type="button" class="qty-btn" id="ppQtyDec">&minus;</button>
+                  <input type="number" class="qty-input" id="ppQtyInput" value="1" min="1" readonly>
+                  <button type="button" class="qty-btn" id="ppQtyInc">&plus;</button>
+                </div>
+              </div>
               
               <div class="modal-btns">
                 <button class="modal-add-btn" id="ppAddBtn" ${isOutOfStock ? 'disabled' : ''}>
@@ -408,6 +464,10 @@ const App = {
                 <button class="modal-buy-now-btn" id="ppBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
                   ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
                 </button>
+                <a class="modal-whatsapp-btn" id="ppWhatsAppBtn" href="${getWhatsAppLink(prod, hasVariants ? prod.variants[0] : null)}" target="_blank" rel="noopener">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.453L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.528 1.977 14.07 1.01 11.5 1.012c-5.436 0-9.86 4.37-9.864 9.8 0 1.702.469 3.364 1.358 4.803l-.993 3.629 3.73-.968c1.393.758 2.87 1.157 4.316 1.157z"/></svg>
+                  WhatsApp Inquiry
+                </a>
                 <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="ppWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
                   ${wlIcon}
                 </button>
@@ -423,10 +483,61 @@ const App = {
 
       let selectedVariant = hasVariants ? prod.variants[0] : null;
 
+      // Bind thumbnails gallery
+      const thumbs = document.querySelectorAll('#productPageContent .thumb-item');
+      const mainImg = document.querySelector('#productPageContent .modal-prod-thumb img.prod-image');
+      thumbs.forEach(thumb => {
+        const imgUrl = thumb.dataset.imgUrl;
+        const activate = () => {
+          thumbs.forEach(t => t.classList.remove('active'));
+          thumb.classList.add('active');
+          if (mainImg) mainImg.src = imgUrl;
+        };
+        thumb.onclick = activate;
+        thumb.onmouseenter = activate;
+      });
+
+      // Bind magnifier hover zoom
+      const thumbContainer = document.querySelector('#productPageContent .modal-prod-thumb');
+      if (thumbContainer && mainImg) {
+        thumbContainer.onmousemove = (e) => {
+          const rect = thumbContainer.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          mainImg.style.transformOrigin = `${x}% ${y}%`;
+          mainImg.style.transform = 'scale(1.8)';
+        };
+        thumbContainer.onmouseleave = () => {
+          mainImg.style.transform = 'scale(1)';
+          mainImg.style.transformOrigin = 'center center';
+        };
+      }
+
+      // Bind quantity selector
+      const qtyInput = document.getElementById('ppQtyInput');
+      const qtyDec = document.getElementById('ppQtyDec');
+      const qtyInc = document.getElementById('ppQtyInc');
+      if (qtyDec && qtyInc && qtyInput) {
+        qtyDec.onclick = () => {
+          let val = parseInt(qtyInput.value) || 1;
+          if (val > 1) qtyInput.value = val - 1;
+        };
+        qtyInc.onclick = () => {
+          let val = parseInt(qtyInput.value) || 1;
+          const maxStock = selectedVariant ? (selectedVariant.stock || 0) : (prod.stock || 0);
+          if (maxStock > 0 && val < maxStock) {
+            qtyInput.value = val + 1;
+          } else if (maxStock === 0) {
+            // do nothing
+          } else {
+            qtyInput.value = val + 1;
+          }
+        };
+      }
+
       if (hasVariants) {
         if (prod.variants[0] && prod.variants[0].imageUrl) {
-          const mainThumb = document.querySelector('#productPageContent .modal-prod-thumb img.prod-image');
-          if (mainThumb) mainThumb.src = prod.variants[0].imageUrl;
+          if (mainImg) mainImg.src = prod.variants[0].imageUrl;
         }
 
         document.querySelectorAll('#productPageContent .variant-chip').forEach(chip => {
@@ -452,6 +563,13 @@ const App = {
             if (addBtn) addBtn.disabled = (vStock === 0);
             if (buyBtn) buyBtn.disabled = (vStock === 0);
 
+            // Reset quantity to 1 when variant changes to prevent exceeding stock bounds
+            if (qtyInput) qtyInput.value = 1;
+
+            // Update WhatsApp link
+            const waBtn = document.getElementById('ppWhatsAppBtn');
+            if (waBtn) waBtn.href = getWhatsAppLink(prod, selectedVariant);
+
             const mainThumbContainer = document.querySelector('#productPageContent .modal-prod-thumb');
             if (mainThumbContainer) {
               const variantImg = selectedVariant.imageUrl;
@@ -468,6 +586,11 @@ const App = {
                       <img class="prod-image" src="${finalImg}" alt="${prod.name}">
                     </div>`;
                 }
+                const matchedThumb = Array.from(thumbs).find(t => t.dataset.imgUrl === finalImg);
+                if (matchedThumb) {
+                  thumbs.forEach(t => t.classList.remove('active'));
+                  matchedThumb.classList.add('active');
+                }
               } else {
                 mainThumbContainer.innerHTML = `<div class="prod-emoji-fallback modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">${prod.emoji || '📦'}</div>`;
               }
@@ -477,7 +600,8 @@ const App = {
       }
 
       const getCartItem = () => {
-        const base = { ...prod, thumbBg: cat.color || '#f0eef8' };
+        const qty = parseInt(document.getElementById('ppQtyInput')?.value) || 1;
+        const base = { ...prod, thumbBg: cat.color || '#f0eef8', qty };
         if (selectedVariant) {
           base.price = selectedVariant.price;
           base.selectedVariant = selectedVariant.label;
@@ -531,6 +655,126 @@ const App = {
       };
 
       this.loadReviewsForModal(prod.id, 'ppReviewsContent');
+
+      // Render Related Products
+      const relGrid = document.getElementById('relatedProductsGrid');
+      if (relSec && relGrid) {
+        const allProds = this.state.products || [];
+        const related = allProds
+          .filter(p => p.category === prod.category && p.id !== prod.id)
+          .slice(0, 4);
+
+        if (related.length > 0) {
+          const catMap = {};
+          this.state.categories.forEach(c => catMap[c.name] = c);
+
+          relGrid.innerHTML = related.map(p => {
+            const cat = catMap[p.category] || {};
+            const thumbBg = cat.color || '#f0eef8';
+            const badgeHTML = p.badge 
+              ? `<span class="prod-badge badge-${p.badge.toLowerCase()}">${p.badge}</span>` 
+              : '';
+            const starsHTML = p._avgRating 
+              ? `<div class="prod-rating-stars">
+                   <div class="stars-fill" style="width: ${p._avgRating * 20}%">★★★★★</div>
+                   <div class="stars-bg">★★★★★</div>
+                   <span class="rating-count">(${p._ratingCount})</span>
+                 </div>`
+              : '';
+            
+            const origPrice = p.originalPrice || null;
+            const origHTML = origPrice ? `<span class="price-original">₹${origPrice}</span>` : '';
+            const finalPrice = p.variants && p.variants.length > 0 ? p.variants[0].price : p.price;
+
+            return `
+              <div class="prod-card" data-pid="${p.id}">
+                <div class="prod-thumb" style="background:${thumbBg}">
+                  ${badgeHTML}
+                  ${this.productMedia(p, thumbBg, 'card')}
+                  <button class="wishlist-card-btn ${typeof Wishlist !== 'undefined' && Wishlist.has(p.id) ? 'active' : ''}" aria-label="Add to Wishlist">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                  </button>
+                </div>
+                <div class="prod-info">
+                  <div class="prod-cat">${p.category}</div>
+                  <h3 class="prod-name">${p.name}</h3>
+                  ${p.unit ? `<div class="prod-unit">${p.unit}</div>` : ''}
+                  ${starsHTML}
+                  <div class="prod-price-row">
+                    <span class="prod-price">₹${finalPrice}</span>
+                    ${origHTML}
+                  </div>
+                  <div class="prod-actions">
+                    <button class="add-to-cart-btn" data-pid="${p.id}">Add to Cart</button>
+                    <button class="buy-now-btn" data-pid="${p.id}">Buy Now</button>
+                  </div>
+                </div>
+              </div>`;
+          }).join('');
+
+          relGrid.querySelectorAll('.prod-card').forEach(card => {
+            card.onclick = (e) => {
+              if (!e.target.classList.contains('add-to-cart-btn') && 
+                  !e.target.classList.contains('buy-now-btn') && 
+                  !e.target.closest('.wishlist-card-btn')) {
+                window.location.hash = `#product/${Number(card.dataset.pid)}`;
+              }
+            };
+          });
+
+          relGrid.querySelectorAll('.wishlist-card-btn').forEach(btn => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              const pid = Number(btn.closest('.prod-card').dataset.pid);
+              const p = related.find(item => item.id === pid);
+              if (p) {
+                const cat = catMap[p.category] || {};
+                const active = Wishlist.toggle({ ...p, thumbBg: cat.color || '#f0eef8' });
+                btn.classList.toggle('active', active);
+              }
+            };
+          });
+
+          relGrid.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+              e.stopPropagation();
+              const pid = Number(btn.dataset.pid);
+              const p = related.find(item => item.id === pid);
+              if (p) {
+                if (p.variants && p.variants.length > 0 && p.variantLabel) {
+                  window.location.hash = `#product/${p.id}`;
+                  return;
+                }
+                const cat = catMap[p.category] || {};
+                Cart.add({ ...p, thumbBg: cat.color || '#f0eef8' });
+                btn.textContent = '✓ Added!';
+                btn.classList.add('added');
+                setTimeout(() => { btn.textContent = 'Add to Cart'; btn.classList.remove('added'); }, 1500);
+              }
+            };
+          });
+
+          relGrid.querySelectorAll('.buy-now-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+              e.stopPropagation();
+              const pid = Number(btn.dataset.pid);
+              const p = related.find(item => item.id === pid);
+              if (p) {
+                if (p.variants && p.variants.length > 0 && p.variantLabel) {
+                  window.location.hash = `#product/${p.id}`;
+                  return;
+                }
+                const cat = catMap[p.category] || {};
+                this.openBuyNowCheckout(p, cat);
+              }
+            };
+          });
+
+          relSec.style.display = '';
+        } else {
+          relSec.style.display = 'none';
+        }
+      }
 
     } catch (e) {
       prodContent.innerHTML = `
