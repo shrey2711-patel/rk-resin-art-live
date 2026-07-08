@@ -355,6 +355,13 @@ const Admin = {
     if (cancel) cancel.style.display = 'none';
     this.editState = { section: null, id: null };
     
+    // Reset track stock check
+    const trackStockChk = document.getElementById('pfTrackStock');
+    if (trackStockChk) {
+      trackStockChk.checked = true;
+      if (trackStockChk.onchange) trackStockChk.onchange();
+    }
+
     // Show base inputs for simple product by default
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
     if (basePriceStockContainer) basePriceStockContainer.style.display = '';
@@ -401,6 +408,12 @@ const Admin = {
     const adminVariantsSection = document.getElementById('adminVariantsSection');
     const multiVariantChk = document.getElementById('pfMultiVariant');
 
+    const trackStockChk = document.getElementById('pfTrackStock');
+    if (trackStockChk) {
+      trackStockChk.checked = (product.trackStock !== false);
+      if (trackStockChk.onchange) trackStockChk.onchange();
+    }
+
     const vl = product.variantLabel || '';
     if (!vl) {
       // Simple Product Mode
@@ -411,7 +424,13 @@ const Admin = {
 
       document.getElementById('pfPrice').value = product.price || '';
       document.getElementById('pfOrig').value = product.originalPrice || '';
-      document.getElementById('pfStock').value = product.stock || '';
+      
+      if (product.trackStock !== false) {
+        document.getElementById('pfStock').value = product.stock || '';
+      } else {
+        document.getElementById('pfStockStatus').value = (Number(product.stock) > 0 ? "1" : "0");
+      }
+
       document.getElementById('pfImageUrl').value = product.imageUrl || '';
       this.updateImagePreview(product.imageUrl || '');
       this.setUploadStatus(product.imageUrl ? 'Current product image loaded.' : '');
@@ -554,7 +573,12 @@ const Admin = {
       }
       price = prcVal;
       originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
-      stock = parseInt(document.getElementById('pfStock').value) || 0;
+      const trackStock = document.getElementById('pfTrackStock') ? document.getElementById('pfTrackStock').checked : true;
+      if (trackStock) {
+        stock = parseInt(document.getElementById('pfStock').value) || 0;
+      } else {
+        stock = parseInt(document.getElementById('pfStockStatus').value) || 0;
+      }
       
       imageUrl = document.getElementById('pfImageUrl').value.trim();
       if (imageUrl.startsWith('blob:')) {
@@ -633,6 +657,7 @@ const Admin = {
       variantLabel,
       variants,
       unit: document.getElementById('pfUnit')?.value.trim() || '',
+      trackStock: document.getElementById('pfTrackStock') ? document.getElementById('pfTrackStock').checked : true,
     };
 
     if (this.editState.section === 'product' && this.editState.id) {
@@ -700,6 +725,62 @@ const Admin = {
     if (multiVariantChk) {
       multiVariantChk.onchange = () => this.toggleMultiVariant();
     }
+
+    const trackStockChk = document.getElementById('pfTrackStock');
+    if (trackStockChk) {
+      trackStockChk.onchange = () => {
+        const trackStock = trackStockChk.checked;
+        const stockInput = document.getElementById('pfStock');
+        const stockStatus = document.getElementById('pfStockStatus');
+        const stockLabel = document.getElementById('pfStockLabel');
+        
+        if (trackStock) {
+          if (stockInput) stockInput.style.display = '';
+          if (stockStatus) stockStatus.style.display = 'none';
+          if (stockLabel) stockLabel.textContent = 'Stock Quantity *';
+        } else {
+          if (stockInput) stockInput.style.display = 'none';
+          if (stockStatus) stockStatus.style.display = '';
+          if (stockLabel) stockLabel.textContent = 'Stock Status';
+        }
+
+        // Toggle existing variant rows input vs select
+        document.querySelectorAll('.admin-variant-row').forEach(row => {
+          const stockEl = row.querySelector('.vr-stock');
+          if (stockEl) {
+            const currentVal = parseInt(stockEl.value) || 0;
+            const parent = stockEl.parentNode;
+            
+            if (trackStock) {
+              if (stockEl.tagName === 'SELECT') {
+                const input = document.createElement('input');
+                input.className = 'vr-stock';
+                input.type = 'number';
+                input.placeholder = 'Stock';
+                input.value = currentVal;
+                input.min = '0';
+                input.style.maxWidth = '70px';
+                parent.replaceChild(input, stockEl);
+              }
+            } else {
+              if (stockEl.tagName === 'INPUT') {
+                const select = document.createElement('select');
+                select.className = 'vr-stock admin-input';
+                select.style.maxWidth = '95px';
+                select.style.padding = '4px';
+                select.style.fontSize = '0.8rem';
+                select.style.height = 'auto';
+                select.style.display = 'inline-block';
+                select.innerHTML = `
+                  <option value="1" ${currentVal > 0 ? 'selected' : ''}>In Stock</option>
+                  <option value="0" ${currentVal === 0 ? 'selected' : ''}>Out of Stock</option>`;
+                parent.replaceChild(select, stockEl);
+              }
+            }
+          }
+        });
+      };
+    }
   },
 
   toggleMultiVariant() {
@@ -744,13 +825,25 @@ const Admin = {
       ? `<img class="vr-thumb-img" src="${imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
       : `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
 
+    const trackStock = document.getElementById('pfTrackStock') ? document.getElementById('pfTrackStock').checked : true;
+    let stockHTML = '';
+    if (trackStock) {
+      stockHTML = `<input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:70px">`;
+    } else {
+      stockHTML = `
+        <select class="vr-stock admin-input" style="max-width:95px; padding:4px; font-size:0.8rem; height:auto; display:inline-block;">
+          <option value="1" ${Number(stock) > 0 ? 'selected' : ''}>In Stock</option>
+          <option value="0" ${Number(stock) === 0 ? 'selected' : ''}>Out of Stock</option>
+        </select>`;
+    }
+
     row.innerHTML = `
       <span class="admin-variant-row-label" style="${labelStyle}">Option:</span>
       <input class="vr-label" placeholder="e.g. Size 6 / 100g" value="${labelVal}" maxlength="50" style="${labelStyle}">
       <span class="admin-variant-row-label">Price ₹:</span>
       <input class="vr-price" type="number" placeholder="Price" value="${price}" min="0" style="max-width:90px">
       <span class="admin-variant-row-label">Stock:</span>
-      <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:70px">
+      ${stockHTML}
       
       <!-- Variant Image Controls -->
       <div class="vr-image-section" style="display:inline-flex; align-items:center; gap:6px;">

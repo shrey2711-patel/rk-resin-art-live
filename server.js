@@ -1761,13 +1761,17 @@ app.post('/api/payment/create-order', (req, res) => {
     if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
       const variant = prod.variants.find(v => v.label === item.selectedVariant);
       if (variant) {
-        if (variant.stock !== undefined && variant.stock < item.qty) {
-          return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+        if (prod.trackStock !== false) {
+          if (variant.stock !== undefined && variant.stock < item.qty) {
+            return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+          }
         }
       }
     } else {
-      if (prod.stock !== undefined && prod.stock < item.qty) {
-        return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
+      if (prod.trackStock !== false) {
+        if (prod.stock !== undefined && prod.stock < item.qty) {
+          return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
+        }
       }
     }
     subtotal += prod.price * item.qty;
@@ -1860,19 +1864,23 @@ app.post('/api/payment/verify', (req, res) => {
       const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
       if (vIdx !== -1) {
         const variant = prod.variants[vIdx];
-        if (variant.stock !== undefined && variant.stock < item.qty) {
-          return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
-        }
-        if (variant.stock !== undefined) {
-          db.products[prodIdx].variants[vIdx].stock = Math.max(0, variant.stock - item.qty);
+        if (prod.trackStock !== false) {
+          if (variant.stock !== undefined && variant.stock < item.qty) {
+            return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+          }
+          if (variant.stock !== undefined) {
+            db.products[prodIdx].variants[vIdx].stock = Math.max(0, variant.stock - item.qty);
+          }
         }
       }
     } else {
-      if (prod.stock !== undefined && prod.stock < item.qty) {
-        return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
-      }
-      if (prod.stock !== undefined) {
-        db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+      if (prod.trackStock !== false) {
+        if (prod.stock !== undefined && prod.stock < item.qty) {
+          return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
+        }
+        if (prod.stock !== undefined) {
+          db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+        }
       }
     }
   }
@@ -1959,22 +1967,26 @@ app.post('/api/orders', (req, res) => {
       const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
       if (vIdx !== -1) {
         const variant = prod.variants[vIdx];
-        if (variant.stock !== undefined && variant.stock < item.qty) {
-          return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
-        }
-        if (variant.stock !== undefined) {
-          db.products[prodIdx].variants[vIdx].stock = Math.max(0, variant.stock - item.qty);
+        if (prod.trackStock !== false) {
+          if (variant.stock !== undefined && variant.stock < item.qty) {
+            return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
+          }
+          if (variant.stock !== undefined) {
+            db.products[prodIdx].variants[vIdx].stock = Math.max(0, variant.stock - item.qty);
+          }
         }
       }
     } else {
-      if (prod.stock !== undefined && prod.stock < item.qty) {
-        return res.status(400).json({
-          error: `Sorry, only ${prod.stock} unit${prod.stock !== 1 ? 's' : ''} of "${prod.name}" in stock`
-        });
-      }
-      // Decrease stock
-      if (prod.stock !== undefined) {
-        db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+      if (prod.trackStock !== false) {
+        if (prod.stock !== undefined && prod.stock < item.qty) {
+          return res.status(400).json({
+            error: `Sorry, only ${prod.stock} unit${prod.stock !== 1 ? 's' : ''} of "${prod.name}" in stock`
+          });
+        }
+        // Decrease stock
+        if (prod.stock !== undefined) {
+          db.products[prodIdx].stock = Math.max(0, prod.stock - item.qty);
+        }
       }
     }
   }
@@ -2396,12 +2408,14 @@ app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
     for (const item of items) {
       const prodIdx = db.products.findIndex(p => p.id === item.id);
       if (prodIdx !== -1 && db.products[prodIdx].stock !== undefined) {
-        const prevStock = Number(db.products[prodIdx].stock) || 0;
-        db.products[prodIdx].stock += item.qty;
-        
-        // Notify if it was out of stock and is now back in stock!
-        if (prevStock === 0 && db.products[prodIdx].stock > 0) {
-          notifyWishlistSubscribers(db.products[prodIdx]);
+        if (db.products[prodIdx].trackStock !== false) {
+          const prevStock = Number(db.products[prodIdx].stock) || 0;
+          db.products[prodIdx].stock += item.qty;
+          
+          // Notify if it was out of stock and is now back in stock!
+          if (prevStock === 0 && db.products[prodIdx].stock > 0) {
+            notifyWishlistSubscribers(db.products[prodIdx]);
+          }
         }
       }
     }
