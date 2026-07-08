@@ -143,7 +143,65 @@ const App = {
     }
   },
 
-  showCollectionPage(catName) {
+  saveNavigationState() {
+    const state = {
+      activeCategory: this.state.activeCategory,
+      searchQuery: this.state.searchQuery,
+      page: this.state.page,
+      sortBy: this.state.sortBy,
+      scrollY: window.scrollY,
+      cartOpen: document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open'),
+      wishlistOpen: document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open'),
+      mobileNavOpen: document.getElementById('mobileNavDrawer') && document.getElementById('mobileNavDrawer').classList.contains('open'),
+      searchInputVal: document.getElementById('searchInput') ? document.getElementById('searchInput').value : ''
+    };
+    sessionStorage.setItem('rk_nav_state', JSON.stringify(state));
+  },
+
+  async restoreNavigationState() {
+    const raw = sessionStorage.getItem('rk_nav_state');
+    if (!raw) return false;
+
+    try {
+      const state = JSON.parse(raw);
+      sessionStorage.removeItem('rk_nav_state');
+
+      this.state.activeCategory = state.activeCategory || 'All';
+      this.state.searchQuery = state.searchQuery || '';
+      this.state.page = state.page || 1;
+      this.state.sortBy = state.sortBy || '';
+
+      const si = document.getElementById('searchInput');
+      if (si) si.value = state.searchInputVal || '';
+
+      const sortSel = document.getElementById('sortSelect');
+      if (sortSel) sortSel.value = state.sortBy || '';
+
+      this.renderCatFilters(this.state.categories);
+      this.syncNavbarActiveState();
+
+      const shopHeading = document.getElementById('shopHeading');
+      if (shopHeading) {
+        shopHeading.textContent = this.state.activeCategory === 'All' ? 'All Products' : this.state.activeCategory;
+      }
+
+      await this.loadProducts();
+
+      if (state.scrollY !== undefined) {
+        window.scrollTo({ top: state.scrollY, behavior: 'instant' });
+      }
+
+      if (state.cartOpen && typeof Cart !== 'undefined') Cart.openDrawer();
+      if (state.wishlistOpen && typeof Wishlist !== 'undefined') Wishlist.openDrawer();
+      
+      return true;
+    } catch (e) {
+      console.error("Failed to restore navigation state:", e);
+      return false;
+    }
+  },
+
+  async showCollectionPage(catName) {
     // Hide home-only sections
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
@@ -156,6 +214,18 @@ const App = {
     if (header)  header.style.display  = '';
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
+
+    // Check if we can restore state (only if activeCategory matches the collection)
+    const raw = sessionStorage.getItem('rk_nav_state');
+    if (raw) {
+      try {
+        const state = JSON.parse(raw);
+        if (state.activeCategory === catName) {
+          const restored = await this.restoreNavigationState();
+          if (restored) return;
+        }
+      } catch (e) {}
+    }
 
     // Update header text
     const titleEl    = document.getElementById('collPageTitle');
@@ -180,7 +250,7 @@ const App = {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
-  showHomePage() {
+  async showHomePage() {
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
@@ -192,6 +262,10 @@ const App = {
     if (header)  header.style.display  = 'none';
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
+
+    // Check if we can restore state
+    const restored = await this.restoreNavigationState();
+    if (restored) return;
 
     const shopHeading = document.getElementById('shopHeading');
     if (shopHeading) shopHeading.textContent = 'All Products';
@@ -213,6 +287,12 @@ const App = {
     const prodPage = document.getElementById('productPageSection');
     const prodContent = document.getElementById('productPageContent');
     if (!prodPage || !prodContent) return;
+
+    // Save previous state if we are coming from home/collection list page
+    const prodPageVisible = prodPage.style.display !== 'none';
+    if (!prodPageVisible) {
+      this.saveNavigationState();
+    }
 
     // Hide home sections
     const banner = document.getElementById('bannerSection');
