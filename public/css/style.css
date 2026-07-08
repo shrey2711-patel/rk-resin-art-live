@@ -2283,3 +2283,54 @@ body.admin-page-active > :not(#adminOverlay):not(#toast) {
     min-height: 100vh !important;
   }
 }
+
+/* Product Page Layout */
+.product-page-section {
+  padding: 40px 0;
+  background: var(--body-bg);
+}
+.product-page-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.product-page-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  width: fit-content;
+  margin-bottom: 24px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.product-page-back:hover {
+  background: var(--border);
+  transform: translateX(-3px);
+}
+.product-page-back svg {
+  transition: transform 0.2s;
+}
+.product-page-back:hover svg {
+  transform: translateX(-2px);
+}
+
+@media (max-width: 768px) {
+  .modal-content-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .product-page-section {
+    padding: 20px 0;
+  }
+  .product-page-inner {
+    padding: 0 16px;
+  }
+}

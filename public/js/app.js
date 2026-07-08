@@ -113,8 +113,11 @@ const App = {
     const route = () => {
       const hash = window.location.hash;
       const match = hash.match(/^#collection\/(.+)$/);
+      const prodMatch = hash.match(/^#product\/(.+)$/);
       if (match) {
         this.showCollectionPage(decodeURIComponent(match[1]));
+      } else if (prodMatch) {
+        this.showProductPage(Number(prodMatch[1]));
       } else if (hash === '' || hash === '#') {
         this.showHomePage();
       }
@@ -126,6 +129,18 @@ const App = {
     // Back button in collection header
     const backBtn = document.getElementById('collPageBack');
     if (backBtn) backBtn.onclick = () => { window.location.hash = ''; };
+
+    // Back button on product page
+    const prodBackBtn = document.getElementById('productPageBack');
+    if (prodBackBtn) {
+      prodBackBtn.onclick = () => {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.hash = '';
+        }
+      };
+    }
   },
 
   showCollectionPage(catName) {
@@ -133,9 +148,14 @@ const App = {
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
+    const prodPage = document.getElementById('productPageSection');
+    const shopMain = document.getElementById('shopMain');
+
     if (banner)  banner.style.display  = 'none';
     if (colls)   colls.style.display   = 'none';
     if (header)  header.style.display  = '';
+    if (prodPage) prodPage.style.display = 'none';
+    if (shopMain) shopMain.style.display = '';
 
     // Update header text
     const titleEl    = document.getElementById('collPageTitle');
@@ -164,9 +184,14 @@ const App = {
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
+    const prodPage = document.getElementById('productPageSection');
+    const shopMain = document.getElementById('shopMain');
+
     if (banner)  banner.style.display  = '';
     if (colls)   colls.style.display   = '';
     if (header)  header.style.display  = 'none';
+    if (prodPage) prodPage.style.display = 'none';
+    if (shopMain) shopMain.style.display = '';
 
     const shopHeading = document.getElementById('shopHeading');
     if (shopHeading) shopHeading.textContent = 'All Products';
@@ -182,6 +207,259 @@ const App = {
     this.loadProducts();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  async showProductPage(productId) {
+    const prodPage = document.getElementById('productPageSection');
+    const prodContent = document.getElementById('productPageContent');
+    if (!prodPage || !prodContent) return;
+
+    // Hide home sections
+    const banner = document.getElementById('bannerSection');
+    const colls  = document.getElementById('collectionsSection');
+    const header = document.getElementById('collectionPageHeader');
+    const shopMain = document.getElementById('shopMain');
+
+    if (banner) banner.style.display = 'none';
+    if (colls) colls.style.display = 'none';
+    if (header) header.style.display = 'none';
+    if (shopMain) shopMain.style.display = 'none';
+    prodPage.style.display = '';
+
+    prodContent.innerHTML = `
+      <div class="loading-state" style="padding: 100px 0;">
+        <div class="spinner"></div>
+        <p>Loading product details...</p>
+      </div>`;
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    try {
+      const prod = await API.getProduct(productId);
+      if (!prod) {
+        window.location.hash = '';
+        return;
+      }
+
+      const cat = this.state.categories.find(c => c.name === prod.category) || {};
+      const hasVariants = prod.variants && prod.variants.length > 0 && prod.variantLabel;
+      const variantLabel = prod.variantLabel || '';
+      
+      const badgeHTML = prod.badge 
+        ? `<span class="prod-badge modal-badge badge-${prod.badge.toLowerCase()}">${prod.badge}</span>` 
+        : '';
+        
+      let variantsHTML = '';
+      if (hasVariants) {
+        variantsHTML = `
+          <div class="modal-variants-section">
+            <label class="modal-variants-label">Select ${variantLabel}:</label>
+            <div class="modal-variants-chips">
+              ${prod.variants.map((v, i) => `
+                <button class="variant-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" data-label="${v.label}" data-price="${v.price}" type="button">
+                  ${v.label}
+                </button>`).join('')}
+            </div>
+          </div>`;
+      }
+
+      const initPrice = hasVariants ? prod.variants[0].price : prod.price;
+      const initStock = hasVariants ? (prod.variants[0].stock !== undefined ? prod.variants[0].stock : 0) : prod.stock;
+      const isOutOfStock = initStock === 0;
+      const ratio = prod.imgRatio || '4:3';
+      const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
+      const descHTML = (prod.description && prod.description.trim())
+        ? `<div class="modal-prod-desc">${parseMarkdown(prod.description)}</div>`
+        : '';
+
+      const origPrice = hasVariants ? (prod.variants[0].originalPrice || null) : (prod.originalPrice || null);
+      const origHTML = origPrice ? `<span class="price-original">₹${origPrice}</span>` : '';
+
+      const isWl = typeof Wishlist !== 'undefined' && Wishlist.has(prod.id);
+      const wlIcon = isWl 
+        ? `<svg class="wl-heart filled" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
+        : `<svg class="wl-heart" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
+      prodContent.innerHTML = `
+        <div class="modal-content-grid">
+          <!-- Left Column: Media Preview -->
+          <div class="modal-grid-left">
+            <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
+              ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+            </div>
+          </div>
+          
+          <!-- Right Column: Product Actions & Specs -->
+          <div class="modal-grid-right">
+            <div class="modal-prod-cat">${prod.category}</div>
+            ${badgeHTML}
+            <h2 class="modal-prod-name">${prod.name}</h2>
+            ${prod.unit ? `<div class="modal-prod-unit">${prod.unit}</div>` : ''}
+            
+            <div class="modal-prod-price-block">
+              <div class="modal-prod-price" id="ppPriceDisplay">₹${initPrice} ${origHTML}</div>
+            </div>
+            
+            ${variantsHTML}
+      
+            <!-- Modal Tabs -->
+            <div class="modal-tabs">
+              <button class="modal-tab active" id="ppTabInfo">📦 Product Info</button>
+              <button class="modal-tab" id="ppTabReviews">⭐ Reviews &amp; Ratings</button>
+            </div>
+      
+            <!-- Info Pane -->
+            <div class="modal-pane" id="ppPaneInfo">
+              ${descHTML}
+              
+              <div class="modal-stock-delivery-row">
+                <span class="modal-prod-stock" id="ppStockDisplay">
+                  ${initStock > 0 ? `✅ In Stock (${initStock} units)` : '❌ Out of Stock'}
+                </span>
+                <span class="modal-delivery-info">
+                  🚚 Free Delivery above ₹999
+                </span>
+              </div>
+              
+              <div class="modal-btns">
+                <button class="modal-add-btn" id="ppAddBtn" ${isOutOfStock ? 'disabled' : ''}>
+                  🛒 Add to Cart
+                </button>
+                <button class="modal-buy-now-btn" id="ppBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
+                  ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
+                </button>
+                <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="ppWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
+                  ${wlIcon}
+                </button>
+              </div>
+            </div>
+      
+            <!-- Reviews Pane -->
+            <div class="modal-pane" id="ppPaneReviews" style="display:none">
+              <div id="ppReviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
+            </div>
+          </div>
+        </div>`;
+
+      let selectedVariant = hasVariants ? prod.variants[0] : null;
+
+      if (hasVariants) {
+        if (prod.variants[0] && prod.variants[0].imageUrl) {
+          const mainThumb = document.querySelector('#productPageContent .modal-prod-thumb img.prod-image');
+          if (mainThumb) mainThumb.src = prod.variants[0].imageUrl;
+        }
+
+        document.querySelectorAll('#productPageContent .variant-chip').forEach(chip => {
+          chip.onclick = () => {
+            document.querySelectorAll('#productPageContent .variant-chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            const vi = parseInt(chip.dataset.vi);
+            selectedVariant = prod.variants[vi];
+            
+            const origPrice = selectedVariant.originalPrice || null;
+            const origHTML = origPrice ? `<span class="price-original">₹${origPrice}</span>` : '';
+            const priceEl = document.getElementById('ppPriceDisplay');
+            if (priceEl) priceEl.innerHTML = `₹${selectedVariant.price} ${origHTML}`;
+
+            const stockEl = document.getElementById('ppStockDisplay');
+            const addBtn = document.getElementById('ppAddBtn');
+            const buyBtn = document.getElementById('ppBuyNowBtn');
+            const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
+            
+            if (stockEl) {
+              stockEl.innerHTML = vStock > 0 ? `✅ In Stock (${vStock} units)` : '❌ Out of Stock';
+            }
+            if (addBtn) addBtn.disabled = (vStock === 0);
+            if (buyBtn) buyBtn.disabled = (vStock === 0);
+
+            const mainThumbContainer = document.querySelector('#productPageContent .modal-prod-thumb');
+            if (mainThumbContainer) {
+              const variantImg = selectedVariant.imageUrl;
+              const fallbackImg = prod.imageUrl;
+              const finalImg = variantImg || fallbackImg;
+              
+              if (finalImg) {
+                let imgEl = mainThumbContainer.querySelector('.prod-image');
+                if (imgEl) {
+                  imgEl.src = finalImg;
+                } else {
+                  mainThumbContainer.innerHTML = `
+                    <div class="prod-image-wrap modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
+                      <img class="prod-image" src="${finalImg}" alt="${prod.name}">
+                    </div>`;
+                }
+              } else {
+                mainThumbContainer.innerHTML = `<div class="prod-emoji-fallback modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">${prod.emoji || '📦'}</div>`;
+              }
+            }
+          };
+        });
+      }
+
+      const getCartItem = () => {
+        const base = { ...prod, thumbBg: cat.color || '#f0eef8' };
+        if (selectedVariant) {
+          base.price = selectedVariant.price;
+          base.selectedVariant = selectedVariant.label;
+          base.name = `${prod.name} (${variantLabel}: ${selectedVariant.label})`;
+          base.stock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
+          if (selectedVariant.imageUrl) {
+            base.imageUrl = selectedVariant.imageUrl;
+          }
+        } else {
+          base.stock = prod.stock;
+        }
+        return base;
+      };
+
+      document.getElementById('ppAddBtn').onclick = () => {
+        if (hasVariants && !selectedVariant) {
+          showToast(`Please select a ${variantLabel} first`, 'error'); return;
+        }
+        Cart.add(getCartItem());
+      };
+
+      document.getElementById('ppBuyNowBtn').onclick = () => {
+        if (hasVariants && !selectedVariant) {
+          showToast(`Please select a ${variantLabel} first`, 'error'); return;
+        }
+        this.openBuyNowCheckout(getCartItem(), cat);
+      };
+
+      document.getElementById('ppWishlistBtn').onclick = () => {
+        if (typeof Wishlist !== 'undefined') {
+          const active = Wishlist.toggle({ ...prod, thumbBg: cat.color || '#f0eef8' });
+          const wlBtn = document.getElementById('ppWishlistBtn');
+          if (wlBtn) {
+            wlBtn.classList.toggle('active', active);
+            wlBtn.innerHTML = active ? wlIcon.replace('wl-heart', 'wl-heart filled') : wlIcon.replace(' filled', '');
+          }
+        }
+      };
+
+      document.getElementById('ppTabInfo').onclick = () => {
+        document.getElementById('ppTabInfo').classList.add('active');
+        document.getElementById('ppTabReviews').classList.remove('active');
+        document.getElementById('ppPaneInfo').style.display = '';
+        document.getElementById('ppPaneReviews').style.display = 'none';
+      };
+      document.getElementById('ppTabReviews').onclick = () => {
+        document.getElementById('ppTabReviews').classList.add('active');
+        document.getElementById('ppTabInfo').classList.remove('active');
+        document.getElementById('ppPaneReviews').style.display = '';
+        document.getElementById('ppPaneInfo').style.display = 'none';
+      };
+
+      this.loadReviewsForModal(prod.id, 'ppReviewsContent');
+
+    } catch (e) {
+      prodContent.innerHTML = `
+        <div class="no-results" style="padding: 100px 0;">
+          <div class="nr-icon">😕</div>
+          <p>Failed to load product details</p>
+          <small>${e.message}</small>
+        </div>`;
+    }
   },
 
   productMedia(product, fallbackBg = '#f0eef8', size = 'card') {
@@ -991,13 +1269,13 @@ const App = {
         </div>`;
     }).join('');
 
-    // Click handlers — open modal on card click (but not on buttons or card heart)
+    // Click handlers — open product page on card click (but not on buttons or card heart)
     grid.querySelectorAll('.prod-card').forEach(card => {
       card.onclick = (e) => {
         if (!e.target.classList.contains('add-to-cart-btn') && 
             !e.target.classList.contains('buy-now-btn') && 
             !e.target.closest('.wishlist-card-btn')) {
-          this.openProductModal(Number(card.dataset.pid), products);
+          window.location.hash = `#product/${Number(card.dataset.pid)}`;
         }
       };
     });
@@ -1023,7 +1301,7 @@ const App = {
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
-            this.openProductModal(prod.id, products);
+            window.location.hash = `#product/${prod.id}`;
             return;
           }
           const cat = catMap[prod.category] || {};
@@ -1042,7 +1320,7 @@ const App = {
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
-            this.openProductModal(prod.id, products);
+            window.location.hash = `#product/${prod.id}`;
             return;
           }
           const cat = catMap[prod.category] || {};
@@ -1320,8 +1598,8 @@ const App = {
     this.loadReviewsForModal(prod.id);
   },
 
-  async loadReviewsForModal(productId) {
-    const container = document.getElementById('reviewsContent');
+  async loadReviewsForModal(productId, containerId = 'reviewsContent') {
+    const container = document.getElementById(containerId);
     if (!container) return;
     try {
       const reviews = await API.getProductReviews(productId);
@@ -1422,7 +1700,7 @@ const App = {
           try {
             await API.submitReview(productId, { rating: selectedRating, comment });
             showToast('Review submitted! Thank you 🎉', 'success');
-            this.loadReviewsForModal(productId);
+            this.loadReviewsForModal(productId, containerId);
             // Refresh product cards to update rating
             this.loadProducts();
           } catch (e) {
