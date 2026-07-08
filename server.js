@@ -1761,14 +1761,14 @@ app.post('/api/payment/create-order', (req, res) => {
     if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
       const variant = prod.variants.find(v => v.label === item.selectedVariant);
       if (variant) {
-        if (prod.trackStock !== false) {
+        if (db.settings.trackStock !== false) {
           if (variant.stock !== undefined && variant.stock < item.qty) {
             return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
           }
         }
       }
     } else {
-      if (prod.trackStock !== false) {
+      if (db.settings.trackStock !== false) {
         if (prod.stock !== undefined && prod.stock < item.qty) {
           return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
         }
@@ -1864,7 +1864,7 @@ app.post('/api/payment/verify', (req, res) => {
       const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
       if (vIdx !== -1) {
         const variant = prod.variants[vIdx];
-        if (prod.trackStock !== false) {
+        if (db.settings.trackStock !== false) {
           if (variant.stock !== undefined && variant.stock < item.qty) {
             return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
           }
@@ -1874,7 +1874,7 @@ app.post('/api/payment/verify', (req, res) => {
         }
       }
     } else {
-      if (prod.trackStock !== false) {
+      if (db.settings.trackStock !== false) {
         if (prod.stock !== undefined && prod.stock < item.qty) {
           return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
         }
@@ -1967,7 +1967,7 @@ app.post('/api/orders', (req, res) => {
       const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
       if (vIdx !== -1) {
         const variant = prod.variants[vIdx];
-        if (prod.trackStock !== false) {
+        if (db.settings.trackStock !== false) {
           if (variant.stock !== undefined && variant.stock < item.qty) {
             return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
           }
@@ -1977,7 +1977,7 @@ app.post('/api/orders', (req, res) => {
         }
       }
     } else {
-      if (prod.trackStock !== false) {
+      if (db.settings.trackStock !== false) {
         if (prod.stock !== undefined && prod.stock < item.qty) {
           return res.status(400).json({
             error: `Sorry, only ${prod.stock} unit${prod.stock !== 1 ? 's' : ''} of "${prod.name}" in stock`
@@ -2407,14 +2407,26 @@ app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
     const items = db.orders[idx].items || [];
     for (const item of items) {
       const prodIdx = db.products.findIndex(p => p.id === item.id);
-      if (prodIdx !== -1 && db.products[prodIdx].stock !== undefined) {
-        if (db.products[prodIdx].trackStock !== false) {
-          const prevStock = Number(db.products[prodIdx].stock) || 0;
-          db.products[prodIdx].stock += item.qty;
-          
-          // Notify if it was out of stock and is now back in stock!
-          if (prevStock === 0 && db.products[prodIdx].stock > 0) {
-            notifyWishlistSubscribers(db.products[prodIdx]);
+      if (prodIdx !== -1) {
+        const prod = db.products[prodIdx];
+        if (db.settings.trackStock !== false) {
+          if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
+            const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
+            if (vIdx !== -1) {
+              const prevVariantStock = Number(prod.variants[vIdx].stock) || 0;
+              db.products[prodIdx].variants[vIdx].stock = prevVariantStock + item.qty;
+              
+              if (prevVariantStock === 0 && db.products[prodIdx].variants[vIdx].stock > 0) {
+                notifyWishlistSubscribers(db.products[prodIdx]);
+              }
+            }
+          } else if (prod.stock !== undefined) {
+            const prevStock = Number(prod.stock) || 0;
+            db.products[prodIdx].stock = prevStock + item.qty;
+            
+            if (prevStock === 0 && db.products[prodIdx].stock > 0) {
+              notifyWishlistSubscribers(db.products[prodIdx]);
+            }
           }
         }
       }

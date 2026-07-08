@@ -17,6 +17,7 @@ const App = {
     otherChargesType: 'flat',
     razorpayEnabled: true,
     cartEnabled: true,
+    trackStock: true,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -396,7 +397,7 @@ const App = {
               
               <div class="modal-stock-delivery-row">
                 <span class="modal-prod-stock" id="ppStockDisplay">
-                  ${initStock > 0 ? (prod.trackStock !== false ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
+                  ${initStock > 0 ? (this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
                 </span>
                 <span class="modal-delivery-info">
                   🚚 Free Delivery above ₹999
@@ -452,7 +453,7 @@ const App = {
             const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
             
             if (stockEl) {
-              stockEl.innerHTML = vStock > 0 ? (prod.trackStock !== false ? `✅ In Stock (${vStock} units)` : '✅ In Stock') : '❌ Out of Stock';
+              stockEl.innerHTML = vStock > 0 ? (this.state.trackStock ? `✅ In Stock (${vStock} units)` : '✅ In Stock') : '❌ Out of Stock';
             }
             if (addBtn) addBtn.disabled = (vStock === 0);
             if (buyBtn) buyBtn.disabled = (vStock === 0);
@@ -721,6 +722,7 @@ const App = {
       if (s.otherChargesType !== undefined) this.state.otherChargesType = s.otherChargesType;
       
       this.state.razorpayEnabled = s.razorpayEnabled !== false;
+      this.state.trackStock = s.trackStock !== false;
       this.resetPaymentSelector();
     } catch {}
   },
@@ -1630,7 +1632,7 @@ const App = {
             
             <div class="modal-stock-delivery-row">
               <span class="modal-prod-stock" id="modalStockDisplay">
-                ${initStock > 0 ? (prod.trackStock !== false ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
+                ${initStock > 0 ? (this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
               </span>
               <span class="modal-delivery-info">
                 🚚 Free Delivery above ₹999
@@ -1687,7 +1689,7 @@ const App = {
           const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
           
           if (stockEl) {
-            stockEl.innerHTML = vStock > 0 ? (prod.trackStock !== false ? `✅ In Stock (${vStock} units)` : '✅ In Stock') : '❌ Out of Stock';
+            stockEl.innerHTML = vStock > 0 ? (this.state.trackStock ? `✅ In Stock (${vStock} units)` : '✅ In Stock') : '❌ Out of Stock';
           }
           if (addBtn) addBtn.disabled = (vStock === 0);
           if (buyBtn) buyBtn.disabled = (vStock === 0);
