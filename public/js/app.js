@@ -360,6 +360,8 @@ const App = {
         ? `<svg class="wl-heart filled" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
         : `<svg class="wl-heart" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
 
+      const relatedProducts = await this.getRelatedProducts(prod);
+
       prodContent.innerHTML = `
         <div class="modal-content-grid">
           <!-- Left Column: Media Preview -->
@@ -419,7 +421,10 @@ const App = {
               <div id="ppReviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
             </div>
           </div>
+          ${this.relatedProductsHTML(prod, relatedProducts, 'page')}
         </div>`;
+
+      this.bindRelatedProductLinks(relatedProducts, '#productPageContent', 'page');
 
       let selectedVariant = hasVariants ? prod.variants[0] : null;
 
@@ -559,6 +564,94 @@ const App = {
         </div>`;
     }
     return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;
+  },
+
+  async getRelatedProducts(product, sourceProducts = []) {
+    const related = [];
+    const seen = new Set([Number(product.id)]);
+    const addProducts = (items = []) => {
+      items.forEach(item => {
+        if (!item) return;
+        const itemId = Number(item.id);
+        if (!itemId || seen.has(itemId)) return;
+        seen.add(itemId);
+        related.push(item);
+      });
+    };
+
+    addProducts(sourceProducts.filter(item => item.category === product.category));
+
+    if (related.length < 4 && product.category) {
+      try {
+        const categoryRes = await API.getProducts({ category: product.category, limit: 8, page: 1 });
+        addProducts(categoryRes.products || []);
+      } catch (e) {
+        console.warn('Related category products unavailable:', e.message);
+      }
+    }
+
+    if (related.length < 4) {
+      try {
+        const allRes = await API.getProducts({ limit: 8, page: 1 });
+        addProducts(allRes.products || []);
+      } catch (e) {
+        console.warn('Related fallback products unavailable:', e.message);
+      }
+    }
+
+    return related.slice(0, 4);
+  },
+
+  relatedProductsHTML(product, relatedProducts = [], context = 'modal') {
+    if (!relatedProducts.length) return '';
+
+    const catMap = {};
+    this.state.categories.forEach(c => catMap[c.name] = c);
+
+    return `
+      <section class="modal-related-section">
+        <div class="modal-related-head">
+          <div>
+            <span class="modal-related-kicker">Discover more</span>
+            <h3>Related products</h3>
+          </div>
+          <p>More picks ${product.category ? `from ${product.category}` : 'you may like'}</p>
+        </div>
+        <div class="modal-related-grid">
+          ${relatedProducts.map(item => {
+            const cat = catMap[item.category] || {};
+            const price = item.price !== undefined ? item.price : (item.variants && item.variants[0] ? item.variants[0].price : 0);
+            return `
+              <button class="modal-related-card" type="button" data-related-pid="${item.id}" data-related-context="${context}">
+                <div class="modal-related-media" style="background:${cat.color || '#f0eef8'}">
+                  ${this.productMedia(item, cat.color || '#f0eef8', 'related')}
+                </div>
+                <div class="modal-related-info">
+                  <span>${item.category || 'Product'}</span>
+                  <strong>${item.name}</strong>
+                  <em>&#8377;${price}</em>
+                </div>
+              </button>`;
+          }).join('')}
+        </div>
+      </section>`;
+  },
+
+  bindRelatedProductLinks(relatedProducts = [], rootSelector = '#modalBody', context = 'modal', sourceProducts = []) {
+    const root = document.querySelector(rootSelector);
+    if (!root) return;
+
+    const productPool = [...sourceProducts, ...relatedProducts];
+    root.querySelectorAll('[data-related-pid]').forEach(btn => {
+      btn.onclick = () => {
+        const relatedId = Number(btn.dataset.relatedPid);
+        if (context === 'modal') {
+          this.openProductModal(relatedId, productPool);
+        } else {
+          window.location.hash = `#product/${relatedId}`;
+        }
+      };
+    });
   },
 
   setupPaymentSelector() {
@@ -1501,6 +1594,7 @@ const App = {
     const descHTML = (prod.description && prod.description.trim())
       ? `<div class="modal-prod-desc">${parseMarkdown(prod.description)}</div>`
       : '';
+    const relatedProducts = await this.getRelatedProducts(prod, products);
 
     document.getElementById('modalBody').innerHTML = `
       <div class="modal-content-grid">
@@ -1561,7 +1655,10 @@ const App = {
             <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
           </div>
         </div>
+        ${this.relatedProductsHTML(prod, relatedProducts, 'modal')}
       </div>`;
+
+    this.bindRelatedProductLinks(relatedProducts, '#modalBody', 'modal', products);
 
     // Track currently selected variant
     let selectedVariant = hasVariants ? prod.variants[0] : null;
