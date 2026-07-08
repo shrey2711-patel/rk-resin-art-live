@@ -762,21 +762,21 @@ input, select, textarea { font-family: inherit; }
 .pp-read-more-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: none;
-  border: 1.5px solid var(--p);
-  color: var(--p);
-  font-size: 0.83rem;
-  font-weight: 700;
-  padding: 5px 14px;
-  border-radius: 999px;
+  border: none;
+  color: #1a6bc4;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: background 0.18s, color 0.18s;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
 }
 .pp-read-more-btn:hover {
-  background: var(--p);
-  color: var(--white);
+  color: #0f4a8a;
+  background: none;
 }
 .pp-chevron {
   font-size: 0.68rem;
@@ -2441,21 +2441,6 @@ body.admin-page-active .admin-panel {
   border: 1px solid var(--border) !important;
 }
 
-[data-theme="dark"].admin-page-active #adminOverlay {
-  background: #121212 !important;
-}
-
-[data-theme="dark"].admin-page-active .admin-panel {
-  background: #1a1a1a !important;
-  border-color: #333 !important;
-}
-
-body.admin-page-active #closeAdminPanel {
-  display: none !important;
-}
-
-body.admin-page-active > :not(#adminOverlay):not(#toast) {
-  display: none !important;
 }
 
 @media (max-width: 768px) {
