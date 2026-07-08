@@ -715,14 +715,79 @@ input, select, textarea { font-family: inherit; }
   line-height: 1.8;
   min-height: 80px;
 }
-.pp-tab-pane .modal-prod-desc {
-  max-height: none !important;
-  overflow-y: visible !important;
-  border-bottom: none !important;
-  padding-bottom: 0 !important;
-  padding-right: 0 !important;
-  font-size: 0.9rem;
+
+/* ── Read More Description Toggle ──────────────────────────── */
+.pp-desc-wrap {
+  position: relative;
 }
+
+.pp-desc-body {
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.85;
+  white-space: pre-wrap;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Clamped state — ~5 lines */
+.pp-desc-body.pp-desc-clamped {
+  max-height: 140px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+/* Expanded — no mask, no height cap */
+.pp-desc-body:not(.pp-desc-clamped) {
+  max-height: 9000px;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Markdown children inside desc */
+.pp-desc-body h2,
+.pp-desc-body h3 { font-family: 'Playfair Display', serif; color: var(--ink); margin: 14px 0 6px; }
+.pp-desc-body h2 { font-size: 1.1rem; }
+.pp-desc-body h3 { font-size: 0.98rem; }
+.pp-desc-body p  { margin: 0 0 10px; }
+.pp-desc-body ul { padding-left: 20px; margin-bottom: 14px; list-style: disc; }
+.pp-desc-body li { margin-bottom: 4px; }
+.pp-desc-body strong { color: var(--ink); }
+
+/* Read More row */
+.pp-read-more-row {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.pp-read-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1.5px solid var(--p);
+  color: var(--p);
+  font-size: 0.83rem;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.18s, color 0.18s;
+}
+.pp-read-more-btn:hover {
+  background: var(--p);
+  color: var(--white);
+}
+.pp-chevron {
+  font-size: 0.68rem;
+  transition: transform 0.25s;
+  display: inline-block;
+}
+.pp-chevron.up {
+  transform: rotate(180deg);
+}
+
 
 
 .modal-content-grid {

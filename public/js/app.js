@@ -419,7 +419,14 @@ const App = {
               <button class="pp-tab" id="ppTabReviews">⭐ Reviews &amp; Ratings</button>
             </div>
             <div class="pp-tab-pane" id="ppPaneInfo">
-              ${descHTML || '<p style="color:var(--muted); font-size:0.9rem;">No description available.</p>'}
+              ${descHTML
+                ? `<div class="pp-desc-wrap">
+                    <div class="pp-desc-body pp-desc-clamped" id="ppDescBody">${prod.description ? parseMarkdown(prod.description) : ''}</div>
+                    <div class="pp-read-more-row" id="ppReadMoreRow" style="display:none">
+                      <button class="pp-read-more-btn" id="ppReadMoreBtn">Read more <span class="pp-chevron">▼</span></button>
+                    </div>
+                  </div>`
+                : '<p style="color:var(--muted); font-size:0.9rem;">No description available.</p>'}
             </div>
             <div class="pp-tab-pane" id="ppPaneReviews" style="display:none">
               <div id="ppReviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
@@ -552,6 +559,31 @@ const App = {
       };
 
       this.loadReviewsForModal(prod.id, 'ppReviewsContent');
+
+      // Read More toggle for long descriptions
+      const descBody = document.getElementById('ppDescBody');
+      const readMoreRow = document.getElementById('ppReadMoreRow');
+      const readMoreBtn = document.getElementById('ppReadMoreBtn');
+      if (descBody && readMoreRow && readMoreBtn) {
+        // Show toggle only if content is taller than the clamped height
+        const CLAMP_HEIGHT = 140; // px — ~5 lines
+        requestAnimationFrame(() => {
+          if (descBody.scrollHeight > CLAMP_HEIGHT + 10) {
+            readMoreRow.style.display = '';
+          }
+        });
+        let expanded = false;
+        readMoreBtn.onclick = () => {
+          expanded = !expanded;
+          if (expanded) {
+            descBody.classList.remove('pp-desc-clamped');
+            readMoreBtn.innerHTML = 'Show less <span class="pp-chevron up">▲</span>';
+          } else {
+            descBody.classList.add('pp-desc-clamped');
+            readMoreBtn.innerHTML = 'Read more <span class="pp-chevron">▼</span>';
+          }
+        };
+      }
 
     } catch (e) {
       prodContent.innerHTML = `
