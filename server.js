@@ -2178,14 +2178,20 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
           }
         });
         
+        const responseBodyText = await imgbbRes.text();
         if (!imgbbRes.ok) {
-          throw new Error(`ImgBB upload failed with status ${imgbbRes.status}`);
+          throw new Error(`ImgBB API responded with status ${imgbbRes.status}: ${responseBodyText}`);
         }
         
-        const imgbbData = await imgbbRes.json();
+        let imgbbData;
+        try {
+          imgbbData = JSON.parse(responseBodyText);
+        } catch (e) {
+          throw new Error(`Failed to parse ImgBB response: ${e.message}. Raw response: ${responseBodyText}`);
+        }
         
         // Delete local temporary file since it is now stored in cloud
-        fs.unlinkSync(filePath);
+        try { fs.unlinkSync(filePath); } catch (e) {}
         
         if (imgbbData && imgbbData.data && imgbbData.data.url) {
           return res.json({
@@ -2194,15 +2200,15 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
             filename: req.file.filename
           });
         } else {
-          throw new Error('Invalid response from ImgBB');
+          throw new Error(`Invalid response structure from ImgBB: ${responseBodyText}`);
         }
       } catch (uploadError) {
-        console.error("ImgBB upload failed, falling back to local file:", uploadError.message);
-        // Fallback to serving locally if upload fails
-        return res.json({
-          success: true,
-          url: `/uploads/${req.file.filename}`,
-          filename: req.file.filename
+        console.error("❌ ImgBB cloud upload failed:", uploadError.message);
+        // Clean up disk temp file on error
+        try { fs.unlinkSync(req.file.path); } catch (e) {}
+        
+        return res.status(500).json({
+          error: `Cloud image upload failed: ${uploadError.message}. Please check your IMGBB_API_KEY environment variable.`
         });
       }
     }

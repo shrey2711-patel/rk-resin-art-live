@@ -107,8 +107,8 @@ const Admin = {
       this.setBannerUploadStatus('Image uploaded and ready to save.', 'success');
     } catch (e) {
       this.updateBannerImagePreview('');
-      this.setBannerUploadStatus('Upload failed. Try a smaller JPG, PNG or WEBP.', 'error');
-      showToast('Image upload failed', 'error');
+      this.setBannerUploadStatus(`Upload failed: ${e.message}`, 'error');
+      showToast(`Upload failed: ${e.message}`, 'error');
     }
   },
 
@@ -194,10 +194,10 @@ const Admin = {
       const result = await API.uploadImage(optimizedFile);
       this.updateImagePreview(result.url);
       this.setUploadStatus('Image uploaded and ready to save.', 'success');
-    } catch (e) {
+    } catch (err) {
       this.updateImagePreview('');
-      this.setUploadStatus('Upload failed. Try a smaller JPG, PNG or WEBP.', 'error');
-      showToast('Image upload failed', 'error');
+      this.setUploadStatus(`Upload failed: ${err.message}`, 'error');
+      showToast(`Upload failed: ${err.message}`, 'error');
     }
   },
 
@@ -259,10 +259,10 @@ const Admin = {
       const result = await API.uploadImage(optimizedFile);
       this.updateCategoryImagePreview(result.url);
       this.setCategoryUploadStatus('Image uploaded and ready to save.', 'success');
-    } catch (e) {
+    } catch (err) {
       this.updateCategoryImagePreview('');
-      this.setCategoryUploadStatus('Upload failed. Try a smaller JPG, PNG or WEBP.', 'error');
-      showToast('Image upload failed', 'error');
+      this.setCategoryUploadStatus(`Upload failed: ${err.message}`, 'error');
+      showToast(`Upload failed: ${err.message}`, 'error');
     }
   },
 
