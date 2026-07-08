@@ -604,6 +604,127 @@ input, select, textarea { font-family: inherit; }
 }
 .modal-body { padding: 2rem; }
 
+/* ── New Product Page Layout (pp-*) ─────────────────────────── */
+.pp-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Top section: image left, actions right */
+.pp-top-grid {
+  display: grid;
+  grid-template-columns: 44% 56%;
+  gap: 2rem;
+  align-items: start;
+}
+
+.pp-image-col { display: flex; flex-direction: column; gap: 12px; }
+.pp-thumb { border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+.pp-action-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.pp-title { font-size: 1.5rem; margin-bottom: 10px; }
+
+/* Stock row */
+.pp-stock-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 10px 14px;
+  background: var(--pl);
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+/* Action buttons - stacked, full width */
+.pp-action-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.pp-btn-full {
+  width: 100% !important;
+  flex: none !important;
+  padding: 14px 20px !important;
+  font-size: 1rem !important;
+  border-radius: 8px !important;
+}
+
+/* Wishlist row below buttons */
+.pp-wishlist-row { margin-bottom: 4px; }
+.pp-wl-inline {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--white);
+  border: 1.5px solid var(--border) !important;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pp-wl-inline:hover { background: var(--pl) !important; border-color: var(--p) !important; color: var(--p); }
+.pp-wl-inline.active { color: var(--red) !important; border-color: var(--red) !important; }
+.pp-wl-inline svg { flex-shrink: 0; }
+.pp-wl-inline.active svg { fill: var(--red); color: var(--red); stroke: var(--red); }
+
+/* Bottom section: full-width tabs + description */
+.pp-bottom-tabs {
+  background: var(--white);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.pp-tab-bar {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  background: var(--pl);
+}
+.pp-tab {
+  flex: 1;
+  padding: 14px 10px;
+  border: none;
+  background: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.pp-tab:hover { color: var(--p); }
+.pp-tab.active { color: var(--p); border-bottom-color: var(--p); background: var(--white); }
+.pp-tab-pane {
+  padding: 24px 28px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.8;
+  min-height: 80px;
+}
+.pp-tab-pane .modal-prod-desc {
+  max-height: none !important;
+  overflow-y: visible !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+  padding-right: 0 !important;
+  font-size: 0.9rem;
+}
+
+
 .modal-content-grid {
   display: grid;
   grid-template-columns: 45% 55%;
@@ -2368,6 +2489,10 @@ body.admin-page-active > :not(#adminOverlay):not(#toast) {
   padding: 0;
 }
 
+.modal-body .pp-layout {
+  padding: 28px 32px 36px;
+}
+
 .modal-content-grid {
   grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
   gap: 0;
@@ -2696,6 +2821,10 @@ body.admin-page-active > :not(#adminOverlay):not(#toast) {
     min-height: 0;
   }
 
+  .modal-body .pp-layout {
+    padding: 18px 18px 28px;
+  }
+
   .modal-related-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2740,4 +2869,27 @@ body.admin-page-active > :not(#adminOverlay):not(#toast) {
   .modal-related-head p {
     margin-top: 4px;
   }
+}
+
+/* ── pp-layout Responsive ──────────────────────────────────── */
+@media (max-width: 720px) {
+  .pp-top-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .pp-image-col { max-height: 300px; overflow: hidden; }
+  .pp-thumb { max-height: 280px; }
+  .pp-thumb .prod-image-wrap,
+  .pp-thumb .prod-emoji-fallback { max-height: 280px; }
+  .pp-title { font-size: 1.25rem; }
+  .pp-tab-pane { padding: 18px; }
+}
+
+@media (max-width: 480px) {
+  .pp-action-btns { gap: 8px; }
+  .pp-btn-full { padding: 13px 16px !important; font-size: 0.95rem !important; }
+  .pp-tab { padding: 12px 6px; font-size: 0.82rem; }
+  .pp-tab-pane { padding: 16px; }
+  .pp-stock-row { font-size: 0.78rem; }
+  .pp-wl-inline { font-size: 0.8rem; padding: 7px 12px !important; }
 }

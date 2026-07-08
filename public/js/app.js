@@ -364,64 +364,68 @@ const App = {
       const relatedProducts = await this.getRelatedProducts(prod);
 
       prodContent.innerHTML = `
-        <div class="modal-content-grid">
-          <!-- Left Column: Media Preview -->
-          <div class="modal-grid-left">
-            <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-              ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+        <div class="pp-layout">
+          <!-- Top Section: Image + Action Panel side by side -->
+          <div class="pp-top-grid">
+            <!-- Left: Image -->
+            <div class="pp-image-col">
+              <div class="modal-prod-thumb pp-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
+                ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+              </div>
             </div>
-          </div>
-          
-          <!-- Right Column: Product Actions & Specs -->
-          <div class="modal-grid-right">
-            <div class="modal-prod-cat">${prod.category}</div>
-            ${badgeHTML}
-            <h2 class="modal-prod-name">${prod.name}</h2>
-            ${prod.unit ? `<div class="modal-prod-unit">${prod.unit}</div>` : ''}
-            
-            <div class="modal-prod-price-block">
-              <div class="modal-prod-price" id="ppPriceDisplay">₹${initPrice} ${origHTML}</div>
-            </div>
-            
-            ${variantsHTML}
-      
-            <!-- Modal Tabs -->
-            <div class="modal-tabs">
-              <button class="modal-tab active" id="ppTabInfo">📦 Product Info</button>
-              <button class="modal-tab" id="ppTabReviews">⭐ Reviews &amp; Ratings</button>
-            </div>
-      
-            <!-- Info Pane -->
-            <div class="modal-pane" id="ppPaneInfo">
-              ${descHTML}
-              
-              <div class="modal-stock-delivery-row">
+
+            <!-- Right: All actions - always visible -->
+            <div class="pp-action-col">
+              <div class="modal-prod-cat">${prod.category}</div>
+              ${badgeHTML}
+              <h1 class="modal-prod-name pp-title">${prod.name}</h1>
+              ${prod.unit ? `<div class="modal-prod-unit">${prod.unit}</div>` : ''}
+
+              <div class="modal-prod-price-block">
+                <div class="modal-prod-price" id="ppPriceDisplay">₹${initPrice} ${origHTML}</div>
+              </div>
+
+              ${variantsHTML}
+
+              <div class="pp-stock-row">
                 <span class="modal-prod-stock" id="ppStockDisplay">
                   ${initStock > 0 ? (this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
                 </span>
-                <span class="modal-delivery-info">
-                  🚚 Free Delivery above ₹999
-                </span>
+                <span class="modal-delivery-info">🚚 Free Delivery above ₹999</span>
               </div>
-              
-              <div class="modal-btns">
-                <button class="modal-add-btn" id="ppAddBtn" ${isOutOfStock ? 'disabled' : ''}>
+
+              <!-- ACTION BUTTONS — always visible, no scrolling needed -->
+              <div class="pp-action-btns">
+                <button class="modal-add-btn pp-btn-full" id="ppAddBtn" ${isOutOfStock ? 'disabled' : ''}>
                   🛒 Add to Cart
                 </button>
-                <button class="modal-buy-now-btn" id="ppBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
+                <button class="modal-buy-now-btn pp-btn-full" id="ppBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
                   ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
                 </button>
-                <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="ppWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
+              </div>
+              <div class="pp-wishlist-row">
+                <button class="modal-wishlist-btn pp-wl-inline ${isWl ? 'active' : ''}" id="ppWishlistBtn" data-pid="${prod.id}">
                   ${wlIcon}
+                  <span>${isWl ? 'Saved to Wishlist' : 'Add to Wishlist'}</span>
                 </button>
               </div>
             </div>
-      
-            <!-- Reviews Pane -->
-            <div class="modal-pane" id="ppPaneReviews" style="display:none">
+          </div>
+
+          <!-- Bottom Section: Tabs for description + reviews -->
+          <div class="pp-bottom-tabs">
+            <div class="pp-tab-bar">
+              <button class="pp-tab active" id="ppTabInfo">📦 Product Info</button>
+              <button class="pp-tab" id="ppTabReviews">⭐ Reviews &amp; Ratings</button>
+            </div>
+            <div class="pp-tab-pane" id="ppPaneInfo">
+              ${descHTML || '<p style="color:var(--muted); font-size:0.9rem;">No description available.</p>'}
+            </div>
+            <div class="pp-tab-pane" id="ppPaneReviews" style="display:none">
               <div id="ppReviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
             </div>
           </div>
+
           ${this.relatedProductsHTML(prod, relatedProducts, 'page')}
         </div>`;
 
@@ -518,7 +522,18 @@ const App = {
           const wlBtn = document.getElementById('ppWishlistBtn');
           if (wlBtn) {
             wlBtn.classList.toggle('active', active);
-            wlBtn.innerHTML = active ? wlIcon.replace('wl-heart', 'wl-heart filled') : wlIcon.replace(' filled', '');
+            const span = wlBtn.querySelector('span');
+            if (span) span.textContent = active ? 'Saved to Wishlist' : 'Add to Wishlist';
+            const heartSvg = wlBtn.querySelector('svg');
+            if (heartSvg) {
+              if (active) {
+                heartSvg.setAttribute('fill', 'currentColor');
+                heartSvg.classList.add('filled');
+              } else {
+                heartSvg.setAttribute('fill', 'none');
+                heartSvg.classList.remove('filled');
+              }
+            }
           }
         }
       };
