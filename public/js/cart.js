@@ -10,18 +10,17 @@ const Cart = {
     }
   },
 
-  add(product, quantityToAdd = null) {
-    const qtyToAdd = quantityToAdd !== null ? quantityToAdd : (product.qty || 1);
+  add(product) {
     const existing = this.items.find(i => i.id === product.id && (i.selectedVariant || null) === (product.selectedVariant || null));
     const currentQty = existing ? existing.qty : 0;
-    if (product.stock !== undefined && currentQty + qtyToAdd > product.stock) {
+    if (product.stock !== undefined && currentQty + 1 > product.stock) {
       showToast(`Sorry, only ${product.stock} units available!`, 'error');
       return;
     }
     if (existing) {
-      existing.qty += qtyToAdd;
+      existing.qty += 1;
     } else {
-      this.items.push({ ...product, qty: qtyToAdd });
+      this.items.push({ ...product, qty: 1 });
     }
     this.save();
     this.renderDrawer();
