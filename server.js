@@ -2182,13 +2182,20 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
         const formData = new URLSearchParams();
         formData.append('image', base64Image);
         
-        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+        // Wrap fetch in a timeout promise to prevent hanging requests
+        const fetchPromise = fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
           method: 'POST',
           body: formData,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         });
+        
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('ImgBB API response timed out after 15 seconds')), 15000)
+        );
+        
+        const imgbbRes = await Promise.race([fetchPromise, timeoutPromise]);
         
         const responseBodyText = await imgbbRes.text();
         if (!imgbbRes.ok) {
@@ -2215,12 +2222,13 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
           throw new Error(`Invalid response structure from ImgBB: ${responseBodyText}`);
         }
       } catch (uploadError) {
-        console.error("❌ ImgBB cloud upload failed:", uploadError.message);
-        // Clean up disk temp file on error
-        try { fs.unlinkSync(req.file.path); } catch (e) {}
-        
-        return res.status(500).json({
-          error: `Cloud image upload failed: ${uploadError.message}. Please check your IMGBB_API_KEY environment variable.`
+        console.error("❌ ImgBB cloud upload failed, falling back to local storage:", uploadError.message);
+        // DO NOT delete the temp file because we are going to use it locally as a fallback
+        return res.json({
+          success: true,
+          url: `/uploads/${req.file.filename}`,
+          filename: req.file.filename,
+          warning: `Cloud image upload failed, fell back to local storage: ${uploadError.message}`
         });
       }
     }
