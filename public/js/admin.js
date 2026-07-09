@@ -1298,7 +1298,7 @@ const Admin = {
 // ── Admin event wiring ────────────────────────────────────────
 document.getElementById('openAdminBtn').onclick = (e) => {
   e.preventDefault();
-  window.open('/admin', '_blank');
+  Admin.open();
 };
 document.getElementById('closeAdminPanel').onclick = () => Admin.close();
 document.getElementById('adminOverlay').onclick = (e) => {
@@ -1709,26 +1709,6 @@ document.querySelectorAll('.atab[data-tab]').forEach(btn => {
     const original = btn.onclick;
     btn.addEventListener('click', () => Admin.renderReviews());
   }
-});
-
-// Load announce and settings into admin fields when admin opens
-document.getElementById('openAdminBtn').addEventListener('click', async () => {
-  try {
-    const s = await API.getSettings();
-    const el = document.getElementById('afAnnounce');
-    if (el) el.value = s.announce || '';
-    const cartEl = document.getElementById('afCartEnabled');
-    if (cartEl) cartEl.checked = s.cartEnabled !== false;
-
-    const rateEl = document.getElementById('afShippingRate');
-    if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
-    const threshEl = document.getElementById('afShippingThreshold');
-    if (threshEl) threshEl.value = s.shippingThreshold !== undefined ? s.shippingThreshold : 999;
-    const otherEl = document.getElementById('afOtherCharges');
-    if (otherEl) otherEl.value = s.otherCharges !== undefined ? s.otherCharges : 0;
-    const typeEl = document.getElementById('afOtherChargesType');
-    if (typeEl) typeEl.value = s.otherChargesType || 'flat';
-  } catch {}
 });
 
 // ── Admin Coupons CRUD ─────────────────────────────────────────
