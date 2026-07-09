@@ -778,14 +778,6 @@ input, select, textarea { font-family: inherit; }
   color: #0f4a8a;
   background: none;
 }
-.pp-chevron {
-  font-size: 0.68rem;
-  transition: transform 0.25s;
-  display: inline-block;
-}
-.pp-chevron.up {
-  transform: rotate(180deg);
-}
 
 
 

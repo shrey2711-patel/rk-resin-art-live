@@ -423,7 +423,7 @@ const App = {
                 ? `<div class="pp-desc-wrap">
                     <div class="pp-desc-body pp-desc-clamped" id="ppDescBody">${prod.description ? parseMarkdown(prod.description) : ''}</div>
                     <div class="pp-read-more-row" id="ppReadMoreRow" style="display:none">
-                      <button class="pp-read-more-btn" id="ppReadMoreBtn">Read more <span class="pp-chevron">▼</span></button>
+                      <button class="pp-read-more-btn" id="ppReadMoreBtn">Read more</button>
                     </div>
                   </div>`
                 : '<p style="color:var(--muted); font-size:0.9rem;">No description available.</p>'}
@@ -577,10 +577,10 @@ const App = {
           expanded = !expanded;
           if (expanded) {
             descBody.classList.remove('pp-desc-clamped');
-            readMoreBtn.innerHTML = 'Show less <span class="pp-chevron up">▲</span>';
+            readMoreBtn.textContent = 'Show less';
           } else {
             descBody.classList.add('pp-desc-clamped');
-            readMoreBtn.innerHTML = 'Read more <span class="pp-chevron">▼</span>';
+            readMoreBtn.textContent = 'Read more';
           }
         };
       }
