@@ -1550,6 +1550,7 @@ app.get('/api/settings', (req, res) => {
   res.json({
     announce: db.settings.announce,
     cartEnabled: db.settings.cartEnabled !== false,
+    trackStock: db.settings.trackStock !== false,
     shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
@@ -2150,6 +2151,7 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   const db = readDB();
   if (req.body.announce !== undefined) db.settings.announce = req.body.announce;
   if (req.body.cartEnabled !== undefined) db.settings.cartEnabled = !!req.body.cartEnabled;
+  if (req.body.trackStock !== undefined) db.settings.trackStock = !!req.body.trackStock;
   if (req.body.shippingRate !== undefined) db.settings.shippingRate = Number(req.body.shippingRate);
   if (req.body.shippingThreshold !== undefined) db.settings.shippingThreshold = Number(req.body.shippingThreshold);
   if (req.body.otherCharges !== undefined) db.settings.otherCharges = Number(req.body.otherCharges);

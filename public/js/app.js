@@ -876,15 +876,15 @@ const App = {
     let startMidX = 0, startMidY = 0;
     let startTx = 0, startTy = 0;
 
-    img.style.transform = 'translate(0px, 0px) scale(1)';
+    // Remove existing listeners by cloning the image element to prevent leaks
+    const newImg = img.cloneNode(true);
+    img.parentNode.replaceChild(newImg, img);
+
+    newImg.style.transform = 'translate(0px, 0px) scale(1)';
 
     const updateTransform = () => {
       newImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     };
-
-    // Remove existing listeners by cloning the image element to prevent leaks
-    const newImg = img.cloneNode(true);
-    img.parentNode.replaceChild(newImg, img);
 
     // Prevent native page scrolling / pull-to-refresh when dragging or interacting inside the modal overlay
     modal.addEventListener('touchmove', (e) => {
@@ -2398,7 +2398,7 @@ const Invoice = {
       doc.setTextColor(...darkColor);
       doc.text(`Order ID: #${order.id}`, 115, 76);
       doc.text(`Order Date: ${date}`, 115, 82);
-      doc.text(`Payment: WhatsApp COD`, 115, 88);
+      doc.text(`Payment: ${order.paymentId ? 'Paid Online via Razorpay' : 'WhatsApp COD'}`, 115, 88);
 
       // Table header
       const tableTop = 108;
@@ -2656,7 +2656,20 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
   const cartSubtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
   const shipping = cartSubtotal >= App.state.shippingThreshold ? 0 : App.state.shippingRate;
-  const grandTotal = cartSubtotal + shipping;
+
+  // Compute discount from applied coupon
+  let localDiscount = 0;
+  if (App.state.appliedCoupon) {
+    const c = App.state.appliedCoupon;
+    localDiscount = c.type === 'percentage'
+      ? Math.min(Math.round(cartSubtotal * Number(c.value) / 100), cartSubtotal)
+      : Math.min(Number(c.value), cartSubtotal);
+  }
+  const taxableSubtotal = Math.max(0, cartSubtotal - localDiscount);
+  const otherChargesAmount = App.state.otherChargesType === 'percentage'
+    ? Math.round(taxableSubtotal * (App.state.otherCharges / 100))
+    : (App.state.otherCharges || 0);
+  const grandTotal = taxableSubtotal + shipping + otherChargesAmount;
 
   const isOnline = App.state.paymentMethod === 'online';
   const WHATSAPP_NUMBER = '918141994995';
@@ -2871,50 +2884,56 @@ function showToast(msg, type = '') {
 // ── Markdown Parser for descriptions ──────────────────────────
 function parseMarkdown(text) {
   if (!text) return '';
-  
+
   // Escape HTML to prevent XSS
   let html = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-    
+
   // Convert Headings: ## Heading -> <h3>Heading</h3>, # Heading -> <h2>Heading</h2>
   html = html.replace(/^##\s+(.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^#\s+(.+)$/gm, '<h2>$1</h2>');
-  
+
   // Convert Bold: **text** -> <strong>text</strong>
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
+
   // Convert Bullet lists: * item or - item -> <li>item</li>
   let lines = html.split('\n');
   let inList = false;
+  const result = [];
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
+    const line = lines[i].trim();
     if (line.startsWith('* ') || line.startsWith('- ')) {
-      let content = line.substring(2).trim();
+      const content = line.substring(2).trim();
       if (!inList) {
-        lines[i] = '<ul><li>' + content + '</li>';
+        result.push('<ul><li>' + content + '</li>');
         inList = true;
       } else {
-        lines[i] = '<li>' + content + '</li>';
+        result.push('<li>' + content + '</li>');
       }
     } else {
       if (inList) {
-        lines[i - 1] += '</ul>';
+        result[result.length - 1] += '</ul>';
         inList = false;
       }
-      // Wrap non-empty, non-heading/list lines in <p> to preserve paragraph spacing
-      if (line && !line.startsWith('<h') && !line.startsWith('<ul') && !line.startsWith('</ul') && !line.startsWith('<li')) {
-        lines[i] = `<p>${lines[i]}</p>`;
+      if (!line) {
+        // Skip blank lines — don't create empty paragraphs
+        continue;
+      } else if (line.startsWith('<h') || line.startsWith('<ul') || line.startsWith('</ul') || line.startsWith('<li')) {
+        result.push(line);
+      } else {
+        result.push(`<p>${line}</p>`);
       }
     }
   }
   if (inList) {
-    lines[lines.length - 1] += '</ul>';
+    result[result.length - 1] += '</ul>';
   }
-  
-  return lines.join('\n');
+
+  return result.join('\n');
 }
+
 
 // ── Admin ok helper ───────────────────────────────────────────
 function showOk(id) {
