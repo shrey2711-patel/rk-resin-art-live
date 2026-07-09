@@ -1298,7 +1298,7 @@ const Admin = {
 // ── Admin event wiring ────────────────────────────────────────
 document.getElementById('openAdminBtn').onclick = (e) => {
   e.preventDefault();
-  Admin.open();
+  window.open('/admin', '_blank');
 };
 document.getElementById('closeAdminPanel').onclick = () => Admin.close();
 document.getElementById('adminOverlay').onclick = (e) => {

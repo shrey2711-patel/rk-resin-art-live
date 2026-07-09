@@ -24,8 +24,9 @@ const App = {
   async init() {
     ThemeManager.init();
     
-    // Check if we are on the dedicated admin route
-    if (window.location.pathname === '/admin') {
+    // Check if we are on the dedicated admin route (case-insensitive, handles trailing slashes)
+    const normPath = window.location.pathname.toLowerCase().replace(/\/$/, '');
+    if (normPath === '/admin') {
       document.body.classList.add('admin-page-active');
       if (typeof Admin !== 'undefined') {
         Admin.open();
