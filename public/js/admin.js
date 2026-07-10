@@ -26,6 +26,23 @@ const Admin = {
     }
   },
 
+  updateStockFieldsVisibility() {
+    const isTracking = this.data.settings && this.data.settings.trackStock !== false;
+    const pfStock = document.getElementById('pfStock');
+    const pfStockStatus = document.getElementById('pfStockStatus');
+    const pfStockLabel = document.getElementById('pfStockLabel');
+    
+    if (isTracking) {
+      if (pfStock) pfStock.style.display = '';
+      if (pfStockStatus) pfStockStatus.style.display = 'none';
+      if (pfStockLabel) pfStockLabel.textContent = 'Stock';
+    } else {
+      if (pfStock) pfStock.style.display = 'none';
+      if (pfStockStatus) pfStockStatus.style.display = '';
+      if (pfStockLabel) pfStockLabel.textContent = 'Stock Status';
+    }
+  },
+
   setBannerUploadStatus(message, type = '') {
     const el = document.getElementById('bannerUploadStatus');
     if (!el) return;
@@ -376,6 +393,10 @@ const Admin = {
     if (addBtn) addBtn.style.display = 'none';
     const rows = document.getElementById('pfVariantRows');
     if (rows) rows.innerHTML = '';
+
+    const pfStockStatus = document.getElementById('pfStockStatus');
+    if (pfStockStatus) pfStockStatus.value = '1';
+    this.updateStockFieldsVisibility();
   },
 
   setProductEdit(product) {
@@ -411,7 +432,11 @@ const Admin = {
 
       document.getElementById('pfPrice').value = product.price || '';
       document.getElementById('pfOrig').value = product.originalPrice || '';
-      document.getElementById('pfStock').value = product.stock || '';
+      document.getElementById('pfStock').value = product.stock !== undefined ? product.stock : '';
+      const isOut = Number(product.stock) === 0;
+      const pfStockStatus = document.getElementById('pfStockStatus');
+      if (pfStockStatus) pfStockStatus.value = isOut ? '0' : '1';
+      this.updateStockFieldsVisibility();
 
       document.getElementById('pfImageUrl').value = product.imageUrl || '';
       this.updateImagePreview(product.imageUrl || '');
@@ -538,6 +563,7 @@ const Admin = {
     if (!name) { showToast('Product name is required', 'error'); return; }
 
     const isMulti = document.getElementById('pfMultiVariant')?.checked;
+    const isTracking = this.data.settings && this.data.settings.trackStock !== false;
 
     let price = 0;
     let originalPrice = null;
@@ -555,7 +581,12 @@ const Admin = {
       }
       price = prcVal;
       originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
-      stock = parseInt(document.getElementById('pfStock').value) || 0;
+      if (isTracking) {
+        stock = parseInt(document.getElementById('pfStock').value) || 0;
+      } else {
+        stock = parseInt(document.getElementById('pfStockStatus').value) || 1;
+      }
+
       
       imageUrl = document.getElementById('pfImageUrl').value.trim();
       if (imageUrl.startsWith('blob:')) {
@@ -578,7 +609,12 @@ const Admin = {
       variantRows.forEach(row => {
         const lbl = row.querySelector('.vr-label')?.value.trim();
         const prc = parseFloat(row.querySelector('.vr-price')?.value);
-        const stk = parseInt(row.querySelector('.vr-stock')?.value);
+        let stk;
+        if (isTracking) {
+          stk = parseInt(row.querySelector('.vr-stock')?.value);
+        } else {
+          stk = parseInt(row.querySelector('.vr-stock-select')?.value || '1');
+        }
         const img = row.querySelector('.vr-image')?.value.trim() || null;
         if (lbl) {
           vrList.push({
@@ -745,13 +781,30 @@ const Admin = {
       ? `<img class="vr-thumb-img" src="${imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
       : `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
 
+    const isTracking = this.data.settings && this.data.settings.trackStock !== false;
+    let stockFieldHtml = '';
+    if (isTracking) {
+      stockFieldHtml = `
+        <span class="admin-variant-row-label">Stock:</span>
+        <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:70px">
+      `;
+    } else {
+      const isOut = Number(stock) === 0;
+      stockFieldHtml = `
+        <span class="admin-variant-row-label">Status:</span>
+        <select class="vr-stock-select" style="max-width:110px; height: 32px; padding: 2px 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
+          <option value="1"${!isOut ? ' selected' : ''}>In Stock</option>
+          <option value="0"${isOut ? ' selected' : ''}>Out of Stock</option>
+        </select>
+      `;
+    }
+
     row.innerHTML = `
       <span class="admin-variant-row-label" style="${labelStyle}">Option:</span>
       <input class="vr-label" placeholder="e.g. Size 6 / 100g" value="${labelVal}" maxlength="50" style="${labelStyle}">
       <span class="admin-variant-row-label">Price ₹:</span>
       <input class="vr-price" type="number" placeholder="Price" value="${price}" min="0" style="max-width:90px">
-      <span class="admin-variant-row-label">Stock:</span>
-      <input class="vr-stock" type="number" placeholder="Stock" value="${stock}" min="0" style="max-width:70px">
+      ${stockFieldHtml}
       
       <!-- Variant Image Controls -->
       <div class="vr-image-section" style="display:inline-flex; align-items:center; gap:6px;">
@@ -908,6 +961,7 @@ const Admin = {
     }
 
     this.initVariantBuilder();
+    this.updateStockFieldsVisibility();
     this.resetProductForm();
   },
 
@@ -1360,6 +1414,16 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
     trackStock: trackStock,
     razorpayEnabled: razorpayEnabled
   });
+
+  // Update local settings cache
+  if (!Admin.data.settings) Admin.data.settings = {};
+  Admin.data.settings.announce = text;
+  Admin.data.settings.cartEnabled = cartEnabled;
+  Admin.data.settings.trackStock = trackStock;
+  Admin.data.settings.razorpayEnabled = razorpayEnabled;
+
+  // Instantly toggle the visibility of the stock inputs
+  Admin.updateStockFieldsVisibility();
 
   const announceTextEl = document.getElementById('announceText');
   if (announceTextEl) announceTextEl.textContent = text;

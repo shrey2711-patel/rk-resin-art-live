@@ -13,7 +13,8 @@ const Cart = {
   add(product) {
     const existing = this.items.find(i => i.id === product.id && (i.selectedVariant || null) === (product.selectedVariant || null));
     const currentQty = existing ? existing.qty : 0;
-    if (product.stock !== undefined && currentQty + 1 > product.stock) {
+    const isTracking = typeof App !== 'undefined' && App.state && App.state.trackStock !== false;
+    if (isTracking && product.stock !== undefined && currentQty + 1 > product.stock) {
       showToast(`Sorry, only ${product.stock} units available!`, 'error');
       return;
     }
@@ -36,7 +37,8 @@ const Cart = {
   updateQty(id, selectedVariant, delta) {
     const item = this.items.find(i => i.id === id && (i.selectedVariant || null) === (selectedVariant || null));
     if (!item) return;
-    if (delta > 0 && item.stock !== undefined && item.qty + delta > item.stock) {
+    const isTracking = typeof App !== 'undefined' && App.state && App.state.trackStock !== false;
+    if (delta > 0 && isTracking && item.stock !== undefined && item.qty + delta > item.stock) {
       showToast(`Only ${item.stock} units available!`, 'error');
       return;
     }

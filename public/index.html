@@ -665,7 +665,14 @@
               <div class="form-row-3" id="pfBasePriceStockContainer">
                 <div class="form-field"><label>Price (₹) *</label><input class="admin-input" type="number" id="pfPrice" placeholder="199"></div>
                 <div class="form-field"><label>Original Price (₹)</label><input class="admin-input" type="number" id="pfOrig" placeholder="Optional"></div>
-                <div class="form-field"><label>Stock</label><input class="admin-input" type="number" id="pfStock" placeholder="50"></div>
+                <div class="form-field">
+                  <label id="pfStockLabel">Stock</label>
+                  <input class="admin-input" type="number" id="pfStock" placeholder="50">
+                  <select class="admin-input" id="pfStockStatus" style="display:none; height: 40px; padding: 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); box-sizing: border-box;">
+                    <option value="1">In Stock</option>
+                    <option value="0">Out of Stock</option>
+                  </select>
+                </div>
               </div>
               <div class="form-row-3">
                 <div class="form-field"><label>Badge</label><select class="admin-input" id="pfBadge"><option value="">None</option><option>New</option><option>Sale</option><option>Hot</option></select></div>
