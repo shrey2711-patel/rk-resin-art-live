@@ -844,6 +844,8 @@ const Admin = {
       if (cartEl) cartEl.checked = s.cartEnabled !== false;
       const trackStockEl = document.getElementById('afTrackStock');
       if (trackStockEl) trackStockEl.checked = s.trackStock !== false;
+      const rzEl = document.getElementById('afRazorpayEnabled');
+      if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
 
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
@@ -1345,18 +1347,24 @@ document.getElementById('cancelBannerBtn').onclick = () => {
 };
 
 // Save Announce & Settings
-document.getElementById('saveAnnounceBtn').onclick = async () => {
+// Save General Settings (Announcement, Cart, Stock tracking, Razorpay)
+document.getElementById('saveSettingsBtn').onclick = async () => {
   const text = document.getElementById('afAnnounce').value.trim();
   const cartEnabled = document.getElementById('afCartEnabled').checked;
   const trackStock = document.getElementById('afTrackStock').checked;
+  const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
 
   await API.updateSettings({ 
     announce: text, 
     cartEnabled: cartEnabled,
-    trackStock: trackStock
+    trackStock: trackStock,
+    razorpayEnabled: razorpayEnabled
   });
-  document.getElementById('announceText').textContent = text;
-  showOk('announceOk');
+
+  const announceTextEl = document.getElementById('announceText');
+  if (announceTextEl) announceTextEl.textContent = text;
+
+  showOk('settingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();
   }
@@ -1376,19 +1384,6 @@ document.getElementById('saveBillingSettingsBtn').onclick = async () => {
     otherChargesType: otherChargesType
   });
   showOk('billingSettingsOk');
-  if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
-    await App.loadSettings();
-  }
-};
-
-// Save Payment Settings
-document.getElementById('savePaymentSettingsBtn').onclick = async () => {
-  const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
-
-  await API.updateSettings({
-    razorpayEnabled: razorpayEnabled
-  });
-  showOk('paymentSettingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();
   }
