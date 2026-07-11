@@ -1220,7 +1220,9 @@ function getFirebaseDbUrl() {
 function firebaseRestUrl() {
   const dbUrl = getFirebaseDbUrl();
   if (!dbUrl) return null;
-  return dbUrl.endsWith('/') ? `${dbUrl}.json` : `${dbUrl}/.json`;
+  const secret = process.env.FIREBASE_DB_SECRET || process.env.FIREBASE_SECRET;
+  const baseUrl = dbUrl.endsWith('/') ? `${dbUrl}.json` : `${dbUrl}/.json`;
+  return secret ? `${baseUrl}?auth=${secret}` : baseUrl;
 }
 
 function getImgBbApiKey() {
