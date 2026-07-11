@@ -24,7 +24,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <!-- jsPDF for invoice generation -->
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -99,7 +99,19 @@
 
   <!-- BANNER SLIDER -->
   <section class="banner-section" id="bannerSection">
-    <div class="banner-track" id="bannerTrack"></div>
+    <div class="banner-track" id="bannerTrack">
+      <div class="banner-slide hero-fallback-slide">
+        <div class="hero-fallback-content">
+          <span class="hero-kicker">Premium resin art supplies</span>
+          <h2>Shop materials made for clean, glossy handmade work</h2>
+          <p>Explore pigments, resin, moulds, flowers, tools and gifting essentials from RK Resin Art.</p>
+          <button class="hero-shop-btn" type="button" onclick="document.getElementById('shopMain').scrollIntoView({behavior:'smooth'})">Shop Products</button>
+        </div>
+        <div class="hero-fallback-media">
+          <img src="/logo.png" alt="RK Resin Art">
+        </div>
+      </div>
+    </div>
     <button class="banner-arrow prev" id="bPrev" aria-label="Previous">&#8249;</button>
     <button class="banner-arrow next" id="bNext" aria-label="Next">&#8250;</button>
     <div class="banner-dots" id="bannerDots"></div>
@@ -108,7 +120,13 @@
   <!-- COLLECTIONS SECTION -->
   <section class="collections-section" id="collectionsSection">
     <div class="collections-inner">
-      <h2 class="collections-title">Collections</h2>
+      <div class="section-title-row">
+        <div>
+          <span class="section-kicker">Shop by craft</span>
+          <h2 class="collections-title">Collections</h2>
+        </div>
+        <p>Find the right materials faster with organized categories.</p>
+      </div>
       <div class="collections-grid" id="collectionsGrid">
         <!-- Dynamically rendered by JS -->
       </div>
@@ -132,7 +150,10 @@
   <!-- MAIN SHOP -->
   <main class="shop-main" id="shopMain">
     <div class="shop-toolbar">
-      <div class="shop-heading" id="shopHeading">All Products</div>
+      <div>
+        <span class="section-kicker">Browse store</span>
+        <div class="shop-heading" id="shopHeading">All Products</div>
+      </div>
       <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div class="shop-meta" id="shopMeta"></div>
         <select class="sort-select" id="sortSelect">
