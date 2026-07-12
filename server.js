@@ -1214,11 +1214,25 @@ app.use(bodyParser.json());
 // ── IP Geolocation & Security Helpers ──────────────────────────
 const failedLoginTracker = {};
 
-function getIpLocation(ip) {
-  let normalizedIp = ip ? ip.trim() : '';
+function normalizeClientIp(ip) {
+  let normalizedIp = Array.isArray(ip) ? ip[0] : (ip || '');
+  normalizedIp = String(normalizedIp).split(',')[0].trim();
   if (normalizedIp.startsWith('::ffff:')) {
     normalizedIp = normalizedIp.substring(7);
   }
+  return normalizedIp || '127.0.0.1';
+}
+
+function formatLocationLabel(location) {
+  if (!location) return 'Location not available';
+  const parts = [location.city, location.region, location.country]
+    .map(part => String(part || '').trim())
+    .filter(part => part && !/^unknown/i.test(part));
+  return parts.length ? parts.join(', ') : 'Location not available';
+}
+
+function getIpLocation(ip) {
+  let normalizedIp = normalizeClientIp(ip);
 
   // Handle local development testing (localhost and local ranges)
   if (normalizedIp === '127.0.0.1' || normalizedIp === '::1' || normalizedIp === 'localhost' || normalizedIp.startsWith('10.') || normalizedIp.startsWith('192.168.') || normalizedIp.startsWith('172.16.')) {
@@ -1255,9 +1269,9 @@ function getIpLocation(ip) {
       const isp = list[Math.abs(hash) % list.length];
 
       return {
-        country: geo.country || 'Unknown Country',
-        region: geo.region || 'Unknown Region',
-        city: geo.city || 'Unknown City',
+        country: geo.country || '',
+        region: geo.region || '',
+        city: geo.city || '',
         isp: isp
       };
     }
@@ -1266,10 +1280,10 @@ function getIpLocation(ip) {
   }
 
   return {
-    country: 'Unknown Country',
-    region: 'Unknown Region',
-    city: 'Unknown City',
-    isp: 'Unknown ISP'
+    country: '',
+    region: '',
+    city: '',
+    isp: 'Network not available'
   };
 }
 
@@ -1436,7 +1450,7 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next, options) => {
-    const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
     logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Auth rate limit exceeded on ${req.originalUrl || req.url}`);
     res.status(options.statusCode).send(options.message);
   }
@@ -1449,7 +1463,7 @@ const checkoutLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next, options) => {
-    const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
     logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Checkout rate limit exceeded on ${req.originalUrl || req.url}`);
     res.status(options.statusCode).send(options.message);
   }
@@ -1472,12 +1486,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const db = readDB();
   const blockedIps = db.blockedIps || [];
-  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
-  
-  let normalizedIp = clientIp.trim();
-  if (normalizedIp.startsWith('::ffff:')) {
-    normalizedIp = normalizedIp.substring(7);
-  }
+  const normalizedIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
   
   if (blockedIps.includes(normalizedIp)) {
     return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
@@ -1488,7 +1497,7 @@ app.use((req, res, next) => {
 // Developer request logger & analytics collector middleware
 app.use((req, res, next) => {
   const startTime = Date.now();
-  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
   
   let visitorId = req.cookies.visitor_id;
   let isNewVisitor = false;
@@ -1533,7 +1542,7 @@ app.use((req, res, next) => {
         userAgent: req.headers['user-agent'] || 'Unknown',
         status: statusCode,
         duration: `${duration}ms`,
-        location: `${geo.city}, ${geo.region}, ${geo.country}`
+        location: formatLocationLabel(geo)
       };
       
       logVisitorRequest(logEntry);
@@ -1969,7 +1978,7 @@ app.get('/api/products/:id', (req, res) => {
 app.post('/api/admin/login', authLimiter, (req, res) => {
   const db = readDB();
   const { password } = req.body;
-  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
   const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword || 'rk2024';
   if (password !== correctPassword) {
     trackFailedLogin(clientIp);
@@ -2038,7 +2047,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
   db.users = db.users || [];
   const email = (req.body.email || '').trim().toLowerCase();
   const password = req.body.password || '';
-  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
   const user = db.users.find(u => u.email === email);
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {

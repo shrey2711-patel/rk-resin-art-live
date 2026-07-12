@@ -1956,14 +1956,87 @@ if (refreshCouponsBtn) {
 }
 
 // ── Admin Analytics & Developer Logs ────────────────────────────
+Admin.formatReadableLocation = function(location) {
+  if (!location) return 'Location not available';
+  if (typeof location === 'string') {
+    const parts = location.split(',').map(part => part.trim()).filter(part => part && !/^unknown/i.test(part));
+    return parts.length ? parts.join(', ') : 'Location not available';
+  }
+  const parts = [location.city, location.region, location.country]
+    .map(part => String(part || '').trim())
+    .filter(part => part && !/^unknown/i.test(part));
+  return parts.length ? parts.join(', ') : 'Location not available';
+};
+
+Admin.readableStatus = function(status) {
+  const code = Number(status);
+  if (code >= 200 && code < 300) return 'Opened';
+  if (code === 304) return 'Already loaded';
+  if (code >= 400 && code < 500) return 'Not allowed';
+  if (code >= 500) return 'Server issue';
+  return status || 'Checked';
+};
+
+Admin.readableAction = function(method) {
+  const m = String(method || '').toUpperCase();
+  if (m === 'GET') return 'Viewed';
+  if (m === 'POST') return 'Saved';
+  if (m === 'PUT' || m === 'PATCH') return 'Updated';
+  if (m === 'DELETE') return 'Deleted';
+  return m || 'Opened';
+};
+
+Admin.polishAnalyticsLabels = function() {
+  const replacements = [
+    ['Visitor Analytics', 'Store Activity Dashboard'],
+    ['Refresh Data', 'Refresh'],
+    ['Total Unique Visitors', 'People Visited Store'],
+    ['New vs Returning', 'New / Returning'],
+    ['Blocked IP Addresses', 'Blocked Visitors'],
+    ['Top Visitor Locations', 'Top Customer Areas'],
+    ['Visitor ISP / Network Distribution', 'Visitor Network Providers'],
+    ['ISP / Network Provider', 'Network Provider'],
+    ['IP Address Blocklist', 'Blocked Visitor List'],
+    ['Blocked IP Address', 'Blocked Visitor'],
+    ['Suspicious Activity', 'Security Alerts'],
+    ['User & Admin Login History', 'Login Activity'],
+    ['Date / Time', 'When'],
+    ['User Identifier (Email)', 'Account'],
+    ['Account Role', 'Type'],
+    ['IP Address', 'Visitor IP'],
+    ['Location (approximate)', 'Area'],
+    ['Real-time Developer Access Logs', 'Recent Website Activity'],
+    ['Timestamp', 'When'],
+    ['Method', 'Action'],
+    ['Request URL', 'Page Opened'],
+    ['Status', 'Result'],
+    ['Duration', 'Time Taken'],
+    ['Location', 'Area']
+  ];
+
+  document.querySelectorAll('#atab-analytics .admin-section-head, #atab-analytics .afc-title, #atab-analytics th, #atab-analytics button, #atab-analytics input').forEach(el => {
+    if (el.tagName === 'INPUT') {
+      if (el.id === 'blockIpInput') el.placeholder = 'Visitor IP address';
+      return;
+    }
+    replacements.forEach(([from, to]) => {
+      if ((el.textContent || '').includes(from)) el.textContent = to;
+    });
+  });
+
+  const blockBtn = document.getElementById('blockIpBtn');
+  if (blockBtn) blockBtn.textContent = 'Block';
+};
+
 Admin.renderAnalytics = async function() {
   try {
+    Admin.polishAnalyticsLabels();
     const data = await API.get('/api/admin/analytics', true);
     
     // Render summary metrics
     const stats = data.analytics || {};
     document.getElementById('statTotalVisitors').textContent = stats.totalVisitors || 0;
-    document.getElementById('statVisitorRatio').textContent = `${stats.newVisitors || 0} New / ${stats.returningVisitors || 0} Ret`;
+    document.getElementById('statVisitorRatio').textContent = `${stats.newVisitors || 0} New / ${stats.returningVisitors || 0} Returning`;
     document.getElementById('statBlockedIps').textContent = (data.blockedIps || []).length;
     
     // Render location tables
@@ -1971,12 +2044,12 @@ Admin.renderAnalytics = async function() {
     if (locsList) {
       const sortedLocs = Object.entries(stats.cities || {}).sort((a, b) => b[1] - a[1]);
       if (sortedLocs.length === 0) {
-        locsList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No visitor locations recorded yet.</td></tr>`;
+        locsList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No customer area data yet.</td></tr>`;
       } else {
         locsList.innerHTML = sortedLocs.map(([city, count]) => {
           return `
             <tr style="border-bottom: 1px solid var(--border);">
-              <td style="padding: 8px 10px; font-weight: 700; color: var(--ink);">${city}</td>
+              <td style="padding: 8px 10px; font-weight: 700; color: var(--ink);">${Admin.formatReadableLocation(city)}</td>
               <td style="padding: 8px 10px; text-align: right; font-weight: 800; color: var(--ink);">${count}</td>
             </tr>
           `;
@@ -1989,7 +2062,7 @@ Admin.renderAnalytics = async function() {
     if (ispsList) {
       const sortedIsps = Object.entries(stats.isps || {}).sort((a, b) => b[1] - a[1]);
       if (sortedIsps.length === 0) {
-        ispsList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No networks recorded yet.</td></tr>`;
+        ispsList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No network data yet.</td></tr>`;
       } else {
         ispsList.innerHTML = sortedIsps.map(([isp, count]) => {
           return `
@@ -2007,7 +2080,7 @@ Admin.renderAnalytics = async function() {
     if (blockedList) {
       const ips = data.blockedIps || [];
       if (ips.length === 0) {
-        blockedList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked IPs.</td></tr>`;
+        blockedList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked visitors.</td></tr>`;
       } else {
         blockedList.innerHTML = ips.map(ip => {
           return `
@@ -2042,7 +2115,7 @@ Admin.renderAnalytics = async function() {
     if (securityList) {
       const logs = data.securityLogs || [];
       if (logs.length === 0) {
-        securityList.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No security logs recorded.</div>`;
+        securityList.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No risky activity found.</div>`;
       } else {
         const sortedLogs = [...logs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         securityList.innerHTML = sortedLogs.map(log => {
@@ -2058,7 +2131,7 @@ Admin.renderAnalytics = async function() {
                 <span style="font-size: 0.72rem; color: var(--muted);">${dt}</span>
               </div>
               <div style="color: var(--ink); margin-bottom: 2px;">${log.message}</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: monospace;">IP: ${log.ip} (${log.location.city}, ${log.location.country})</div>
+              <div style="font-size: 0.72rem; color: var(--muted); font-family: monospace;">Visitor IP: ${log.ip} (${Admin.formatReadableLocation(log.location)})</div>
             </div>
           `;
         }).join('');
@@ -2069,12 +2142,12 @@ Admin.renderAnalytics = async function() {
     if (loginHistoryList) {
       const logins = data.loginLogs || [];
       if (logins.length === 0) {
-        loginHistoryList.innerHTML = `<tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--muted);">No successful logins recorded yet.</td></tr>`;
+        loginHistoryList.innerHTML = `<tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--muted);">No login activity yet.</td></tr>`;
       } else {
         const sortedLogins = [...logins].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         loginHistoryList.innerHTML = sortedLogins.map(entry => {
           const dt = new Date(entry.timestamp).toLocaleString('en-IN');
-          const loc = entry.location ? `${entry.location.city || 'Unknown City'}, ${entry.location.region || 'Unknown Region'}, ${entry.location.country || 'Unknown Country'}` : 'Unknown Location';
+          const loc = Admin.formatReadableLocation(entry.location);
           const isAdm = entry.role === 'Admin';
           return `
             <tr style="border-bottom: 1px solid var(--border);">
@@ -2101,7 +2174,7 @@ Admin.renderDevLogs = async function() {
   try {
     const logs = await API.get('/api/admin/dev-logs', true);
     if (!logs || logs.length === 0) {
-      list.innerHTML = `<tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--muted);">No logs available. Try visiting the home page to generate developer logs.</td></tr>`;
+      list.innerHTML = `<tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--muted);">No website activity yet.</td></tr>`;
       return;
     }
     
@@ -2109,21 +2182,24 @@ Admin.renderDevLogs = async function() {
       let statusColor = '#059669'; // 2xx success green
       if (log.status >= 400 && log.status < 500) statusColor = '#d97706'; // 4xx orange
       if (log.status >= 500) statusColor = '#dc2626'; // 5xx red
+      const resultText = Admin.readableStatus(log.status);
+      const actionText = Admin.readableAction(log.method);
+      const locationText = Admin.formatReadableLocation(log.location);
       
       return `
         <tr style="border-bottom: 1px solid var(--border);">
           <td style="padding: 6px 10px; color: var(--muted); white-space: nowrap;">${new Date(log.timestamp).toLocaleString('en-IN')}</td>
           <td style="padding: 6px 10px; font-weight: 700; color: var(--ink); white-space: nowrap;">${log.ip}</td>
-          <td style="padding: 6px 10px; font-weight: 800; color: var(--ink);">${log.method}</td>
+          <td style="padding: 6px 10px; font-weight: 800; color: var(--ink);">${actionText}</td>
           <td style="padding: 6px 10px; color: var(--ink); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${log.url}">${log.url}</td>
-          <td style="padding: 6px 10px; font-weight: 800; color: ${statusColor}; text-align: center;">${log.status}</td>
+          <td style="padding: 6px 10px; font-weight: 800; color: ${statusColor}; text-align: center;" title="Code ${log.status}">${resultText}</td>
           <td style="padding: 6px 10px; color: var(--muted);">${log.duration}</td>
-          <td style="padding: 6px 10px; color: var(--ink); white-space: nowrap;">${log.location}</td>
+          <td style="padding: 6px 10px; color: var(--ink); white-space: nowrap;">${locationText}</td>
         </tr>
       `;
     }).join('');
   } catch (err) {
-    list.innerHTML = `<tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--red);">Failed to load developer logs: ${err.message}</td></tr>`;
+    list.innerHTML = `<tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--red);">Could not load website activity: ${err.message}</td></tr>`;
   }
 };
 

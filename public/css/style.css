@@ -1100,7 +1100,7 @@ input, select, textarea { font-family: inherit; }
 .admin-overlay { align-items: flex-start; padding: 1.5rem; overflow-y: auto; }
 .admin-panel {
   background: var(--white); border-radius: 16px;
-  width: 100%; max-width: 740px; position: relative;
+  width: 100%; max-width: 1080px; position: relative;
   min-height: 400px; margin: auto;
 }
 .admin-login-box { padding: 3rem 2rem; text-align: center; }
@@ -1174,6 +1174,71 @@ input, select, textarea { font-family: inherit; }
   margin-top: 4px; transition: background 0.2s;
 }
 .admin-save-btn:hover { background: var(--pd); }
+
+#atab-analytics .admin-form-card {
+  background: var(--white);
+  border-color: rgba(228, 222, 211, 0.95);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(31, 37, 34, 0.05);
+}
+
+#atab-analytics .afc-title {
+  font-size: 0.95rem;
+  font-weight: 950;
+  color: var(--ink);
+  letter-spacing: 0;
+}
+
+#atab-analytics .admin-table {
+  font-family: 'Nunito', sans-serif !important;
+  min-width: 680px;
+}
+
+#atab-analytics th {
+  color: var(--muted) !important;
+  font-size: 0.78rem;
+  font-weight: 950 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+#atab-analytics td {
+  vertical-align: middle;
+}
+
+#developerLogsList td,
+#analyticsLoginHistoryList td {
+  font-size: 0.86rem;
+}
+
+#developerLogsList td:nth-child(2),
+#analyticsLoginHistoryList td:nth-child(4),
+#blockedIpsList td:first-child {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+#atab-analytics .admin-section-head {
+  color: var(--ink);
+  font-size: 1rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#refreshAnalyticsBtn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--ink);
+  padding: 8px 14px;
+  font-weight: 900;
+}
+
+#refreshAnalyticsBtn:hover {
+  border-color: var(--p);
+  color: var(--p);
+}
+
 .admin-cancel-btn {
   width: 100%; padding: 10px; background: transparent;
   border: 1.5px solid var(--border); border-radius: 8px;
