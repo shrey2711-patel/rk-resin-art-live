@@ -1954,3 +1954,192 @@ if (refreshCouponsBtn) {
     showToast('Coupons refreshed', 'success');
   };
 }
+
+// ── Admin Analytics & Developer Logs ────────────────────────────
+Admin.renderAnalytics = async function() {
+  try {
+    const data = await API.get('/api/admin/analytics', true);
+    
+    // Render summary metrics
+    const stats = data.analytics || {};
+    document.getElementById('statTotalVisitors').textContent = stats.totalVisitors || 0;
+    document.getElementById('statVisitorRatio').textContent = `${stats.newVisitors || 0} New / ${stats.returningVisitors || 0} Ret`;
+    document.getElementById('statBlockedIps').textContent = (data.blockedIps || []).length;
+    
+    // Render location tables
+    const locsList = document.getElementById('analyticsLocationsList');
+    if (locsList) {
+      const sortedLocs = Object.entries(stats.cities || {}).sort((a, b) => b[1] - a[1]);
+      if (sortedLocs.length === 0) {
+        locsList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No visitor locations recorded yet.</td></tr>`;
+      } else {
+        locsList.innerHTML = sortedLocs.map(([city, count]) => {
+          return `
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 8px 10px; font-weight: 700; color: var(--ink);">${city}</td>
+              <td style="padding: 8px 10px; text-align: right; font-weight: 800; color: var(--ink);">${count}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Render ISP distribution
+    const ispsList = document.getElementById('analyticsIspsList');
+    if (ispsList) {
+      const sortedIsps = Object.entries(stats.isps || {}).sort((a, b) => b[1] - a[1]);
+      if (sortedIsps.length === 0) {
+        ispsList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No networks recorded yet.</td></tr>`;
+      } else {
+        ispsList.innerHTML = sortedIsps.map(([isp, count]) => {
+          return `
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 8px 10px; font-weight: 700; color: var(--ink);">${isp}</td>
+              <td style="padding: 8px 10px; text-align: right; font-weight: 800; color: var(--ink);">${count}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Render Blocked IPs
+    const blockedList = document.getElementById('blockedIpsList');
+    if (blockedList) {
+      const ips = data.blockedIps || [];
+      if (ips.length === 0) {
+        blockedList.innerHTML = `<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked IPs.</td></tr>`;
+      } else {
+        blockedList.innerHTML = ips.map(ip => {
+          return `
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 8px 10px; font-family: monospace; font-weight: 700; color: var(--ink);">${ip}</td>
+              <td style="padding: 8px 10px; text-align: right;">
+                <button class="btn-unblock-ip" data-ip="${ip}" style="background: var(--green); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">Unblock</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        // Bind unblock buttons
+        blockedList.querySelectorAll('.btn-unblock-ip').forEach(btn => {
+          btn.onclick = async () => {
+            const ip = btn.dataset.ip;
+            if (!confirm(`Unblock IP address ${ip}?`)) return;
+            try {
+              await API.post('/api/admin/ip-unblock', { ip }, true);
+              showToast(`IP ${ip} unblocked`, 'success');
+              Admin.renderAnalytics();
+            } catch (err) {
+              showToast(err.message, 'error');
+            }
+          };
+        });
+      }
+    }
+
+    // Render Security Warning Logs
+    const securityList = document.getElementById('securityLogsList');
+    if (securityList) {
+      const logs = data.securityLogs || [];
+      if (logs.length === 0) {
+        securityList.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No security logs recorded.</div>`;
+      } else {
+        const sortedLogs = [...logs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        securityList.innerHTML = sortedLogs.map(log => {
+          const dt = new Date(log.timestamp).toLocaleString('en-IN');
+          let color = '#d97706'; // warning orange
+          if (log.type === 'BRUTE_FORCE_DETECTED' || log.type === 'RATE_LIMIT_EXCEEDED') {
+            color = '#dc2626'; // critical red
+          }
+          return `
+            <div style="border-left: 4px solid ${color}; padding: 8px 12px; background: var(--white); border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.8rem; text-align: left;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 800; color: ${color};">${log.type}</span>
+                <span style="font-size: 0.72rem; color: var(--muted);">${dt}</span>
+              </div>
+              <div style="color: var(--ink); margin-bottom: 2px;">${log.message}</div>
+              <div style="font-size: 0.72rem; color: var(--muted); font-family: monospace;">IP: ${log.ip} (${log.location.city}, ${log.location.country})</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+  } catch (err) {
+    showToast('Failed to load analytics: ' + err.message, 'error');
+  }
+};
+
+Admin.renderDevLogs = async function() {
+  const list = document.getElementById('developerLogsList');
+  if (!list) return;
+  
+  try {
+    const logs = await API.get('/api/admin/dev-logs', true);
+    if (!logs || logs.length === 0) {
+      list.innerHTML = `<tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--muted);">No logs available. Try visiting the home page to generate developer logs.</td></tr>`;
+      return;
+    }
+    
+    list.innerHTML = logs.map(log => {
+      let statusColor = '#059669'; // 2xx success green
+      if (log.status >= 400 && log.status < 500) statusColor = '#d97706'; // 4xx orange
+      if (log.status >= 500) statusColor = '#dc2626'; // 5xx red
+      
+      return `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 6px 10px; color: var(--muted); white-space: nowrap;">${new Date(log.timestamp).toLocaleString('en-IN')}</td>
+          <td style="padding: 6px 10px; font-weight: 700; color: var(--ink); white-space: nowrap;">${log.ip}</td>
+          <td style="padding: 6px 10px; font-weight: 800; color: var(--ink);">${log.method}</td>
+          <td style="padding: 6px 10px; color: var(--ink); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${log.url}">${log.url}</td>
+          <td style="padding: 6px 10px; font-weight: 800; color: ${statusColor}; text-align: center;">${log.status}</td>
+          <td style="padding: 6px 10px; color: var(--muted);">${log.duration}</td>
+          <td style="padding: 6px 10px; color: var(--ink); white-space: nowrap;">${log.location}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    list.innerHTML = `<tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--red);">Failed to load developer logs: ${err.message}</td></tr>`;
+  }
+};
+
+// Auto-load analytics when Analytics tab is clicked
+document.querySelectorAll('.atab[data-tab]').forEach(btn => {
+  if (btn.dataset.tab === 'analytics') {
+    btn.addEventListener('click', () => {
+      Admin.renderAnalytics();
+      Admin.renderDevLogs();
+    });
+  }
+});
+
+// Block IP Address form
+const blockIpBtn = document.getElementById('blockIpBtn');
+if (blockIpBtn) {
+  blockIpBtn.onclick = async () => {
+    const input = document.getElementById('blockIpInput');
+    const ip = input ? input.value.trim() : '';
+    if (!ip) {
+      showToast('Please enter a valid IP address!', 'error');
+      return;
+    }
+    try {
+      await API.post('/api/admin/ip-block', { ip }, true);
+      showToast(`IP ${ip} blocked`, 'success');
+      if (input) input.value = '';
+      Admin.renderAnalytics();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+}
+
+// Refresh analytics button
+const refreshAnalyticsBtn = document.getElementById('refreshAnalyticsBtn');
+if (refreshAnalyticsBtn) {
+  refreshAnalyticsBtn.onclick = () => {
+    Admin.renderAnalytics();
+    Admin.renderDevLogs();
+    showToast('Analytics refreshed', 'success');
+  };
+}

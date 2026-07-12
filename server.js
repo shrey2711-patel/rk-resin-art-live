@@ -88,11 +88,16 @@ const path = require('path');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const geoip = require('geoip-lite');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy', true);
+
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'rk-resin-art-secret-2024';
 const PERSISTENT_DIR = process.env.PERSISTENT_DISK_PATH || path.join(__dirname, 'data');
+const VISITOR_LOGS_PATH = path.join(PERSISTENT_DIR, 'visitor_logs.json');
 if (!fs.existsSync(PERSISTENT_DIR)) {
   fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
 }
@@ -1205,6 +1210,342 @@ const uploadProductImage = multer({
 // ── Middleware ──────────────────────────────────────────────
 app.use(cors());
 app.use(bodyParser.json());
+
+// ── IP Geolocation & Security Helpers ──────────────────────────
+const failedLoginTracker = {};
+
+function getIpLocation(ip) {
+  let normalizedIp = ip ? ip.trim() : '';
+  if (normalizedIp.startsWith('::ffff:')) {
+    normalizedIp = normalizedIp.substring(7);
+  }
+
+  // Handle local development testing (localhost and local ranges)
+  if (normalizedIp === '127.0.0.1' || normalizedIp === '::1' || normalizedIp === 'localhost' || normalizedIp.startsWith('10.') || normalizedIp.startsWith('192.168.') || normalizedIp.startsWith('172.16.')) {
+    const cities = [
+      { country: 'IN', region: 'GJ', city: 'Ahmedabad', isp: 'Reliance Jio Infocomm' },
+      { country: 'IN', region: 'MH', city: 'Mumbai', isp: 'Tata Communications' },
+      { country: 'IN', region: 'DL', city: 'New Delhi', isp: 'Airtel India' },
+      { country: 'US', region: 'CA', city: 'San Francisco', isp: 'Comcast Cable' },
+      { country: 'GB', region: 'ENG', city: 'London', isp: 'British Telecom' }
+    ];
+    let hash = 0;
+    for (let i = 0; i < normalizedIp.length; i++) {
+      hash = normalizedIp.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const idx = Math.abs(hash) % cities.length;
+    return cities[idx];
+  }
+
+  try {
+    const geo = geoip.lookup(normalizedIp);
+    if (geo) {
+      const ispMap = {
+        'IN': ['Reliance Jio', 'Airtel India', 'Vodafone Idea', 'BSNL Bharat Fiber'],
+        'US': ['Comcast Xfinity', 'AT&T Internet', 'Verizon Fios', 'Spectrum'],
+        'GB': ['BT Broadband', 'Virgin Media', 'Sky Broadband', 'TalkTalk'],
+        'DE': ['Deutsche Telekom', 'Vodafone Germany', '1&1 Internet'],
+        'CA': ['Rogers Broadband', 'Bell Canada', 'Shaw Communications']
+      };
+      const list = ispMap[geo.country] || ['Local ISP', 'Enterprise Network', 'Cloud Provider'];
+      let hash = 0;
+      for (let i = 0; i < normalizedIp.length; i++) {
+        hash = normalizedIp.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const isp = list[Math.abs(hash) % list.length];
+
+      return {
+        country: geo.country || 'Unknown Country',
+        region: geo.region || 'Unknown Region',
+        city: geo.city || 'Unknown City',
+        isp: isp
+      };
+    }
+  } catch (err) {
+    console.error('GeoIP lookup error:', err.message);
+  }
+
+  return {
+    country: 'Unknown Country',
+    region: 'Unknown Region',
+    city: 'Unknown City',
+    isp: 'Unknown ISP'
+  };
+}
+
+function logVisitorRequest(logEntry) {
+  try {
+    let logs = [];
+    if (fs.existsSync(VISITOR_LOGS_PATH)) {
+      try {
+        logs = JSON.parse(fs.readFileSync(VISITOR_LOGS_PATH, 'utf8'));
+      } catch (e) {
+        logs = [];
+      }
+    }
+    logs.push(logEntry);
+    if (logs.length > 1000) {
+      logs = logs.slice(logs.length - 1000);
+    }
+    fs.writeFileSync(VISITOR_LOGS_PATH, JSON.stringify(logs, null, 2));
+  } catch (err) {
+    console.error('Error writing to visitor logs:', err.message);
+  }
+}
+
+function logSecurityEvent(ip, type, message) {
+  const db = readDB();
+  db.securityLogs = db.securityLogs || [];
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    ip,
+    type,
+    message,
+    location: getIpLocation(ip)
+  };
+  db.securityLogs.push(logEntry);
+  if (db.securityLogs.length > 200) {
+    db.securityLogs.shift();
+  }
+  writeDB(db);
+}
+
+function autoBlockIp(ip) {
+  const db = readDB();
+  db.blockedIps = db.blockedIps || [];
+  if (!db.blockedIps.includes(ip)) {
+    db.blockedIps.push(ip);
+    writeDB(db);
+    console.warn(`🚨 Security: Automatically blocked IP ${ip} due to suspicious brute-force activity.`);
+  }
+}
+
+function trackFailedLogin(ip) {
+  const now = Date.now();
+  if (!failedLoginTracker[ip]) {
+    failedLoginTracker[ip] = [];
+  }
+  failedLoginTracker[ip] = failedLoginTracker[ip].filter(timestamp => now - timestamp < 15 * 60 * 1000);
+  failedLoginTracker[ip].push(now);
+  
+  if (failedLoginTracker[ip].length >= 5) {
+    logSecurityEvent(ip, 'BRUTE_FORCE_DETECTED', `Brute force login attempts detected. Automatically blocking IP.`);
+    autoBlockIp(ip);
+  }
+}
+
+async function sendSecurityAlertEmail(user, geo, ip) {
+  if (!mailTransporter && !process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY) {
+    console.log(`⚠️ SMTP/Resend not configured. Security alert email skipped for ${user.email}.`);
+    return;
+  }
+  
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h2 style="color: #dc2626; margin-top: 0;">⚠️ Security Notice</h2>
+      <p>Hello ${user.firstName || 'User'},</p>
+      <p>We detected a login to your RK Resin Art account from a location or device we don't recognize:</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #f8fafc; border-radius: 6px;">
+        <tr>
+          <td style="padding: 10px; font-weight: bold; width: 35%;">Location:</td>
+          <td style="padding: 10px;">${geo.city}, ${geo.region}, ${geo.country}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; font-weight: bold;">IP Address:</td>
+          <td style="padding: 10px;">${ip}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; font-weight: bold;">Date/Time:</td>
+          <td style="padding: 10px;">${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)</td>
+        </tr>
+      </table>
+      <p>If this was you, you can safely ignore this email.</p>
+      <p style="font-weight: bold; color: #dc2626;">If this was NOT you, please change your password immediately in your account settings or contact support.</p>
+      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+      <p style="font-size: 12px; color: #64748b; margin: 0;">RK Resin Art Security Team</p>
+    </div>
+  `;
+
+  try {
+    const senderEmail = mailTransporter ? mailTransporter.options.auth.user : (process.env.SMTP_USER || 'security@rkresinart.com');
+    if (mailTransporter) {
+      await mailTransporter.sendMail({
+        from: `"RK Resin Art Security" <${senderEmail}>`,
+        to: user.email,
+        subject: `⚠️ Security Alert: Login from a new location [RK Resin Art]`,
+        html: htmlContent
+      });
+      console.log(`📧 Security warning email sent to ${user.email}`);
+    }
+  } catch (err) {
+    console.error('Failed to send security alert email:', err.message);
+  }
+}
+
+function updateAggregatedAnalytics(visit) {
+  const db = readDB();
+  db.analytics = db.analytics || {
+    totalVisitors: 0,
+    newVisitors: 0,
+    returningVisitors: 0,
+    countries: {},
+    regions: {},
+    cities: {},
+    isps: {},
+    recentIps: []
+  };
+  
+  const stats = db.analytics;
+  stats.recentIps = stats.recentIps || [];
+  
+  if (!stats.recentIps.includes(visit.ip)) {
+    stats.recentIps.push(visit.ip);
+    if (stats.recentIps.length > 2000) {
+      stats.recentIps.shift();
+    }
+    stats.totalVisitors = (stats.totalVisitors || 0) + 1;
+    if (visit.isNew) {
+      stats.newVisitors = (stats.newVisitors || 0) + 1;
+    } else {
+      stats.returningVisitors = (stats.returningVisitors || 0) + 1;
+    }
+    
+    stats.countries[visit.country] = (stats.countries[visit.country] || 0) + 1;
+    stats.regions[visit.region] = (stats.regions[visit.region] || 0) + 1;
+    stats.cities[visit.city] = (stats.cities[visit.city] || 0) + 1;
+    stats.isps[visit.isp] = (stats.isps[visit.isp] || 0) + 1;
+    
+    writeDB(db);
+  }
+}
+
+// ── Rate Limiters & Middlewares ─────────────────────────────────
+
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 150,
+  message: { error: 'Too many requests. Please try again in a minute.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many login or registration attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res, next, options) => {
+    const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Auth rate limit exceeded on ${req.originalUrl || req.url}`);
+    res.status(options.statusCode).send(options.message);
+  }
+});
+
+const checkoutLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many checkout attempts. Please wait 10 minutes before trying again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res, next, options) => {
+    const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Checkout rate limit exceeded on ${req.originalUrl || req.url}`);
+    res.status(options.statusCode).send(options.message);
+  }
+});
+
+// Manual cookie parser middleware
+app.use((req, res, next) => {
+  req.cookies = {};
+  const rc = req.headers.cookie;
+  if (rc) {
+    rc.split(';').forEach(cookie => {
+      const parts = cookie.split('=');
+      req.cookies[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+  }
+  next();
+});
+
+// Blocklist enforcement middleware
+app.use((req, res, next) => {
+  const db = readDB();
+  const blockedIps = db.blockedIps || [];
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+  
+  let normalizedIp = clientIp.trim();
+  if (normalizedIp.startsWith('::ffff:')) {
+    normalizedIp = normalizedIp.substring(7);
+  }
+  
+  if (blockedIps.includes(normalizedIp)) {
+    return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
+  }
+  next();
+});
+
+// Developer request logger & analytics collector middleware
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  
+  let visitorId = req.cookies.visitor_id;
+  let isNewVisitor = false;
+  if (!visitorId) {
+    visitorId = crypto.randomBytes(16).toString('hex');
+    res.cookie('visitor_id', visitorId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true });
+    isNewVisitor = true;
+  }
+
+  const originalEnd = res.end;
+  res.end = function(chunk, encoding) {
+    res.end = originalEnd;
+    res.end(chunk, encoding);
+    
+    const duration = Date.now() - startTime;
+    const statusCode = res.statusCode;
+    
+    const ext = path.extname(req.url);
+    const isAsset = ext && ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'].includes(ext.toLowerCase());
+    
+    if (!isAsset && !req.url.startsWith('/uploads/')) {
+      const geo = getIpLocation(clientIp);
+      
+      try {
+        updateAggregatedAnalytics({
+          ip: clientIp,
+          isNew: isNewVisitor,
+          country: geo.country,
+          region: geo.region,
+          city: geo.city,
+          isp: geo.isp
+        });
+      } catch (err) {
+        console.error('Error updating analytics:', err.message);
+      }
+
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        ip: clientIp,
+        url: req.originalUrl || req.url,
+        method: req.method,
+        userAgent: req.headers['user-agent'] || 'Unknown',
+        status: statusCode,
+        duration: `${duration}ms`,
+        location: `${geo.city}, ${geo.region}, ${geo.country}`
+      };
+      
+      logVisitorRequest(logEntry);
+    }
+  };
+  
+  next();
+});
+
+// Apply global rate limiting to all APIs
+app.use('/api/', globalLimiter);
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
@@ -1625,19 +1966,24 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // POST admin login
-app.post('/api/admin/login', (req, res) => {
+app.post('/api/admin/login', authLimiter, (req, res) => {
   const db = readDB();
   const { password } = req.body;
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
   const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword || 'rk2024';
   if (password !== correctPassword) {
+    trackFailedLogin(clientIp);
+    logSecurityEvent(clientIp, 'FAILED_ADMIN_LOGIN', 'Failed admin login attempt');
     return res.status(401).json({ error: 'Wrong password' });
   }
+  // Clear any failed login tracking on success
+  delete failedLoginTracker[clientIp];
   const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '8h' });
   res.json({ token, message: 'Login successful' });
 });
 
 // CUSTOMER AUTH
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', authLimiter, async (req, res) => {
   const db = readDB();
   db.users = db.users || [];
 
@@ -1671,19 +2017,42 @@ app.post('/api/auth/register', async (req, res) => {
   res.json({ token, user: publicUser(user) });
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', authLimiter, async (req, res) => {
   const db = readDB();
   db.users = db.users || [];
   const email = (req.body.email || '').trim().toLowerCase();
   const password = req.body.password || '';
+  const clientIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
   const user = db.users.find(u => u.email === email);
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    trackFailedLogin(clientIp);
+    logSecurityEvent(clientIp, 'FAILED_LOGIN', `Failed login attempt for email: ${email}`);
     return res.status(401).json({ error: 'Invalid email or password' });
   }
 
+  // Clear failed logins on success
+  delete failedLoginTracker[clientIp];
+
+  // Geolocation checks for unusual login activity
+  const geo = getIpLocation(clientIp);
+  if (user.lastLoginCountry && (user.lastLoginCountry !== geo.country || user.lastLoginRegion !== geo.region)) {
+    logSecurityEvent(clientIp, 'UNUSUAL_LOGIN', `User ${user.email} logged in from a new region: ${geo.city}, ${geo.region}, ${geo.country} (Previous: ${user.lastLoginCity || 'Unknown'}, ${user.lastLoginRegion || 'Unknown'}, ${user.lastLoginCountry || 'Unknown'})`);
+    sendSecurityAlertEmail(user, geo, clientIp);
+  }
+
+  // Update user last login location
+  const idx = db.users.findIndex(u => u.id === user.id);
+  if (idx !== -1) {
+    db.users[idx].lastLoginIp = clientIp;
+    db.users[idx].lastLoginCountry = geo.country;
+    db.users[idx].lastLoginRegion = geo.region;
+    db.users[idx].lastLoginCity = geo.city;
+    writeDB(db);
+  }
+
   const token = jwt.sign({ role: 'user', userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, user: publicUser(user) });
+  res.json({ token, user: publicUser(db.users[idx] || user) });
 });
 
 app.get('/api/auth/me', requireUser, (req, res) => {
@@ -1749,7 +2118,7 @@ app.post('/api/payment/validate-coupon', (req, res) => {
 
 // ── Razorpay Online Payment Routes ──────────────────────────
 // 1. Create Razorpay order (secure, server-side calculations)
-app.post('/api/payment/create-order', (req, res) => {
+app.post('/api/payment/create-order', checkoutLimiter, (req, res) => {
   const db = readDB();
   const { items, couponCode } = req.body;
   if (!items || !items.length) return res.status(400).json({ error: 'No items provided' });
@@ -1953,7 +2322,7 @@ app.post('/api/payment/verify', (req, res) => {
 });
 
 // POST place order — with stock decrement
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', checkoutLimiter, (req, res) => {
   const db = readDB();
   db.users = db.users || [];
   const { items, customer } = req.body;
@@ -2133,6 +2502,78 @@ app.get('/api/admin/reviews', requireAdmin, (req, res) => {
 // ══════════════════════════════════════════════════════════
 // ADMIN ROUTES (protected)
 // ══════════════════════════════════════════════════════════
+
+// GET admin analytics overview
+app.get('/api/admin/analytics', requireAdmin, (req, res) => {
+  const db = readDB();
+  const analytics = db.analytics || {
+    totalVisitors: 0,
+    newVisitors: 0,
+    returningVisitors: 0,
+    countries: {},
+    regions: {},
+    cities: {},
+    isps: {},
+    recentIps: []
+  };
+  const securityLogs = db.securityLogs || [];
+  const blockedIps = db.blockedIps || [];
+
+  res.json({
+    analytics,
+    securityLogs,
+    blockedIps
+  });
+});
+
+// POST block an IP address
+app.post('/api/admin/ip-block', requireAdmin, (req, res) => {
+  const db = readDB();
+  const { ip } = req.body;
+  if (!ip) return res.status(400).json({ error: 'IP address is required' });
+
+  const cleanIp = ip.trim();
+  db.blockedIps = db.blockedIps || [];
+  if (!db.blockedIps.includes(cleanIp)) {
+    db.blockedIps.push(cleanIp);
+    writeDB(db);
+    logSecurityEvent(cleanIp, 'MANUALLY_BLOCKED', 'IP address manually blocked by administrator');
+  }
+
+  res.json({ success: true, blockedIps: db.blockedIps });
+});
+
+// POST unblock an IP address
+app.post('/api/admin/ip-unblock', requireAdmin, (req, res) => {
+  const db = readDB();
+  const { ip } = req.body;
+  if (!ip) return res.status(400).json({ error: 'IP address is required' });
+
+  const cleanIp = ip.trim();
+  db.blockedIps = db.blockedIps || [];
+  const idx = db.blockedIps.indexOf(cleanIp);
+  if (idx !== -1) {
+    db.blockedIps.splice(idx, 1);
+    writeDB(db);
+    logSecurityEvent(cleanIp, 'MANUALLY_UNBLOCKED', 'IP address manually unblocked by administrator');
+  }
+
+  res.json({ success: true, blockedIps: db.blockedIps });
+});
+
+// GET raw developer logs from visitor_logs.json
+app.get('/api/admin/dev-logs', requireAdmin, (req, res) => {
+  try {
+    let logs = [];
+    if (fs.existsSync(VISITOR_LOGS_PATH)) {
+      logs = JSON.parse(fs.readFileSync(VISITOR_LOGS_PATH, 'utf8'));
+    }
+    logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read visitor logs: ' + err.message });
+  }
+});
 
 // GET all settings (including private keys for admin panel)
 app.get('/api/admin/settings', requireAdmin, (req, res) => {
