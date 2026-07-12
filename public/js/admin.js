@@ -29,17 +29,41 @@ const Admin = {
   updateStockFieldsVisibility() {
     const isTracking = this.data.settings && this.data.settings.trackStock !== false;
     const pfStock = document.getElementById('pfStock');
-    const pfStockStatus = document.getElementById('pfStockStatus');
+    const pfStockToggleContainer = document.getElementById('pfStockStatusToggleContainer');
     const pfStockLabel = document.getElementById('pfStockLabel');
     
     if (isTracking) {
       if (pfStock) pfStock.style.display = '';
-      if (pfStockStatus) pfStockStatus.style.display = 'none';
+      if (pfStockToggleContainer) pfStockToggleContainer.style.display = 'none';
       if (pfStockLabel) pfStockLabel.textContent = 'Stock';
     } else {
       if (pfStock) pfStock.style.display = 'none';
-      if (pfStockStatus) pfStockStatus.style.display = '';
+      if (pfStockToggleContainer) pfStockToggleContainer.style.display = '';
       if (pfStockLabel) pfStockLabel.textContent = 'Stock Status';
+    }
+  },
+
+  setStockStatusButtonState(val) {
+    const btn = document.getElementById('pfStockStatusBtn');
+    const input = document.getElementById('pfStockStatus');
+    if (!btn || !input) return;
+    
+    input.value = val;
+    const dot = btn.querySelector('.toggle-dot');
+    const text = btn.querySelector('.toggle-text');
+    
+    if (val === '1' || val === 1) {
+      btn.style.background = '#25D366'; // Green for active In Stock
+      btn.style.color = '#ffffff';
+      btn.style.borderColor = '#25D366';
+      if (dot) dot.style.background = '#ffffff';
+      if (text) text.textContent = 'In Stock';
+    } else {
+      btn.style.background = '#e5e7eb'; // Grey for Out of Stock
+      btn.style.color = '#555555';
+      btn.style.borderColor = '#e5e7eb';
+      if (dot) dot.style.background = '#888888';
+      if (text) text.textContent = 'Out of Stock';
     }
   },
 
@@ -394,8 +418,7 @@ const Admin = {
     const rows = document.getElementById('pfVariantRows');
     if (rows) rows.innerHTML = '';
 
-    const pfStockStatus = document.getElementById('pfStockStatus');
-    if (pfStockStatus) pfStockStatus.value = '1';
+    this.setStockStatusButtonState('1');
     this.updateStockFieldsVisibility();
   },
 
@@ -434,8 +457,7 @@ const Admin = {
       document.getElementById('pfOrig').value = product.originalPrice || '';
       document.getElementById('pfStock').value = product.stock !== undefined ? product.stock : '';
       const isOut = Number(product.stock) === 0;
-      const pfStockStatus = document.getElementById('pfStockStatus');
-      if (pfStockStatus) pfStockStatus.value = isOut ? '0' : '1';
+      this.setStockStatusButtonState(isOut ? '0' : '1');
       this.updateStockFieldsVisibility();
 
       document.getElementById('pfImageUrl').value = product.imageUrl || '';
@@ -613,7 +635,7 @@ const Admin = {
         if (isTracking) {
           stk = parseInt(row.querySelector('.vr-stock')?.value);
         } else {
-          stk = parseInt(row.querySelector('.vr-stock-select')?.value || '1');
+          stk = parseInt(row.querySelector('.vr-stock-value')?.value || '1');
         }
         const img = row.querySelector('.vr-image')?.value.trim() || null;
         if (lbl) {
@@ -792,10 +814,11 @@ const Admin = {
       const isOut = Number(stock) === 0;
       stockFieldHtml = `
         <span class="admin-variant-row-label">Status:</span>
-        <select class="vr-stock-select" style="max-width:110px; height: 32px; padding: 2px 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box;">
-          <option value="1"${!isOut ? ' selected' : ''}>In Stock</option>
-          <option value="0"${isOut ? ' selected' : ''}>Out of Stock</option>
-        </select>
+        <button type="button" class="vr-stock-btn" style="min-height: 32px; min-width: 110px; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-weight: 800; cursor: pointer; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px; justify-content: center; outline: none; transition: all 0.2s;">
+          <span class="toggle-dot" style="width: 6px; height: 6px; border-radius: 50%; display: inline-block;"></span>
+          <span class="toggle-text">In Stock</span>
+        </button>
+        <input type="hidden" class="vr-stock-value" value="${isOut ? '0' : '1'}">
       `;
     }
 
@@ -829,6 +852,40 @@ const Admin = {
         this.uploadVariantImage(file, row);
       }
     };
+
+    // Wire up variant toggle button if present
+    const vrBtn = row.querySelector('.vr-stock-btn');
+    const vrInput = row.querySelector('.vr-stock-value');
+    if (vrBtn && vrInput) {
+      const updateVrBtnState = (val) => {
+        vrInput.value = val;
+        const dot = vrBtn.querySelector('.toggle-dot');
+        const text = vrBtn.querySelector('.toggle-text');
+        
+        if (val === '1' || val === 1) {
+          vrBtn.style.background = '#25D366';
+          vrBtn.style.color = '#ffffff';
+          vrBtn.style.borderColor = '#25D366';
+          if (dot) dot.style.background = '#ffffff';
+          if (text) text.textContent = 'In Stock';
+        } else {
+          vrBtn.style.background = '#e5e7eb';
+          vrBtn.style.color = '#555555';
+          vrBtn.style.borderColor = '#e5e7eb';
+          if (dot) dot.style.background = '#888888';
+          if (text) text.textContent = 'Out of Stock';
+        }
+      };
+
+      // Set initial color state
+      updateVrBtnState(vrInput.value);
+
+      // Handle toggling
+      vrBtn.onclick = () => {
+        const newVal = vrInput.value === '1' ? '0' : '1';
+        updateVrBtnState(newVal);
+      };
+    }
 
     row.querySelector('.admin-remove-variant-btn').onclick = () => row.remove();
     rowsEl.appendChild(row);
@@ -1499,6 +1556,17 @@ if (categoryUploadBox) {
     document.getElementById('cfImageFile').files = e.dataTransfer.files;
     await Admin.uploadCategoryImage(file);
   });
+}
+
+// Stock status toggle button
+const pfStockStatusBtn = document.getElementById('pfStockStatusBtn');
+if (pfStockStatusBtn) {
+  pfStockStatusBtn.onclick = () => {
+    const input = document.getElementById('pfStockStatus');
+    const currentVal = input ? input.value : '1';
+    const newVal = currentVal === '1' ? '0' : '1';
+    Admin.setStockStatusButtonState(newVal);
+  };
 }
 
 // Add / Update Product
