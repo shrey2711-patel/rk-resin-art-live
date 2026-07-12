@@ -2064,6 +2064,30 @@ Admin.renderAnalytics = async function() {
         }).join('');
       }
     }
+    // Render Login History
+    const loginHistoryList = document.getElementById('analyticsLoginHistoryList');
+    if (loginHistoryList) {
+      const logins = data.loginLogs || [];
+      if (logins.length === 0) {
+        loginHistoryList.innerHTML = `<tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--muted);">No successful logins recorded yet.</td></tr>`;
+      } else {
+        const sortedLogins = [...logins].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        loginHistoryList.innerHTML = sortedLogins.map(entry => {
+          const dt = new Date(entry.timestamp).toLocaleString('en-IN');
+          const loc = entry.location ? `${entry.location.city || 'Unknown City'}, ${entry.location.region || 'Unknown Region'}, ${entry.location.country || 'Unknown Country'}` : 'Unknown Location';
+          const isAdm = entry.role === 'Admin';
+          return `
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 8px 10px; color: var(--muted); white-space: nowrap;">${dt}</td>
+              <td style="padding: 8px 10px; font-weight: 700; color: var(--ink);">${entry.email}</td>
+              <td style="padding: 8px 10px; color: ${isAdm ? '#dc2626' : 'var(--muted)'}; font-weight: ${isAdm ? '800' : 'normal'};">${entry.role}</td>
+              <td style="padding: 8px 10px; font-family: monospace; color: var(--ink);">${entry.ip}</td>
+              <td style="padding: 8px 10px; color: var(--muted);">${loc}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
 
   } catch (err) {
     showToast('Failed to load analytics: ' + err.message, 'error');

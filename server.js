@@ -1978,6 +1978,22 @@ app.post('/api/admin/login', authLimiter, (req, res) => {
   }
   // Clear any failed login tracking on success
   delete failedLoginTracker[clientIp];
+
+  // Record login log
+  const geo = getIpLocation(clientIp);
+  db.loginLogs = db.loginLogs || [];
+  db.loginLogs.push({
+    timestamp: new Date().toISOString(),
+    email: 'Admin',
+    role: 'Admin',
+    ip: clientIp,
+    location: geo
+  });
+  if (db.loginLogs.length > 500) {
+    db.loginLogs.shift();
+  }
+  writeDB(db);
+
   const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '8h' });
   res.json({ token, message: 'Login successful' });
 });
@@ -2048,8 +2064,21 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     db.users[idx].lastLoginCountry = geo.country;
     db.users[idx].lastLoginRegion = geo.region;
     db.users[idx].lastLoginCity = geo.city;
-    writeDB(db);
   }
+
+  // Record login log
+  db.loginLogs = db.loginLogs || [];
+  db.loginLogs.push({
+    timestamp: new Date().toISOString(),
+    email: user.email,
+    role: 'User',
+    ip: clientIp,
+    location: geo
+  });
+  if (db.loginLogs.length > 500) {
+    db.loginLogs.shift();
+  }
+  writeDB(db);
 
   const token = jwt.sign({ role: 'user', userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
   res.json({ token, user: publicUser(db.users[idx] || user) });
@@ -2522,7 +2551,8 @@ app.get('/api/admin/analytics', requireAdmin, (req, res) => {
   res.json({
     analytics,
     securityLogs,
-    blockedIps
+    blockedIps,
+    loginLogs: db.loginLogs || []
   });
 });
 

@@ -922,6 +922,27 @@
               </div>
             </div>
 
+            <!-- User & Admin Login History -->
+            <div class="admin-form-card" style="margin: 0; margin-bottom: 24px;">
+              <div class="afc-title">🔐 User &amp; Admin Login History (Full Record)</div>
+              <div style="overflow-x: auto; max-height: 280px;">
+                <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                  <thead>
+                    <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted); background: var(--bg);">
+                      <th style="padding: 8px 10px; width: 180px;">Date / Time</th>
+                      <th style="padding: 8px 10px;">User Identifier (Email)</th>
+                      <th style="padding: 8px 10px; width: 100px;">Account Role</th>
+                      <th style="padding: 8px 10px; width: 120px;">IP Address</th>
+                      <th style="padding: 8px 10px; width: 220px;">Location (approximate)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="analyticsLoginHistoryList">
+                    <tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--muted);">No successful logins recorded yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <!-- Developer Access Logs -->
             <div class="admin-form-card" style="margin: 0;">
               <div class="afc-title">🖥️ Real-time Developer Access Logs</div>
