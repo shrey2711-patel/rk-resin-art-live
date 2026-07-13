@@ -1443,8 +1443,6 @@ const App = {
     }
 
     window.location.hash = `#collection/${encodeURIComponent(name)}`;
-  },
-
     const shopMain = document.getElementById('shopMain');
     if (shopMain) shopMain.scrollIntoView({ behavior: 'smooth' });
   },
