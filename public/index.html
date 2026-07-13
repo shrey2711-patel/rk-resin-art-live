@@ -166,6 +166,12 @@
       </div>
     </div>
 
+    <!-- SUBCATEGORIES SELECTION VIEW -->
+    <div class="subcat-section" id="subcatSection" style="display:none; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 25px;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">Browse Category By Type</div>
+      <div class="subcat-grid" id="subcatGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;"></div>
+    </div>
+
     <div class="cat-filter-row" id="catFilterRow"></div>
 
     <div class="prod-grid" id="prodGrid">
@@ -669,6 +675,50 @@
               </div>
               <div class="admin-ok" id="catOk">✅ Category saved!</div>
             </div>
+
+            <!-- SUBCATEGORIES MANAGEMENT -->
+            <div class="admin-section-head" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 30px;">
+              <span>Product Subcategories</span>
+            </div>
+            <div id="adminSubcatList" class="admin-list" style="margin-bottom: 20px;"></div>
+            
+            <div class="admin-form-card">
+              <div class="afc-title" id="subcatFormTitle">Add Subcategory</div>
+              <div class="form-row-3">
+                <div class="form-field">
+                  <label>Parent Category *</label>
+                  <select class="admin-input" id="scfParentCat"></select>
+                </div>
+                <div class="form-field">
+                  <label>Subcategory Name *</label>
+                  <input class="admin-input" id="scfName" placeholder="e.g. Mica Colors">
+                </div>
+                <div class="form-field">
+                  <label>Emoji</label>
+                  <input class="admin-input" id="scfEmoji" placeholder="✨">
+                </div>
+              </div>
+              <div class="form-field" style="margin-top:10px">
+                <label>Subcategory Poster Image (Optional)</label>
+                <input type="hidden" id="scfImageUrl">
+                <input class="product-file-input" type="file" id="scfImageFile" accept="image/jpeg,image/png,image/webp">
+                <label class="product-upload-box" id="subcategoryUploadBox" for="scfImageFile">
+                  <span class="upload-icon">+</span>
+                  <span class="upload-title">Drop subcategory poster here or choose file</span>
+                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                </label>
+                <div class="product-image-preview" id="subcategoryImagePreview" style="display:none">
+                  <img id="scfImagePreviewImg" alt="Subcategory preview">
+                  <button type="button" class="image-remove-btn" id="removeSubcategoryImageBtn">Remove Image</button>
+                </div>
+                <div class="upload-status" id="subcategoryUploadStatus"></div>
+              </div>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="addSubcatBtn">+ Add Subcategory</button>
+                <button class="admin-cancel-btn" id="cancelSubcatBtn" style="display:none">Cancel Edit</button>
+              </div>
+              <div class="admin-ok" id="subcatOk">✅ Subcategory saved!</div>
+            </div>
           </div>
 
           <!-- PRODUCTS -->
@@ -680,9 +730,15 @@
             <div id="adminProdList" class="admin-list"></div>
             <div class="admin-form-card">
               <div class="afc-title">Add Product</div>
-              <div class="form-row-2">
+              <div class="form-row-3">
                 <div class="form-field"><label>Product Name *</label><input class="admin-input" id="pfName" placeholder="e.g. Rose Gold Mica 10g"></div>
                 <div class="form-field"><label>Category *</label><select class="admin-input" id="pfCat"></select></div>
+                <div class="form-field">
+                  <label>Subcategory</label>
+                  <select class="admin-input" id="pfSubcat">
+                    <option value="">None / General</option>
+                  </select>
+                </div>
               </div>
               <div class="form-row-3" id="pfBasePriceStockContainer">
                 <div class="form-field"><label>Price (₹) *</label><input class="admin-input" type="number" id="pfPrice" placeholder="199"></div>

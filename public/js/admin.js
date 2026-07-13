@@ -387,6 +387,9 @@ const Admin = {
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = '4:3';
     document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
+    this.populateProdSubcatSelect();
+    const pfSub = document.getElementById('pfSubcat');
+    if (pfSub) pfSub.value = '';
     document.getElementById('pfImageFile').value = '';
     this.updateImagePreview('');
     this.setUploadStatus('');
@@ -425,6 +428,9 @@ const Admin = {
   setProductEdit(product) {
     document.getElementById('pfName').value = product.name || '';
     document.getElementById('pfCat').value = product.category || this.data.categories[0]?.name || '';
+    this.populateProdSubcatSelect();
+    const pfSub = document.getElementById('pfSubcat');
+    if (pfSub) pfSub.value = product.subcategory || '';
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = product.imgRatio || '4:3';
     document.getElementById('pfEmoji').value = product.emoji || '';
@@ -683,6 +689,7 @@ const Admin = {
       price,
       originalPrice,
       category: document.getElementById('pfCat').value,
+      subcategory: document.getElementById('pfSubcat')?.value || '',
       stock,
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',
       badge: document.getElementById('pfBadge').value,
@@ -990,6 +997,7 @@ const Admin = {
     this.renderBanners();
     this.renderNav();
     this.renderCategories();
+    this.renderSubcategories();
     this.renderProducts();
     this.renderOrders();
     if (this.renderReviews) this.renderReviews();
@@ -1025,10 +1033,11 @@ const Admin = {
 
   async loadAll() {
     try {
-      const [banners, nav, cats, prodRes, orders, coupons, settings] = await Promise.all([
+      const [banners, nav, cats, subcats, prodRes, orders, coupons, settings] = await Promise.all([
         API.getBanners(),
         API.getNav(),
         API.getCategories(),
+        API.getSubcategories().catch(() => []),
         API.getProducts({ limit: 200 }),
         API.getOrders(),
         API.getCoupons().catch(() => []),
@@ -1037,6 +1046,7 @@ const Admin = {
       this.data.banners = banners;
       this.data.nav = nav;
       this.data.categories = cats;
+      this.data.subcategories = subcats;
       this.data.products = prodRes.products;
       this.data.orders = orders;
       this.data.coupons = coupons;
@@ -1153,8 +1163,197 @@ const Admin = {
 
   populateProdCatSelect() {
     const sel = document.getElementById('pfCat');
-    if (!sel) return;
-    sel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
+    if (sel) {
+      sel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
+      sel.onchange = () => this.populateProdSubcatSelect();
+    }
+    const scSel = document.getElementById('scfParentCat');
+    if (scSel) {
+      scSel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
+    }
+    this.populateProdSubcatSelect();
+  },
+
+  renderSubcategories() {
+    const list = document.getElementById('adminSubcatList');
+    if (!list) return;
+    this.data.subcategories = this.data.subcategories || [];
+    list.innerHTML = this.data.subcategories.map(s => {
+      const imgHtml = s.imageUrl ? `<img src="${s.imageUrl}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;margin-right:8px;">` : '';
+      return `
+        <div class="admin-list-item">
+          ${imgHtml}
+          <div class="ali-info">
+            <div class="ali-name">${s.emoji || '✨'} ${s.name} <span style="font-size:0.75rem;color:var(--muted)">(${s.category})</span></div>
+          </div>
+          <div class="ali-actions">
+            <button class="ali-edit" data-edit-scid="${s.id}">Edit</button>
+            <button class="ali-del" data-scid="${s.id}">Delete</button>
+          </div>
+        </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No subcategories.</div>';
+
+    list.querySelectorAll('[data-edit-scid]').forEach(btn => {
+      btn.onclick = () => {
+        const subcat = this.data.subcategories.find(item => item.id === Number(btn.dataset.editScid));
+        if (subcat) this.setSubcategoryEdit(subcat);
+      };
+    });
+
+    list.querySelectorAll('[data-scid]').forEach(btn => {
+      btn.onclick = async () => {
+        if (!confirm('Delete this subcategory?')) return;
+        await API.deleteSubcategory(Number(btn.dataset.scid));
+        await this.loadAll();
+        this.renderSubcategories();
+        this.populateProdSubcatSelect();
+      };
+    });
+    this.populateProdSubcatSelect();
+  },
+
+  setSubcategoryEdit(subcat) {
+    document.getElementById('scfParentCat').value = subcat.category || '';
+    document.getElementById('scfName').value = subcat.name || '';
+    document.getElementById('scfEmoji').value = subcat.emoji || '';
+    document.getElementById('scfImageUrl').value = subcat.imageUrl || '';
+    
+    const preview = document.getElementById('subcategoryImagePreview');
+    const previewImg = document.getElementById('scfImagePreviewImg');
+    if (preview && previewImg) {
+      if (subcat.imageUrl) {
+        previewImg.src = subcat.imageUrl;
+        preview.style.display = '';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    const btn = document.getElementById('addSubcatBtn');
+    const cancel = document.getElementById('cancelSubcatBtn');
+    if (btn) btn.textContent = 'Update Subcategory';
+    if (cancel) cancel.style.display = '';
+    this.editStateSubcat = { id: subcat.id };
+  },
+
+  resetSubcategoryForm() {
+    document.getElementById('scfName').value = '';
+    document.getElementById('scfEmoji').value = '';
+    document.getElementById('scfImageUrl').value = '';
+    document.getElementById('scfImageFile').value = '';
+    const preview = document.getElementById('subcategoryImagePreview');
+    if (preview) preview.style.display = 'none';
+    const status = document.getElementById('subcategoryUploadStatus');
+    if (status) status.textContent = '';
+    
+    const btn = document.getElementById('addSubcatBtn');
+    const cancel = document.getElementById('cancelSubcatBtn');
+    if (btn) btn.textContent = '+ Add Subcategory';
+    if (cancel) cancel.style.display = 'none';
+    this.editStateSubcat = { id: null };
+  },
+
+  async saveSubcategoryForm() {
+    const parentCat = document.getElementById('scfParentCat').value;
+    const name = document.getElementById('scfName').value.trim();
+    const emoji = document.getElementById('scfEmoji').value.trim() || '✨';
+    const imageUrl = document.getElementById('scfImageUrl').value;
+
+    if (!parentCat || !name) {
+      showToast('Parent Category and Subcategory Name are required', 'error');
+      return;
+    }
+
+    const payload = { category: parentCat, name, emoji, imageUrl };
+
+    try {
+      if (this.editStateSubcat && this.editStateSubcat.id) {
+        await API.updateSubcategory(this.editStateSubcat.id, payload);
+        showToast('Subcategory updated', 'success');
+      } else {
+        await API.addSubcategory(payload);
+        showToast('Subcategory created', 'success');
+        showOk('subcatOk');
+      }
+      this.resetSubcategoryForm();
+      await this.loadAll();
+      this.renderSubcategories();
+    } catch (e) {
+      showToast(e.message || 'Error saving subcategory', 'error');
+    }
+  },
+
+  cancelSubcategoryEdit() {
+    this.resetSubcategoryForm();
+  },
+
+  async uploadSubcategoryImage(file) {
+    if (!file) return;
+    this.setSubcategoryUploadStatus('Compressing & uploading image...', 'info');
+    try {
+      const img = new Image();
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        img.src = e.target.result;
+      };
+      
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > 1200 || height > 1200) {
+          if (width > height) {
+            height = Math.round((height * 1200) / width);
+            width = 1200;
+          } else {
+            width = Math.round((width * 1200) / height);
+            height = 1200;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(async (blob) => {
+          const optimizedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+          try {
+            const result = await API.uploadImage(optimizedFile);
+            document.getElementById('scfImageUrl').value = result.url;
+            
+            const preview = document.getElementById('subcategoryImagePreview');
+            const previewImg = document.getElementById('scfImagePreviewImg');
+            if (preview && previewImg) {
+              previewImg.src = result.url;
+              preview.style.display = '';
+            }
+            this.setSubcategoryUploadStatus('Image uploaded successfully!', 'success');
+          } catch (e) {
+            this.setSubcategoryUploadStatus('Upload failed: ' + e.message, 'error');
+          }
+        }, 'image/jpeg', 0.85);
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (e) {
+      this.setSubcategoryUploadStatus('Compression failed: ' + e.message, 'error');
+    }
+  },
+
+  setSubcategoryUploadStatus(msg, type = 'info') {
+    const status = document.getElementById('subcategoryUploadStatus');
+    if (!status) return;
+    status.textContent = msg;
+    status.className = 'upload-status ' + type;
+  },
+
+  populateProdSubcatSelect() {
+    const pfSub = document.getElementById('pfSubcat');
+    if (!pfSub) return;
+    const catVal = document.getElementById('pfCat').value;
+    const filtered = (this.data.subcategories || []).filter(s => s.category === catVal);
+    pfSub.innerHTML = '<option value="">None / General</option>' + filtered.map(s => `<option value="${s.name}">${s.emoji || '✨'} ${s.name}</option>`).join('');
   },
 
   // ── Products ──────────────────────────────────────────────
@@ -1555,6 +1754,48 @@ if (categoryUploadBox) {
     const file = e.dataTransfer.files[0];
     document.getElementById('cfImageFile').files = e.dataTransfer.files;
     await Admin.uploadCategoryImage(file);
+  });
+}
+
+// Add / Update Subcategory
+document.getElementById('addSubcatBtn').onclick = async () => {
+  await Admin.saveSubcategoryForm();
+};
+document.getElementById('cancelSubcatBtn').onclick = () => {
+  Admin.cancelSubcategoryEdit();
+};
+
+// Subcategory Image upload events
+document.getElementById('scfImageFile').onchange = async (e) => {
+  await Admin.uploadSubcategoryImage(e.target.files[0]);
+};
+
+document.getElementById('removeSubcategoryImageBtn').onclick = () => {
+  document.getElementById('scfImageFile').value = '';
+  document.getElementById('scfImageUrl').value = '';
+  const preview = document.getElementById('subcategoryImagePreview');
+  if (preview) preview.style.display = 'none';
+  Admin.setSubcategoryUploadStatus('Image removed. Save subcategory to keep this change.', 'success');
+};
+
+const subcategoryUploadBox = document.getElementById('subcategoryUploadBox');
+if (subcategoryUploadBox) {
+  ['dragenter', 'dragover'].forEach(eventName => {
+    subcategoryUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      subcategoryUploadBox.classList.add('dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    subcategoryUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      subcategoryUploadBox.classList.remove('dragging');
+    });
+  });
+  subcategoryUploadBox.addEventListener('drop', async (e) => {
+    const file = e.dataTransfer.files[0];
+    document.getElementById('scfImageFile').files = e.dataTransfer.files;
+    await Admin.uploadSubcategoryImage(file);
   });
 }
 

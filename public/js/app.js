@@ -203,7 +203,11 @@ const App = {
     }
   },
 
-  async showCollectionPage(catName) {
+  async showCollectionPage(catNameString) {
+    const parts = catNameString.split('/');
+    const parentCat = parts[0];
+    const subcatName = parts[1] || null;
+
     // Hide home-only sections
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
@@ -217,12 +221,28 @@ const App = {
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
 
-    // Check if we can restore state (only if activeCategory matches the collection)
+    // Back button behavior
+    const backBtn = document.getElementById('collPageBack');
+    if (backBtn) {
+      if (subcatName) {
+        backBtn.onclick = (e) => {
+          e.preventDefault();
+          window.location.hash = `#collection/${encodeURIComponent(parentCat)}`;
+        };
+      } else {
+        backBtn.onclick = (e) => {
+          e.preventDefault();
+          window.location.hash = '';
+        };
+      }
+    }
+
+    // Check if we can restore state (only if activeCategory matches the collection string)
     const raw = sessionStorage.getItem('rk_nav_state');
     if (raw) {
       try {
         const state = JSON.parse(raw);
-        if (state.activeCategory === catName) {
+        if (state.activeCategory === catNameString) {
           const restored = await this.restoreNavigationState();
           if (restored) return;
         }
@@ -232,14 +252,23 @@ const App = {
     // Update header text
     const titleEl    = document.getElementById('collPageTitle');
     const subtitleEl = document.getElementById('collPageSubtitle');
-    if (titleEl)    titleEl.textContent    = catName;
-    if (subtitleEl) subtitleEl.textContent = 'Browse all products in this collection';
+    if (titleEl) {
+      titleEl.textContent = subcatName ? `${parentCat} › ${subcatName}` : parentCat;
+    }
+    if (subtitleEl) {
+      subtitleEl.textContent = subcatName 
+        ? `Showing items in ${parentCat} › ${subcatName}` 
+        : `Browse all products and categories in ${parentCat}`;
+    }
 
-    // Update shop heading & load products
+    // Update shop heading
     const shopHeading = document.getElementById('shopHeading');
-    if (shopHeading) shopHeading.textContent = catName;
+    if (shopHeading) {
+      shopHeading.textContent = subcatName ? subcatName : parentCat;
+    }
 
-    this.state.activeCategory = catName;
+    this.state.activeCategory = parentCat;
+    this.state.activeSubcategory = subcatName;
     this.state.searchQuery    = '';
     this.state.page           = 1;
     const si = document.getElementById('searchInput');
@@ -247,7 +276,52 @@ const App = {
 
     this.renderCatFilters(this.state.categories); // keep pills in sync
     this.syncNavbarActiveState();
-    this.loadProducts();
+
+    // Subcategory UI Handling
+    const subcatSection = document.getElementById('subcatSection');
+    const subcatGrid = document.getElementById('subcatGrid');
+    
+    // Find subcategories for this parent category
+    const list = (this.state.subcategories || []).filter(s => s.category === parentCat);
+    
+    if (list.length > 0 && !subcatName) {
+      // We have subcategories, and the user hasn't selected one yet!
+      // Show subcategories grid, hide product grid
+      if (subcatSection) subcatSection.style.display = '';
+      
+      if (subcatGrid) {
+        subcatGrid.innerHTML = list.map(s => {
+          const hashUrl = `#collection/${encodeURIComponent(parentCat)}/${encodeURIComponent(s.name)}`;
+          const visual = s.imageUrl 
+            ? `<img src="${s.imageUrl}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; border: 2px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,0.04);">`
+            : `<div style="font-size: 2.8rem; margin-bottom: 12px;">${s.emoji || '✨'}</div>`;
+          return `
+            <a href="${hashUrl}" class="subcat-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; text-decoration: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.02); text-align: center;">
+              ${visual}
+              <div style="font-size: 0.95rem; font-weight: 800; color: var(--ink);">${s.name}</div>
+            </a>
+          `;
+        }).join('');
+
+        // Add micro-animations
+        subcatGrid.querySelectorAll('.subcat-card').forEach(card => {
+          card.onmouseenter = () => { card.style.transform = 'translateY(-4px)'; card.style.boxShadow = '0 6px 16px rgba(0,0,0,0.06)'; card.style.borderColor = 'var(--p)'; };
+          card.onmouseleave = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.02)'; card.style.borderColor = 'var(--border)'; };
+        });
+      }
+
+      // Hide products grid and pagination when showing subcategories
+      const prodGrid = document.getElementById('prodGrid');
+      if (prodGrid) prodGrid.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">Select a subcategory above to browse products.</div>';
+      const pag = document.getElementById('pagination');
+      if (pag) pag.innerHTML = '';
+      
+    } else {
+      // No subcategories or subcategory is selected!
+      // Hide subcategories grid, load products grid normally
+      if (subcatSection) subcatSection.style.display = 'none';
+      this.loadProducts();
+    }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
@@ -1245,8 +1319,12 @@ const App = {
   // ── Categories ────────────────────────────────────────────
   async loadCategories() {
     try {
-      const cats = await API.getCategories();
+      const [cats, subcats] = await Promise.all([
+        API.getCategories(),
+        API.getSubcategories().catch(() => [])
+      ]);
       this.state.categories = cats;
+      this.state.subcategories = subcats;
       this.renderCatFilters(cats);
       this.renderCollections(cats); // render collections grid
     } catch {}
@@ -1341,19 +1419,31 @@ const App = {
   },
 
   filterByCategory(name) {
-    this.state.activeCategory = name;
-    this.state.searchQuery = '';
-    this.state.page = 1;
-    document.getElementById('searchInput').value = '';
+    if (name === 'All' || name === 'New Arrival') {
+      this.state.activeCategory = name;
+      this.state.activeSubcategory = null;
+      this.state.searchQuery = '';
+      this.state.page = 1;
+      const si = document.getElementById('searchInput');
+      if (si) si.value = '';
+      
+      const heading = document.getElementById('shopHeading');
+      if (heading) {
+        if (name === 'All') heading.textContent = 'All Products';
+        else heading.textContent = 'New Arrivals';
+      }
+      
+      const subcatSection = document.getElementById('subcatSection');
+      if (subcatSection) subcatSection.style.display = 'none';
 
-    const heading = document.getElementById('shopHeading');
-    if (name === 'All') heading.textContent = 'All Products';
-    else if (name === 'New Arrival') heading.textContent = 'New Arrivals';
-    else heading.textContent = name;
+      this.renderCatFilters(this.state.categories);
+      this.syncNavbarActiveState();
+      this.loadProducts();
+      return;
+    }
 
-    this.renderCatFilters(this.state.categories);
-    this.syncNavbarActiveState();
-    this.loadProducts();
+    window.location.hash = `#collection/${encodeURIComponent(name)}`;
+  },
 
     const shopMain = document.getElementById('shopMain');
     if (shopMain) shopMain.scrollIntoView({ behavior: 'smooth' });
@@ -1369,6 +1459,9 @@ const App = {
       if (this.state.activeCategory !== 'All') {
         if (this.state.activeCategory === 'New Arrival') params.badge = 'New';
         else params.category = this.state.activeCategory;
+      }
+      if (this.state.activeSubcategory) {
+        params.subcategory = this.state.activeSubcategory;
       }
       if (this.state.searchQuery) params.search = this.state.searchQuery;
       if (this.state.sortBy) params.sortBy = this.state.sortBy;

@@ -1662,6 +1662,7 @@ function readDB() {
     if (!data.banners) data.banners = [];
     if (!data.navLinks) data.navLinks = [];
     if (!data.categories) data.categories = [];
+    if (!data.subcategories) data.subcategories = [];
     if (!data.products) data.products = [];
     if (!data.orders) data.orders = [];
     if (!data.cart) data.cart = [];
@@ -1678,6 +1679,7 @@ function readDB() {
       banners: [],
       navLinks: [],
       categories: [],
+      subcategories: [],
       products: [],
       orders: [],
       cart: [],
@@ -1930,10 +1932,13 @@ app.get('/api/categories', (req, res) => {
 app.get('/api/products', (req, res) => {
   const db = readDB();
   let prods = [...db.products];
-  const { category, search, badge, sortBy, page = 1, limit = 24 } = req.query;
+  const { category, subcategory, search, badge, sortBy, page = 1, limit = 24 } = req.query;
 
   if (category && category !== 'All') {
     prods = prods.filter(p => p.category === category);
+  }
+  if (subcategory) {
+    prods = prods.filter(p => p.subcategory && p.subcategory.toLowerCase() === subcategory.toLowerCase());
   }
   if (badge) {
     prods = prods.filter(p => p.badge && p.badge.toLowerCase() === badge.toLowerCase());
@@ -2795,6 +2800,40 @@ app.delete('/api/admin/categories/:id', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+// GET subcategories
+app.get('/api/subcategories', (req, res) => {
+  const db = readDB();
+  res.json(db.subcategories || []);
+});
+
+// SUBCATEGORIES CRUD (protected)
+app.post('/api/admin/subcategories', requireAdmin, (req, res) => {
+  const db = readDB();
+  db.subcategories = db.subcategories || [];
+  const subcat = { id: nextId(db.subcategories), ...req.body };
+  db.subcategories.push(subcat);
+  writeDB(db);
+  res.json(subcat);
+});
+
+app.put('/api/admin/subcategories/:id', requireAdmin, (req, res) => {
+  const db = readDB();
+  db.subcategories = db.subcategories || [];
+  const idx = db.subcategories.findIndex(s => s.id === Number(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  db.subcategories[idx] = { ...db.subcategories[idx], ...req.body };
+  writeDB(db);
+  res.json(db.subcategories[idx]);
+});
+
+app.delete('/api/admin/subcategories/:id', requireAdmin, (req, res) => {
+  const db = readDB();
+  db.subcategories = db.subcategories || [];
+  db.subcategories = db.subcategories.filter(s => s.id !== Number(req.params.id));
+  writeDB(db);
+  res.json({ success: true });
+});
+
 // ADMIN COUPONS CRUD (protected)
 app.get('/api/admin/coupons', requireAdmin, (req, res) => {
   const db = readDB();
@@ -3007,6 +3046,19 @@ async function startServer() {
   try {
     // Sync database from Firebase Realtime Database before server starts
     await initPersistentDatabase();
+
+    // Seed default subcategories if none exist
+    const db = readDB();
+    db.subcategories = db.subcategories || [];
+    if (db.subcategories.length === 0) {
+      db.subcategories = [
+        { id: 1, category: "Pigments", name: "Mica Colors", emoji: "✨" },
+        { id: 2, category: "Pigments", name: "Liquid Colors", emoji: "💧" },
+        { id: 3, category: "Pigments", name: "Opaque Colors", emoji: "🎨" }
+      ];
+      writeDB(db);
+      console.log("🌱 Seeded default Pigments subcategories.");
+    }
   } catch (err) {
     console.error("💥 Server failed to start due to database synchronization error:", err.message);
     process.exit(1);
