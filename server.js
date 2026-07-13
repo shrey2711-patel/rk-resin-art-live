@@ -1938,7 +1938,17 @@ app.get('/api/products', (req, res) => {
     prods = prods.filter(p => p.category === category);
   }
   if (subcategory) {
-    prods = prods.filter(p => p.subcategory && p.subcategory.toLowerCase() === subcategory.toLowerCase());
+    const subcatLower = subcategory.toLowerCase();
+    prods = prods.filter(p => {
+      if (p.subcategory && p.subcategory.toLowerCase() === subcatLower) return true;
+      if (!p.subcategory && p.category === 'Pigments') {
+        const nameLower = (p.name || '').toLowerCase();
+        if (subcatLower === 'mica colors' && nameLower.includes('mica')) return true;
+        if (subcatLower === 'liquid colors' && nameLower.includes('liquid')) return true;
+        if (subcatLower === 'opaque colors' && (nameLower.includes('opaque') || nameLower.includes('opeque'))) return true;
+      }
+      return false;
+    });
   }
   if (badge) {
     prods = prods.filter(p => p.badge && p.badge.toLowerCase() === badge.toLowerCase());

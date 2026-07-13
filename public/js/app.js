@@ -2041,9 +2041,12 @@ const App = {
     const doSearch = () => {
       this.state.searchQuery = document.getElementById('searchInput').value.trim();
       this.state.activeCategory = 'All';
+      this.state.activeSubcategory = null;
       this.state.page = 1;
       const q = this.state.searchQuery;
       document.getElementById('shopHeading').textContent = q ? `Results for "${q}"` : 'All Products';
+      const subcatSection = document.getElementById('subcatSection');
+      if (subcatSection) subcatSection.style.display = 'none';
       this.renderCatFilters(this.state.categories);
       this.loadProducts();
     };
