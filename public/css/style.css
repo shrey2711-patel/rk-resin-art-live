@@ -2,49 +2,48 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Curated Premium Ocean Indigo & Pearl Gold theme variables */
   --tea-green: #d1fae5;
-  --beige: #f8fafc;
+  --beige: #fdfaf6;
   --cornsilk: #fef3c7;
   --papaya-whip: #fee2e2;
   --light-bronze: #d97706;
 
-  /* Global Theme System Mappings - Light Theme */
-  --p: #4f46e5;            /* Premium Vibrant Indigo */
-  --pd: #3730a3;           /* Darker Royal Indigo for hover */
-  --pl: #e0e7ff;           /* Light soft indigo backdrop */
-  --ink: #0f172a;          /* Deep slate ink for high readability */
-  --muted: #64748b;        /* Elegant slate gray for subtexts */
-  --border: #e2e8f0;       /* Super clean slate border */
-  --bg: #f8fafc;           /* Clean premium slate-white page bg */
-  --white: #ffffff;        /* Crisp white container base */
-  --card: #ffffff;         /* Clean card backgrounds */
-  --red: #f43f5e;          /* Crimson red for warning/wishlist */
-  --green: #10b981;        /* Emerald green for success/badges */
-  --gold: #f59e0b;         /* Pearl gold accent for ratings & premiums */
-  --shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.05), 0 8px 10px -6px rgba(79, 70, 229, 0.05), 0 0 0 1px rgba(79, 70, 229, 0.02);
-  --shadow-lg: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(79, 70, 229, 0.04);
-  --radius: 16px;          /* Softer, more modern corners */
+  /* Global Theme System Mappings - Light Theme (Royal Amethyst & Peach Gold) */
+  --p: #7c3aed;            /* Royal Amethyst */
+  --pd: #6d28d9;           /* Deep Royal Amethyst */
+  --pl: #f5f3ff;           /* Soft Lavender Breeze */
+  --ink: #0f172a;          /* Deep Slate Black */
+  --muted: #475569;        /* Charcoal Slate */
+  --border: #e2e8f0;       /* Crisp Border */
+  --bg: #fbfbfe;           /* Cool Alabaster White */
+  --white: #ffffff;        /* Pure White */
+  --card: #ffffff;         /* Card Background */
+  --red: #f43f5e;          /* Crimson Red */
+  --green: #10b981;        /* Emerald Green */
+  --gold: #f59e0b;         /* Warm Gold Accent */
+  --shadow: 0 8px 30px rgba(124, 58, 237, 0.04), 0 2px 8px rgba(124, 58, 237, 0.02);
+  --shadow-lg: 0 16px 40px rgba(124, 58, 237, 0.08), 0 4px 16px rgba(124, 58, 237, 0.04);
+  --radius: 20px;          /* Softer, luxury rounded corners */
   --header-h: 130px;
 }
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
-  /* Global Theme System Mappings - Dark Theme */
-  --bg: #0b0f19;           /* Deep midnight space blue */
-  --white: #111625;        /* Dark slate container backdrop */
-  --card: #151b2c;         /* Card background */
-  --ink: #f8fafc;          /* High contrast bright slate text */
-  --muted: #94a3b8;        /* Soft gray-blue secondary text */
-  --border: #1e293b;       /* Dark slate borders */
-  --p: #6366f1;            /* Vibrant indigo-violet for dark mode */
-  --pd: #4f46e5;           /* Rich indigo for hover */
-  --pl: #1e1b4b;           /* Deep indigo shadow/bg */
+  /* Global Theme System Mappings - Dark Theme (Mystic Obsidian & Violet Glow) */
+  --bg: #0b0a12;           /* Deep Midnight Violet */
+  --white: #12111d;        /* Mystic Obsidian Container */
+  --card: #161426;         /* Deep Card Background */
+  --ink: #f5f3ff;          /* Crisp Lavender White text */
+  --muted: #94a3b8;        /* Soft Slate Muted text */
+  --border: #242238;       /* Deep Amethyst Border */
+  --p: #8b5cf6;            /* Radiant Violet Glow */
+  --pd: #7c3aed;           /* Royal Amethyst */
+  --pl: #1e1b4b;           /* Obsidian Indigo */
   --red: #f43f5e;          
   --green: #10b981;
   --gold: #fbbf24;
-  --shadow: 0 10px 30px rgba(0,0,0,0.5);
-  --shadow-lg: 0 18px 44px rgba(0,0,0,0.6);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] body { background: var(--bg); }
@@ -84,10 +83,12 @@ input, select, textarea { font-family: inherit; }
 /* ─── Announce Bar ──────────────────────────────────────── */
 .announce-bar {
   width: 100%; overflow: hidden; white-space: nowrap;
-  background: var(--p); color: var(--pl); padding: 10px 0; position: relative;
-  border-bottom: 2px solid var(--pd);
+  background: linear-gradient(90deg, var(--p), var(--pd)); 
+  color: var(--pl); padding: 10px 0; position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 700;
   letter-spacing: 0.03em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 .announce-track {
   display: inline-block; padding-left: 100%;
@@ -433,16 +434,17 @@ input, select, textarea { font-family: inherit; }
 
 .prod-card {
   background: var(--white);
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 1px 0 rgba(31,41,51,0.04);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex; flex-direction: column;
 }
 .prod-card:hover {
   border-color: var(--p);
+  transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 .prod-thumb {
