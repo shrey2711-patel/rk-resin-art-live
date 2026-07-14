@@ -181,28 +181,27 @@ const Admin = {
     if (this.isHeicImage(file)) {
       this.updateConversionStatus('Converting iPhone HEIC image... (please wait)');
       try {
-        if (!window.heic2any) {
-          await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Failed to load HEIC converter library.'));
-            document.head.appendChild(script);
-          });
+        const converter = window.heic2any || (typeof heic2any !== 'undefined' ? heic2any : null);
+        if (!converter) {
+          throw new Error('HEIC converter library not loaded.');
         }
         
-        const convertedBlob = await window.heic2any({
+        let convertedBlob = await converter({
           blob: file,
           toType: 'image/jpeg',
           quality: 0.9
         });
+        
+        if (Array.isArray(convertedBlob)) {
+          convertedBlob = convertedBlob[0];
+        }
         
         const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
         file = new File([convertedBlob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
         this.updateConversionStatus('HEIC converted successfully. Compressing...');
       } catch (err) {
         console.error('HEIC conversion failed:', err);
-        showToast('HEIC conversion failed, trying normal upload.', 'error');
+        showToast('HEIC conversion failed: ' + err.message, 'error');
       }
     }
 
