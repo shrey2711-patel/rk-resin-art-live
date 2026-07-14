@@ -108,11 +108,11 @@ const Admin = {
   isValidImageType(file) {
     if (!file) return false;
     const type = (file.type || '').toLowerCase();
-    if (['image/jpeg', 'image/png', 'image/webp'].includes(type)) return true;
+    if (['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'].includes(type)) return true;
     
     // Fallback check on extension in case MIME type is missing or generic (e.g. on mobile/external folders)
     const ext = (file.name || '').split('.').pop().toLowerCase();
-    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return true;
+    if (['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext)) return true;
     
     return false;
   },
@@ -128,14 +128,9 @@ const Admin = {
 
   async uploadBannerImage(file) {
     if (!file) return;
-    
-    if (this.isHeicImage(file)) {
-      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
-      return;
-    }
 
     if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
       return;
     }
 
@@ -169,7 +164,48 @@ const Admin = {
     }
   },
 
+  updateConversionStatus(msg) {
+    const ids = ['categoryUploadStatus', 'subcategoryUploadStatus', 'bannerUploadStatus'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = msg;
+    });
+    // For products, update both elements
+    const prodStatus = document.getElementById('prodUploadStatus');
+    if (prodStatus) prodStatus.textContent = msg;
+    const uploadStatus = document.querySelector('.upload-status');
+    if (uploadStatus) uploadStatus.textContent = msg;
+  },
+
   async resizeImageForUpload(file) {
+    if (this.isHeicImage(file)) {
+      this.updateConversionStatus('Converting iPhone HEIC image... (please wait)');
+      try {
+        if (!window.heic2any) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load HEIC converter library.'));
+            document.head.appendChild(script);
+          });
+        }
+        
+        const convertedBlob = await window.heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.9
+        });
+        
+        const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
+        file = new File([convertedBlob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+        this.updateConversionStatus('HEIC converted successfully. Compressing...');
+      } catch (err) {
+        console.error('HEIC conversion failed:', err);
+        showToast('HEIC conversion failed, trying normal upload.', 'error');
+      }
+    }
+
     try {
       const imageUrl = URL.createObjectURL(file);
       const img = new Image();
@@ -196,7 +232,6 @@ const Admin = {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(imageUrl);
 
-      // Convert all uploads to WebP format at 0.80 quality
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.80));
       if (!blob) return file;
 
@@ -212,14 +247,9 @@ const Admin = {
 
   async uploadProductImage(file) {
     if (!file) return;
-    
-    if (this.isHeicImage(file)) {
-      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
-      return;
-    }
 
     if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
       return;
     }
 
@@ -277,14 +307,9 @@ const Admin = {
 
   async uploadCategoryImage(file) {
     if (!file) return;
-    
-    if (this.isHeicImage(file)) {
-      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
-      return;
-    }
 
     if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
       return;
     }
 
@@ -1284,55 +1309,27 @@ const Admin = {
 
   async uploadSubcategoryImage(file) {
     if (!file) return;
+
+    if (!this.isValidImageType(file)) {
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
+      return;
+    }
+
     this.setSubcategoryUploadStatus('Compressing & uploading image...', 'info');
     try {
-      const img = new Image();
-      const reader = new FileReader();
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      document.getElementById('scfImageUrl').value = result.url;
       
-      reader.onload = (e) => {
-        img.src = e.target.result;
-      };
-      
-      img.onload = async () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > 1200 || height > 1200) {
-          if (width > height) {
-            height = Math.round((height * 1200) / width);
-            width = 1200;
-          } else {
-            width = Math.round((width * 1200) / height);
-            height = 1200;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        canvas.toBlob(async (blob) => {
-          const optimizedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
-          try {
-            const result = await API.uploadImage(optimizedFile);
-            document.getElementById('scfImageUrl').value = result.url;
-            
-            const preview = document.getElementById('subcategoryImagePreview');
-            const previewImg = document.getElementById('scfImagePreviewImg');
-            if (preview && previewImg) {
-              previewImg.src = result.url;
-              preview.style.display = '';
-            }
-            this.setSubcategoryUploadStatus('Image uploaded successfully!', 'success');
-          } catch (e) {
-            this.setSubcategoryUploadStatus('Upload failed: ' + e.message, 'error');
-          }
-        }, 'image/jpeg', 0.85);
-      };
-      
-      reader.readAsDataURL(file);
+      const preview = document.getElementById('subcategoryImagePreview');
+      const previewImg = document.getElementById('scfImagePreviewImg');
+      if (preview && previewImg) {
+        previewImg.src = result.url;
+        preview.style.display = '';
+      }
+      this.setSubcategoryUploadStatus('Image uploaded successfully!', 'success');
     } catch (e) {
-      this.setSubcategoryUploadStatus('Compression failed: ' + e.message, 'error');
+      this.setSubcategoryUploadStatus('Upload failed: ' + e.message, 'error');
     }
   },
 
