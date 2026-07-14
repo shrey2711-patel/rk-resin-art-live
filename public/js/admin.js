@@ -170,27 +170,18 @@ const Admin = {
   },
 
   async resizeImageForUpload(file) {
-    // If it's webp or not an image type, we return it as is
-    if (file.type === 'image/webp') return file;
-    const ext = (file.name || '').split('.').pop().toLowerCase();
-    if (ext === 'webp') return file;
-
     try {
       const imageUrl = URL.createObjectURL(file);
       const img = new Image();
       
-      // Use onload/onerror standard events instead of decode() to prevent mobile browser crashes/timing issues
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = () => reject(new Error('Failed to load image for resize'));
         img.src = imageUrl;
       });
 
-      const scale = Math.min(1, this.maxUploadWidth / img.width);
-      if (scale === 1) {
-        URL.revokeObjectURL(imageUrl);
-        return file;
-      }
+      const maxW = 1200;
+      const scale = Math.min(1, maxW / img.width);
 
       const canvas = document.createElement('canvas');
       canvas.width = Math.round(img.width * scale);
@@ -199,19 +190,23 @@ const Admin = {
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         URL.revokeObjectURL(imageUrl);
-        return file; // Fail-safe: fallback to original file
+        return file;
       }
       
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(imageUrl);
 
-      const mimeType = file.type || 'image/jpeg';
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.95));
-      if (!blob) return file; // Fail-safe: fallback to original file
-      return new File([blob], file.name, { type: mimeType });
-    } catch (err) {
-      console.warn("Image resize failed, falling back to original file:", err);
-      return file; // Safety: upload original file if resizing fails
+      // Convert all uploads to WebP format at 0.80 quality
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.80));
+      if (!blob) return file;
+
+      const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
+      const newName = `${baseName}.webp`;
+
+      return new File([blob], newName, { type: 'image/webp', lastModified: Date.now() });
+    } catch (e) {
+      console.error('Image compression failed, using original file:', e);
+      return file;
     }
   },
 
