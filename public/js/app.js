@@ -2111,7 +2111,8 @@ const ThemeManager = {
   init() {
     const saved = localStorage.getItem('rk_theme') || 'light';
     this.apply(saved);
-    document.getElementById('themeToggleBtn').onclick = () => this.toggle();
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.onclick = () => this.toggle();
   },
   apply(theme) {
     document.documentElement.setAttribute('data-theme', theme);
