@@ -293,7 +293,7 @@ const App = {
         subcatGrid.innerHTML = list.map(s => {
           const hashUrl = `#collection/${encodeURIComponent(parentCat)}/${encodeURIComponent(s.name)}`;
           const visual = s.imageUrl 
-            ? `<img src="${s.imageUrl}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; border: 2px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,0.04);">`
+            ? `<img src="${s.imageUrl}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; border: 2px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,0.04);" loading="lazy">`
             : `<div style="font-size: 2.8rem; margin-bottom: 12px;">${s.emoji || '✨'}</div>`;
           return `
             <a href="${hashUrl}" class="subcat-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow); text-align: center;">
