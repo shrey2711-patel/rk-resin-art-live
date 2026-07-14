@@ -2635,6 +2635,7 @@ app.get('/api/admin/settings', requireAdmin, (req, res) => {
   res.json({
     announce: db.settings.announce || '',
     cartEnabled: db.settings.cartEnabled !== false,
+    trackStock: db.settings.trackStock !== false,
     shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
