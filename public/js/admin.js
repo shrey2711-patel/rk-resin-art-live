@@ -1029,6 +1029,8 @@ const Admin = {
       if (announceEl) announceEl.value = s.announce || '';
       const cartEl = document.getElementById('afCartEnabled');
       if (cartEl) cartEl.checked = s.cartEnabled !== false;
+      const trackEl = document.getElementById('afTrackStock');
+      if (trackEl) trackEl.checked = s.trackStock !== false;
       
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
@@ -1694,6 +1696,13 @@ document.getElementById('saveBillingSettingsBtn').onclick = async () => {
     otherCharges: otherCharges,
     otherChargesType: otherChargesType
   });
+
+  if (!Admin.data.settings) Admin.data.settings = {};
+  Admin.data.settings.shippingRate = shippingRate;
+  Admin.data.settings.shippingThreshold = shippingThreshold;
+  Admin.data.settings.otherCharges = otherCharges;
+  Admin.data.settings.otherChargesType = otherChargesType;
+
   showOk('billingSettingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();
