@@ -2,48 +2,49 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Exact custom hex variables for Black and White Monochrome theme */
-  --tea-green: #e5e7eb;
-  --beige: #f9fafb;
-  --cornsilk: #ffffff;
-  --papaya-whip: #f3f4f6;
-  --light-bronze: #000000;
+  /* Curated Premium Ocean Indigo & Pearl Gold theme variables */
+  --tea-green: #d1fae5;
+  --beige: #f8fafc;
+  --cornsilk: #fef3c7;
+  --papaya-whip: #fee2e2;
+  --light-bronze: #d97706;
 
   /* Global Theme System Mappings - Light Theme */
-  --p: #000000;            /* High-contrast pure black */
-  --pd: #222222;           /* Dark graphite for hover states */
-  --pl: #ffffff;           /* Crisp pure white */
-  --ink: #111111;          /* Pitch black for main text */
-  --muted: #555555;        /* Neutral gray for secondary text */
-  --border: #e5e7eb;       /* Clean light gray border */
-  --bg: #f9fafb;           /* Clean soft white page background */
-  --white: #ffffff;        /* Pure white for containers/modal base */
-  --card: #ffffff;         /* Pure white card backgrounds */
-  --red: #111111;          /* Black active state (wishlist / alerts) */
-  --green: #555555;        /* Medium gray for success states */
-  --gold: #888888;         /* Silver gray for accents */
-  --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
-  --radius: 10px;
+  --p: #4f46e5;            /* Premium Vibrant Indigo */
+  --pd: #3730a3;           /* Darker Royal Indigo for hover */
+  --pl: #e0e7ff;           /* Light soft indigo backdrop */
+  --ink: #0f172a;          /* Deep slate ink for high readability */
+  --muted: #64748b;        /* Elegant slate gray for subtexts */
+  --border: #e2e8f0;       /* Super clean slate border */
+  --bg: #f8fafc;           /* Clean premium slate-white page bg */
+  --white: #ffffff;        /* Crisp white container base */
+  --card: #ffffff;         /* Clean card backgrounds */
+  --red: #f43f5e;          /* Crimson red for warning/wishlist */
+  --green: #10b981;        /* Emerald green for success/badges */
+  --gold: #f59e0b;         /* Pearl gold accent for ratings & premiums */
+  --shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.05), 0 8px 10px -6px rgba(79, 70, 229, 0.05), 0 0 0 1px rgba(79, 70, 229, 0.02);
+  --shadow-lg: 0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(79, 70, 229, 0.04);
+  --radius: 16px;          /* Softer, more modern corners */
   --header-h: 130px;
 }
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
   /* Global Theme System Mappings - Dark Theme */
-  --bg: #000000;           /* Pitch black background */
-  --white: #121212;        /* Sleek dark graphite containers */
-  --card: #1c1c1e;         /* Modern dark grey card backgrounds */
-  --ink: #ffffff;          /* Clean white text */
-  --muted: #888888;        /* Soft gray for secondary text */
-  --border: #2c2c2e;       /* Deep gray borders */
-  --p: #ffffff;            /* High-contrast pure white */
-  --pd: #e5e7eb;           /* Light silver gray for hover states */
-  --pl: #111111;           /* Contrast black background */
-  --red: #ffffff;          /* White active state (wishlist / alerts) */
-  --green: #aaaaaa;        /* Muted gray success state */
-  --shadow: 0 10px 30px rgba(0,0,0,0.6);
-  --shadow-lg: 0 18px 44px rgba(0,0,0,0.7);
+  --bg: #0b0f19;           /* Deep midnight space blue */
+  --white: #111625;        /* Dark slate container backdrop */
+  --card: #151b2c;         /* Card background */
+  --ink: #f8fafc;          /* High contrast bright slate text */
+  --muted: #94a3b8;        /* Soft gray-blue secondary text */
+  --border: #1e293b;       /* Dark slate borders */
+  --p: #6366f1;            /* Vibrant indigo-violet for dark mode */
+  --pd: #4f46e5;           /* Rich indigo for hover */
+  --pl: #1e1b4b;           /* Deep indigo shadow/bg */
+  --red: #f43f5e;          
+  --green: #10b981;
+  --gold: #fbbf24;
+  --shadow: 0 10px 30px rgba(0,0,0,0.5);
+  --shadow-lg: 0 18px 44px rgba(0,0,0,0.6);
 }
 
 [data-theme="dark"] body { background: var(--bg); }
