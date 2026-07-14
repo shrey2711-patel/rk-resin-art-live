@@ -2507,7 +2507,7 @@ body.admin-page-active .admin-panel {
   border: 1px solid var(--border) !important;
 }
 
-}
+
 
 @media (max-width: 768px) {
   body.admin-page-active #adminOverlay {
