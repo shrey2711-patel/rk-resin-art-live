@@ -1,10 +1,5 @@
 # 🎨 RK Resin Art — Full E-commerce Website
 
-## Tech Stack
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
-- **Backend**: Node.js + Express.js
-- **Database**: JSON file (db.json) — no database setup needed!
-- **Auth**: JWT tokens for admin
 
 ---
 

@@ -108,11 +108,11 @@ const Admin = {
   isValidImageType(file) {
     if (!file) return false;
     const type = (file.type || '').toLowerCase();
-    if (['image/jpeg', 'image/png', 'image/webp'].includes(type)) return true;
+    if (['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'].includes(type)) return true;
     
     // Fallback check on extension in case MIME type is missing or generic (e.g. on mobile/external folders)
     const ext = (file.name || '').split('.').pop().toLowerCase();
-    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return true;
+    if (['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext)) return true;
     
     return false;
   },
@@ -128,14 +128,9 @@ const Admin = {
 
   async uploadBannerImage(file) {
     if (!file) return;
-    
-    if (this.isHeicImage(file)) {
-      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
-      return;
-    }
 
     if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
       return;
     }
 
@@ -169,28 +164,59 @@ const Admin = {
     }
   },
 
+  updateConversionStatus(msg) {
+    const ids = ['categoryUploadStatus', 'subcategoryUploadStatus', 'bannerUploadStatus'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = msg;
+    });
+    // For products, update both elements
+    const prodStatus = document.getElementById('prodUploadStatus');
+    if (prodStatus) prodStatus.textContent = msg;
+    const uploadStatus = document.querySelector('.upload-status');
+    if (uploadStatus) uploadStatus.textContent = msg;
+  },
+
   async resizeImageForUpload(file) {
-    // If it's webp or not an image type, we return it as is
-    if (file.type === 'image/webp') return file;
-    const ext = (file.name || '').split('.').pop().toLowerCase();
-    if (ext === 'webp') return file;
+    if (this.isHeicImage(file)) {
+      this.updateConversionStatus('Converting iPhone HEIC image... (please wait)');
+      try {
+        const converter = window.heic2any || (typeof heic2any !== 'undefined' ? heic2any : null);
+        if (!converter) {
+          throw new Error('HEIC converter library not loaded.');
+        }
+        
+        let convertedBlob = await converter({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.9
+        });
+        
+        if (Array.isArray(convertedBlob)) {
+          convertedBlob = convertedBlob[0];
+        }
+        
+        const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
+        file = new File([convertedBlob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+        this.updateConversionStatus('HEIC converted successfully. Compressing...');
+      } catch (err) {
+        console.error('HEIC conversion failed:', err);
+        showToast('HEIC conversion failed: ' + err.message, 'error');
+      }
+    }
 
     try {
       const imageUrl = URL.createObjectURL(file);
       const img = new Image();
       
-      // Use onload/onerror standard events instead of decode() to prevent mobile browser crashes/timing issues
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = () => reject(new Error('Failed to load image for resize'));
         img.src = imageUrl;
       });
 
-      const scale = Math.min(1, this.maxUploadWidth / img.width);
-      if (scale === 1) {
-        URL.revokeObjectURL(imageUrl);
-        return file;
-      }
+      const maxW = 1200;
+      const scale = Math.min(1, maxW / img.width);
 
       const canvas = document.createElement('canvas');
       canvas.width = Math.round(img.width * scale);
@@ -199,32 +225,30 @@ const Admin = {
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         URL.revokeObjectURL(imageUrl);
-        return file; // Fail-safe: fallback to original file
+        return file;
       }
       
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(imageUrl);
 
-      const mimeType = file.type || 'image/jpeg';
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.95));
-      if (!blob) return file; // Fail-safe: fallback to original file
-      return new File([blob], file.name, { type: mimeType });
-    } catch (err) {
-      console.warn("Image resize failed, falling back to original file:", err);
-      return file; // Safety: upload original file if resizing fails
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.80));
+      if (!blob) return file;
+
+      const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
+      const newName = `${baseName}.webp`;
+
+      return new File([blob], newName, { type: 'image/webp', lastModified: Date.now() });
+    } catch (e) {
+      console.error('Image compression failed, using original file:', e);
+      return file;
     }
   },
 
   async uploadProductImage(file) {
     if (!file) return;
-    
-    if (this.isHeicImage(file)) {
-      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
-      return;
-    }
 
     if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
       return;
     }
 
@@ -282,14 +306,9 @@ const Admin = {
 
   async uploadCategoryImage(file) {
     if (!file) return;
-    
-    if (this.isHeicImage(file)) {
-      showToast('iPhone HEIC files are not supported natively. Please convert to JPG/PNG or select a different photo!', 'error');
-      return;
-    }
 
     if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG or WEBP image', 'error');
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
       return;
     }
 
@@ -1010,6 +1029,8 @@ const Admin = {
       if (announceEl) announceEl.value = s.announce || '';
       const cartEl = document.getElementById('afCartEnabled');
       if (cartEl) cartEl.checked = s.cartEnabled !== false;
+      const trackEl = document.getElementById('afTrackStock');
+      if (trackEl) trackEl.checked = s.trackStock !== false;
       
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
@@ -1289,55 +1310,27 @@ const Admin = {
 
   async uploadSubcategoryImage(file) {
     if (!file) return;
+
+    if (!this.isValidImageType(file)) {
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
+      return;
+    }
+
     this.setSubcategoryUploadStatus('Compressing & uploading image...', 'info');
     try {
-      const img = new Image();
-      const reader = new FileReader();
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      document.getElementById('scfImageUrl').value = result.url;
       
-      reader.onload = (e) => {
-        img.src = e.target.result;
-      };
-      
-      img.onload = async () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > 1200 || height > 1200) {
-          if (width > height) {
-            height = Math.round((height * 1200) / width);
-            width = 1200;
-          } else {
-            width = Math.round((width * 1200) / height);
-            height = 1200;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        canvas.toBlob(async (blob) => {
-          const optimizedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
-          try {
-            const result = await API.uploadImage(optimizedFile);
-            document.getElementById('scfImageUrl').value = result.url;
-            
-            const preview = document.getElementById('subcategoryImagePreview');
-            const previewImg = document.getElementById('scfImagePreviewImg');
-            if (preview && previewImg) {
-              previewImg.src = result.url;
-              preview.style.display = '';
-            }
-            this.setSubcategoryUploadStatus('Image uploaded successfully!', 'success');
-          } catch (e) {
-            this.setSubcategoryUploadStatus('Upload failed: ' + e.message, 'error');
-          }
-        }, 'image/jpeg', 0.85);
-      };
-      
-      reader.readAsDataURL(file);
+      const preview = document.getElementById('subcategoryImagePreview');
+      const previewImg = document.getElementById('scfImagePreviewImg');
+      if (preview && previewImg) {
+        previewImg.src = result.url;
+        preview.style.display = '';
+      }
+      this.setSubcategoryUploadStatus('Image uploaded successfully!', 'success');
     } catch (e) {
-      this.setSubcategoryUploadStatus('Compression failed: ' + e.message, 'error');
+      this.setSubcategoryUploadStatus('Upload failed: ' + e.message, 'error');
     }
   },
 
@@ -1703,6 +1696,13 @@ document.getElementById('saveBillingSettingsBtn').onclick = async () => {
     otherCharges: otherCharges,
     otherChargesType: otherChargesType
   });
+
+  if (!Admin.data.settings) Admin.data.settings = {};
+  Admin.data.settings.shippingRate = shippingRate;
+  Admin.data.settings.shippingThreshold = shippingThreshold;
+  Admin.data.settings.otherCharges = otherCharges;
+  Admin.data.settings.otherChargesType = otherChargesType;
+
   showOk('billingSettingsOk');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();

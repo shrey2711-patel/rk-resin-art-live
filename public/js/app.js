@@ -293,10 +293,10 @@ const App = {
         subcatGrid.innerHTML = list.map(s => {
           const hashUrl = `#collection/${encodeURIComponent(parentCat)}/${encodeURIComponent(s.name)}`;
           const visual = s.imageUrl 
-            ? `<img src="${s.imageUrl}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; border: 2px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,0.04);">`
+            ? `<img src="${s.imageUrl}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; border: 2px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,0.04);" loading="lazy">`
             : `<div style="font-size: 2.8rem; margin-bottom: 12px;">${s.emoji || '✨'}</div>`;
           return `
-            <a href="${hashUrl}" class="subcat-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; text-decoration: none; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.02); text-align: center;">
+            <a href="${hashUrl}" class="subcat-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); text-decoration: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow); text-align: center;">
               ${visual}
               <div style="font-size: 0.95rem; font-weight: 800; color: var(--ink);">${s.name}</div>
             </a>
@@ -305,8 +305,8 @@ const App = {
 
         // Add micro-animations
         subcatGrid.querySelectorAll('.subcat-card').forEach(card => {
-          card.onmouseenter = () => { card.style.transform = 'translateY(-4px)'; card.style.boxShadow = '0 6px 16px rgba(0,0,0,0.06)'; card.style.borderColor = 'var(--p)'; };
-          card.onmouseleave = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.02)'; card.style.borderColor = 'var(--border)'; };
+          card.onmouseenter = () => { card.style.transform = 'translateY(-5px)'; card.style.boxShadow = 'var(--shadow-lg)'; card.style.borderColor = 'var(--p)'; };
+          card.onmouseleave = () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = 'var(--shadow)'; card.style.borderColor = 'var(--border)'; };
         });
       }
 
@@ -2111,7 +2111,8 @@ const ThemeManager = {
   init() {
     const saved = localStorage.getItem('rk_theme') || 'light';
     this.apply(saved);
-    document.getElementById('themeToggleBtn').onclick = () => this.toggle();
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.onclick = () => this.toggle();
   },
   apply(theme) {
     document.documentElement.setAttribute('data-theme', theme);

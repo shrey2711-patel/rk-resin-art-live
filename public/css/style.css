@@ -2,48 +2,48 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Exact custom hex variables for Black and White Monochrome theme */
-  --tea-green: #e5e7eb;
-  --beige: #f9fafb;
-  --cornsilk: #ffffff;
-  --papaya-whip: #f3f4f6;
-  --light-bronze: #000000;
+  --tea-green: #d1fae5;
+  --beige: #fdfaf6;
+  --cornsilk: #fef3c7;
+  --papaya-whip: #fee2e2;
+  --light-bronze: #d97706;
 
-  /* Global Theme System Mappings - Light Theme */
-  --p: #000000;            /* High-contrast pure black */
-  --pd: #222222;           /* Dark graphite for hover states */
-  --pl: #ffffff;           /* Crisp pure white */
-  --ink: #111111;          /* Pitch black for main text */
-  --muted: #555555;        /* Neutral gray for secondary text */
-  --border: #e5e7eb;       /* Clean light gray border */
-  --bg: #f9fafb;           /* Clean soft white page background */
-  --white: #ffffff;        /* Pure white for containers/modal base */
-  --card: #ffffff;         /* Pure white card backgrounds */
-  --red: #111111;          /* Black active state (wishlist / alerts) */
-  --green: #555555;        /* Medium gray for success states */
-  --gold: #888888;         /* Silver gray for accents */
-  --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
-  --radius: 10px;
+  /* Global Theme System Mappings - Light Theme (Royal Amethyst & Peach Gold) */
+  --p: #7c3aed;            /* Royal Amethyst */
+  --pd: #6d28d9;           /* Deep Royal Amethyst */
+  --pl: #f5f3ff;           /* Soft Lavender Breeze */
+  --ink: #0f172a;          /* Deep Slate Black */
+  --muted: #475569;        /* Charcoal Slate */
+  --border: #e2e8f0;       /* Crisp Border */
+  --bg: #fbfbfe;           /* Cool Alabaster White */
+  --white: #ffffff;        /* Pure White */
+  --card: #ffffff;         /* Card Background */
+  --red: #f43f5e;          /* Crimson Red */
+  --green: #10b981;        /* Emerald Green */
+  --gold: #f59e0b;         /* Warm Gold Accent */
+  --shadow: 0 8px 30px rgba(124, 58, 237, 0.04), 0 2px 8px rgba(124, 58, 237, 0.02);
+  --shadow-lg: 0 16px 40px rgba(124, 58, 237, 0.08), 0 4px 16px rgba(124, 58, 237, 0.04);
+  --radius: 20px;          /* Softer, luxury rounded corners */
   --header-h: 130px;
 }
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
 [data-theme="dark"] {
-  /* Global Theme System Mappings - Dark Theme */
-  --bg: #000000;           /* Pitch black background */
-  --white: #121212;        /* Sleek dark graphite containers */
-  --card: #1c1c1e;         /* Modern dark grey card backgrounds */
-  --ink: #ffffff;          /* Clean white text */
-  --muted: #888888;        /* Soft gray for secondary text */
-  --border: #2c2c2e;       /* Deep gray borders */
-  --p: #ffffff;            /* High-contrast pure white */
-  --pd: #e5e7eb;           /* Light silver gray for hover states */
-  --pl: #111111;           /* Contrast black background */
-  --red: #ffffff;          /* White active state (wishlist / alerts) */
-  --green: #aaaaaa;        /* Muted gray success state */
-  --shadow: 0 10px 30px rgba(0,0,0,0.6);
-  --shadow-lg: 0 18px 44px rgba(0,0,0,0.7);
+  /* Global Theme System Mappings - Dark Theme (Mystic Obsidian & Violet Glow) */
+  --bg: #0b0a12;           /* Deep Midnight Violet */
+  --white: #12111d;        /* Mystic Obsidian Container */
+  --card: #161426;         /* Deep Card Background */
+  --ink: #f5f3ff;          /* Crisp Lavender White text */
+  --muted: #94a3b8;        /* Soft Slate Muted text */
+  --border: #242238;       /* Deep Amethyst Border */
+  --p: #8b5cf6;            /* Radiant Violet Glow */
+  --pd: #7c3aed;           /* Royal Amethyst */
+  --pl: #1e1b4b;           /* Obsidian Indigo */
+  --red: #f43f5e;          
+  --green: #10b981;
+  --gold: #fbbf24;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] body { background: var(--bg); }
@@ -83,10 +83,12 @@ input, select, textarea { font-family: inherit; }
 /* ─── Announce Bar ──────────────────────────────────────── */
 .announce-bar {
   width: 100%; overflow: hidden; white-space: nowrap;
-  background: var(--p); color: var(--pl); padding: 10px 0; position: relative;
-  border-bottom: 2px solid var(--pd);
+  background: linear-gradient(90deg, var(--p), var(--pd)); 
+  color: var(--pl); padding: 10px 0; position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 700;
   letter-spacing: 0.03em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 .announce-track {
   display: inline-block; padding-left: 100%;
@@ -432,16 +434,17 @@ input, select, textarea { font-family: inherit; }
 
 .prod-card {
   background: var(--white);
-  border: 1px solid rgba(31,41,51,0.08);
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 1px 0 rgba(31,41,51,0.04);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex; flex-direction: column;
 }
 .prod-card:hover {
   border-color: var(--p);
+  transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 .prod-thumb {
