@@ -181,14 +181,14 @@ const Admin = {
     if (this.isHeicImage(file)) {
       this.updateConversionStatus('Converting iPhone HEIC image... (please wait)');
       try {
-        const converter = window.heic2any || (typeof heic2any !== 'undefined' ? heic2any : null);
+        const converter = window.heicTo || (typeof heicTo !== 'undefined' ? heicTo : null);
         if (!converter) {
           throw new Error('HEIC converter library not loaded.');
         }
         
         let convertedBlob = await converter({
           blob: file,
-          toType: 'image/jpeg',
+          type: 'image/jpeg',
           quality: 0.9
         });
         
