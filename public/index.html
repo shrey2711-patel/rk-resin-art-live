@@ -557,68 +557,114 @@
           <!-- SETTINGS -->
           <div class="tab-pane" id="atab-settings">
             <div class="admin-section-head">⚙️ Store Settings</div>
-            <div class="admin-form-card">
-              <div class="form-field"><label>Announcement Text</label><input class="admin-input" id="afAnnounce" placeholder="Free shipping above ₹999..."></div>
+            <div class="settings-grid">
               
-              <!-- Settings Checklist -->
-              <div class="admin-settings-checklist" style="margin-top: 15px; margin-bottom: 15px;">
-                <!-- Cart Toggle Switch -->
-                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                  <input type="checkbox" id="afCartEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
-                  <label for="afCartEnabled" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Enable Shopping Cart Store (If disabled, shopping cart is hidden and only direct inquiries are allowed)</label>
+              <!-- Announcement & Banner Settings Card -->
+              <div class="settings-group">
+                <div class="settings-group-title">📣 Announcement & Store Alert</div>
+                <div class="form-field" style="margin-bottom: 0;">
+                  <label for="afAnnounce">Announcement Bar Message</label>
+                  <textarea class="admin-input" id="afAnnounce" rows="3" style="width: 100%; min-height: 90px; resize: vertical; font-family: inherit;" placeholder="e.g. Free shipping above ₹999..."></textarea>
                 </div>
-
-                <!-- Global Stock Tracking Switch -->
-                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                  <input type="checkbox" id="afTrackStock" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
-                  <label for="afTrackStock" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Track exact stock levels globally (If disabled, customers see binary In Stock/Out of Stock statuses and orders do not decrease stock quantities)</label>
-                </div>
-
-                <!-- Razorpay Switch -->
-                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                  <input type="checkbox" id="afRazorpayEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
-                  <label for="afRazorpayEnabled" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Enable Razorpay (Online Payments)</label>
+                <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--p); padding: 12px; font-size: 0.78rem; color: var(--muted); border-radius: 8px; margin-top: 5px;">
+                  💡 This message appears at the top banner of the storefront. Keep it short and eye-catching.
                 </div>
               </div>
 
-              <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--border); padding: 10px 15px; font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; border-radius: 4px;">
-                💡 If Razorpay is disabled (unchecked), checkout will automatically default to <strong>WhatsApp COD</strong> payments only and hide the online payment selection.
+              <!-- Store Modes and Switched Toggles -->
+              <div class="settings-group">
+                <div class="settings-group-title">🛠️ Feature Control Switches</div>
+                
+                <!-- Cart Switch -->
+                <div class="switch-container">
+                  <div class="switch-details">
+                    <span class="switch-title">Enable Shopping Cart</span>
+                    <span class="switch-desc">Allow customers to accumulate multiple items in a shopping cart and place unified orders.</span>
+                  </div>
+                  <label class="modern-switch">
+                    <input type="checkbox" id="afCartEnabled">
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+
+                <!-- Stock tracking switch -->
+                <div class="switch-container">
+                  <div class="switch-details">
+                    <span class="switch-title">Track Inventory Levels</span>
+                    <span class="switch-desc">Verify and decrease stock quantities automatically when checkout order succeeds.</span>
+                  </div>
+                  <label class="modern-switch">
+                    <input type="checkbox" id="afTrackStock">
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+
+                <!-- Razorpay switch -->
+                <div class="switch-container">
+                  <div class="switch-details">
+                    <span class="switch-title">Enable Online Payment (Razorpay)</span>
+                    <span class="switch-desc">Integrate card/UPI payment gateways. If disabled, defaults to WhatsApp COD checkout.</span>
+                  </div>
+                  <label class="modern-switch">
+                    <input type="checkbox" id="afRazorpayEnabled">
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
               </div>
 
-              <button class="admin-save-btn" id="saveSettingsBtn">Save Settings</button>
-              <div class="admin-ok" id="settingsOk">✅ Settings saved!</div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button class="admin-save-btn" id="saveSettingsBtn" style="padding: 14px; font-size: 0.95rem; border-radius: var(--radius);">Save General Settings</button>
+              <div class="admin-ok" id="settingsOk">✅ Settings saved successfully!</div>
             </div>
           </div>
 
           <!-- BILLING & CHARGES -->
           <div class="tab-pane" id="atab-billing-settings">
-            <div class="admin-section-head">Billing &amp; Charges Settings</div>
-            <div class="admin-form-card">
-              <div class="form-row-2">
+            <div class="admin-section-head">💳 Billing &amp; Shipping Charges</div>
+            <div class="settings-grid">
+              
+              <!-- Shipping rate card -->
+              <div class="settings-group">
+                <div class="settings-group-title">🚚 Shipping Rates</div>
                 <div class="form-field">
-                  <label>Flat Shipping Rate (₹)</label>
+                  <label for="afShippingRate">Flat Shipping Fee (₹)</label>
                   <input class="admin-input" type="number" step="0.01" id="afShippingRate" placeholder="60">
                 </div>
                 <div class="form-field">
-                  <label>Free Shipping Threshold (₹)</label>
+                  <label for="afShippingThreshold">Free Shipping Threshold (₹)</label>
                   <input class="admin-input" type="number" step="0.01" id="afShippingThreshold" placeholder="999">
                 </div>
+                <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--p); padding: 10px 14px; font-size: 0.78rem; color: var(--muted); border-radius: 8px;">
+                  💡 Orders with subtotal exceeding the threshold will get 100% free delivery.
+                </div>
               </div>
-              <div class="form-row-2">
+
+              <!-- Other charges card -->
+              <div class="settings-group">
+                <div class="settings-group-title">🏷️ Taxes & Extra Fees</div>
                 <div class="form-field">
-                  <label>Other Charges Value</label>
+                  <label for="afOtherCharges">Charges / Fee Amount</label>
                   <input class="admin-input" type="number" step="0.01" id="afOtherCharges" placeholder="0">
                 </div>
                 <div class="form-field">
-                  <label>Other Charges Type</label>
-                  <select class="admin-input" id="afOtherChargesType" style="height: 40px; padding: 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); box-sizing: border-box;">
-                    <option value="flat">Flat (₹)</option>
-                    <option value="percentage">Percentage (%)</option>
+                  <label for="afOtherChargesType">Fee Calculation Method</label>
+                  <select class="admin-input" id="afOtherChargesType" style="height: 42px; padding: 0 10px; background: var(--white); color: var(--ink); border: 1px solid var(--border); border-radius: 8px;">
+                    <option value="flat">Flat Charge (₹)</option>
+                    <option value="percentage">Percentage of Total (%)</option>
                   </select>
                 </div>
+                <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--p); padding: 10px 14px; font-size: 0.78rem; color: var(--muted); border-radius: 8px;">
+                  💡 Use this to collect service charges, packaging fees, or local trade tax rates.
+                </div>
               </div>
-              <button class="admin-save-btn" id="saveBillingSettingsBtn">Save Billing Settings</button>
-              <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved!</div>
+
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button class="admin-save-btn" id="saveBillingSettingsBtn" style="padding: 14px; font-size: 0.95rem; border-radius: var(--radius);">Save Billing Settings</button>
+              <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved successfully!</div>
             </div>
           </div>
 
