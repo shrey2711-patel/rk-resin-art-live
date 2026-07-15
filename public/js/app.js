@@ -214,12 +214,16 @@ const App = {
     const header = document.getElementById('collectionPageHeader');
     const prodPage = document.getElementById('productPageSection');
     const shopMain = document.getElementById('shopMain');
+    const siteHeader = document.getElementById('siteHeader');
+    const announceBar = document.getElementById('announceBar');
 
     if (banner)  banner.style.display  = 'none';
     if (colls)   colls.style.display   = 'none';
     if (header)  header.style.display  = '';
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
+    if (siteHeader) siteHeader.style.display = '';
+    if (announceBar) announceBar.style.display = '';
 
     // Back button behavior
     const backBtn = document.getElementById('collPageBack');
@@ -332,12 +336,16 @@ const App = {
     const header = document.getElementById('collectionPageHeader');
     const prodPage = document.getElementById('productPageSection');
     const shopMain = document.getElementById('shopMain');
+    const siteHeader = document.getElementById('siteHeader');
+    const announceBar = document.getElementById('announceBar');
 
     if (banner)  banner.style.display  = '';
     if (colls)   colls.style.display   = '';
     if (header)  header.style.display  = 'none';
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
+    if (siteHeader) siteHeader.style.display = '';
+    if (announceBar) announceBar.style.display = '';
 
     // Check if we can restore state
     const restored = await this.restoreNavigationState();
@@ -375,11 +383,15 @@ const App = {
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
     const shopMain = document.getElementById('shopMain');
+    const siteHeader = document.getElementById('siteHeader');
+    const announceBar = document.getElementById('announceBar');
 
     if (banner) banner.style.display = 'none';
     if (colls) colls.style.display = 'none';
     if (header) header.style.display = 'none';
     if (shopMain) shopMain.style.display = 'none';
+    if (siteHeader) siteHeader.style.display = 'none';
+    if (announceBar) announceBar.style.display = 'none';
     prodPage.style.display = '';
 
     prodContent.innerHTML = `
@@ -444,8 +456,8 @@ const App = {
           <div class="pp-top-grid">
             <!-- Left: Image -->
             <div class="pp-image-col">
-              <div class="modal-prod-thumb pp-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-                ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
+              <div class="modal-prod-thumb pp-thumb" style="background:#fff; aspect-ratio: 1 / 1;">
+                ${this.productMedia(prod, '#fff', 'modal')}
               </div>
             </div>
 
@@ -671,8 +683,8 @@ const App = {
   },
 
   productMedia(product, fallbackBg = '#f0eef8', size = 'card') {
-    const ratio = product.imgRatio || '4:3';
-    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
+    const ratio = (size === 'modal' || size === 'product') ? '1:1' : (product.imgRatio || '4:3');
+    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : (ratio === '1:1' ? 'aspect-ratio: 1 / 1;' : 'aspect-ratio: 4 / 3;');
     
     // Fallback to first variant's image if product.imageUrl is not directly defined but variants exist
     let displayImageUrl = product.imageUrl;

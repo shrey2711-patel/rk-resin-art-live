@@ -3567,10 +3567,29 @@ body {
     grid-template-columns: 1fr;
     gap: 1.25rem;
   }
-  .pp-image-col { max-height: 300px; overflow: hidden; }
-  .pp-thumb { max-height: 280px; }
+  .pp-image-col { 
+    max-height: none; 
+    overflow: visible; 
+  }
+  .pp-thumb { 
+    max-height: none !important; 
+    min-height: 0 !important; 
+    border: none !important; 
+    box-shadow: none !important; 
+    border-radius: 0 !important; 
+    background: transparent !important;
+  }
   .pp-thumb .prod-image-wrap,
-  .pp-thumb .prod-emoji-fallback { max-height: 280px; }
+  .pp-thumb .prod-emoji-fallback { 
+    max-height: none !important; 
+    min-height: 0 !important; 
+    border-radius: 0 !important; 
+    background: transparent !important;
+  }
+  .pp-thumb .prod-image {
+    border-radius: 0 !important;
+    object-fit: cover !important;
+  }
   .pp-title { font-size: 1.25rem; }
   .pp-tab-pane { padding: 18px; }
 }
