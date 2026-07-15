@@ -223,5 +223,25 @@
       "name": "Opaque Colors",
       "emoji": "🎨"
     }
-  ]
+  ],
+  "analytics": {
+    "totalVisitors": 1,
+    "newVisitors": 0,
+    "returningVisitors": 1,
+    "countries": {
+      "IN": 1
+    },
+    "regions": {
+      "GJ": 1
+    },
+    "cities": {
+      "Ahmedabad": 1
+    },
+    "isps": {
+      "Reliance Jio Infocomm": 1
+    },
+    "recentIps": [
+      "::1"
+    ]
+  }
 }

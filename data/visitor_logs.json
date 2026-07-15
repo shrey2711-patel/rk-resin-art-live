@@ -218,5 +218,265 @@
     "status": 206,
     "duration": "9ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:39.940Z",
+    "ip": "::1",
+    "url": "/",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "24ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.501Z",
+    "ip": "::1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "26ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.506Z",
+    "ip": "::1",
+    "url": "/api/banners",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "17ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.510Z",
+    "ip": "::1",
+    "url": "/api/nav",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "19ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.517Z",
+    "ip": "::1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "23ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.525Z",
+    "ip": "::1",
+    "url": "/api/subcategories",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "30ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.709Z",
+    "ip": "::1",
+    "url": "/api/products?category=Pigments&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "18ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.716Z",
+    "ip": "::1",
+    "url": "/api/products?category=Resins&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "21ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.722Z",
+    "ip": "::1",
+    "url": "/api/products?category=Moulds&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "25ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.727Z",
+    "ip": "::1",
+    "url": "/api/products?category=Dry+Flowers&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "28ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.734Z",
+    "ip": "::1",
+    "url": "/api/products?category=Glitters&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "32ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.739Z",
+    "ip": "::1",
+    "url": "/api/products?category=Tools&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "34ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.764Z",
+    "ip": "::1",
+    "url": "/api/products?category=Jewellery&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "17ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.769Z",
+    "ip": "::1",
+    "url": "/api/products?category=Candle&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "20ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.778Z",
+    "ip": "::1",
+    "url": "/api/products?category=Teak+Wood&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "21ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.785Z",
+    "ip": "::1",
+    "url": "/api/products?category=Stickers&limit=1&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "27ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.791Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "31ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.796Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "35ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.806Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:41.814Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:57.330Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20&category=Pigments&subcategory=Mica+Colors",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "13ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:56:57.347Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "26ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:57:08.518Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20&category=Resins",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:57:08.527Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:57:14.409Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-15T15:57:14.416Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
   }
 ]
