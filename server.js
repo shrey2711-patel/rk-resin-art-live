@@ -79,6 +79,7 @@ if (!global.fetch) {
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -1209,6 +1210,21 @@ const uploadProductImage = multer({
 
 // ── Middleware ──────────────────────────────────────────────
 app.use(cors());
+app.use(
+  helmet({
+    // Disable Content Security Policy to prevent breaking any third-party script, stylesheet,
+    // font, or image loads (e.g., Razorpay, Google Fonts, unpkg, jsdelivr CDN scripts).
+    contentSecurityPolicy: false,
+    // Disable Cross-Origin Opener and Embedder policies to avoid blocking cross-origin resources or popups.
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
+    // Explicitly set X-Frame-Options to DENY to protect against Clickjacking attacks.
+    frameguard: {
+      action: 'deny',
+    },
+  })
+);
 app.use(bodyParser.json());
 
 // ── IP Geolocation & Security Helpers ──────────────────────────

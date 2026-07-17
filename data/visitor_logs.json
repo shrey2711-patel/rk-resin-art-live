@@ -478,5 +478,55 @@
     "status": 304,
     "duration": "10ms",
     "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-17T14:39:14.323Z",
+    "ip": "::1",
+    "url": "/",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-17T14:39:43.015Z",
+    "ip": "::1",
+    "url": "/",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-17T14:40:04.374Z",
+    "ip": "::1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
+    "status": 200,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-17T14:40:12.229Z",
+    "ip": "::1",
+    "url": "/api/products",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
+    "status": 200,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-07-17T14:40:16.806Z",
+    "ip": "::1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
+    "status": 200,
+    "duration": "1ms",
+    "location": "Ahmedabad, GJ, IN"
   }
 ]
