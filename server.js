@@ -79,6 +79,7 @@ if (!global.fetch) {
 
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
@@ -93,7 +94,11 @@ const geoip = require('geoip-lite');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-app.set('trust proxy', true);
+if (process.env.RENDER) {
+  app.set('trust proxy', 1); // Trust Render's single-hop load balancer
+} else {
+  app.set('trust proxy', false); // Do not trust proxies in local development
+}
 
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'rk-resin-art-secret-2024';
@@ -1209,6 +1214,7 @@ const uploadProductImage = multer({
 });
 
 // ── Middleware ──────────────────────────────────────────────
+app.use(compression());
 app.use(cors());
 app.use(
   helmet({
@@ -1727,6 +1733,9 @@ function readDB() {
   }
 }
 
+let isSyncingToFirebase = false;
+let pendingFirebaseSyncData = null;
+
 function writeDB(data) {
   try {
     if (fs.existsSync(DB_PATH)) {
@@ -1747,29 +1756,48 @@ function writeDB(data) {
   // 1. Instant local write (ensures zero latency and consistency for immediate readDB calls)
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 
-  // 2. Async background push to Firebase
+  // 2. Queue background push to Firebase to prevent race conditions
+  triggerFirebaseSync(data);
+}
+
+function triggerFirebaseSync(data) {
   const firebaseUrl = firebaseRestUrl();
-  if (firebaseUrl) {
-    fetch(firebaseUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }).then(async res => {
-      if (!res.ok) {
-        let errBody = '';
-        try {
-          errBody = await res.text();
-        } catch (_) {}
-        console.error(`❌ Firebase sync failed with status ${res.status}. Response: ${errBody}`);
-      } else {
-        console.log("☁️ Database background-synced to Firebase successfully!");
-      }
-    }).catch(err => {
-      console.error("❌ Firebase background sync error:", err);
-    });
+  if (!firebaseUrl) return;
+
+  if (isSyncingToFirebase) {
+    // If a sync is already running, accumulate the latest state for the next run
+    pendingFirebaseSyncData = data;
+    return;
   }
+
+  isSyncingToFirebase = true;
+  pendingFirebaseSyncData = null;
+
+  fetch(firebaseUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }).then(async res => {
+    if (!res.ok) {
+      let errBody = '';
+      try {
+        errBody = await res.text();
+      } catch (_) {}
+      console.error(`❌ Firebase sync failed with status ${res.status}. Response: ${errBody}`);
+    } else {
+      console.log("☁️ Database background-synced to Firebase successfully!");
+    }
+  }).catch(err => {
+    console.error("❌ Firebase background sync error:", err);
+  }).finally(() => {
+    isSyncingToFirebase = false;
+    if (pendingFirebaseSyncData) {
+      const nextData = pendingFirebaseSyncData;
+      triggerFirebaseSync(nextData);
+    }
+  });
 }
 function nextId(arr) {
   return arr.length ? Math.max(...arr.map(i => i.id)) + 1 : 1;
@@ -2699,6 +2727,10 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+app.get('/api/admin/imgbb-key', requireAdmin, (req, res) => {
+  res.json({ key: getImgBbApiKey() });
+});
+
 // PRODUCT IMAGE UPLOAD
 app.post('/api/admin/upload', requireAdmin, (req, res) => {
   uploadProductImage.single('image')(req, res, async (err) => {
@@ -3094,7 +3126,45 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+function validateEnvironment() {
+  console.log('📋 Running environment configuration audit...');
+  
+  if (process.env.PORT && isNaN(Number(process.env.PORT))) {
+    console.error('💥 CRITICAL ERROR: PORT environment variable is not a valid number.');
+    process.exit(1);
+  }
+
+  const defaultJwt = 'rk-resin-art-secret-2024';
+  if ((process.env.NODE_ENV === 'production' || process.env.RENDER) && (!process.env.JWT_SECRET || process.env.JWT_SECRET === defaultJwt)) {
+    console.warn('⚠️ SECURITY WARNING: Using the default insecure JWT_SECRET in production/Render. Please configure a custom JWT_SECRET.');
+  }
+
+  const smtpFields = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'];
+  const configuredFields = smtpFields.filter(f => process.env[f]);
+  if (configuredFields.length > 0 && configuredFields.length < smtpFields.length) {
+    console.error(`💥 CRITICAL ERROR: SMTP mailer is partially configured. Missing fields: ${smtpFields.filter(f => !process.env[f]).join(', ')}`);
+    process.exit(1);
+  }
+
+  if (process.env.RENDER) {
+    if (!getFirebaseDbUrl()) {
+      console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but FIREBASE_DB_URL is not configured!`);
+      console.warn(`   All uploaded products, orders, and settings will be DELETED on your next deploy or restart.`);
+      console.warn(`   Please configure FIREBASE_DB_URL or FIREBASE_DATABASE_URL in your Render dashboard under Settings -> Environment Variables.\n`);
+    }
+    if (!getImgBbApiKey()) {
+      console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but IMGBB_API_KEY is not configured!`);
+      console.warn(`   Uploaded product and banner images will be lost on your next deploy.`);
+      console.warn(`   Please configure IMGBB_API_KEY or IMGBB_KEY in your Render dashboard to save images permanently on the cloud.\n`);
+    }
+  }
+  
+  console.log('✅ Environment configuration audit completed.');
+}
+
 async function startServer() {
+  validateEnvironment();
+
   try {
     // Sync database from Firebase Realtime Database before server starts
     await initPersistentDatabase();
@@ -3119,20 +3189,6 @@ async function startServer() {
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Resin Art server running at http://localhost:${PORT}`);
     console.log(`   Admin password: rk2024\n`);
-
-    if (process.env.RENDER) {
-      if (!getFirebaseDbUrl()) {
-        console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but FIREBASE_DB_URL is not configured!`);
-        console.warn(`   All uploaded products, orders, and settings will be DELETED on your next deploy or restart.`);
-        console.warn(`   Please configure FIREBASE_DB_URL or FIREBASE_DATABASE_URL in your Render dashboard under Settings -> Environment Variables.\n`);
-      }
-      if (!getImgBbApiKey()) {
-        console.warn(`\n⚠️ CRITICAL WARNING: Running on Render but IMGBB_API_KEY is not configured!`);
-        console.warn(`   Uploaded product and banner images will be lost on your next deploy.`);
-        console.warn(`   Please configure IMGBB_API_KEY or IMGBB_KEY in your Render dashboard to save images permanently on the cloud.\n`);
-      }
-    }
-
     await initMailer();
   });
 

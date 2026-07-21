@@ -95,10 +95,54 @@ const API = {
   },
 
   async uploadImage(file) {
-    const formData = new FormData();
-    formData.append('image', file);
     const headers = {};
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
+
+    try {
+      // 1. Fetch ImgBB key securely from the server
+      const keyData = await API.get('/api/admin/imgbb-key', true);
+      
+      if (keyData && keyData.key) {
+        // Convert optimized file to base64 for direct ImgBB POST request
+        const reader = new FileReader();
+        const base64Promise = new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+        });
+        reader.readAsDataURL(file);
+        const base64Image = await base64Promise;
+
+        const imgbbFormData = new URLSearchParams();
+        imgbbFormData.append('image', base64Image);
+
+        // 2. Direct upload using the admin's residential IP (bypasses Render cloud server IP ban!)
+        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${keyData.key}`, {
+          method: 'POST',
+          body: imgbbFormData,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+
+        if (imgbbRes.ok) {
+          const imgbbData = await imgbbRes.json();
+          if (imgbbData && imgbbData.data && imgbbData.data.url) {
+            return {
+              success: true,
+              url: imgbbData.data.url,
+              filename: file.name
+            };
+          }
+        }
+        console.warn('Direct client-side ImgBB upload failed, falling back to server-side upload.');
+      }
+    } catch (err) {
+      console.warn('Direct upload setup failed, falling back to server-side upload:', err);
+    }
+
+    // 3. Fallback: Upload through the server (saves locally if server fails to connect to ImgBB)
+    const formData = new FormData();
+    formData.append('image', file);
 
     const res = await fetch(BASE + '/api/admin/upload', {
       method: 'POST',
