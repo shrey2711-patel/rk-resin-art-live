@@ -79,6 +79,7 @@ if (!global.fetch) {
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -1209,6 +1210,21 @@ const uploadProductImage = multer({
 
 // ── Middleware ──────────────────────────────────────────────
 app.use(cors());
+app.use(
+  helmet({
+    // Disable Content Security Policy to prevent breaking any third-party script, stylesheet,
+    // font, or image loads (e.g., Razorpay, Google Fonts, unpkg, jsdelivr CDN scripts).
+    contentSecurityPolicy: false,
+    // Disable Cross-Origin Opener and Embedder policies to avoid blocking cross-origin resources or popups.
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
+    // Explicitly set X-Frame-Options to DENY to protect against Clickjacking attacks.
+    frameguard: {
+      action: 'deny',
+    },
+  })
+);
 app.use(bodyParser.json());
 
 // ── IP Geolocation & Security Helpers ──────────────────────────
@@ -1396,6 +1412,12 @@ async function sendSecurityAlertEmail(user, geo, ip) {
   }
 }
 
+function sanitizeFirebaseKey(key) {
+  if (!key) return 'Unknown';
+  if (typeof key !== 'string') key = String(key);
+  return key.replace(/[\.\$\#\[\]\/]/g, '_');
+}
+
 function updateAggregatedAnalytics(visit) {
   const db = readDB();
   db.analytics = db.analytics || {
@@ -1424,10 +1446,15 @@ function updateAggregatedAnalytics(visit) {
       stats.returningVisitors = (stats.returningVisitors || 0) + 1;
     }
     
-    stats.countries[visit.country] = (stats.countries[visit.country] || 0) + 1;
-    stats.regions[visit.region] = (stats.regions[visit.region] || 0) + 1;
-    stats.cities[visit.city] = (stats.cities[visit.city] || 0) + 1;
-    stats.isps[visit.isp] = (stats.isps[visit.isp] || 0) + 1;
+    const cleanCountry = sanitizeFirebaseKey(visit.country);
+    const cleanRegion = sanitizeFirebaseKey(visit.region);
+    const cleanCity = sanitizeFirebaseKey(visit.city);
+    const cleanIsp = sanitizeFirebaseKey(visit.isp);
+
+    stats.countries[cleanCountry] = (stats.countries[cleanCountry] || 0) + 1;
+    stats.regions[cleanRegion] = (stats.regions[cleanRegion] || 0) + 1;
+    stats.cities[cleanCity] = (stats.cities[cleanCity] || 0) + 1;
+    stats.isps[cleanIsp] = (stats.isps[cleanIsp] || 0) + 1;
     
     writeDB(db);
   }
@@ -1521,6 +1548,8 @@ app.use((req, res, next) => {
     if (!isAsset && !req.url.startsWith('/uploads/')) {
       const geo = getIpLocation(clientIp);
       
+      // Disabled to prevent automatic visitor analytics updates from triggering database writes on every page load, saving Render bandwidth.
+      /*
       try {
         updateAggregatedAnalytics({
           ip: clientIp,
@@ -1533,6 +1562,7 @@ app.use((req, res, next) => {
       } catch (err) {
         console.error('Error updating analytics:', err.message);
       }
+      */
 
       const logEntry = {
         timestamp: new Date().toISOString(),
@@ -1655,6 +1685,25 @@ async function initPersistentDatabase() {
 
 function readDB() {
   try {
+    if (!fs.existsSync(DB_PATH)) {
+      return {
+        settings: {},
+        banners: [],
+        navLinks: [],
+        categories: [],
+        subcategories: [],
+        products: [],
+        orders: [],
+        cart: [],
+        users: [],
+        reviews: [],
+        wishlistSubscriptions: [],
+        coupons: [],
+        blockedIps: [],
+        securityLogs: []
+      };
+    }
+
     const data = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
     
     // Self-healing database structure initialization
@@ -1673,21 +1722,8 @@ function readDB() {
     
     return data;
   } catch (err) {
-    console.error("❌ Failed to parse DB file, returning empty structure:", err.message);
-    return {
-      settings: {},
-      banners: [],
-      navLinks: [],
-      categories: [],
-      subcategories: [],
-      products: [],
-      orders: [],
-      cart: [],
-      users: [],
-      reviews: [],
-      wishlistSubscriptions: [],
-      coupons: []
-    };
+    console.error("❌ CRITICAL ERROR reading/parsing DB file:", err.message);
+    throw err; // Fail-safe: crash instead of overwriting with empty DB
   }
 }
 
@@ -1720,9 +1756,13 @@ function writeDB(data) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
-    }).then(res => {
+    }).then(async res => {
       if (!res.ok) {
-        console.error(`❌ Firebase sync failed with status ${res.status}`);
+        let errBody = '';
+        try {
+          errBody = await res.text();
+        } catch (_) {}
+        console.error(`❌ Firebase sync failed with status ${res.status}. Response: ${errBody}`);
       } else {
         console.log("☁️ Database background-synced to Firebase successfully!");
       }
