@@ -30,8 +30,8 @@
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- Razorpay for secure checkout -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <!-- heic2any for iPhone HEIC image conversion -->
-  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+  <!-- heic-to for modern iPhone HEIC image conversion -->
+  <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
 </head>
 <body>
 
@@ -533,11 +533,11 @@
               <div class="form-field">
                 <label>Banner Image (Photo)</label>
                 <input type="hidden" id="bfImageUrl">
-                <input class="product-file-input" type="file" id="bfImageFile" accept="image/jpeg,image/png,image/webp">
+                <input class="product-file-input" type="file" id="bfImageFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif">
                 <label class="product-upload-box" id="bannerUploadBox" for="bfImageFile">
                   <span class="upload-icon">+</span>
                   <span class="upload-title">Drop banner image here or choose file</span>
-                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                  <span class="upload-sub">JPG, PNG, WEBP or HEIC up to 15MB. Image is uploaded automatically.</span>
                 </label>
                 <div class="product-image-preview" id="bannerImagePreview" style="display:none">
                   <img id="bfImagePreviewImg" alt="Banner preview">
@@ -656,11 +656,11 @@
               <div class="form-field" style="margin-top:10px">
                 <label>Category Poster Image (Optional)</label>
                 <input type="hidden" id="cfImageUrl">
-                <input class="product-file-input" type="file" id="cfImageFile" accept="image/jpeg,image/png,image/webp">
+                <input class="product-file-input" type="file" id="cfImageFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif">
                 <label class="product-upload-box" id="categoryUploadBox" for="cfImageFile">
                   <span class="upload-icon">+</span>
                   <span class="upload-title">Drop category poster here or choose file</span>
-                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                  <span class="upload-sub">JPG, PNG, WEBP or HEIC up to 15MB. Image is uploaded automatically.</span>
                 </label>
                 <div class="product-image-preview" id="categoryImagePreview" style="display:none">
                   <img id="cfImagePreviewImg" alt="Category preview">
@@ -700,11 +700,11 @@
               <div class="form-field" style="margin-top:10px">
                 <label>Subcategory Poster Image (Optional)</label>
                 <input type="hidden" id="scfImageUrl">
-                <input class="product-file-input" type="file" id="scfImageFile" accept="image/jpeg,image/png,image/webp">
+                <input class="product-file-input" type="file" id="scfImageFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif">
                 <label class="product-upload-box" id="subcategoryUploadBox" for="scfImageFile">
                   <span class="upload-icon">+</span>
                   <span class="upload-title">Drop subcategory poster here or choose file</span>
-                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                  <span class="upload-sub">JPG, PNG, WEBP or HEIC up to 15MB. Image is uploaded automatically.</span>
                 </label>
                 <div class="product-image-preview" id="subcategoryImagePreview" style="display:none">
                   <img id="scfImagePreviewImg" alt="Subcategory preview">
@@ -762,11 +762,11 @@
               <div class="form-field" id="pfBaseImageContainer">
                 <label>Product Image</label>
                 <input type="hidden" id="pfImageUrl">
-                <input class="product-file-input" type="file" id="pfImageFile" accept="image/jpeg,image/png,image/webp">
+                <input class="product-file-input" type="file" id="pfImageFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif">
                 <label class="product-upload-box" id="productUploadBox" for="pfImageFile">
                   <span class="upload-icon">+</span>
                   <span class="upload-title">Drop product image here or choose file</span>
-                  <span class="upload-sub">JPG, PNG or WEBP up to 15MB. Image is uploaded automatically.</span>
+                  <span class="upload-sub">JPG, PNG, WEBP or HEIC up to 15MB. Image is uploaded automatically.</span>
                 </label>
                 <div class="product-image-preview" id="productImagePreview" style="display:none">
                   <img id="pfImagePreviewImg" alt="Product preview">

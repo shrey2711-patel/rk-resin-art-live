@@ -1,202 +1,9 @@
 {
-  "settings": {
-    "announce": "💎 Premium UV Resin @ ₹349 | Only ₹699/Set 🔥 | 🚚 Free Shipping Above ₹999",
-    "adminPassword": "rk2024",
-    "adminEmail": "rinkupatel3495@gmail.com",
-    "smtp": {
-      "host": "smtp.gmail.com",
-      "port": 587,
-      "secure": false,
-      "user": "rinkupatel3495@gmail.com",
-      "pass": "rgxbhqlaawflvguy"
-    },
-    "cartEnabled": true
-  },
+  "settings": {},
   "banners": [],
-  "navLinks": [
-    {
-      "id": 1,
-      "label": "Home",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 2,
-      "label": "Resin",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 3,
-      "label": "New Arrival",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 4,
-      "label": "Candle Material",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 5,
-      "label": "Pipe Cleaner",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 6,
-      "label": "Lippan Art",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 7,
-      "label": "Teak Wood",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 8,
-      "label": "Moulds",
-      "row": 1,
-      "featured": false
-    },
-    {
-      "id": 9,
-      "label": "Pigments",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 10,
-      "label": "Jewellery",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 11,
-      "label": "Stickers",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 12,
-      "label": "Glitters",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 13,
-      "label": "Dry Flowers",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 14,
-      "label": "Stands",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 15,
-      "label": "Stones",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 16,
-      "label": "Clock Set",
-      "row": 2,
-      "featured": false
-    },
-    {
-      "id": 17,
-      "label": "DIY Kit",
-      "row": 3,
-      "featured": false
-    },
-    {
-      "id": 18,
-      "label": "All Products",
-      "row": 3,
-      "featured": false
-    },
-    {
-      "id": 19,
-      "label": "WhatsApp Community",
-      "row": 3,
-      "featured": false
-    },
-    {
-      "id": 20,
-      "label": "Contact Us",
-      "row": 3,
-      "featured": false
-    }
-  ],
-  "categories": [
-    {
-      "id": 1,
-      "name": "Pigments",
-      "emoji": "✨",
-      "color": "#FFF3D4"
-    },
-    {
-      "id": 2,
-      "name": "Resins",
-      "emoji": "🧪",
-      "color": "#EDE8FF"
-    },
-    {
-      "id": 3,
-      "name": "Moulds",
-      "emoji": "🟪",
-      "color": "#FFE8F5"
-    },
-    {
-      "id": 4,
-      "name": "Dry Flowers",
-      "emoji": "🌸",
-      "color": "#FBE8FF"
-    },
-    {
-      "id": 5,
-      "name": "Glitters",
-      "emoji": "🌟",
-      "color": "#FFF8E8"
-    },
-    {
-      "id": 6,
-      "name": "Tools",
-      "emoji": "🔧",
-      "color": "#E8F5EE"
-    },
-    {
-      "id": 7,
-      "name": "Jewellery",
-      "emoji": "💍",
-      "color": "#E8F0FF"
-    },
-    {
-      "id": 8,
-      "name": "Candle",
-      "emoji": "🕯",
-      "color": "#FFF3E8"
-    },
-    {
-      "id": 9,
-      "name": "Teak Wood",
-      "emoji": "🪵",
-      "color": "#F5EBD4"
-    },
-    {
-      "id": 10,
-      "name": "Stickers",
-      "emoji": "🏷",
-      "color": "#E8FFF0"
-    }
-  ],
+  "navLinks": [],
+  "categories": [],
+  "subcategories": [],
   "products": [],
   "orders": [],
   "cart": [],
@@ -204,24 +11,24 @@
   "reviews": [],
   "wishlistSubscriptions": [],
   "coupons": [],
-  "subcategories": [
-    {
-      "id": 1,
-      "category": "Pigments",
-      "name": "Mica Colors",
-      "emoji": "✨"
+  "analytics": {
+    "totalVisitors": 1,
+    "newVisitors": 0,
+    "returningVisitors": 1,
+    "countries": {
+      "IN": 1
     },
-    {
-      "id": 2,
-      "category": "Pigments",
-      "name": "Liquid Colors",
-      "emoji": "💧"
+    "regions": {
+      "GJ": 1
     },
-    {
-      "id": 3,
-      "category": "Pigments",
-      "name": "Opaque Colors",
-      "emoji": "🎨"
-    }
-  ]
+    "cities": {
+      "Ahmedabad": 1
+    },
+    "isps": {
+      "Reliance Jio Infocomm": 1
+    },
+    "recentIps": [
+      "::1"
+    ]
+  }
 }
