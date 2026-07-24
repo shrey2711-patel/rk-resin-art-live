@@ -395,9 +395,31 @@ const App = {
     prodPage.style.display = '';
 
     prodContent.innerHTML = `
-      <div class="loading-state" style="padding: 100px 0;">
-        <div class="spinner"></div>
-        <p>Loading product details...</p>
+      <div class="pp-layout" style="pointer-events: none; padding: 20px 0;">
+        <div class="pp-top-grid">
+          <!-- Left: Image -->
+          <div class="pp-image-col">
+            <div class="modal-prod-thumb pp-thumb skeleton-shimmer skeleton-detail-img" style="aspect-ratio: 1 / 1;"></div>
+          </div>
+
+          <!-- Right: Actions -->
+          <div class="pp-action-col">
+            <div class="skeleton-shimmer skeleton-detail-cat"></div>
+            <div class="skeleton-shimmer skeleton-detail-title"></div>
+            <div class="skeleton-shimmer skeleton-detail-price"></div>
+            
+            <div style="margin-top: 20px;">
+              <div class="skeleton-shimmer skeleton-detail-line"></div>
+              <div class="skeleton-shimmer skeleton-detail-line" style="width: 80%;"></div>
+              <div class="skeleton-shimmer skeleton-detail-line" style="width: 50%;"></div>
+            </div>
+
+            <div class="pp-action-btns" style="margin-top: 30px; display: flex; gap: 10px;">
+              <div class="skeleton-shimmer skeleton-detail-btn" style="flex: 1;"></div>
+              <div class="skeleton-shimmer skeleton-detail-btn" style="flex: 1;"></div>
+            </div>
+          </div>
+        </div>
       </div>`;
 
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1462,7 +1484,25 @@ const App = {
   // ── Products ──────────────────────────────────────────────
   async loadProducts() {
     const grid = document.getElementById('prodGrid');
-    grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading products...</p></div>';
+    let skeletonsHTML = '';
+    for (let i = 0; i < 8; i++) {
+      skeletonsHTML += `
+        <div class="prod-card skeleton-card">
+          <div class="prod-thumb skeleton-shimmer"></div>
+          <div class="prod-body">
+            <div class="prod-body-header">
+              <span class="skeleton-shimmer skeleton-cat"></span>
+            </div>
+            <div class="skeleton-shimmer skeleton-title"></div>
+            <div class="skeleton-shimmer skeleton-price"></div>
+            <div class="prod-card-btns">
+              <div class="skeleton-shimmer skeleton-button"></div>
+              <div class="skeleton-shimmer skeleton-button"></div>
+            </div>
+          </div>
+        </div>`;
+    }
+    grid.innerHTML = skeletonsHTML;
 
     try {
       const params = { page: this.state.page, limit: 20 };

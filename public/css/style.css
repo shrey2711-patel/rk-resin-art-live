@@ -25,6 +25,8 @@
   --shadow-lg: 0 16px 40px rgba(124, 58, 237, 0.08), 0 4px 16px rgba(124, 58, 237, 0.04);
   --radius: 20px;          /* Softer, luxury rounded corners */
   --header-h: 130px;
+  --skeleton-bg: #e2e8f0;
+  --skeleton-shimmer: #cbd5e1;
 }
 
 /* ─── Dark Mode ─────────────────────────────────────────── */
@@ -44,6 +46,8 @@
   --gold: #fbbf24;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --skeleton-bg: #1e1b30;
+  --skeleton-shimmer: #2e2a4a;
 }
 
 [data-theme="dark"] body { background: var(--bg); }
@@ -3715,3 +3719,99 @@ body {
   transform: translateX(22px);
 }
 
+/* ─── Skeleton Screen Loading Feature ───────────────────── */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-bg) 25%,
+    var(--skeleton-shimmer) 50%,
+    var(--skeleton-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.6s infinite linear;
+}
+
+@keyframes shimmer-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  pointer-events: none;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+.skeleton-card .prod-thumb {
+  background: var(--skeleton-bg);
+}
+
+.skeleton-cat {
+  width: 50%;
+  height: 12px;
+  border-radius: 4px;
+  display: block;
+}
+
+.skeleton-title {
+  width: 90%;
+  height: 18px;
+  border-radius: 4px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.skeleton-price {
+  width: 40%;
+  height: 16px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.skeleton-button {
+  height: 30px;
+  border-radius: 7px;
+  width: 100%;
+}
+
+/* Detail page skeletons */
+.skeleton-detail-img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+}
+
+.skeleton-detail-cat {
+  width: 30%;
+  height: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.skeleton-detail-title {
+  width: 80%;
+  height: 32px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.skeleton-detail-price {
+  width: 40%;
+  height: 28px;
+  border-radius: 6px;
+  margin-bottom: 25px;
+}
+
+.skeleton-detail-line {
+  width: 60%;
+  height: 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.skeleton-detail-btn {
+  height: 48px;
+  border-radius: 10px;
+}
