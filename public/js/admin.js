@@ -2227,59 +2227,10 @@ Admin.readableAction = function(method) {
   return m || 'Opened';
 };
 
-Admin.polishAnalyticsLabels = function() {
-  const replacements = [
-    ['Visitor Analytics', 'Store Activity Dashboard'],
-    ['Refresh Data', 'Refresh'],
-    ['Total Unique Visitors', 'People Visited Store'],
-    ['New vs Returning', 'New / Returning'],
-    ['Blocked IP Addresses', 'Blocked Visitors'],
-    ['Top Visitor Locations', 'Top Customer Areas'],
-    ['Visitor ISP / Network Distribution', 'Visitor Network Providers'],
-    ['ISP / Network Provider', 'Network Provider'],
-    ['IP Address Blocklist', 'Blocked Visitor List'],
-    ['Blocked IP Address', 'Blocked Visitor'],
-    ['Suspicious Activity', 'Security Alerts'],
-    ['User & Admin Login History', 'Login Activity'],
-    ['Date / Time', 'When'],
-    ['User Identifier (Email)', 'Account'],
-    ['Account Role', 'Type'],
-    ['IP Address', 'Visitor IP'],
-    ['Location (approximate)', 'Area'],
-    ['Real-time Developer Access Logs', 'Recent Website Activity'],
-    ['Timestamp', 'When'],
-    ['Method', 'Action'],
-    ['Request URL', 'Page Opened'],
-    ['Status', 'Result'],
-    ['Duration', 'Time Taken'],
-    ['Location', 'Area']
-  ];
-
-  document.querySelectorAll('#atab-analytics .admin-section-head, #atab-analytics .afc-title, #atab-analytics th, #atab-analytics button, #atab-analytics input').forEach(el => {
-    if (el.tagName === 'INPUT') {
-      if (el.id === 'blockIpInput') el.placeholder = 'Visitor IP address';
-      return;
-    }
-    replacements.forEach(([from, to]) => {
-      if ((el.textContent || '').includes(from)) el.textContent = to;
-    });
-  });
-
-  const blockBtn = document.getElementById('blockIpBtn');
-  if (blockBtn) blockBtn.textContent = 'Block';
-};
-
 Admin.renderAnalytics = async function() {
   try {
-    Admin.polishAnalyticsLabels();
     const data = await API.get('/api/admin/analytics', true);
     
-    // Render summary metrics
-    const stats = data.analytics || {};
-    document.getElementById('statTotalVisitors').textContent = stats.totalVisitors || 0;
-    document.getElementById('statVisitorRatio').textContent = `${stats.newVisitors || 0} New / ${stats.returningVisitors || 0} Returning`;
-    document.getElementById('statBlockedIps').textContent = (data.blockedIps || []).length;
-
     // Render financial statistics and charts
     const orderStats = data.orderStats || {
       totalRevenue: 0,
