@@ -2486,10 +2486,13 @@ Admin.renderTopProductsList = function(topProducts) {
     return;
   }
 
-  const maxQty = Math.max(...topProducts.map(p => p.quantity), 1);
+  // Limit to maximum of 5 products
+  const listToRender = topProducts.slice(0, 5);
+
+  const maxQty = Math.max(...listToRender.map(p => p.quantity), 1);
   const colors = ['var(--p)', 'var(--green)', 'var(--gold)', 'var(--red)', '#06b6d4'];
 
-  container.innerHTML = topProducts.map((p, i) => {
+  container.innerHTML = listToRender.map((p, i) => {
     const pct = (p.quantity / maxQty) * 100;
     const color = colors[i % colors.length];
     return `
