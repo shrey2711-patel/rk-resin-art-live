@@ -148,17 +148,32 @@ const App = {
     const prodBackBtn = document.getElementById('productPageBack');
     if (prodBackBtn) {
       prodBackBtn.onclick = () => {
-        const raw = sessionStorage.getItem('rk_nav_state');
-        if (raw) {
-          try {
+        let returnHash = '';
+        try {
+          const raw = sessionStorage.getItem('rk_nav_state');
+          if (raw) {
             const state = JSON.parse(raw);
             if (state.returnHash !== undefined) {
-              window.location.hash = state.returnHash;
-              return;
+              returnHash = state.returnHash;
             }
-          } catch (e) {}
+          }
+        } catch (e) {
+          console.error("Storage access failed:", e);
         }
-        window.location.hash = '';
+
+        // Reset active product tracking
+        this.state.activeProductId = null;
+
+        if (window.location.hash === returnHash) {
+          // If the hash is already equal to target, trigger routing manually
+          if (returnHash.startsWith('#collection/')) {
+            this.showCollectionPage(decodeURIComponent(returnHash.replace('#collection/', '')));
+          } else {
+            this.showHomePage();
+          }
+        } else {
+          window.location.hash = returnHash;
+        }
       };
     }
   },
