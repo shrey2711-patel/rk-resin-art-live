@@ -2279,6 +2279,27 @@ Admin.renderAnalytics = async function() {
     document.getElementById('statTotalVisitors').textContent = stats.totalVisitors || 0;
     document.getElementById('statVisitorRatio').textContent = `${stats.newVisitors || 0} New / ${stats.returningVisitors || 0} Returning`;
     document.getElementById('statBlockedIps').textContent = (data.blockedIps || []).length;
+
+    // Render financial statistics and charts
+    const orderStats = data.orderStats || {
+      totalRevenue: 0,
+      orderCount: 0,
+      salesHistory: [],
+      topProducts: [],
+      categoryDistribution: []
+    };
+
+    document.getElementById('statTotalRevenue').textContent = `₹${orderStats.totalRevenue.toLocaleString('en-IN')}`;
+    document.getElementById('statTotalOrders').textContent = orderStats.orderCount;
+
+    // Render sales trend line chart
+    Admin.renderSalesTrendChart(orderStats.salesHistory);
+
+    // Render category donut chart
+    Admin.renderCategoryDonutChart(orderStats.categoryDistribution);
+
+    // Render top selling products progress bars
+    Admin.renderTopProductsList(orderStats.topProducts);
     
     // Render location tables
     const locsList = document.getElementById('analyticsLocationsList');
@@ -2484,3 +2505,232 @@ if (refreshAnalyticsBtn) {
     showToast('Analytics refreshed', 'success');
   };
 }
+
+// ── SVG Chart Drawing Helpers ─────────────────────────────
+Admin.renderSalesTrendChart = function(history) {
+  const container = document.getElementById('salesTrendChartContainer');
+  if (!container) return;
+
+  if (!history || history.length === 0) {
+    container.innerHTML = `<div style="color: var(--muted); font-size: 0.86rem;">No sales trend data yet.</div>`;
+    return;
+  }
+
+  const width = 500;
+  const height = 240;
+  const paddingLeft = 40;
+  const paddingRight = 20;
+  const paddingTop = 20;
+  const paddingBottom = 30;
+
+  const chartWidth = width - paddingLeft - paddingRight;
+  const chartHeight = height - paddingTop - paddingBottom;
+
+  const revenues = history.map(h => h.revenue);
+  const maxVal = Math.max(...revenues, 100);
+
+  // Generate points
+  const points = history.map((h, i) => {
+    const x = paddingLeft + (i / (history.length - 1)) * chartWidth;
+    const y = height - paddingBottom - (h.revenue / maxVal) * chartHeight;
+    return { x, y, date: h.date, val: h.revenue };
+  });
+
+  // Build SVG path
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - paddingBottom} L ${points[0].x} ${height - paddingBottom} Z`;
+
+  // Gridlines
+  let gridlinesHTML = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = paddingTop + (i / 4) * chartHeight;
+    const val = Math.round(maxVal - (i / 4) * maxVal);
+    gridlinesHTML += `
+      <line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="var(--border)" stroke-dasharray="4" />
+      <text x="${paddingLeft - 8}" y="${y + 4}" fill="var(--muted)" font-size="9" text-anchor="end" font-weight="700">₹${val}</text>
+    `;
+  }
+
+  // Markers & X Labels
+  let markersHTML = '';
+  let xLabelsHTML = '';
+  points.forEach((p, i) => {
+    const d = new Date(p.date);
+    const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    
+    xLabelsHTML += `
+      <text x="${p.x}" y="${height - 10}" fill="var(--muted)" font-size="9" text-anchor="middle" font-weight="700">${label}</text>
+    `;
+
+    markersHTML += `
+      <circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--p)" stroke="var(--white)" stroke-width="2" class="chart-point" data-date="${label}" data-val="₹${p.val.toLocaleString('en-IN')}" style="cursor: pointer; transition: r 0.2s;" />
+      <circle cx="${p.x}" cy="${p.y}" r="12" fill="transparent" class="chart-point-target" data-idx="${i}" style="cursor: pointer;" />
+    `;
+  });
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" style="width: 100%; height: 100%; overflow: visible;">
+      <defs>
+        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--p)" stop-opacity="0.25" />
+          <stop offset="100%" stop-color="var(--p)" stop-opacity="0.00" />
+        </linearGradient>
+      </defs>
+      ${gridlinesHTML}
+      <path d="${areaPath}" fill="url(#chartGradient)" />
+      <path d="${linePath}" fill="none" stroke="var(--p)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      ${markersHTML}
+      ${xLabelsHTML}
+    </svg>
+    <div class="chart-tooltip" style="position: absolute; display: none; background: var(--ink); color: var(--white); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none; transform: translate(-50%, -100%); margin-top: -12px; white-space: nowrap; z-index: 10;"></div>
+  `;
+
+  // Bind tooltip hover events
+  const tooltip = container.querySelector('.chart-tooltip');
+  const pointsList = container.querySelectorAll('.chart-point');
+  container.querySelectorAll('.chart-point-target').forEach(target => {
+    const idx = target.dataset.idx;
+    const pt = pointsList[idx];
+    
+    target.onmouseenter = (e) => {
+      pt.setAttribute('r', '7');
+      tooltip.style.display = 'block';
+      tooltip.innerHTML = `<span style="color:var(--muted);">${pt.dataset.date}</span><br/><strong>${pt.dataset.val}</strong>`;
+      
+      const rect = container.getBoundingClientRect();
+      const ptRect = pt.getBoundingClientRect();
+      const x = ptRect.left - rect.left + ptRect.width / 2;
+      const y = ptRect.top - rect.top;
+      
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+    };
+    
+    target.onmouseleave = () => {
+      pt.setAttribute('r', '5');
+      tooltip.style.display = 'none';
+    };
+  });
+};
+
+Admin.renderCategoryDonutChart = function(dist) {
+  const container = document.getElementById('categoryChartContainer');
+  if (!container) return;
+
+  const activeDist = (dist || []).filter(c => c.quantity > 0);
+
+  if (activeDist.length === 0) {
+    container.innerHTML = `<div style="color: var(--muted); font-size: 0.86rem;">No category sales data yet.</div>`;
+    return;
+  }
+
+  const total = activeDist.reduce((acc, c) => acc + c.quantity, 0);
+  const colors = ['var(--p)', 'var(--green)', 'var(--gold)', 'var(--red)', '#06b6d4', '#ec4899'];
+
+  let cumulativePercent = 0;
+  const radius = 70;
+  const strokeWidth = 18;
+  const circumference = 2 * Math.PI * radius; // 439.8
+  const center = 100;
+
+  let circlesHTML = '';
+  let legendHTML = '';
+
+  activeDist.forEach((c, i) => {
+    const pct = (c.quantity / total) * 100;
+    const strokeDash = (pct / 100) * circumference;
+    const strokeOffset = circumference - (cumulativePercent / 100) * circumference;
+    const color = colors[i % colors.length];
+
+    circlesHTML += `
+      <circle cx="${center}" cy="${center}" r="${radius}" fill="transparent"
+              stroke="${color}" stroke-width="${strokeWidth}"
+              stroke-dasharray="${strokeDash} ${circumference - strokeDash}"
+              stroke-dashoffset="${strokeOffset}"
+              transform="rotate(-90 ${center} ${center})"
+              class="donut-segment"
+              data-name="${c.category}"
+              data-val="${c.quantity} items (${Math.round(pct)}%)"
+              style="transition: stroke-width 0.2s; cursor: pointer;" />
+    `;
+
+    legendHTML += `
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 0.76rem; color: var(--ink); margin-bottom: 6px;">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; flex-shrink: 0;"></span>
+        <span style="font-weight: 700; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${c.category}">${c.category}</span>
+        <span style="margin-left: auto; color: var(--muted); font-weight: 800;">${c.quantity}</span>
+      </div>
+    `;
+
+    cumulativePercent += pct;
+  });
+
+  container.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; padding: 0 10px;">
+      <svg viewBox="0 0 200 200" style="width: 160px; height: 160px; overflow: visible; flex-shrink: 0;">
+        ${circlesHTML}
+        <circle cx="${center}" cy="${center}" r="${radius - strokeWidth/2 - 2}" fill="var(--card)" />
+        <text x="${center}" y="${center + 4}" font-size="12" font-weight="900" fill="var(--ink)" text-anchor="middle">Sales</text>
+        <text x="${center}" y="${center + 18}" font-size="9" font-weight="700" fill="var(--muted)" text-anchor="middle">${total} items</text>
+      </svg>
+      <div style="flex: 1; min-width: 120px; display: flex; flex-direction: column; justify-content: center; max-height: 180px; overflow-y: auto; padding-right: 4px;">
+        ${legendHTML}
+      </div>
+    </div>
+    <div class="donut-tooltip" style="position: absolute; display: none; background: var(--ink); color: var(--white); padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.15); pointer-events: none; transform: translate(-50%, -100%); margin-top: -12px; white-space: nowrap; z-index: 10;"></div>
+  `;
+
+  // Bind tooltip hover events
+  const tooltip = container.querySelector('.donut-tooltip');
+  container.querySelectorAll('.donut-segment').forEach(seg => {
+    seg.onmouseenter = (e) => {
+      seg.setAttribute('stroke-width', `${strokeWidth + 4}`);
+      tooltip.style.display = 'block';
+      tooltip.innerHTML = `<span style="color:var(--muted);">${seg.dataset.name}</span><br/><strong>${seg.dataset.val}</strong>`;
+      
+      const rect = container.getBoundingClientRect();
+      tooltip.style.left = `${e.clientX - rect.left}px`;
+      tooltip.style.top = `${e.clientY - rect.top - 10}px`;
+    };
+    
+    seg.onmousemove = (e) => {
+      const rect = container.getBoundingClientRect();
+      tooltip.style.left = `${e.clientX - rect.left}px`;
+      tooltip.style.top = `${e.clientY - rect.top - 10}px`;
+    };
+
+    seg.onmouseleave = () => {
+      seg.setAttribute('stroke-width', `${strokeWidth}`);
+      tooltip.style.display = 'none';
+    };
+  });
+};
+
+Admin.renderTopProductsList = function(topProducts) {
+  const container = document.getElementById('topProductsList');
+  if (!container) return;
+
+  if (!topProducts || topProducts.length === 0) {
+    container.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 20px; font-size: 0.86rem;">No products sold yet.</div>`;
+    return;
+  }
+
+  const maxQty = Math.max(...topProducts.map(p => p.quantity), 1);
+  const colors = ['var(--p)', 'var(--green)', 'var(--gold)', 'var(--red)', '#06b6d4'];
+
+  container.innerHTML = topProducts.map((p, i) => {
+    const pct = (p.quantity / maxQty) * 100;
+    const color = colors[i % colors.length];
+    return `
+      <div style="margin-bottom: 14px; text-align: left;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: var(--ink); margin-bottom: 4px;">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">${p.name}</span>
+          <span style="font-weight: 900; color: ${color};">${p.quantity} sold</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden;">
+          <div style="width: ${pct}%; height: 100%; background: ${color}; border-radius: 99px; transition: width 0.8s ease-out;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+};

@@ -951,6 +951,54 @@
               </div>
             </div>
 
+            <!-- Financial summary cards -->
+            <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Total Sales / Revenue</div>
+                  <div id="statTotalRevenue" style="font-size: 1.8rem; font-weight: 900; color: var(--green);">₹0</div>
+                </div>
+                <div style="font-size: 2.2rem;">💰</div>
+              </div>
+              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Total Orders Paid</div>
+                  <div id="statTotalOrders" style="font-size: 1.8rem; font-weight: 900; color: var(--p);">0</div>
+                </div>
+                <div style="font-size: 2.2rem;">📦</div>
+              </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+              <!-- Chart 1: Sales Trend -->
+              <div class="admin-form-card" style="margin: 0; min-height: 320px; display: flex; flex-direction: column;">
+                <div class="afc-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                  <span>Sales Trend (Last 7 Days)</span>
+                  <small style="font-size: 0.72rem; color: var(--muted); font-weight: normal;">Daily Revenue</small>
+                </div>
+                <div id="salesTrendChartContainer" style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
+                  <!-- SVG chart gets injected here -->
+                </div>
+              </div>
+
+              <!-- Chart 2: Category Distribution -->
+              <div class="admin-form-card" style="margin: 0; min-height: 320px; display: flex; flex-direction: column;">
+                <div class="afc-title" style="margin-bottom: 12px;">Category Sales</div>
+                <div id="categoryChartContainer" style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
+                  <!-- SVG donut/pie gets injected here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Selling Products Section -->
+            <div class="admin-form-card" style="margin-bottom: 24px;">
+              <div class="afc-title">Top Selling Products</div>
+              <div id="topProductsList" style="padding: 10px 0;">
+                <!-- Horizontal progress bars injected here -->
+              </div>
+            </div>
+
             <!-- Geographic & ISP Distribution grids -->
             <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
               <div class="admin-form-card" style="margin: 0;">

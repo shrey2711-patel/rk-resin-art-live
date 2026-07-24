@@ -3815,3 +3815,18 @@ body {
   height: 48px;
   border-radius: 10px;
 }
+
+/* --- Analytics Visual Charts --- */
+#salesTrendChartContainer svg,
+#categoryChartContainer svg {
+  user-select: none;
+}
+.chart-point:hover {
+  filter: brightness(1.2);
+}
+.chart-tooltip,
+.donut-tooltip {
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15) !important;
+  border: 1px solid var(--border);
+}

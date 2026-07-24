@@ -2639,12 +2639,90 @@ app.get('/api/admin/analytics', requireAdmin, (req, res) => {
   };
   const securityLogs = db.securityLogs || [];
   const blockedIps = db.blockedIps || [];
+  const orders = db.orders || [];
+  const products = db.products || [];
+
+  // Calculate order & revenue analytics
+  let totalRevenue = 0;
+  let orderCount = 0;
+  const productQtyMap = {};
+  const categoryQtyMap = {};
+  const salesHistoryMap = {};
+
+  // Initialize last 7 days of sales history
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    salesHistoryMap[dateStr] = 0;
+  }
+
+  // Create a product category lookup map
+  const productCategoryMap = {};
+  products.forEach(p => {
+    productCategoryMap[p.id] = p.category || 'Other';
+  });
+
+  orders.forEach(o => {
+    if (o.status === 'cancelled') return;
+    totalRevenue += o.grandTotal || 0;
+    orderCount += 1;
+
+    // Daily Sales History
+    if (o.createdAt) {
+      const dateStr = o.createdAt.split('T')[0];
+      if (salesHistoryMap[dateStr] !== undefined) {
+        salesHistoryMap[dateStr] += o.grandTotal || 0;
+      }
+    }
+
+    // Product & Category Sales
+    (o.items || []).forEach(item => {
+      const pId = item.productId;
+      const pName = item.name || `Product #${pId}`;
+      const qty = Number(item.quantity) || 0;
+      
+      // Top Products map
+      if (!productQtyMap[pId]) {
+        productQtyMap[pId] = { name: pName, quantity: 0 };
+      }
+      productQtyMap[pId].quantity += qty;
+
+      // Category map
+      const cat = productCategoryMap[pId] || 'Other';
+      categoryQtyMap[cat] = (categoryQtyMap[cat] || 0) + qty;
+    });
+  });
+
+  // Format sales history
+  const salesHistory = Object.entries(salesHistoryMap).map(([date, revenue]) => ({
+    date,
+    revenue: Math.round(revenue * 100) / 100
+  })).sort((a, b) => a.date.localeCompare(b.date));
+
+  // Format top products
+  const topProducts = Object.values(productQtyMap)
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5);
+
+  // Format category distribution
+  const categoryDistribution = Object.entries(categoryQtyMap).map(([category, quantity]) => ({
+    category,
+    quantity
+  })).sort((a, b) => b.quantity - a.quantity);
 
   res.json({
     analytics,
     securityLogs,
     blockedIps,
-    loginLogs: db.loginLogs || []
+    loginLogs: db.loginLogs || [],
+    orderStats: {
+      totalRevenue: Math.round(totalRevenue * 100) / 100,
+      orderCount,
+      salesHistory,
+      topProducts,
+      categoryDistribution
+    }
   });
 });
 
