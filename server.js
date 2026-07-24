@@ -2678,9 +2678,10 @@ app.get('/api/admin/analytics', requireAdmin, (req, res) => {
 
     // Product & Category Sales
     (o.items || []).forEach(item => {
-      const pId = item.productId;
+      const pId = item.id || item.productId;
+      if (!pId) return;
       const pName = item.name || `Product #${pId}`;
-      const qty = Number(item.quantity) || 0;
+      const qty = Number(item.qty || item.quantity) || 0;
       
       // Top Products map
       if (!productQtyMap[pId]) {
@@ -2689,7 +2690,7 @@ app.get('/api/admin/analytics', requireAdmin, (req, res) => {
       productQtyMap[pId].quantity += qty;
 
       // Category map
-      const cat = productCategoryMap[pId] || 'Other';
+      const cat = productCategoryMap[Number(pId)] || 'Other';
       categoryQtyMap[cat] = (categoryQtyMap[cat] || 0) + qty;
     });
   });
