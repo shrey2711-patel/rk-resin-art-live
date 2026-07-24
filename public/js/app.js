@@ -162,6 +162,14 @@ const App = {
     window.location.hash = `#product/${id}`;
   },
 
+  showSection(el) {
+    if (!el) return;
+    el.style.display = '';
+    el.classList.remove('fade-in-up');
+    void el.offsetWidth; // Trigger reflow
+    el.classList.add('fade-in-up');
+  },
+
   saveNavigationState() {
     const state = {
       activeCategory: this.state.activeCategory,
@@ -236,9 +244,9 @@ const App = {
 
     if (banner)  banner.style.display  = 'none';
     if (colls)   colls.style.display   = 'none';
-    if (header)  header.style.display  = '';
+    if (header)  this.showSection(header);
     if (prodPage) prodPage.style.display = 'none';
-    if (shopMain) shopMain.style.display = '';
+    if (shopMain) this.showSection(shopMain);
     if (siteHeader) siteHeader.style.display = '';
     if (announceBar) announceBar.style.display = '';
 
@@ -356,11 +364,11 @@ const App = {
     const siteHeader = document.getElementById('siteHeader');
     const announceBar = document.getElementById('announceBar');
 
-    if (banner)  banner.style.display  = '';
-    if (colls)   colls.style.display   = '';
+    if (banner)  this.showSection(banner);
+    if (colls)   this.showSection(colls);
     if (header)  header.style.display  = 'none';
     if (prodPage) prodPage.style.display = 'none';
-    if (shopMain) shopMain.style.display = '';
+    if (shopMain) this.showSection(shopMain);
     if (siteHeader) siteHeader.style.display = '';
     if (announceBar) announceBar.style.display = '';
 
@@ -409,7 +417,7 @@ const App = {
     if (shopMain) shopMain.style.display = 'none';
     if (siteHeader) siteHeader.style.display = 'none';
     if (announceBar) announceBar.style.display = 'none';
-    prodPage.style.display = '';
+    this.showSection(prodPage);
 
     prodContent.innerHTML = `
       <div class="pp-layout" style="pointer-events: none; padding: 20px 0;">
