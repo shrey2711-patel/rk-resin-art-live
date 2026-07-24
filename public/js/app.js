@@ -18,6 +18,8 @@ const App = {
     razorpayEnabled: true,
     cartEnabled: true,
     trackStock: true,
+    internalProductNav: false,
+    activeProductId: null,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -117,10 +119,20 @@ const App = {
       const match = hash.match(/^#collection\/(.+)$/);
       const prodMatch = hash.match(/^#product\/(.+)$/);
       if (match) {
+        this.state.activeProductId = null;
         this.showCollectionPage(decodeURIComponent(match[1]));
       } else if (prodMatch) {
-        this.showProductPage(Number(prodMatch[1]));
+        const prodId = Number(prodMatch[1]);
+        if (this.state.internalProductNav || this.state.activeProductId === null || this.state.activeProductId === prodId) {
+          this.state.internalProductNav = false;
+          this.state.activeProductId = prodId;
+          this.showProductPage(prodId);
+        } else {
+          // Revert hash to the active product ID to block manual typing
+          window.location.hash = `#product/${this.state.activeProductId}`;
+        }
       } else if (hash === '' || hash === '#') {
+        this.state.activeProductId = null;
         this.showHomePage();
       }
     };
@@ -143,6 +155,11 @@ const App = {
         }
       };
     }
+  },
+
+  navigateToProduct(id) {
+    this.state.internalProductNav = true;
+    window.location.hash = `#product/${id}`;
   },
 
   saveNavigationState() {
@@ -805,7 +822,7 @@ const App = {
         if (context === 'modal') {
           this.openProductModal(relatedId, productPool);
         } else {
-          window.location.hash = `#product/${relatedId}`;
+          this.navigateToProduct(relatedId);
         }
       };
     });
@@ -1641,7 +1658,7 @@ const App = {
         if (!e.target.classList.contains('add-to-cart-btn') && 
             !e.target.classList.contains('buy-now-btn') && 
             !e.target.closest('.wishlist-card-btn')) {
-          window.location.hash = `#product/${Number(card.dataset.pid)}`;
+          this.navigateToProduct(Number(card.dataset.pid));
         }
       };
     });
@@ -1667,7 +1684,7 @@ const App = {
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
-            window.location.hash = `#product/${prod.id}`;
+            this.navigateToProduct(prod.id);
             return;
           }
           const cat = catMap[prod.category] || {};
@@ -1686,7 +1703,7 @@ const App = {
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
-            window.location.hash = `#product/${prod.id}`;
+            this.navigateToProduct(prod.id);
             return;
           }
           const cat = catMap[prod.category] || {};
