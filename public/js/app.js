@@ -148,11 +148,17 @@ const App = {
     const prodBackBtn = document.getElementById('productPageBack');
     if (prodBackBtn) {
       prodBackBtn.onclick = () => {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          window.location.hash = '';
+        const raw = sessionStorage.getItem('rk_nav_state');
+        if (raw) {
+          try {
+            const state = JSON.parse(raw);
+            if (state.returnHash !== undefined) {
+              window.location.hash = state.returnHash;
+              return;
+            }
+          } catch (e) {}
         }
+        window.location.hash = '';
       };
     }
   },
@@ -173,6 +179,8 @@ const App = {
   saveNavigationState() {
     const state = {
       activeCategory: this.state.activeCategory,
+      activeSubcategory: this.state.activeSubcategory,
+      returnHash: window.location.hash,
       searchQuery: this.state.searchQuery,
       page: this.state.page,
       sortBy: this.state.sortBy,
@@ -194,6 +202,7 @@ const App = {
       sessionStorage.removeItem('rk_nav_state');
 
       this.state.activeCategory = state.activeCategory || 'All';
+      this.state.activeSubcategory = state.activeSubcategory || null;
       this.state.searchQuery = state.searchQuery || '';
       this.state.page = state.page || 1;
       this.state.sortBy = state.sortBy || '';
