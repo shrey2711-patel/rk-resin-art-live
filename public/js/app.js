@@ -769,13 +769,15 @@ const App = {
       displayImageUrl = product.variants[0].imageUrl;
     }
 
+    const emojiFallback = product.emoji || '📦';
+
     if (displayImageUrl) {
       return `
         <div class="prod-image-wrap ${size}" style="background:${fallbackBg}; ${aspectStyle}">
-          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy">
+          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.className='prod-emoji-fallback ${size}'; this.parentElement.style.background='${fallbackBg}'; this.parentElement.innerHTML='${emojiFallback}';">
         </div>`;
     }
-    return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;
+    return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${emojiFallback}</div>`;
   },
 
   async getRelatedProducts(product, sourceProducts = []) {
@@ -1179,22 +1181,25 @@ const App = {
       }
     });
 
-    window.addEventListener('mousemove', (e) => {
+    const onMouseMove = (e) => {
       if (isMouseDown && scale > 1) {
         translateX = e.clientX - mouseStartX;
         translateY = e.clientY - mouseStartY;
         updateTransform();
       }
-    });
+    };
 
-    window.addEventListener('mouseup', () => {
+    const onMouseUp = () => {
       if (isMouseDown) {
         isMouseDown = false;
         newImg.style.cursor = 'zoom-in';
         lastTranslateX = translateX;
         lastTranslateY = translateY;
       }
-    });
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mouseup', onMouseUp, { passive: true });
 
     // Wheel / Trackpad pinch-to-zoom for laptops and desktops
     newImg.addEventListener('wheel', (e) => {
@@ -1266,6 +1271,8 @@ const App = {
     // Close logic
     const closeBtn = document.getElementById('closeZoomModal');
     const closeModal = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
       modal.style.display = 'none';
       document.body.style.overflow = '';
       newImg.src = '';
