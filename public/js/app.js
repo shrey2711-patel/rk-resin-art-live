@@ -2884,125 +2884,127 @@ document.getElementById('placeOrderBtn').onclick = async () => {
   const WHATSAPP_NUMBER = '918141994995';
 
   if (isOnline) {
-    try {
-      btn.textContent = 'Preparing Payment...';
-      btn.disabled = true;
+    loadRazorpay(async () => {
+      try {
+        btn.textContent = 'Preparing Payment...';
+        btn.disabled = true;
 
-      // 1. Create Razorpay order on the server
-      const reqPayload = { items: cartItems };
-      if (App.state.appliedCoupon) {
-        reqPayload.couponCode = App.state.appliedCoupon.code;
-      }
-      const resOrder = await API.createPaymentOrder(reqPayload);
-      const { keyId, order: razorpayOrder } = resOrder;
-
-      // 2. Open Razorpay checkout modal
-      const options = {
-        key: keyId,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        name: 'RK Resin Art',
-        description: 'Premium Craft Supplies Order',
-        order_id: razorpayOrder.id,
-        prefill: {
-          name: `${firstName} ${customer.lastName}`.trim(),
-          email: customer.email || '',
-          contact: phone
-        },
-        theme: { color: '#0f766e' },
-        handler: async function (response) {
-          try {
-            btn.textContent = 'Verifying Payment...';
-            
-            // 3. Cryptographically verify signature & place order
-            const verifyPayload = {
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              items: cartItems,
-              customer
-            };
-            if (App.state.appliedCoupon) {
-              verifyPayload.couponCode = App.state.appliedCoupon.code;
-            }
-            const verifyRes = await API.verifyPayment(verifyPayload);
-
-            App.state.lastOrderData = verifyRes.order;
-
-            if (!isBuyNow) Cart.clear();
-
-            btn.textContent = 'Pay securely with Razorpay';
-            btn.disabled = false;
-            btn._isBuyNow = false;
-            btn._buyNowItems = null;
-
-            // Invoice download button
-            const invoiceBtn = document.getElementById('invoiceDownloadBtn');
-            invoiceBtn.style.display = 'flex';
-            invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
-
-            showToast(`Order #${verifyRes.orderId} placed & paid successfully! 🎉`, 'success');
-
-            // WhatsApp message to admin
-            const orderLines = cartItems.map((i, index) =>
-              `${index + 1}. ${i.name}\n` +
-              `   Category: ${i.category || 'Product'}\n` +
-              `   Qty: ${i.qty}\n` +
-              `   Rate: ₹${Number(i.price).toLocaleString('en-IN')}\n` +
-              `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
-            ).join('\n\n');
-            const fullName = `${firstName} ${customer.lastName}`.trim();
-            const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
-            
-            const discountAmount = verifyRes.order.discount || 0;
-            const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
-            const otherChargesAmount = verifyRes.order.otherChargesAmount || 0;
-            const otherLine = otherChargesAmount > 0 ? `Other Charges${verifyRes.order.otherChargesType === 'percentage' ? ' (' + verifyRes.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
-
-            const msg = encodeURIComponent(
-              `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
-              `Order ID: #${verifyRes.orderId}\n` +
-              `Payment Status: Paid online via Razorpay\n` +
-              `Payment ID: ${response.razorpay_payment_id}\n` +
-              `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
-              `📦 ORDER DETAILS\n${orderLines}\n\n` +
-              `💰 PAYMENT SUMMARY\n` +
-              `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
-              discountLine +
-              `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
-              otherLine +
-              `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
-              `👤 CUSTOMER DETAILS\n` +
-              `Name: ${fullName}\n` +
-              `Phone: ${phone}\n` +
-              `Email: ${customer.email || '-'}\n` +
-              `Address: ${fullAddress}`
-            );
-            window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
-            App.loadProducts();
-            document.getElementById('checkoutModalOverlay').classList.remove('open');
-          } catch (e) {
-            btn.textContent = 'Pay securely with Razorpay';
-            btn.disabled = false;
-            showToast(e.message || 'Payment verification failed', 'error');
-          }
-        },
-        modal: {
-          ondismiss: function () {
-            btn.textContent = 'Pay securely with Razorpay';
-            btn.disabled = false;
-            showToast('Payment cancelled by user', 'error');
-          }
+        // 1. Create Razorpay order on the server
+        const reqPayload = { items: cartItems };
+        if (App.state.appliedCoupon) {
+          reqPayload.couponCode = App.state.appliedCoupon.code;
         }
-      };
+        const resOrder = await API.createPaymentOrder(reqPayload);
+        const { keyId, order: razorpayOrder } = resOrder;
 
-      const rzp = new Razorpay(options);
-      rzp.open();
-    } catch (e) {
-      btn.textContent = 'Pay securely with Razorpay';
-      btn.disabled = false;
-      showToast(e.message || 'Failed to initiate payment', 'error');
-    }
+        // 2. Open Razorpay checkout modal
+        const options = {
+          key: keyId,
+          amount: razorpayOrder.amount,
+          currency: razorpayOrder.currency,
+          name: 'RK Resin Art',
+          description: 'Premium Craft Supplies Order',
+          order_id: razorpayOrder.id,
+          prefill: {
+            name: `${firstName} ${customer.lastName}`.trim(),
+            email: customer.email || '',
+            contact: phone
+          },
+          theme: { color: '#0f766e' },
+          handler: async function (response) {
+            try {
+              btn.textContent = 'Verifying Payment...';
+              
+              // 3. Cryptographically verify signature & place order
+              const verifyPayload = {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                items: cartItems,
+                customer
+              };
+              if (App.state.appliedCoupon) {
+                verifyPayload.couponCode = App.state.appliedCoupon.code;
+              }
+              const verifyRes = await API.verifyPayment(verifyPayload);
+
+              App.state.lastOrderData = verifyRes.order;
+
+              if (!isBuyNow) Cart.clear();
+
+              btn.textContent = 'Pay securely with Razorpay';
+              btn.disabled = false;
+              btn._isBuyNow = false;
+              btn._buyNowItems = null;
+
+              // Invoice download button
+              const invoiceBtn = document.getElementById('invoiceDownloadBtn');
+              invoiceBtn.style.display = 'flex';
+              invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
+
+              showToast(`Order #${verifyRes.orderId} placed & paid successfully! 🎉`, 'success');
+
+              // WhatsApp message to admin
+              const orderLines = cartItems.map((i, index) =>
+                `${index + 1}. ${i.name}\n` +
+                `   Category: ${i.category || 'Product'}\n` +
+                `   Qty: ${i.qty}\n` +
+                `   Rate: ₹${Number(i.price).toLocaleString('en-IN')}\n` +
+                `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
+              ).join('\n\n');
+              const fullName = `${firstName} ${customer.lastName}`.trim();
+              const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
+              
+              const discountAmount = verifyRes.order.discount || 0;
+              const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
+              const otherChargesAmount = verifyRes.order.otherChargesAmount || 0;
+              const otherLine = otherChargesAmount > 0 ? `Other Charges${verifyRes.order.otherChargesType === 'percentage' ? ' (' + verifyRes.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
+
+              const msg = encodeURIComponent(
+                `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
+                `Order ID: #${verifyRes.orderId}\n` +
+                `Payment Status: Paid online via Razorpay\n` +
+                `Payment ID: ${response.razorpay_payment_id}\n` +
+                `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
+                `📦 ORDER DETAILS\n${orderLines}\n\n` +
+                `💰 PAYMENT SUMMARY\n` +
+                `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
+                discountLine +
+                `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
+                otherLine +
+                `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
+                `👤 CUSTOMER DETAILS\n` +
+                `Name: ${fullName}\n` +
+                `Phone: ${phone}\n` +
+                `Email: ${customer.email || '-'}\n` +
+                `Address: ${fullAddress}`
+              );
+              window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+              App.loadProducts();
+              document.getElementById('checkoutModalOverlay').classList.remove('open');
+            } catch (e) {
+              btn.textContent = 'Pay securely with Razorpay';
+              btn.disabled = false;
+              showToast(e.message || 'Payment verification failed', 'error');
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              btn.textContent = 'Pay securely with Razorpay';
+              btn.disabled = false;
+              showToast('Payment cancelled by user', 'error');
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } catch (e) {
+        btn.textContent = 'Pay securely with Razorpay';
+        btn.disabled = false;
+        showToast(e.message || 'Failed to initiate payment', 'error');
+      }
+    });
   } else {
     // WhatsApp Inquiry flow
     try {
