@@ -161,7 +161,9 @@ const Cart = {
           }
         }
       } catch (err) {
-        console.error('Failed to sync cart with server:', err);
+        if (typeof API !== 'undefined' && !API.isUserLoggedIn()) return;
+        if (err && err.message && err.message.toLowerCase().includes('login')) return;
+        console.warn('Cart sync paused:', err.message || err);
       }
     }
   }

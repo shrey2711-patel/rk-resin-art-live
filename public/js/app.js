@@ -48,11 +48,17 @@ const App = {
     this.bindMobileNav();
     Auth.init();
     if (typeof Cart !== 'undefined') {
-      Cart.syncWithServer();
-      // Start real-time cross-device cart synchronization every 4 seconds
-      setInterval(() => {
-        Cart.syncWithServer(true);
-      }, 4000);
+      if (typeof API !== 'undefined' && API.isUserLoggedIn()) {
+        Cart.syncWithServer();
+      }
+      // Start real-time cross-device cart synchronization every 4 seconds when logged in
+      if (!window.__cartSyncInterval) {
+        window.__cartSyncInterval = setInterval(() => {
+          if (typeof Cart !== 'undefined' && typeof API !== 'undefined' && API.isUserLoggedIn()) {
+            Cart.syncWithServer(true);
+          }
+        }, 4000);
+      }
     }
     // Coupon apply listener
     const applyBtn = document.getElementById('applyPromoBtn');

@@ -19,8 +19,15 @@ const API = {
 
   async handleResponse(res, adminAuth = true) {
     if (!res.ok) {
-      if (adminAuth && (res.status === 401 || res.status === 403)) {
-        API.adminLogout();
+      if (res.status === 401 || res.status === 403) {
+        if (adminAuth) {
+          API.adminLogout();
+        } else {
+          API.logout();
+          if (typeof Auth !== 'undefined' && Auth.render) {
+            Auth.render();
+          }
+        }
       }
       let text = await res.text();
       try {
@@ -39,7 +46,7 @@ const API = {
       method: 'GET',
       headers: this.headers(auth)
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, auth);
   },
 
   async post(path, data, auth = false) {
@@ -48,7 +55,7 @@ const API = {
       headers: this.headers(auth),
       body: JSON.stringify(data)
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, auth);
   },
 
   async userGet(path) {
@@ -56,7 +63,7 @@ const API = {
       method: 'GET',
       headers: this.userHeaders()
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, false);
   },
 
   async userPost(path, data) {
@@ -65,7 +72,7 @@ const API = {
       headers: this.userHeaders(),
       body: JSON.stringify(data)
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, false);
   },
 
   async userPut(path, data) {
@@ -74,7 +81,7 @@ const API = {
       headers: this.userHeaders(),
       body: JSON.stringify(data)
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, false);
   },
 
   async put(path, data, auth = false) {
