@@ -267,4 +267,13 @@ const API = {
   getCoupons: () => API.get('/api/admin/coupons', true),
   createCoupon: (data) => API.post('/api/admin/coupons', data, true),
   deleteCoupon: (id) => API.delete(`/api/admin/coupons/${id}`, true),
+
+  // ── Admin user management ──────────────────────────
+  getAdminUsers: () => API.get('/api/admin/users', true),
+  updateAdminUser: (id, data) => API.put(`/api/admin/users/${id}`, data, true),
+  deleteAdminUser: (id) => API.delete(`/api/admin/users/${id}`, true),
+
+  // ── User OTP password change ───────────────────────
+  requestPasswordOtp: (newPassword) => API.userPost('/api/auth/request-password-otp', { newPassword }),
+  changePassword: (otp, newPassword) => API.userPost('/api/auth/change-password', { otp, newPassword }),
 };

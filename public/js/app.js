@@ -2298,6 +2298,97 @@ const Auth = {
     };
 
     document.getElementById('saveProfileBtn').onclick = () => this.saveProfile();
+
+    // ── Change Password OTP flow ─────────────────────────────
+    // Toggle expand/collapse of change password card
+    const changePwToggle = document.getElementById('changePwToggle');
+    if (changePwToggle) {
+      changePwToggle.onclick = () => {
+        const body = document.getElementById('changePwBody');
+        const arrow = document.getElementById('changePwArrow');
+        const open = body.style.display !== 'none';
+        body.style.display = open ? 'none' : '';
+        if (arrow) arrow.textContent = open ? '▼' : '▲';
+      };
+    }
+
+    // Show/hide password toggles
+    const toggleNewPw = document.getElementById('toggleNewPw');
+    const toggleConfirmPw = document.getElementById('toggleConfirmPw');
+    if (toggleNewPw) {
+      toggleNewPw.onclick = () => {
+        const inp = document.getElementById('newPwInput');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        toggleNewPw.textContent = inp.type === 'password' ? '👁' : '🙈';
+      };
+    }
+    if (toggleConfirmPw) {
+      toggleConfirmPw.onclick = () => {
+        const inp = document.getElementById('confirmPwInput');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        toggleConfirmPw.textContent = inp.type === 'password' ? '👁' : '🙈';
+      };
+    }
+
+    const changePwMsg = (text, type = '') => {
+      const el = document.getElementById('changePwMsg');
+      if (!el) return;
+      el.textContent = text;
+      el.className = `change-pw-msg ${type}`;
+    };
+
+    const sendOtp = async () => {
+      if (!this.user) return this.message('Please log in first.', 'error');
+      const newPw = (document.getElementById('newPwInput').value || '').trim();
+      const confirmPw = (document.getElementById('confirmPwInput').value || '').trim();
+      if (!newPw || newPw.length < 6) return changePwMsg('New password must be at least 6 characters.', 'error');
+      if (newPw !== confirmPw) return changePwMsg('Passwords do not match.', 'error');
+      const btn = document.getElementById('sendPwOtpBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Sending OTP…';
+      changePwMsg('');
+      try {
+        await API.requestPasswordOtp(newPw);
+        document.getElementById('otpSection').style.display = '';
+        document.getElementById('otpInput').value = '';
+        changePwMsg(`✅ OTP sent to ${this.user.email}. Check your inbox!`, 'success');
+      } catch (e) {
+        changePwMsg(e.message || 'Failed to send OTP', 'error');
+      }
+      btn.disabled = false;
+      btn.textContent = '📧 Send OTP to Email';
+    };
+
+    const sendPwOtpBtn = document.getElementById('sendPwOtpBtn');
+    if (sendPwOtpBtn) sendPwOtpBtn.onclick = sendOtp;
+
+    const resendOtpBtn = document.getElementById('resendOtpBtn');
+    if (resendOtpBtn) resendOtpBtn.onclick = sendOtp;
+
+    const confirmPwChangeBtn = document.getElementById('confirmPwChangeBtn');
+    if (confirmPwChangeBtn) {
+      confirmPwChangeBtn.onclick = async () => {
+        const otp = (document.getElementById('otpInput').value || '').trim();
+        const newPw = (document.getElementById('newPwInput').value || '').trim();
+        if (!otp || otp.length !== 6) return changePwMsg('Please enter the 6-digit OTP from your email.', 'error');
+        confirmPwChangeBtn.disabled = true;
+        confirmPwChangeBtn.textContent = '⏳ Verifying…';
+        changePwMsg('');
+        try {
+          await API.changePassword(otp, newPw);
+          changePwMsg('🎉 Password changed successfully! You can now log in with your new password.', 'success');
+          document.getElementById('newPwInput').value = '';
+          document.getElementById('confirmPwInput').value = '';
+          document.getElementById('otpInput').value = '';
+          document.getElementById('otpSection').style.display = 'none';
+          showToast('Password changed successfully!', 'success');
+        } catch (e) {
+          changePwMsg(e.message || 'Invalid OTP or session expired', 'error');
+        }
+        confirmPwChangeBtn.disabled = false;
+        confirmPwChangeBtn.textContent = '✅ Confirm & Change Password';
+      };
+    }
   },
 
   open() {

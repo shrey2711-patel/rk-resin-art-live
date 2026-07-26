@@ -2508,3 +2508,216 @@ Admin.renderTopProductsList = function(topProducts) {
     `;
   }).join('');
 };
+
+// ── Users Tab ──────────────────────────────────────────────────
+Admin._usersCache = [];
+Admin._userToDelete = null;
+
+Admin.renderUsers = async function () {
+  const list = document.getElementById('adminUserList');
+  const badge = document.getElementById('usersCountBadge');
+  if (!list) return;
+  list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted)">⏳ Loading users...</div>`;
+  try {
+    const users = await API.getAdminUsers();
+    Admin._usersCache = users;
+    badge && (badge.textContent = `${users.length} user${users.length !== 1 ? 's' : ''}`);
+    Admin._renderUserList(users);
+  } catch (e) {
+    list.innerHTML = `<div style="padding:20px;color:var(--red)">❌ Failed to load users: ${e.message}</div>`;
+  }
+};
+
+Admin._renderUserList = function (users) {
+  const list = document.getElementById('adminUserList');
+  if (!list) return;
+  if (!users.length) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--muted);font-size:0.95rem">No registered users yet.</div>`;
+    return;
+  }
+  list.innerHTML = users.map(u => {
+    const initials = (u.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const joinDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+    const address = [u.address, u.city, u.pin].filter(Boolean).join(', ') || '<span style="color:var(--muted)">No address</span>';
+    const orders = u.orderCount || 0;
+    return `
+      <div class="user-row" data-uid="${u.id}" style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);transition:background 0.18s">
+        <div class="user-avatar-initials" style="flex-shrink:0;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--green));color:#fff;font-weight:800;font-size:1.05rem;display:flex;align-items:center;justify-content:center;letter-spacing:0.5px">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="font-weight:800;font-size:0.96rem;color:var(--ink)">${u.name || '—'}</span>
+            <span style="font-size:0.73rem;background:${orders > 0 ? '#d1fae5' : 'var(--border)'};color:${orders > 0 ? '#065f46' : 'var(--muted)'};padding:2px 8px;border-radius:99px;font-weight:700">${orders} order${orders !== 1 ? 's' : ''}</span>
+            ${u.hasPassword ? '<span style="font-size:0.7rem;background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:99px;font-weight:700">🔐 Has Password</span>' : ''}
+          </div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-bottom:2px">📧 ${u.email || '—'} &nbsp;|&nbsp; 📱 ${u.phone || '—'}</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:2px">🏠 ${address}</div>
+          <div style="font-size:0.74rem;color:var(--muted)">Joined: ${joinDate} &nbsp;|&nbsp; Last login: ${u.lastLoginCity ? `${u.lastLoginCity}, ${u.lastLoginCountry}` : '—'}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          <button class="admin-action-btn edit-user-btn" data-uid="${u.id}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--p);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">✏️ Edit</button>
+          <button class="admin-action-btn delete-user-btn" data-uid="${u.id}" data-name="${u.name || 'this user'}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">🗑️ Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Bind edit buttons
+  list.querySelectorAll('.edit-user-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const uid = Number(btn.dataset.uid);
+      const user = Admin._usersCache.find(u => u.id === uid);
+      if (!user) return;
+      Admin._openUserEditModal(user);
+    });
+  });
+
+  // Bind delete buttons
+  list.querySelectorAll('.delete-user-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      Admin._userToDelete = Number(btn.dataset.uid);
+      const name = btn.dataset.name || 'this user';
+      const msgEl = document.getElementById('userDeleteMsg');
+      if (msgEl) msgEl.textContent = `Are you sure you want to permanently delete "${name}"? This cannot be undone.`;
+      const overlay = document.getElementById('userDeleteModalOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    });
+  });
+};
+
+Admin._openUserEditModal = function (user) {
+  document.getElementById('editUserId').value = user.id;
+  document.getElementById('euName').value = user.name || '';
+  document.getElementById('euPhone').value = user.phone || '';
+  document.getElementById('euAddress').value = user.address || '';
+  document.getElementById('euCity').value = user.city || '';
+  document.getElementById('euPin').value = user.pin || '';
+  document.getElementById('euPassword').value = '';
+  const msg = document.getElementById('userEditMsg');
+  if (msg) { msg.textContent = ''; msg.style.display = 'none'; }
+  const overlay = document.getElementById('userEditModalOverlay');
+  if (overlay) overlay.style.display = 'flex';
+};
+
+// Users tab tab click
+document.querySelectorAll('.atab[data-tab]').forEach(btn => {
+  if (btn.dataset.tab === 'users') {
+    btn.addEventListener('click', () => Admin.renderUsers());
+  }
+});
+
+// Refresh users button
+const refreshUsersBtn = document.getElementById('refreshUsersBtn');
+if (refreshUsersBtn) {
+  refreshUsersBtn.onclick = () => {
+    Admin.renderUsers();
+    showToast('Users refreshed', 'success');
+  };
+}
+
+// Search users
+const usersSearchInput = document.getElementById('usersSearchInput');
+if (usersSearchInput) {
+  usersSearchInput.addEventListener('input', () => {
+    const q = usersSearchInput.value.toLowerCase();
+    const filtered = Admin._usersCache.filter(u =>
+      (u.name || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.phone || '').toLowerCase().includes(q)
+    );
+    Admin._renderUserList(filtered);
+  });
+}
+
+// Edit modal — save
+const saveUserEditBtn = document.getElementById('saveUserEditBtn');
+if (saveUserEditBtn) {
+  saveUserEditBtn.addEventListener('click', async () => {
+    const id = Number(document.getElementById('editUserId').value);
+    const payload = {
+      name: document.getElementById('euName').value.trim(),
+      phone: document.getElementById('euPhone').value.trim(),
+      address: document.getElementById('euAddress').value.trim(),
+      city: document.getElementById('euCity').value.trim(),
+      pin: document.getElementById('euPin').value.trim(),
+    };
+    const pw = document.getElementById('euPassword').value;
+    if (pw) {
+      if (pw.length < 6) return showToast('Password must be at least 6 characters', 'error');
+      payload.password = pw;
+    }
+    saveUserEditBtn.disabled = true;
+    saveUserEditBtn.textContent = 'Saving…';
+    try {
+      await API.updateAdminUser(id, payload);
+      // Update cache
+      const idx = Admin._usersCache.findIndex(u => u.id === id);
+      if (idx !== -1) { Admin._usersCache[idx] = { ...Admin._usersCache[idx], ...payload }; }
+      Admin._renderUserList(Admin._usersCache);
+      const msg = document.getElementById('userEditMsg');
+      if (msg) { msg.textContent = '✅ User saved successfully!'; msg.style.display = 'block'; msg.style.color = 'var(--green)'; }
+      showToast('User updated successfully', 'success');
+      setTimeout(() => {
+        const overlay = document.getElementById('userEditModalOverlay');
+        if (overlay) overlay.style.display = 'none';
+      }, 1200);
+    } catch (e) {
+      showToast(e.message || 'Failed to save user', 'error');
+    }
+    saveUserEditBtn.disabled = false;
+    saveUserEditBtn.textContent = '💾 Save Changes';
+  });
+}
+
+// Edit modal — cancel / close
+const closeUserEditModal = document.getElementById('closeUserEditModal');
+const cancelUserEditBtn = document.getElementById('cancelUserEditBtn');
+[closeUserEditModal, cancelUserEditBtn].forEach(el => {
+  if (el) el.addEventListener('click', () => {
+    const overlay = document.getElementById('userEditModalOverlay');
+    if (overlay) overlay.style.display = 'none';
+  });
+});
+
+// Delete modal — confirm
+const confirmUserDeleteBtn = document.getElementById('confirmUserDeleteBtn');
+if (confirmUserDeleteBtn) {
+  confirmUserDeleteBtn.addEventListener('click', async () => {
+    if (!Admin._userToDelete) return;
+    confirmUserDeleteBtn.disabled = true;
+    confirmUserDeleteBtn.textContent = 'Deleting…';
+    try {
+      await API.deleteAdminUser(Admin._userToDelete);
+      Admin._usersCache = Admin._usersCache.filter(u => u.id !== Admin._userToDelete);
+      Admin._renderUserList(Admin._usersCache);
+      const badge = document.getElementById('usersCountBadge');
+      if (badge) badge.textContent = `${Admin._usersCache.length} user${Admin._usersCache.length !== 1 ? 's' : ''}`;
+      showToast('User deleted successfully', 'success');
+      const overlay = document.getElementById('userDeleteModalOverlay');
+      if (overlay) overlay.style.display = 'none';
+    } catch (e) {
+      showToast(e.message || 'Failed to delete user', 'error');
+    }
+    confirmUserDeleteBtn.disabled = false;
+    confirmUserDeleteBtn.textContent = '🗑️ Delete';
+    Admin._userToDelete = null;
+  });
+}
+
+// Delete modal — cancel
+const cancelUserDeleteBtn = document.getElementById('cancelUserDeleteBtn');
+if (cancelUserDeleteBtn) {
+  cancelUserDeleteBtn.addEventListener('click', () => {
+    Admin._userToDelete = null;
+    const overlay = document.getElementById('userDeleteModalOverlay');
+    if (overlay) overlay.style.display = 'none';
+  });
+}
+
+// Show/hide password toggle in user edit modal
+const toggleEuPw = document.getElementById('toggleEuPw');
+if (toggleEuPw) {
+  toggleEuPw.addEventListener('click', () => {
+    const input = document.getElementById('euPassword');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    toggleEuPw.textContent = input.type === 'password' ? '👁' : '🙈';
+  });
+}

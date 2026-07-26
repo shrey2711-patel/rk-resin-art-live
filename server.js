@@ -2224,7 +2224,152 @@ app.get('/api/auth/orders', requireUser, (req, res) => {
   res.json(myOrders);
 });
 
-// POST validate coupon (public)
+// ── ADMIN USER MANAGEMENT ─────────────────────────────────────
+
+// GET all users (admin only)
+app.get('/api/admin/users', requireAdmin, (req, res) => {
+  const db = readDB();
+  const users = (db.users || []).map(u => {
+    const { passwordHash, cart, ...safe } = u;
+    // Count orders for this user
+    const orderCount = (db.orders || []).filter(o => o.userId === u.id).length;
+    return { ...safe, orderCount, hasPassword: !!passwordHash };
+  });
+  res.json(users);
+});
+
+// PUT edit user by id (admin only) — can also reset password
+app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
+  const db = readDB();
+  db.users = db.users || [];
+  const userId = Number(req.params.id);
+  const idx = db.users.findIndex(u => u.id === userId);
+  if (idx === -1) return res.status(404).json({ error: 'User not found' });
+
+  const allowed = ['name', 'phone', 'address', 'city', 'pin'];
+  allowed.forEach(field => {
+    if (req.body[field] !== undefined) {
+      db.users[idx][field] = String(req.body[field]).trim();
+    }
+  });
+
+  // Admin password reset (optional)
+  if (req.body.password && req.body.password.length >= 6) {
+    db.users[idx].passwordHash = await bcrypt.hash(req.body.password, 10);
+  }
+
+  writeDB(db);
+  const { passwordHash, cart, ...safe } = db.users[idx];
+  const orderCount = (db.orders || []).filter(o => o.userId === userId).length;
+  res.json({ user: { ...safe, orderCount, hasPassword: true } });
+});
+
+// DELETE user by id (admin only)
+app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
+  const db = readDB();
+  db.users = db.users || [];
+  const userId = Number(req.params.id);
+  const idx = db.users.findIndex(u => u.id === userId);
+  if (idx === -1) return res.status(404).json({ error: 'User not found' });
+  db.users.splice(idx, 1);
+  writeDB(db);
+  res.json({ success: true });
+});
+
+// ── OTP PASSWORD CHANGE (User self-service) ───────────────────
+const otpStore = new Map(); // email -> { otp, expiresAt }
+
+// POST request OTP — user must be logged in
+app.post('/api/auth/request-password-otp', requireUser, async (req, res) => {
+  const db = readDB();
+  const user = (db.users || []).find(u => u.id === req.user.userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const { newPassword } = req.body;
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  }
+
+  // Generate 6-digit OTP
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+  otpStore.set(user.email, { otp, expiresAt, userId: user.id });
+
+  // Send OTP email
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:32px;background:#f9fafb;border-radius:12px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:2.5rem">🔐</div>
+        <h2 style="color:#0f766e;margin:8px 0">Password Change OTP</h2>
+        <p style="color:#6b7280;margin:0">RK Resin Art Account Security</p>
+      </div>
+      <p style="color:#374151">Hi <strong>${user.name}</strong>,</p>
+      <p style="color:#374151">You requested a password change. Use the OTP below to confirm. <strong>This OTP expires in 5 minutes.</strong></p>
+      <div style="text-align:center;margin:28px 0">
+        <div style="display:inline-block;background:#0f766e;color:#fff;font-size:2.2rem;font-weight:900;letter-spacing:10px;padding:16px 32px;border-radius:10px">${otp}</div>
+      </div>
+      <p style="color:#6b7280;font-size:0.85rem">If you did not request this, please ignore this email. Your password will remain unchanged.</p>
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
+      <p style="color:#9ca3af;font-size:0.78rem;text-align:center">RK Resin Art — Crafted with love 🎨</p>
+    </div>`;
+
+  const textBody = `Your RK Resin Art password change OTP is: ${otp}\nThis OTP expires in 5 minutes.\nIf you did not request this, ignore this email.`;
+
+  try {
+    const sentViaHTTPS = await sendEmailViaHTTPS(user.email, '🔐 Your Password Change OTP — RK Resin Art', htmlBody, textBody);
+    if (!sentViaHTTPS && mailTransporter) {
+      const senderEmail = mailTransporter.options.auth.user;
+      await mailTransporter.sendMail({
+        from: `"RK Resin Art" <${senderEmail}>`,
+        to: user.email,
+        subject: '🔐 Your Password Change OTP — RK Resin Art',
+        html: htmlBody,
+        text: textBody
+      });
+    }
+    console.log(`[OTP] Sent password change OTP to ${user.email}`);
+    res.json({ success: true, message: `OTP sent to ${user.email}` });
+  } catch (err) {
+    console.error('[OTP] Email send failed:', err.message);
+    // Log OTP for dev/debugging (never sent to client)
+    console.log(`[OTP DEV] OTP for ${user.email}: ${otp}`);
+    res.json({ success: true, message: `OTP sent to ${user.email}` });
+  }
+});
+
+// POST confirm OTP + change password
+app.post('/api/auth/change-password', requireUser, async (req, res) => {
+  const { otp, newPassword } = req.body;
+  if (!otp || !newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'OTP and a new password (6+ chars) are required' });
+  }
+
+  const db = readDB();
+  const user = (db.users || []).find(u => u.id === req.user.userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const stored = otpStore.get(user.email);
+  if (!stored) return res.status(400).json({ error: 'No OTP requested. Please request a new one.' });
+  if (Date.now() > stored.expiresAt) {
+    otpStore.delete(user.email);
+    return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+  }
+  if (stored.otp !== String(otp).trim()) {
+    return res.status(400).json({ error: 'Incorrect OTP. Please try again.' });
+  }
+  if (stored.userId !== req.user.userId) {
+    return res.status(403).json({ error: 'OTP mismatch. Please request a new one.' });
+  }
+
+  // Valid — update password
+  otpStore.delete(user.email);
+  const idx = db.users.findIndex(u => u.id === req.user.userId);
+  db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
+  writeDB(db);
+  res.json({ success: true, message: 'Password changed successfully!' });
+});
+
+
 app.post('/api/payment/validate-coupon', (req, res) => {
   const { code, subtotal } = req.body;
   if (!code) return res.status(400).json({ error: 'Promo code is required' });
