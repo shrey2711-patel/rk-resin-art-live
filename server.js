@@ -2320,7 +2320,18 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
     }
   });
 
-  // Admin password reset (optional)
+  // Admin editing user's email directly
+  if (req.body.email) {
+    const newEmail = String(req.body.email).trim().toLowerCase();
+    if (newEmail && newEmail !== db.users[idx].email) {
+      if (db.users.some(u => u.id !== userId && u.email === newEmail)) {
+        return res.status(409).json({ error: 'This email is already in use by another user' });
+      }
+      db.users[idx].email = newEmail;
+    }
+  }
+
+  // Admin password reset (direct — no OTP needed for admin)
   if (req.body.password && req.body.password.length >= 6) {
     db.users[idx].passwordHash = await bcrypt.hash(req.body.password, 10);
   }

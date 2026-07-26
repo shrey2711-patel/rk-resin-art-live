@@ -1096,15 +1096,24 @@
   <div class="modal-overlay" id="userEditModalOverlay" style="display:none">
     <div class="modal-box user-edit-modal">
       <button class="modal-close" id="closeUserEditModal">&times;</button>
-      <h3 class="modal-title">✏️ Edit User</h3>
+      <h3 class="modal-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>✏️ Edit User</span>
+        <span style="font-size:0.72rem;background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:99px;font-weight:700;">⚡ Admin Rights (No OTP)</span>
+      </h3>
       <input type="hidden" id="editUserId">
       <div class="form-field">
         <label>Full Name</label>
         <input type="text" id="euName" class="admin-input" placeholder="Full name">
       </div>
-      <div class="form-field">
-        <label>Phone</label>
-        <input type="tel" id="euPhone" class="admin-input" placeholder="Phone number">
+      <div class="form-row-2">
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="euEmail" class="admin-input" placeholder="user@email.com">
+        </div>
+        <div class="form-field">
+          <label>Phone</label>
+          <input type="tel" id="euPhone" class="admin-input" placeholder="Phone number">
+        </div>
       </div>
       <div class="form-field">
         <label>Address</label>

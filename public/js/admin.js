@@ -2586,6 +2586,8 @@ Admin._renderUserList = function (users) {
 Admin._openUserEditModal = function (user) {
   document.getElementById('editUserId').value = user.id;
   document.getElementById('euName').value = user.name || '';
+  const emailInput = document.getElementById('euEmail');
+  if (emailInput) emailInput.value = user.email || '';
   document.getElementById('euPhone').value = user.phone || '';
   document.getElementById('euAddress').value = user.address || '';
   document.getElementById('euCity').value = user.city || '';
@@ -2627,11 +2629,12 @@ if (usersSearchInput) {
   });
 }
 
-// Edit modal — save
+// Edit modal — save (Admin direct edit — NO OTP required!)
 const saveUserEditBtn = document.getElementById('saveUserEditBtn');
 if (saveUserEditBtn) {
   saveUserEditBtn.addEventListener('click', async () => {
     const id = Number(document.getElementById('editUserId').value);
+    const emailVal = document.getElementById('euEmail')?.value.trim();
     const payload = {
       name: document.getElementById('euName').value.trim(),
       phone: document.getElementById('euPhone').value.trim(),
@@ -2639,6 +2642,7 @@ if (saveUserEditBtn) {
       city: document.getElementById('euCity').value.trim(),
       pin: document.getElementById('euPin').value.trim(),
     };
+    if (emailVal) payload.email = emailVal;
     const pw = document.getElementById('euPassword').value;
     if (pw) {
       if (pw.length < 6) return showToast('Password must be at least 6 characters', 'error');
