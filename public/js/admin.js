@@ -2721,3 +2721,56 @@ if (toggleEuPw) {
     toggleEuPw.textContent = input.type === 'password' ? '👁' : '🙈';
   });
 }
+
+// ── Admin Password Change (Settings Tab) ───────────────────
+['CurrentPw', 'NewPw', 'ConfirmPw'].forEach(type => {
+  const btn = document.getElementById(`toggleAp${type}`);
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(`ap${type}`);
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+        btn.textContent = input.type === 'password' ? '👁' : '🙈';
+      }
+    });
+  }
+});
+
+const changeAdminPwBtn = document.getElementById('changeAdminPwBtn');
+if (changeAdminPwBtn) {
+  changeAdminPwBtn.addEventListener('click', async () => {
+    const currentPassword = (document.getElementById('apCurrentPw')?.value || '').trim();
+    const newPassword = (document.getElementById('apNewPw')?.value || '').trim();
+    const confirmPassword = (document.getElementById('apConfirmPw')?.value || '').trim();
+    const okEl = document.getElementById('adminPwOk');
+
+    const showMsg = (text, isErr = false) => {
+      if (okEl) {
+        okEl.textContent = text;
+        okEl.style.display = 'block';
+        okEl.style.color = isErr ? 'var(--red)' : 'var(--green)';
+      }
+    };
+
+    if (!currentPassword) return showMsg('Please enter your current admin password', true);
+    if (!newPassword || newPassword.length < 6) return showMsg('New password must be at least 6 characters', true);
+    if (newPassword !== confirmPassword) return showMsg('New passwords do not match', true);
+
+    changeAdminPwBtn.disabled = true;
+    changeAdminPwBtn.textContent = '⏳ Updating...';
+    try {
+      const res = await API.changeAdminPassword(currentPassword, newPassword);
+      showMsg('✅ ' + (res.message || 'Admin password updated successfully!'), false);
+      showToast('Admin password updated successfully!', 'success');
+      document.getElementById('apCurrentPw').value = '';
+      document.getElementById('apNewPw').value = '';
+      document.getElementById('apConfirmPw').value = '';
+    } catch (err) {
+      showMsg('❌ ' + (err.message || 'Failed to update admin password'), true);
+      showToast(err.message || 'Failed to update admin password', 'error');
+    }
+    changeAdminPwBtn.disabled = false;
+    changeAdminPwBtn.textContent = '🔒 Update Admin Password';
+  });
+}
+

@@ -2130,6 +2130,33 @@ app.post('/api/admin/login', authLimiter, (req, res) => {
   res.json({ token, message: 'Login successful' });
 });
 
+// POST change admin password
+app.post('/api/admin/change-password', requireAdmin, (req, res) => {
+  const db = readDB();
+  const { currentPassword, newPassword } = req.body;
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current password and new password are required' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New admin password must be at least 6 characters' });
+  }
+
+  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword || 'rk2024';
+  if (currentPassword !== correctPassword) {
+    logSecurityEvent(clientIp, 'FAILED_ADMIN_PW_CHANGE', 'Attempted admin password change with wrong current password');
+    return res.status(401).json({ error: 'Current admin password is incorrect' });
+  }
+
+  db.settings = db.settings || {};
+  db.settings.adminPassword = newPassword;
+  writeDB(db);
+  logSecurityEvent(clientIp, 'ADMIN_PASSWORD_CHANGED', 'Admin password changed successfully');
+  res.json({ success: true, message: 'Admin password changed successfully!' });
+});
+
+
 // CUSTOMER AUTH
 app.post('/api/auth/register', authLimiter, async (req, res) => {
   const db = readDB();

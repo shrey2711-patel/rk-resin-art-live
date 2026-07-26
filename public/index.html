@@ -642,6 +642,34 @@
                 </div>
               </div>
 
+              <!-- Admin Password Security Card -->
+              <div class="settings-group">
+                <div class="settings-group-title">🔑 Change Admin Password</div>
+                <div class="form-field">
+                  <label for="apCurrentPw">Current Admin Password</label>
+                  <div style="position:relative">
+                    <input type="password" id="apCurrentPw" class="admin-input" placeholder="Current admin password">
+                    <button type="button" class="pw-eye-btn" id="toggleApCurrentPw" title="Show/Hide">👁</button>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="apNewPw">New Admin Password</label>
+                  <div style="position:relative">
+                    <input type="password" id="apNewPw" class="admin-input" placeholder="Min 6 characters">
+                    <button type="button" class="pw-eye-btn" id="toggleApNewPw" title="Show/Hide">👁</button>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="apConfirmPw">Confirm New Admin Password</label>
+                  <div style="position:relative">
+                    <input type="password" id="apConfirmPw" class="admin-input" placeholder="Repeat new admin password">
+                    <button type="button" class="pw-eye-btn" id="toggleApConfirmPw" title="Show/Hide">👁</button>
+                  </div>
+                </div>
+                <button class="admin-save-btn" id="changeAdminPwBtn" style="padding: 12px 20px; font-size: 0.9rem; border-radius: var(--radius); margin-top: 6px;">🔒 Update Admin Password</button>
+                <div class="admin-ok" id="adminPwOk"></div>
+              </div>
+
             </div>
 
             <div style="margin-top: 20px;">

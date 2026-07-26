@@ -276,4 +276,8 @@ const API = {
   // ── User OTP password change ───────────────────────
   requestPasswordOtp: (newPassword) => API.userPost('/api/auth/request-password-otp', { newPassword }),
   changePassword: (otp, newPassword) => API.userPost('/api/auth/change-password', { otp, newPassword }),
+
+  // ── Admin password change ──────────────────────────
+  changeAdminPassword: (currentPassword, newPassword) => API.post('/api/admin/change-password', { currentPassword, newPassword }, true),
 };
+
