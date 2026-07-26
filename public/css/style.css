@@ -4005,3 +4005,9 @@ body {
   color: var(--ink);
   margin: 0 0 18px;
 }
+
+#userEditModalOverlay,
+#userDeleteModalOverlay {
+  z-index: 10005 !important;
+}
+

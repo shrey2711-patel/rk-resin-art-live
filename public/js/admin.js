@@ -2562,24 +2562,29 @@ Admin._renderUserList = function (users) {
 
   // Bind edit buttons
   list.querySelectorAll('.edit-user-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const uid = Number(btn.dataset.uid);
-      const user = Admin._usersCache.find(u => u.id === uid);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const uid = String(btn.dataset.uid);
+      const user = Admin._usersCache.find(u => String(u.id) === uid);
       if (!user) return;
       Admin._openUserEditModal(user);
-    });
+    };
   });
 
   // Bind delete buttons
   list.querySelectorAll('.delete-user-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      Admin._userToDelete = Number(btn.dataset.uid);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      Admin._userToDelete = String(btn.dataset.uid);
       const name = btn.dataset.name || 'this user';
       const msgEl = document.getElementById('userDeleteMsg');
       if (msgEl) msgEl.textContent = `Are you sure you want to permanently delete "${name}"? This cannot be undone.`;
       const overlay = document.getElementById('userDeleteModalOverlay');
-      if (overlay) overlay.style.display = 'flex';
-    });
+      if (overlay) {
+        overlay.style.display = 'flex';
+        overlay.classList.add('open');
+      }
+    };
   });
 };
 
@@ -2596,7 +2601,10 @@ Admin._openUserEditModal = function (user) {
   const msg = document.getElementById('userEditMsg');
   if (msg) { msg.textContent = ''; msg.style.display = 'none'; }
   const overlay = document.getElementById('userEditModalOverlay');
-  if (overlay) overlay.style.display = 'flex';
+  if (overlay) {
+    overlay.style.display = 'flex';
+    overlay.classList.add('open');
+  }
 };
 
 // Users tab tab click
@@ -2633,7 +2641,7 @@ if (usersSearchInput) {
 const saveUserEditBtn = document.getElementById('saveUserEditBtn');
 if (saveUserEditBtn) {
   saveUserEditBtn.addEventListener('click', async () => {
-    const id = Number(document.getElementById('editUserId').value);
+    const id = document.getElementById('editUserId').value;
     const emailVal = document.getElementById('euEmail')?.value.trim();
     const payload = {
       name: document.getElementById('euName').value.trim(),
@@ -2653,7 +2661,7 @@ if (saveUserEditBtn) {
     try {
       await API.updateAdminUser(id, payload);
       // Update cache
-      const idx = Admin._usersCache.findIndex(u => u.id === id);
+      const idx = Admin._usersCache.findIndex(u => String(u.id) === String(id));
       if (idx !== -1) { Admin._usersCache[idx] = { ...Admin._usersCache[idx], ...payload }; }
       Admin._renderUserList(Admin._usersCache);
       const msg = document.getElementById('userEditMsg');
@@ -2661,7 +2669,10 @@ if (saveUserEditBtn) {
       showToast('User updated successfully', 'success');
       setTimeout(() => {
         const overlay = document.getElementById('userEditModalOverlay');
-        if (overlay) overlay.style.display = 'none';
+        if (overlay) {
+          overlay.style.display = 'none';
+          overlay.classList.remove('open');
+        }
       }, 1200);
     } catch (e) {
       showToast(e.message || 'Failed to save user', 'error');
@@ -2674,12 +2685,23 @@ if (saveUserEditBtn) {
 // Edit modal — cancel / close
 const closeUserEditModal = document.getElementById('closeUserEditModal');
 const cancelUserEditBtn = document.getElementById('cancelUserEditBtn');
+const userEditModalOverlay = document.getElementById('userEditModalOverlay');
 [closeUserEditModal, cancelUserEditBtn].forEach(el => {
   if (el) el.addEventListener('click', () => {
-    const overlay = document.getElementById('userEditModalOverlay');
-    if (overlay) overlay.style.display = 'none';
+    if (userEditModalOverlay) {
+      userEditModalOverlay.style.display = 'none';
+      userEditModalOverlay.classList.remove('open');
+    }
   });
 });
+if (userEditModalOverlay) {
+  userEditModalOverlay.addEventListener('click', (e) => {
+    if (e.target === userEditModalOverlay) {
+      userEditModalOverlay.style.display = 'none';
+      userEditModalOverlay.classList.remove('open');
+    }
+  });
+}
 
 // Delete modal — confirm
 const confirmUserDeleteBtn = document.getElementById('confirmUserDeleteBtn');
@@ -2690,13 +2712,16 @@ if (confirmUserDeleteBtn) {
     confirmUserDeleteBtn.textContent = 'Deleting…';
     try {
       await API.deleteAdminUser(Admin._userToDelete);
-      Admin._usersCache = Admin._usersCache.filter(u => u.id !== Admin._userToDelete);
+      Admin._usersCache = Admin._usersCache.filter(u => String(u.id) !== String(Admin._userToDelete));
       Admin._renderUserList(Admin._usersCache);
       const badge = document.getElementById('usersCountBadge');
       if (badge) badge.textContent = `${Admin._usersCache.length} user${Admin._usersCache.length !== 1 ? 's' : ''}`;
       showToast('User deleted successfully', 'success');
       const overlay = document.getElementById('userDeleteModalOverlay');
-      if (overlay) overlay.style.display = 'none';
+      if (overlay) {
+        overlay.style.display = 'none';
+        overlay.classList.remove('open');
+      }
     } catch (e) {
       showToast(e.message || 'Failed to delete user', 'error');
     }
@@ -2706,13 +2731,25 @@ if (confirmUserDeleteBtn) {
   });
 }
 
-// Delete modal — cancel
+// Delete modal — cancel / close
 const cancelUserDeleteBtn = document.getElementById('cancelUserDeleteBtn');
+const userDeleteModalOverlay = document.getElementById('userDeleteModalOverlay');
 if (cancelUserDeleteBtn) {
   cancelUserDeleteBtn.addEventListener('click', () => {
     Admin._userToDelete = null;
-    const overlay = document.getElementById('userDeleteModalOverlay');
-    if (overlay) overlay.style.display = 'none';
+    if (userDeleteModalOverlay) {
+      userDeleteModalOverlay.style.display = 'none';
+      userDeleteModalOverlay.classList.remove('open');
+    }
+  });
+}
+if (userDeleteModalOverlay) {
+  userDeleteModalOverlay.addEventListener('click', (e) => {
+    if (e.target === userDeleteModalOverlay) {
+      Admin._userToDelete = null;
+      userDeleteModalOverlay.style.display = 'none';
+      userDeleteModalOverlay.classList.remove('open');
+    }
   });
 }
 
