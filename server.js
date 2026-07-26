@@ -1245,6 +1245,28 @@ function normalizeClientIp(ip) {
   return normalizedIp || '127.0.0.1';
 }
 
+const DEVELOPER_WHITELIST_IPS = [
+  '152.59.2.171', // Developer PC IP
+  '127.0.0.1',
+  '::1',
+  '::ffff:127.0.0.1',
+  ...(process.env.DEVELOPER_IPS ? process.env.DEVELOPER_IPS.split(',').map(s => s.trim()) : [])
+];
+
+function isWhitelistedIp(ip) {
+  if (!ip) return false;
+  const norm = normalizeClientIp(ip);
+  let customWhitelist = [];
+  try {
+    const db = readDB();
+    if (Array.isArray(db.settings?.whitelistedIps)) {
+      customWhitelist = db.settings.whitelistedIps;
+    }
+  } catch (e) {}
+  return DEVELOPER_WHITELIST_IPS.includes(norm) || DEVELOPER_WHITELIST_IPS.includes(ip) || customWhitelist.includes(norm) || customWhitelist.includes(ip);
+}
+
+
 function formatLocationLabel(location) {
   if (!location) return 'Location not available';
   const parts = [location.city, location.region, location.country]
@@ -1347,6 +1369,10 @@ function logSecurityEvent(ip, type, message) {
 }
 
 function autoBlockIp(ip) {
+  if (isWhitelistedIp(ip)) {
+    console.log(`🛡️ Security: Skipping auto-block for whitelisted developer IP ${ip}.`);
+    return;
+  }
   const db = readDB();
   db.blockedIps = db.blockedIps || [];
   if (!db.blockedIps.includes(ip)) {
@@ -1517,10 +1543,15 @@ app.use((req, res, next) => {
 
 // Blocklist enforcement middleware
 app.use((req, res, next) => {
-  const db = readDB();
-  const blockedIps = db.blockedIps || [];
   const normalizedIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
   
+  if (isWhitelistedIp(normalizedIp)) {
+    return next();
+  }
+
+  const db = readDB();
+  const blockedIps = db.blockedIps || [];
+
   if (blockedIps.includes(normalizedIp)) {
     return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
   }
@@ -1723,8 +1754,17 @@ function readDB() {
     if (!data.cart) data.cart = [];
     if (!data.users) data.users = [];
     if (!data.reviews) data.reviews = [];
-    if (!data.wishlistSubscriptions) data.wishlistSubscriptions = [];
     if (!data.coupons) data.coupons = [];
+    if (!data.blockedIps) data.blockedIps = [];
+    if (!data.securityLogs) data.securityLogs = [];
+
+    // Automatically remove whitelisted developer IPs from blocked list if present
+    if (Array.isArray(data.blockedIps)) {
+      data.blockedIps = data.blockedIps.filter(ip => {
+        const norm = normalizeClientIp(ip);
+        return !DEVELOPER_WHITELIST_IPS.includes(norm) && !DEVELOPER_WHITELIST_IPS.includes(ip);
+      });
+    }
     
     return data;
   } catch (err) {
@@ -2906,6 +2946,16 @@ app.post('/api/admin/ip-unblock', requireAdmin, (req, res) => {
 
   res.json({ success: true, blockedIps: db.blockedIps });
 });
+
+// Emergency public endpoint to unblock current client IP (useful if locked out)
+app.get('/api/security/unblock-me', (req, res) => {
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
+  const db = readDB();
+  db.blockedIps = (db.blockedIps || []).filter(ip => ip !== clientIp && normalizeClientIp(ip) !== clientIp);
+  writeDB(db);
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>IP Unblocked</title><style>body{font-family:sans-serif;text-align:center;padding:50px;background:#f9fafb;color:#1e293b}a{color:#0f766e;font-weight:bold;text-decoration:none}.card{background:#fff;max-width:500px;margin:auto;padding:40px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}</style></head><body><div class="card"><h1 style="color:#0f766e">✅ IP Unblocked!</h1><p>Your IP address (<strong>${clientIp}</strong>) has been successfully removed from the blocklist.</p><p><a href="/">Click here to return to RK Resin Art</a></p></div></body></html>`);
+});
+
 
 // GET raw developer logs from visitor_logs.json
 app.get('/api/admin/dev-logs', requireAdmin, (req, res) => {
