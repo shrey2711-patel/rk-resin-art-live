@@ -2436,6 +2436,101 @@ app.post('/api/auth/change-password', requireUser, async (req, res) => {
   res.json({ success: true, message: 'Password changed successfully!' });
 });
 
+// ── UNAUTHENTICATED FORGOT PASSWORD VIA OTP (Login screen) ─────────
+
+// POST request forgot password OTP
+app.post('/api/auth/forgot-password-otp', authLimiter, async (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Please enter a valid registered email address' });
+  }
+
+  const db = readDB();
+  const user = (db.users || []).find(u => u.email === email);
+  if (!user) {
+    return res.status(404).json({ error: 'No account found with this email address' });
+  }
+
+  // Generate 6-digit OTP
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+  otpStore.set(user.email, { otp, expiresAt, userId: user.id });
+
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:32px;background:#f9fafb;border-radius:12px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:2.5rem">🔑</div>
+        <h2 style="color:#0f766e;margin:8px 0">Reset Password OTP</h2>
+        <p style="color:#6b7280;margin:0">RK Resin Art Account Security</p>
+      </div>
+      <p style="color:#374151">Hi <strong>${user.name}</strong>,</p>
+      <p style="color:#374151">We received a request to reset your password. Use the 6-digit OTP code below. <strong>This OTP expires in 5 minutes.</strong></p>
+      <div style="text-align:center;margin:28px 0">
+        <div style="display:inline-block;background:#0f766e;color:#fff;font-size:2.2rem;font-weight:900;letter-spacing:10px;padding:16px 32px;border-radius:10px">${otp}</div>
+      </div>
+      <p style="color:#6b7280;font-size:0.85rem">If you did not request a password reset, please ignore this email. Your account remains secure.</p>
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
+      <p style="color:#9ca3af;font-size:0.78rem;text-align:center">RK Resin Art — Crafted with love 🎨</p>
+    </div>`;
+
+  const textBody = `Your RK Resin Art password reset OTP is: ${otp}\nThis OTP expires in 5 minutes.`;
+
+  try {
+    const sentViaHTTPS = await sendEmailViaHTTPS(user.email, '🔑 Your Password Reset OTP — RK Resin Art', htmlBody, textBody);
+    if (!sentViaHTTPS && mailTransporter) {
+      const senderEmail = mailTransporter.options.auth.user;
+      await mailTransporter.sendMail({
+        from: `"RK Resin Art" <${senderEmail}>`,
+        to: user.email,
+        subject: '🔑 Your Password Reset OTP — RK Resin Art',
+        html: htmlBody,
+        text: textBody
+      });
+    }
+    console.log(`[FORGOT OTP] Sent password reset OTP to ${user.email}`);
+    res.json({ success: true, message: `OTP sent to ${user.email}` });
+  } catch (err) {
+    console.error('[FORGOT OTP] Email send failed:', err.message);
+    console.log(`[FORGOT OTP DEV] OTP for ${user.email}: ${otp}`);
+    res.json({ success: true, message: `OTP sent to ${user.email}` });
+  }
+});
+
+// POST verify OTP & reset password -> logs user in automatically!
+app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  const { otp, newPassword } = req.body;
+
+  if (!email || !otp || !newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'Email, OTP, and a new password (6+ chars) are required' });
+  }
+
+  const db = readDB();
+  const user = (db.users || []).find(u => u.email === email);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const stored = otpStore.get(user.email);
+  if (!stored) return res.status(400).json({ error: 'No OTP requested for this email. Please request a new one.' });
+  if (Date.now() > stored.expiresAt) {
+    otpStore.delete(user.email);
+    return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+  }
+  if (stored.otp !== String(otp).trim()) {
+    return res.status(400).json({ error: 'Incorrect OTP code. Please check your email.' });
+  }
+
+  // Valid OTP -> update password hash
+  otpStore.delete(user.email);
+  const idx = db.users.findIndex(u => u.id === user.id);
+  db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
+  writeDB(db);
+
+  // Generate JWT token so user is automatically logged in!
+  const token = jwt.sign({ role: 'user', userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+  res.json({ token, user: publicUser(db.users[idx]), message: 'Password reset & logged in successfully!' });
+});
+
+
 
 app.post('/api/payment/validate-coupon', (req, res) => {
   const { code, subtotal } = req.body;

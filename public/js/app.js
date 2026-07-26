@@ -2389,6 +2389,82 @@ const Auth = {
         confirmPwChangeBtn.textContent = '✅ Confirm & Change Password';
       };
     }
+
+    // ── Forgot Password OTP (Login Screen) ─────────────────────
+    const forgotPwLink = document.getElementById('forgotPwLink');
+    if (forgotPwLink) {
+      forgotPwLink.onclick = (e) => {
+        e.preventDefault();
+        const loginEmail = (document.getElementById('loginEmail')?.value || '').trim();
+        if (loginEmail) {
+          document.getElementById('fpEmail').value = loginEmail;
+        }
+        this.switchTab('forgot-pw');
+      };
+    }
+
+    const fpBackToLogin = document.getElementById('fpBackToLogin');
+    if (fpBackToLogin) {
+      fpBackToLogin.onclick = (e) => {
+        e.preventDefault();
+        this.switchTab('login');
+      };
+    }
+
+    const fpMsg = (text, type = '') => {
+      const el = document.getElementById('fpMsg');
+      if (!el) return;
+      el.textContent = text;
+      el.className = `change-pw-msg ${type}`;
+    };
+
+    const fpSendOtpBtn = document.getElementById('fpSendOtpBtn');
+    if (fpSendOtpBtn) {
+      fpSendOtpBtn.onclick = async () => {
+        const email = (document.getElementById('fpEmail')?.value || '').trim();
+        if (!email || !email.includes('@')) return fpMsg('Please enter a valid registered email address', 'error');
+        fpSendOtpBtn.disabled = true;
+        fpSendOtpBtn.textContent = '⏳ Sending OTP…';
+        fpMsg('');
+        try {
+          await API.forgotPasswordOtp(email);
+          document.getElementById('fpOtpSection').style.display = 'block';
+          fpMsg(`✅ 6-digit OTP sent to ${email}! Check your email.`, 'success');
+        } catch (e) {
+          fpMsg(e.message || 'Failed to send OTP', 'error');
+        }
+        fpSendOtpBtn.disabled = false;
+        fpSendOtpBtn.textContent = '📧 Send OTP to Email';
+      };
+    }
+
+    const fpResetBtn = document.getElementById('fpResetBtn');
+    if (fpResetBtn) {
+      fpResetBtn.onclick = async () => {
+        const email = (document.getElementById('fpEmail')?.value || '').trim();
+        const otp = (document.getElementById('fpOtpInput')?.value || '').trim();
+        const newPw = (document.getElementById('fpNewPwInput')?.value || '').trim();
+        const confirmPw = (document.getElementById('fpConfirmPwInput')?.value || '').trim();
+
+        if (!email) return fpMsg('Please enter your email', 'error');
+        if (!otp || otp.length !== 6) return fpMsg('Please enter the 6-digit OTP code', 'error');
+        if (!newPw || newPw.length < 6) return fpMsg('New password must be at least 6 characters', 'error');
+        if (newPw !== confirmPw) return fpMsg('Passwords do not match', 'error');
+
+        fpResetBtn.disabled = true;
+        fpResetBtn.textContent = '⏳ Verifying & Logging in…';
+        fpMsg('');
+        try {
+          await API.resetPasswordOtp(email, otp, newPw);
+          showToast('🎉 Password reset & logged in successfully!', 'success');
+          this.render();
+        } catch (e) {
+          fpMsg(e.message || 'Failed to reset password', 'error');
+        }
+        fpResetBtn.disabled = false;
+        fpResetBtn.textContent = '✅ Reset Password & Login';
+      };
+    }
   },
 
   open() {
@@ -2410,6 +2486,7 @@ const Auth = {
       btn.classList.toggle('active', btn.dataset.accountTab === tab);
     });
     document.querySelectorAll('.account-pane[id^="account-"]').forEach(pane => {
+      pane.style.display = pane.id === `account-${tab}` ? 'block' : 'none';
       pane.classList.toggle('active', pane.id === `account-${tab}`);
     });
     this.message('');

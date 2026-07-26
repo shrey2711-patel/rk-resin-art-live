@@ -410,7 +410,13 @@
 
         <div class="account-pane active" id="account-login">
           <div class="form-field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@email.com"></div>
-          <div class="form-field"><label>Password</label><input id="loginPassword" type="password" placeholder="Your password"></div>
+          <div class="form-field">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <label style="margin:0;">Password</label>
+              <a href="#" id="forgotPwLink" style="font-size:0.78rem;color:var(--p);font-weight:700;text-decoration:none;">Forgot Password? (Reset via OTP)</a>
+            </div>
+            <input id="loginPassword" type="password" placeholder="Your password">
+          </div>
           <button class="account-primary-btn" id="loginBtn">Login</button>
           <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
             Don't have an account? <a href="#" id="gotoRegisterLink" style="color: var(--p); font-weight: 700; text-decoration: none;">Please Register</a>
@@ -432,6 +438,39 @@
           <button class="account-primary-btn" id="registerBtn">Create Account</button>
           <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
             Already have an account? <a href="#" id="gotoLoginLink" style="color: var(--p); font-weight: 700; text-decoration: none;">Please Login</a>
+          </div>
+        </div>
+
+        <!-- Forgot Password OTP Reset Pane -->
+        <div class="account-pane" id="account-forgot-pw" style="display:none">
+          <div style="font-weight:800;font-size:1.05rem;color:var(--ink);margin-bottom:4px;">🔑 Reset Password via OTP</div>
+          <p style="font-size:0.82rem;color:var(--muted);margin:0 0 14px;">Enter your registered email address to receive a 6-digit verification code.</p>
+          
+          <div class="form-field">
+            <label>Registered Email</label>
+            <input id="fpEmail" type="email" placeholder="you@email.com">
+          </div>
+          <button class="account-primary-btn" id="fpSendOtpBtn" style="width:100%;">📧 Send OTP to Email</button>
+          
+          <div id="fpOtpSection" style="display:none;margin-top:14px;background:var(--bg);border:1px dashed var(--p);border-radius:10px;padding:14px;">
+            <p style="font-size:0.8rem;color:var(--muted);margin:0 0 10px;text-align:center;">Enter the 6-digit OTP sent to your email & your new password</p>
+            <div class="form-field">
+              <label>6-Digit OTP</label>
+              <input id="fpOtpInput" class="otp-input" placeholder="123456" maxlength="6" inputmode="numeric" style="letter-spacing:6px;font-weight:800;text-align:center;">
+            </div>
+            <div class="form-field">
+              <label>New Password</label>
+              <input id="fpNewPwInput" type="password" placeholder="Min 6 characters">
+            </div>
+            <div class="form-field">
+              <label>Confirm New Password</label>
+              <input id="fpConfirmPwInput" type="password" placeholder="Repeat new password">
+            </div>
+            <button class="account-primary-btn" id="fpResetBtn" style="width:100%;margin-top:6px;">✅ Reset Password &amp; Login</button>
+          </div>
+          <div class="change-pw-msg" id="fpMsg" style="margin-top:10px;"></div>
+          <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
+            Remembered your password? <a href="#" id="fpBackToLogin" style="color: var(--p); font-weight: 700; text-decoration: none;">Back to Login</a>
           </div>
         </div>
       </div>

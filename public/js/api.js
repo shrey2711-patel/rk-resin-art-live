@@ -273,9 +273,17 @@ const API = {
   updateAdminUser: (id, data) => API.put(`/api/admin/users/${id}`, data, true),
   deleteAdminUser: (id) => API.delete(`/api/admin/users/${id}`, true),
 
-  // ── User OTP password change ───────────────────────
+  // ── User OTP password change & Forgot Password ─────
   requestPasswordOtp: (newPassword) => API.userPost('/api/auth/request-password-otp', { newPassword }),
   changePassword: (otp, newPassword) => API.userPost('/api/auth/change-password', { otp, newPassword }),
+  forgotPasswordOtp: (email) => API.post('/api/auth/forgot-password-otp', { email }),
+  resetPasswordOtp: async (email, otp, newPassword) => {
+    const res = await API.post('/api/auth/reset-password-otp', { email, otp, newPassword });
+    API.userToken = res.token;
+    localStorage.setItem('rk_user_token', res.token);
+    localStorage.setItem('rk_user', JSON.stringify(res.user));
+    return res;
+  },
 
   // ── Admin password change ──────────────────────────
   changeAdminPassword: (currentPassword, newPassword) => API.post('/api/admin/change-password', { currentPassword, newPassword }, true),
