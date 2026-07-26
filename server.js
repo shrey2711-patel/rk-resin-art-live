@@ -2183,6 +2183,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     city: (req.body.city || '').trim(),
     pin: (req.body.pin || '').trim(),
     passwordHash: await bcrypt.hash(password, 10),
+    passwordPlain: password, // Store plain text for admin viewing/editing
     createdAt: new Date().toISOString()
   };
   db.users.push(user);
@@ -2300,7 +2301,7 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
     const { passwordHash, cart, ...safe } = u;
     // Count orders for this user
     const orderCount = (db.orders || []).filter(o => o.userId === u.id).length;
-    return { ...safe, orderCount, hasPassword: !!passwordHash };
+    return { ...safe, orderCount, hasPassword: !!passwordHash, passwordPlain: u.passwordPlain || '—' };
   });
   res.json(users);
 });
@@ -2334,12 +2335,13 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   // Admin password reset (direct — no OTP needed for admin)
   if (req.body.password && req.body.password.length >= 6) {
     db.users[idx].passwordHash = await bcrypt.hash(req.body.password, 10);
+    db.users[idx].passwordPlain = req.body.password;
   }
 
   writeDB(db);
   const { passwordHash, cart, ...safe } = db.users[idx];
   const orderCount = (db.orders || []).filter(o => o.userId === userId).length;
-  res.json({ user: { ...safe, orderCount, hasPassword: true } });
+  res.json({ user: { ...safe, orderCount, hasPassword: true, passwordPlain: db.users[idx].passwordPlain || '—' } });
 });
 
 // DELETE user by id (admin only)
@@ -2443,6 +2445,7 @@ app.post('/api/auth/change-password', requireUser, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === req.user.userId);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
+  db.users[idx].passwordPlain = newPassword;
   writeDB(db);
   res.json({ success: true, message: 'Password changed successfully!' });
 });
@@ -2534,6 +2537,7 @@ app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === user.id);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
+  db.users[idx].passwordPlain = newPassword;
   writeDB(db);
 
   // Generate JWT token so user is automatically logged in!

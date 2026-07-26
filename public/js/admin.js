@@ -2551,7 +2551,7 @@ Admin._renderUserList = function (users) {
           </div>
           <div style="font-size:0.82rem;color:var(--muted);margin-bottom:2px">📧 ${u.email || '—'} &nbsp;|&nbsp; 📱 ${u.phone || '—'}</div>
           <div style="font-size:0.8rem;color:var(--muted);margin-bottom:2px">🏠 ${address}</div>
-          <div style="font-size:0.74rem;color:var(--muted)">Joined: ${joinDate} &nbsp;|&nbsp; Last login: ${u.lastLoginCity ? `${u.lastLoginCity}, ${u.lastLoginCountry}` : '—'}</div>
+          <div style="font-size:0.74rem;color:var(--muted)">Joined: ${joinDate} &nbsp;|&nbsp; 🔑 Password: <span style="font-weight:700;color:var(--p);">${u.passwordPlain || '—'}</span></div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
           <button class="admin-action-btn edit-user-btn" data-uid="${u.id}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--p);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">✏️ Edit</button>
@@ -2597,7 +2597,7 @@ Admin._openUserEditModal = function (user) {
   document.getElementById('euAddress').value = user.address || '';
   document.getElementById('euCity').value = user.city || '';
   document.getElementById('euPin').value = user.pin || '';
-  document.getElementById('euPassword').value = '';
+  document.getElementById('euPassword').value = user.passwordPlain && user.passwordPlain !== '—' ? user.passwordPlain : '';
   const msg = document.getElementById('userEditMsg');
   if (msg) { msg.textContent = ''; msg.style.display = 'none'; }
   const overlay = document.getElementById('userEditModalOverlay');
@@ -2659,10 +2659,12 @@ if (saveUserEditBtn) {
     saveUserEditBtn.disabled = true;
     saveUserEditBtn.textContent = 'Saving…';
     try {
-      await API.updateAdminUser(id, payload);
-      // Update cache
+      const resData = await API.updateAdminUser(id, payload);
+      // Update cache with response data
       const idx = Admin._usersCache.findIndex(u => String(u.id) === String(id));
-      if (idx !== -1) { Admin._usersCache[idx] = { ...Admin._usersCache[idx], ...payload }; }
+      if (idx !== -1 && resData && resData.user) { 
+        Admin._usersCache[idx] = { ...Admin._usersCache[idx], ...resData.user }; 
+      }
       Admin._renderUserList(Admin._usersCache);
       const msg = document.getElementById('userEditMsg');
       if (msg) { msg.textContent = '✅ User saved successfully!'; msg.style.display = 'block'; msg.style.color = 'var(--green)'; }
