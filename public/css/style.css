@@ -3994,19 +3994,13 @@ body {
 }
 
 /* ── User Edit Modal ─────────────────────────────────────── */
-.user-edit-modal {
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-title {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin: 0 0 18px;
+#userEditModalOverlay {
+  z-index: 10005 !important;
+  align-items: flex-start !important;
+  overflow-y: auto !important;
+  padding: 40px 15px !important;
 }
 
-#userEditModalOverlay,
 #userDeleteModalOverlay {
   z-index: 10005 !important;
 }
