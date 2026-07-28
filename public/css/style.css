@@ -2487,7 +2487,7 @@ body.admin-page-active {
   color: var(--ink) !important;
 }
 
-body.admin-page-active > :not(#adminOverlay):not(#toast) {
+body.admin-page-active > :not(#adminOverlay):not(#toast):not(.modal-overlay):not(.zoom-modal):not(.toast) {
   display: none !important;
 }
 
