@@ -1658,7 +1658,8 @@ const App = {
       const totalStock = (p.variants && p.variants.length > 0)
         ? p.variants.reduce((sum, v) => sum + (v.stock !== undefined ? Number(v.stock) : 0), 0)
         : (p.stock !== undefined ? Number(p.stock) : 0);
-      const stockHTML = totalStock > 0 && totalStock <= 10 ? `<div class="stock-low">⚡ Only ${totalStock} left!</div>` : '';
+      const isStockTracked = this.state.trackStock && p.trackStock !== false;
+      const stockHTML = (isStockTracked && totalStock > 1 && totalStock <= 10) ? `<div class="stock-low">⚡ Only ${totalStock} left!</div>` : '';
       const avgRating = p._avgRating || 0;
       const ratingCount = p._ratingCount || 0;
       const starsHTML = avgRating > 0
