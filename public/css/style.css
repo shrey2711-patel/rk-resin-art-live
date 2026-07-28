@@ -4013,6 +4013,7 @@ body {
 
 /* ── Premium User Edit Modal UI/UX ─────────────────────────── */
 .user-edit-modal {
+  width: 100%;
   max-width: 550px;
   background: var(--white);
   border-radius: 20px;
@@ -4021,6 +4022,7 @@ body {
   padding: 28px;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
   animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -4189,6 +4191,33 @@ body {
 .user-edit-modal .admin-cancel-btn:hover {
   background: var(--border);
   color: var(--ink);
+}
+
+@media (max-width: 576px) {
+  #userEditModalOverlay {
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+    padding: 12px !important;
+  }
+  .user-edit-modal {
+    padding: 20px 16px !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
+  }
+  .user-edit-modal .modal-title {
+    font-size: 1.15rem !important;
+    margin-bottom: 16px !important;
+  }
+  .user-edit-modal .admin-form-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 18px !important;
+  }
+  .user-edit-modal .admin-save-btn,
+  .user-edit-modal .admin-cancel-btn {
+    width: 100% !important;
+    padding: 10px 16px !important;
+  }
 }
 
 

@@ -2642,20 +2642,39 @@ const saveUserEditBtn = document.getElementById('saveUserEditBtn');
 if (saveUserEditBtn) {
   saveUserEditBtn.addEventListener('click', async () => {
     const id = document.getElementById('editUserId').value;
+    const name = document.getElementById('euName').value.trim();
     const emailVal = document.getElementById('euEmail')?.value.trim();
-    const payload = {
-      name: document.getElementById('euName').value.trim(),
-      phone: document.getElementById('euPhone').value.trim(),
-      address: document.getElementById('euAddress').value.trim(),
-      city: document.getElementById('euCity').value.trim(),
-      pin: document.getElementById('euPin').value.trim(),
+    const phone = document.getElementById('euPhone').value.trim();
+    const address = document.getElementById('euAddress').value.trim();
+    const city = document.getElementById('euCity').value.trim();
+    const pin = document.getElementById('euPin').value.trim();
+
+    const msg = document.getElementById('userEditMsg');
+    if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+
+    const showError = (text) => {
+      if (msg) {
+        msg.textContent = '❌ ' + text;
+        msg.style.display = 'block';
+        msg.style.color = 'var(--red)';
+        msg.style.backgroundColor = 'rgba(239,68,68,0.08)';
+      }
+      showToast(text, 'error');
     };
+
+    if (!name) return showError('Full Name is required');
+    if (!emailVal || !emailVal.includes('@')) return showError('Please enter a valid email address');
+    if (!phone) return showError('Phone number is required');
+
+    const payload = { name, phone, address, city, pin };
     if (emailVal) payload.email = emailVal;
+
     const pw = document.getElementById('euPassword').value;
     if (pw) {
-      if (pw.length < 6) return showToast('Password must be at least 6 characters', 'error');
+      if (pw.length < 6) return showError('Password must be at least 6 characters');
       payload.password = pw;
     }
+
     saveUserEditBtn.disabled = true;
     saveUserEditBtn.textContent = 'Saving…';
     try {
@@ -2666,8 +2685,12 @@ if (saveUserEditBtn) {
         Admin._usersCache[idx] = { ...Admin._usersCache[idx], ...resData.user }; 
       }
       Admin._renderUserList(Admin._usersCache);
-      const msg = document.getElementById('userEditMsg');
-      if (msg) { msg.textContent = '✅ User saved successfully!'; msg.style.display = 'block'; msg.style.color = 'var(--green)'; }
+      if (msg) { 
+        msg.textContent = '✅ User saved successfully!'; 
+        msg.style.display = 'block'; 
+        msg.style.color = 'var(--green)'; 
+        msg.style.backgroundColor = 'rgba(22,135,91,0.08)'; 
+      }
       showToast('User updated successfully', 'success');
       setTimeout(() => {
         const overlay = document.getElementById('userEditModalOverlay');
@@ -2677,7 +2700,7 @@ if (saveUserEditBtn) {
         }
       }, 1200);
     } catch (e) {
-      showToast(e.message || 'Failed to save user', 'error');
+      showError(e.message || 'Failed to save user');
     }
     saveUserEditBtn.disabled = false;
     saveUserEditBtn.textContent = '💾 Save Changes';
