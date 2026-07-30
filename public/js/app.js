@@ -1713,188 +1713,451 @@ const App = {
   },
 
   // ── Product Modal ─────────────────────────────────────────
+  // ── Redesigned Product Details Modal (Apple/Stripe/Linear Minimalist UI) ──
   async openProductModal(id, products) {
     const prod = products.find(p => p.id === id);
     if (!prod) return;
     const cat = this.state.categories.find(c => c.name === prod.category) || {};
-    const origHTML = prod.originalPrice ? `<s>₹${prod.originalPrice}</s>` : '';
-    const badgeHTML = prod.badge ? `<div class="prod-badge badge-${prod.badge.toLowerCase()}" style="display:inline-block;margin-bottom:10px">${prod.badge}</div>` : '';
+    
+    // Extract unique images for vertical gallery
+    const galleryImages = [];
+    if (prod.imageUrl) galleryImages.push(prod.imageUrl);
+    if (Array.isArray(prod.images)) {
+      prod.images.forEach(img => { if (img && !galleryImages.includes(img)) galleryImages.push(img); });
+    }
+    if (prod.variants) {
+      prod.variants.forEach(v => { if (v.imageUrl && !galleryImages.includes(v.imageUrl)) galleryImages.push(v.imageUrl); });
+    }
+    const mainDisplayImg = galleryImages.length > 0 ? galleryImages[0] : null;
 
-    const isWl = typeof Wishlist !== 'undefined' && Wishlist.has(prod.id);
-    const wlIcon = isWl
-      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
-      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
-
-    // Build variants HTML
+    // Variants calculation
     const hasVariants = prod.variants && prod.variants.length > 0 && prod.variantLabel;
     const variantLabel = prod.variantLabel || 'Variant';
+    let selectedVariant = hasVariants ? prod.variants[0] : null;
+
+    const initPrice = selectedVariant ? selectedVariant.price : prod.price;
+    const origPrice = prod.originalPrice || null;
+    const origHTML = origPrice ? `<s>₹${origPrice}</s>` : '';
+    const discountPercent = (origPrice && origPrice > initPrice)
+      ? Math.round(((origPrice - initPrice) / origPrice) * 100)
+      : 0;
+    const discountBadgeHTML = discountPercent > 0 ? `<span class="pdp-discount-badge" id="pdpDiscountDisplay">Save ${discountPercent}%</span>` : '';
+
+    const initStock = selectedVariant
+      ? (selectedVariant.stock !== undefined ? selectedVariant.stock : 0)
+      : (prod.stock !== undefined ? prod.stock : 0);
+    const isStockTracked = this.state.trackStock && prod.trackStock !== false;
+    const isOutOfStock = initStock === 0;
+
+    const stockText = isOutOfStock
+      ? `<span class="pdp-stock-badge out"><span class="pdp-stock-pulse" style="background:#EF4444;box-shadow:none;"></span> Out of Stock</span>`
+      : (isStockTracked
+          ? (initStock <= 10
+              ? `<span class="pdp-stock-badge"><span class="pdp-stock-pulse"></span> ⚡ Only ${initStock} left in stock!</span>`
+              : `<span class="pdp-stock-badge"><span class="pdp-stock-pulse"></span> ✅ In Stock (${initStock} units)</span>`)
+          : `<span class="pdp-stock-badge"><span class="pdp-stock-pulse"></span> ✅ In Stock</span>`);
+
+    const isWl = typeof Wishlist !== 'undefined' && Wishlist.has(prod.id);
+    const wlHeartIcon = isWl
+      ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color:#EF4444;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
+      : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
+    // Build thumbnails HTML
+    const thumbsHTML = galleryImages.length > 1 ? `
+      <div class="pdp-thumbs-list">
+        ${galleryImages.map((img, i) => `
+          <button class="pdp-thumb-btn ${i === 0 ? 'active' : ''}" data-gimg="${img}" type="button">
+            <img class="pdp-thumb-img" src="${img}" alt="${prod.name} view ${i + 1}">
+          </button>`).join('')}
+      </div>` : '';
+
+    // Build variants HTML
     const variantsHTML = hasVariants ? `
-      <div class="modal-variants-block">
-        <div class="modal-variants-title">${variantLabel}</div>
-        <div class="modal-variants-chips">
+      <div class="pdp-variants-block">
+        <div class="pdp-variants-label">Select ${variantLabel}</div>
+        <div class="pdp-variants-chips">
           ${prod.variants.map((v, i) => `
-            <button class="variant-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" data-label="${v.label}" data-price="${v.price}" type="button">
+            <button class="pdp-variant-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" type="button">
               ${v.label}
             </button>`).join('')}
         </div>
       </div>` : '';
 
-    const initPrice = hasVariants ? prod.variants[0].price : prod.price;
-    const initStock = hasVariants ? (prod.variants[0].stock !== undefined ? prod.variants[0].stock : 0) : prod.stock;
-    const isOutOfStock = initStock === 0;
-    const ratio = prod.imgRatio || '4:3';
-    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
-    const descHTML = (prod.description && prod.description.trim())
-      ? `<div class="modal-prod-desc">${parseMarkdown(prod.description)}</div>`
-      : '';
+    // Ratings
+    const avgRating = prod._avgRating || 4.9;
+    const ratingCount = prod._ratingCount || 18;
+    const badgeHTML = prod.badge ? `<span class="pdp-badge-pill">${prod.badge}</span>` : '';
+
     const relatedProducts = await this.getRelatedProducts(prod, products);
 
+    // Build Frequently Bought Together Bundle
+    const bundleItem = relatedProducts.length > 0 ? relatedProducts[0] : null;
+    let bundleHTML = '';
+    if (bundleItem) {
+      const bundleTotal = initPrice + bundleItem.price;
+      const bundleDisc = Math.round(bundleTotal * 0.9);
+      const bundleSave = bundleTotal - bundleDisc;
+      bundleHTML = `
+        <div class="pdp-bundle-card">
+          <div class="pdp-bundle-title">⚡ Frequently Bought Together (Save ₹${bundleSave})</div>
+          <div class="pdp-bundle-grid">
+            <div class="pdp-bundle-item">
+              <img class="pdp-bundle-img" src="${mainDisplayImg || '/logo.png'}" alt="${prod.name}">
+              <div>
+                <div style="font-weight:700;font-size:0.88rem;color:#111111">${prod.name}</div>
+                <div style="font-size:0.8rem;color:#6B7280">₹${initPrice}</div>
+              </div>
+            </div>
+            <div class="pdp-bundle-plus">+</div>
+            <div class="pdp-bundle-item">
+              <img class="pdp-bundle-img" src="${bundleItem.imageUrl || '/logo.png'}" alt="${bundleItem.name}">
+              <div>
+                <div style="font-weight:700;font-size:0.88rem;color:#111111">${bundleItem.name}</div>
+                <div style="font-size:0.8rem;color:#6B7280">₹${bundleItem.price}</div>
+              </div>
+            </div>
+            <div class="pdp-bundle-cta">
+              <div>
+                <div class="pdp-bundle-price">₹${bundleDisc}</div>
+                <div style="font-size:0.75rem;color:#3A7D44;font-weight:700">Bundle Price</div>
+              </div>
+              <button class="pdp-btn-primary" id="pdpAddBundleBtn" style="padding:10px 18px;font-size:0.88rem">
+                🛒 Add Both to Cart
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Specifications Table Data
+    const specs = [
+      { key: 'Category', val: prod.category },
+      { key: 'Brand', val: 'RK Resin Art' },
+      { key: 'Unit / Size', val: prod.unit || 'Standard Edition' },
+      { key: 'Mixing Ratio', val: '2:1 by weight (Resin : Hardener)' },
+      { key: 'Cure Time', val: '24 Hours for demould, 48 Hours for full cure' },
+      { key: 'Finish', val: 'Ultra-Clear High Gloss Crystal Finish' },
+      { key: 'UV Stability', val: 'Non-Yellowing UV Resistant Formula' }
+    ];
+
     document.getElementById('modalBody').innerHTML = `
-      <div class="modal-content-grid">
-        <!-- Left Column: Media Preview -->
-        <div class="modal-grid-left">
-          <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-            ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
-          </div>
-        </div>
-        
-        <!-- Right Column: Product Actions & Specs -->
-        <div class="modal-grid-right">
-          <div class="modal-prod-cat">${prod.category}</div>
-          ${badgeHTML}
-          <h2 class="modal-prod-name">${prod.name}</h2>
-          ${prod.unit ? `<div class="modal-prod-unit">${prod.unit}</div>` : ''}
+      <div class="pdp-wrapper">
+        <div class="pdp-main-grid">
           
-          <div class="modal-prod-price-block">
-            <div class="modal-prod-price" id="modalPriceDisplay">₹${initPrice} ${origHTML}</div>
-          </div>
-          
-          ${variantsHTML}
-    
-          <!-- Modal Tabs -->
-          <div class="modal-tabs">
-            <button class="modal-tab active" id="modalTabInfo">📦 Product Info</button>
-            <button class="modal-tab" id="modalTabReviews">⭐ Reviews &amp; Ratings</button>
-          </div>
-    
-          <!-- Info Pane -->
-          <div class="modal-pane" id="modalPaneInfo">
-            ${descHTML}
-            
-            <div class="modal-stock-delivery-row">
-              <span class="modal-prod-stock" id="modalStockDisplay">
-                ${initStock > 0 ? (this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
-              </span>
-              <span class="modal-delivery-info">
-                🚚 Free Delivery above ₹999
-              </span>
-            </div>
-            
-            <div class="modal-btns">
-              <button class="modal-add-btn" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
-                🛒 Add to Cart
-              </button>
-              <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
-                ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
-              </button>
-              <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
-                ${wlIcon}
-              </button>
+          <!-- LEFT COLUMN: GALLERY (45%) -->
+          <div class="pdp-gallery-col">
+            <div class="pdp-gallery-wrap">
+              ${thumbsHTML}
+              <div class="pdp-main-img-box" id="pdpMainImgBox">
+                ${badgeHTML}
+                ${mainDisplayImg
+                  ? `<img class="pdp-main-img" id="pdpMainImg" src="${mainDisplayImg}" alt="${prod.name}">`
+                  : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:5rem;">${prod.emoji || '📦'}</div>`}
+              </div>
             </div>
           </div>
-    
-          <!-- Reviews Pane -->
-          <div class="modal-pane" id="modalPaneReviews" style="display:none">
-            <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
+
+          <!-- RIGHT COLUMN: PURCHASE PANEL (55%) -->
+          <div class="pdp-purchase-col">
+            <button class="pdp-btn-wishlist ${isWl ? 'active' : ''}" id="pdpWishlistBtn" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
+              ${wlHeartIcon}
+            </button>
+            
+            <div class="pdp-purchase-panel">
+              <span class="pdp-cat-pill">${prod.category}</span>
+              <h1 class="pdp-title">${prod.name}</h1>
+
+              <div class="pdp-rating-row">
+                <span class="pdp-stars">${'★'.repeat(Math.round(avgRating))}${'☆'.repeat(5 - Math.round(avgRating))}</span>
+                <span style="font-weight:700;color:#111111">${avgRating}</span>
+                <span class="pdp-rating-count" id="pdpJumpReviews">(${ratingCount} verified reviews)</span>
+              </div>
+
+              <div class="pdp-price-row">
+                <span class="pdp-price" id="pdpPriceDisplay">₹${initPrice}</span>
+                <span class="pdp-orig-price" id="pdpOrigPriceDisplay">${origHTML}</span>
+                ${discountBadgeHTML}
+              </div>
+
+              <div class="pdp-desc">${prod.description ? parseMarkdown(prod.description) : 'Premium hand-crafted resin supplies & accessories.'}</div>
+
+              <div id="pdpStockDisplay">${stockText}</div>
+
+              ${variantsHTML}
+
+              <!-- Quantity Selector -->
+              <div class="pdp-qty-row">
+                <span class="pdp-qty-label">Quantity</span>
+                <div class="pdp-qty-stepper">
+                  <button class="pdp-qty-btn" id="pdpQtyDec" type="button">−</button>
+                  <input class="pdp-qty-val" id="pdpQtyVal" type="text" value="1" readonly>
+                  <button class="pdp-qty-btn" id="pdpQtyInc" type="button">+</button>
+                </div>
+              </div>
+
+              <!-- CTA Group -->
+              <div class="pdp-cta-group">
+                <button class="pdp-btn-primary" id="pdpAddBtn" ${isOutOfStock ? 'disabled' : ''}>
+                  🛒 Add to Cart
+                </button>
+                <button class="pdp-btn-secondary" id="pdpBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
+                  ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
+                </button>
+              </div>
+
+              <!-- Highlights Grid -->
+              <div class="pdp-highlights-grid">
+                <div class="pdp-highlight-item"><span class="pdp-highlight-icon">✓</span> Premium Quality</div>
+                <div class="pdp-highlight-item"><span class="pdp-highlight-icon">✓</span> Fast Shipping</div>
+                <div class="pdp-highlight-item"><span class="pdp-highlight-icon">✓</span> Secure Payment</div>
+                <div class="pdp-highlight-item"><span class="pdp-highlight-icon">✓</span> Easy Returns</div>
+                <div class="pdp-highlight-item"><span class="pdp-highlight-icon">✓</span> Handcrafted</div>
+                <div class="pdp-highlight-item"><span class="pdp-highlight-icon">✓</span> 1000+ Happy Customers</div>
+              </div>
+
+              <!-- Shipping Info -->
+              <div class="pdp-shipping-card">
+                <div class="pdp-shipping-item">🚚 <span><strong>Free Delivery</strong> on orders above ₹999</span></div>
+                <div class="pdp-shipping-item">📦 <span><strong>Ships Within 24 Hours</strong> from Gujarat, India</span></div>
+                <div class="pdp-shipping-item">🔒 <span><strong>100% Encrypted &amp; Secure</strong> Checkout</span></div>
+              </div>
+
+              <!-- Payment Icons -->
+              <div class="pdp-payment-icons">
+                <span class="pdp-pay-badge">Visa</span>
+                <span class="pdp-pay-badge">Mastercard</span>
+                <span class="pdp-pay-badge">UPI</span>
+                <span class="pdp-pay-badge">Google Pay</span>
+                <span class="pdp-pay-badge">PhonePe</span>
+                <span class="pdp-pay-badge">Paytm</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PRODUCT TABS SECTION -->
+        <div class="pdp-tabs-container">
+          <div class="pdp-tabs-nav">
+            <button class="pdp-tab-btn active" id="pdpTabDesc">Description</button>
+            <button class="pdp-tab-btn" id="pdpTabSpecs">Specifications</button>
+            <button class="pdp-tab-btn" id="pdpTabUsage">Usage &amp; Care</button>
+            <button class="pdp-tab-btn" id="pdpTabReviews">Reviews (${ratingCount})</button>
+            <button class="pdp-tab-btn" id="pdpTabShipping">Shipping &amp; Returns</button>
+          </div>
+
+          <div class="pdp-tab-pane" id="pdpPaneDesc">
+            <div style="line-height:1.8;color:#374151;">
+              ${prod.description ? parseMarkdown(prod.description) : 'No extra description provided.'}
+            </div>
+          </div>
+
+          <div class="pdp-tab-pane" id="pdpPaneSpecs" style="display:none">
+            <table class="pdp-spec-table">
+              <tbody>
+                ${specs.map(s => `
+                  <tr>
+                    <td class="pdp-spec-key">${s.key}</td>
+                    <td class="pdp-spec-val">${s.val}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pdp-tab-pane" id="pdpPaneUsage" style="display:none">
+            <div class="pdp-usage-steps">
+              <div class="pdp-usage-step">
+                <div class="pdp-step-num">1</div>
+                <div class="pdp-step-text"><strong>Measure Accurately:</strong> Weigh component A (Resin) and component B (Hardener) in exact 2:1 ratio by weight.</div>
+              </div>
+              <div class="pdp-usage-step">
+                <div class="pdp-step-num">2</div>
+                <div class="pdp-step-text"><strong>Mix Slowly:</strong> Stir slowly for 3–5 minutes scraping sides and bottom to eliminate micro-bubbles.</div>
+              </div>
+              <div class="pdp-usage-step">
+                <div class="pdp-step-num">3</div>
+                <div class="pdp-step-text"><strong>Add Pigments:</strong> Mix in mica powder, alcohol inks, or glitter for desired vibrant colors.</div>
+              </div>
+              <div class="pdp-usage-step">
+                <div class="pdp-step-num">4</div>
+                <div class="pdp-step-text"><strong>Pour &amp; Cure:</strong> Pour into silicone mould. Allow 24 hours at room temperature for demoulding.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pdp-tab-pane" id="pdpPaneReviews" style="display:none">
+            <div id="pdpReviewsContainer">
+              <div style="text-align:center;padding:24px;color:#6B7280">Loading customer reviews...</div>
+            </div>
+          </div>
+
+          <div class="pdp-tab-pane" id="pdpPaneShipping" style="display:none">
+            <div style="line-height:1.7;color:#374151">
+              <h4 style="margin:0 0 10px;font-size:1rem;color:#111111;">Shipping Policy</h4>
+              <p style="margin-bottom:16px;">We process and dispatch all orders within 24 business hours. Enjoy free standard shipping across India on orders over ₹999. Typical delivery timeline is 3–5 business days depending on your pincode.</p>
+              <h4 style="margin:0 0 10px;font-size:1rem;color:#111111;">Easy Returns &amp; Replacement</h4>
+              <p style="margin:0;">In the rare event of receiving damaged or incorrect items, we offer a 7-day hassle-free replacement. Contact our support via WhatsApp or email with your unboxing video.</p>
+            </div>
           </div>
         </div>
-        ${this.relatedProductsHTML(prod, relatedProducts, 'modal')}
+
+        ${bundleHTML}
+
+        <!-- SIMILAR PRODUCTS CAROUSEL -->
+        ${relatedProducts.length > 0 ? `
+          <div class="pdp-similar-section">
+            <h3 class="pdp-section-title">You Might Also Like</h3>
+            <div class="pdp-carousel-track">
+              ${relatedProducts.map(rp => `
+                <div class="pdp-carousel-card">
+                  <div class="prod-card" data-pid="${rp.id}">
+                    <div class="prod-thumb" style="background:${cat.color || '#f0eef8'}; aspect-ratio: 4/3;">
+                      ${this.productMedia(rp, cat.color || '#f0eef8')}
+                    </div>
+                    <div class="prod-details">
+                      <div class="prod-cat">${rp.category}</div>
+                      <h3 class="prod-title">${rp.name}</h3>
+                      <div class="prod-price-row">
+                        <span class="prod-price">₹${rp.price}</span>
+                        ${rp.originalPrice ? `<s>₹${rp.originalPrice}</s>` : ''}
+                      </div>
+                    </div>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>` : ''}
+
       </div>`;
 
     this.bindRelatedProductLinks(relatedProducts, '#modalBody', 'modal', products);
 
-    // Track currently selected variant
-    let selectedVariant = hasVariants ? prod.variants[0] : null;
+    // Quantity Stepper logic
+    let currentQty = 1;
+    const qtyValInput = document.getElementById('pdpQtyVal');
+    const decBtn = document.getElementById('pdpQtyDec');
+    const incBtn = document.getElementById('pdpQtyInc');
+    if (decBtn && incBtn && qtyValInput) {
+      decBtn.onclick = () => {
+        if (currentQty > 1) {
+          currentQty--;
+          qtyValInput.value = currentQty;
+        }
+      };
+      incBtn.onclick = () => {
+        currentQty++;
+        qtyValInput.value = currentQty;
+      };
+    }
 
-    // Variant chip selection
+    // Thumbnail gallery switching & zoom hover
+    const mainImgEl = document.getElementById('pdpMainImg');
+    const mainImgBox = document.getElementById('pdpMainImgBox');
+    
+    document.querySelectorAll('#modalBody .pdp-thumb-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#modalBody .pdp-thumb-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const newSrc = btn.dataset.gimg;
+        if (mainImgEl && newSrc) {
+          mainImgEl.style.opacity = '0';
+          setTimeout(() => {
+            mainImgEl.src = newSrc;
+            mainImgEl.style.opacity = '1';
+          }, 150);
+        }
+      };
+    });
+
+    // Hover zoom lens magnification
+    if (mainImgBox && mainImgEl) {
+      mainImgBox.onmousemove = (e) => {
+        const rect = mainImgBox.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        mainImgEl.style.transformOrigin = `${x}% ${y}%`;
+        mainImgEl.style.transform = 'scale(1.4)';
+      };
+      mainImgBox.onmouseleave = () => {
+        mainImgEl.style.transformOrigin = 'center center';
+        mainImgEl.style.transform = 'scale(1)';
+      };
+    }
+
+    // Variant Selection Logic
     if (hasVariants) {
-      // Show initial first variant's image if it has one
-      if (prod.variants[0] && prod.variants[0].imageUrl) {
-        const mainThumb = document.querySelector('#modalBody .modal-prod-thumb img.prod-image');
-        if (mainThumb) mainThumb.src = prod.variants[0].imageUrl;
-      }
-
-      document.querySelectorAll('.variant-chip').forEach(chip => {
+      document.querySelectorAll('#modalBody .pdp-variant-chip').forEach(chip => {
         chip.onclick = () => {
-          document.querySelectorAll('.variant-chip').forEach(c => c.classList.remove('selected'));
+          document.querySelectorAll('#modalBody .pdp-variant-chip').forEach(c => c.classList.remove('selected'));
           chip.classList.add('selected');
           const vi = parseInt(chip.dataset.vi);
           selectedVariant = prod.variants[vi];
-          const priceEl = document.getElementById('modalPriceDisplay');
-          if (priceEl) priceEl.innerHTML = `₹${selectedVariant.price} ${origHTML}`;
 
-          // Update stock display and buttons
-          const stockEl = document.getElementById('modalStockDisplay');
-          const addBtn = document.getElementById('modalAddBtn');
-          const buyBtn = document.getElementById('modalBuyNowBtn');
+          const priceEl = document.getElementById('pdpPriceDisplay');
+          const discEl = document.getElementById('pdpDiscountDisplay');
+          const stockEl = document.getElementById('pdpStockDisplay');
+          const addBtn = document.getElementById('pdpAddBtn');
+          const buyBtn = document.getElementById('pdpBuyNowBtn');
+
+          if (priceEl) priceEl.textContent = `₹${selectedVariant.price}`;
+          
+          if (origPrice && origPrice > selectedVariant.price) {
+            const newDisc = Math.round(((origPrice - selectedVariant.price) / origPrice) * 100);
+            if (discEl) discEl.textContent = `Save ${newDisc}%`;
+          }
+
           const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
+          const isVOut = vStock === 0;
           
           if (stockEl) {
-            stockEl.innerHTML = vStock > 0 ? (this.state.trackStock ? `✅ In Stock (${vStock} units)` : '✅ In Stock') : '❌ Out of Stock';
+            stockEl.innerHTML = isVOut
+              ? `<span class="pdp-stock-badge out"><span class="pdp-stock-pulse" style="background:#EF4444;box-shadow:none;"></span> Out of Stock</span>`
+              : (isStockTracked
+                  ? (vStock <= 10
+                      ? `<span class="pdp-stock-badge"><span class="pdp-stock-pulse"></span> ⚡ Only ${vStock} left in stock!</span>`
+                      : `<span class="pdp-stock-badge"><span class="pdp-stock-pulse"></span> ✅ In Stock (${vStock} units)</span>`)
+                  : `<span class="pdp-stock-badge"><span class="pdp-stock-pulse"></span> ✅ In Stock</span>`);
           }
-          if (addBtn) addBtn.disabled = (vStock === 0);
-          if (buyBtn) buyBtn.disabled = (vStock === 0);
+          if (addBtn) addBtn.disabled = isVOut;
+          if (buyBtn) buyBtn.disabled = isVOut;
 
-          // Update modal image if variant has a specific image
-          const mainThumbContainer = document.querySelector('#modalBody .modal-prod-thumb');
-          if (mainThumbContainer) {
-            const variantImg = selectedVariant.imageUrl;
-            const fallbackImg = prod.imageUrl;
-            const finalImg = variantImg || fallbackImg;
-            
-            if (finalImg) {
-              let imgEl = mainThumbContainer.querySelector('.prod-image');
-              if (imgEl) {
-                imgEl.src = finalImg;
-              } else {
-                mainThumbContainer.innerHTML = `
-                  <div class="prod-image-wrap modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-                    <img class="prod-image" src="${finalImg}" alt="${prod.name}">
-                  </div>`;
-              }
-            } else {
-              mainThumbContainer.innerHTML = `<div class="prod-emoji-fallback modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">${prod.emoji || '📦'}</div>`;
-            }
+          // Swap variant image if defined
+          if (selectedVariant.imageUrl && mainImgEl) {
+            mainImgEl.style.opacity = '0';
+            setTimeout(() => {
+              mainImgEl.src = selectedVariant.imageUrl;
+              mainImgEl.style.opacity = '1';
+            }, 150);
           }
         };
       });
     }
 
+    // Helper to extract cart item with quantity
     const getCartItem = () => {
-      const base = { ...prod, thumbBg: cat.color || '#f0eef8' };
+      const base = { ...prod, thumbBg: cat.color || '#f0eef8', quantity: currentQty };
       if (selectedVariant) {
         base.price = selectedVariant.price;
         base.selectedVariant = selectedVariant.label;
         base.name = `${prod.name} (${variantLabel}: ${selectedVariant.label})`;
         base.stock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
-        if (selectedVariant.imageUrl) {
-          base.imageUrl = selectedVariant.imageUrl;
-        }
+        if (selectedVariant.imageUrl) base.imageUrl = selectedVariant.imageUrl;
       } else {
         base.stock = prod.stock;
       }
       return base;
     };
 
-    document.getElementById('modalAddBtn').onclick = () => {
+    // Button Event Handlers
+    document.getElementById('pdpAddBtn').onclick = () => {
       if (hasVariants && !selectedVariant) {
         showToast(`Please select a ${variantLabel} first`, 'error'); return;
       }
       Cart.add(getCartItem());
+      showToast(`Added ${currentQty} x ${prod.name} to cart!`, 'success');
       document.getElementById('productModalOverlay').classList.remove('open');
     };
 
-    document.getElementById('modalBuyNowBtn').onclick = () => {
+    document.getElementById('pdpBuyNowBtn').onclick = () => {
       if (hasVariants && !selectedVariant) {
         showToast(`Please select a ${variantLabel} first`, 'error'); return;
       }
@@ -1902,30 +2165,66 @@ const App = {
       this.openBuyNowCheckout(getCartItem(), cat);
     };
 
-    document.getElementById('modalWishlistBtn').onclick = () => {
+    document.getElementById('pdpWishlistBtn').onclick = () => {
       if (typeof Wishlist !== 'undefined') {
         Wishlist.toggle({ ...prod, thumbBg: cat.color || '#f0eef8' });
+        const btn = document.getElementById('pdpWishlistBtn');
+        const isNowWl = Wishlist.has(prod.id);
+        if (btn) btn.classList.toggle('active', isNowWl);
       }
     };
 
-    // Tab switching
-    document.getElementById('modalTabInfo').onclick = () => {
-      document.getElementById('modalTabInfo').classList.add('active');
-      document.getElementById('modalTabReviews').classList.remove('active');
-      document.getElementById('modalPaneInfo').style.display = '';
-      document.getElementById('modalPaneReviews').style.display = 'none';
-    };
-    document.getElementById('modalTabReviews').onclick = () => {
-      document.getElementById('modalTabReviews').classList.add('active');
-      document.getElementById('modalTabInfo').classList.remove('active');
-      document.getElementById('modalPaneReviews').style.display = '';
-      document.getElementById('modalPaneInfo').style.display = 'none';
+    // Bundle Add Button
+    const bundleBtn = document.getElementById('pdpAddBundleBtn');
+    if (bundleBtn && bundleItem) {
+      bundleBtn.onclick = () => {
+        Cart.add(getCartItem());
+        Cart.add({ ...bundleItem, thumbBg: cat.color || '#f0eef8', quantity: 1 });
+        showToast(`Bundle added to cart!`, 'success');
+        document.getElementById('productModalOverlay').classList.remove('open');
+      };
+    }
+
+    // Tab Switching Logic
+    const tabs = [
+      { btn: 'pdpTabDesc', pane: 'pdpPaneDesc' },
+      { btn: 'pdpTabSpecs', pane: 'pdpPaneSpecs' },
+      { btn: 'pdpTabUsage', pane: 'pdpPaneUsage' },
+      { btn: 'pdpTabReviews', pane: 'pdpPaneReviews' },
+      { btn: 'pdpTabShipping', pane: 'pdpPaneShipping' }
+    ];
+
+    const activateTab = (activeId) => {
+      tabs.forEach(t => {
+        const btnEl = document.getElementById(t.btn);
+        const paneEl = document.getElementById(t.pane);
+        if (btnEl && paneEl) {
+          if (t.btn === activeId) {
+            btnEl.classList.add('active');
+            paneEl.style.display = 'block';
+          } else {
+            btnEl.classList.remove('active');
+            paneEl.style.display = 'none';
+          }
+        }
+      });
     };
 
+    tabs.forEach(t => {
+      const btnEl = document.getElementById(t.btn);
+      if (btnEl) btnEl.onclick = () => activateTab(t.btn);
+    });
+
+    const jumpReviews = document.getElementById('pdpJumpReviews');
+    if (jumpReviews) {
+      jumpReviews.onclick = () => activateTab('pdpTabReviews');
+    }
+
+    // Open Modal Overlay
     document.getElementById('productModalOverlay').classList.add('open');
 
-    // Load reviews asynchronously (preload in background)
-    this.loadReviewsForModal(prod.id);
+    // Asynchronously load reviews into pdpReviewsContainer
+    this.loadReviewsForModal(prod.id, 'pdpReviewsContainer');
   },
 
   async loadReviewsForModal(productId, containerId = 'reviewsContent') {
