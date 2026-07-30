@@ -24,9 +24,14 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
-
+  <!-- jsPDF for invoice generation -->
+  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- Razorpay for secure checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <!-- heic-to for modern iPhone HEIC image conversion -->
+  <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
 </head>
 <body>
 
@@ -410,13 +415,7 @@
 
         <div class="account-pane active" id="account-login">
           <div class="form-field"><label>Email</label><input id="loginEmail" type="email" placeholder="you@email.com"></div>
-          <div class="form-field">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <label style="margin:0;">Password</label>
-              <a href="#" id="forgotPwLink" style="font-size:0.78rem;color:var(--p);font-weight:700;text-decoration:none;">Forgot Password? (Reset via OTP)</a>
-            </div>
-            <input id="loginPassword" type="password" placeholder="Your password">
-          </div>
+          <div class="form-field"><label>Password</label><input id="loginPassword" type="password" placeholder="Your password"></div>
           <button class="account-primary-btn" id="loginBtn">Login</button>
           <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
             Don't have an account? <a href="#" id="gotoRegisterLink" style="color: var(--p); font-weight: 700; text-decoration: none;">Please Register</a>
@@ -438,39 +437,6 @@
           <button class="account-primary-btn" id="registerBtn">Create Account</button>
           <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
             Already have an account? <a href="#" id="gotoLoginLink" style="color: var(--p); font-weight: 700; text-decoration: none;">Please Login</a>
-          </div>
-        </div>
-
-        <!-- Forgot Password OTP Reset Pane -->
-        <div class="account-pane" id="account-forgot-pw" style="display:none">
-          <div style="font-weight:800;font-size:1.05rem;color:var(--ink);margin-bottom:4px;">🔑 Reset Password via OTP</div>
-          <p style="font-size:0.82rem;color:var(--muted);margin:0 0 14px;">Enter your registered email address to receive a 6-digit verification code.</p>
-          
-          <div class="form-field">
-            <label>Registered Email</label>
-            <input id="fpEmail" type="email" placeholder="you@email.com">
-          </div>
-          <button class="account-primary-btn" id="fpSendOtpBtn" style="width:100%;">📧 Send OTP to Email</button>
-          
-          <div id="fpOtpSection" style="display:none;margin-top:14px;background:var(--bg);border:1px dashed var(--p);border-radius:10px;padding:14px;">
-            <p style="font-size:0.8rem;color:var(--muted);margin:0 0 10px;text-align:center;">Enter the 6-digit OTP sent to your email & your new password</p>
-            <div class="form-field">
-              <label>6-Digit OTP</label>
-              <input id="fpOtpInput" class="otp-input" placeholder="123456" maxlength="6" inputmode="numeric" style="letter-spacing:6px;font-weight:800;text-align:center;">
-            </div>
-            <div class="form-field">
-              <label>New Password</label>
-              <input id="fpNewPwInput" type="password" placeholder="Min 6 characters">
-            </div>
-            <div class="form-field">
-              <label>Confirm New Password</label>
-              <input id="fpConfirmPwInput" type="password" placeholder="Repeat new password">
-            </div>
-            <button class="account-primary-btn" id="fpResetBtn" style="width:100%;margin-top:6px;">✅ Reset Password &amp; Login</button>
-          </div>
-          <div class="change-pw-msg" id="fpMsg" style="margin-top:10px;"></div>
-          <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
-            Remembered your password? <a href="#" id="fpBackToLogin" style="color: var(--p); font-weight: 700; text-decoration: none;">Back to Login</a>
           </div>
         </div>
       </div>
@@ -504,41 +470,6 @@
             </div>
             <button class="account-primary-btn" id="saveProfileBtn">Save Changes</button>
           </div>
-
-          <!-- Change Password Card -->
-          <div class="change-pw-card" id="changePwCard">
-            <div class="change-pw-header" id="changePwToggle">
-              <span>🔑 Change Password</span>
-              <span class="change-pw-arrow" id="changePwArrow">▼</span>
-            </div>
-            <div class="change-pw-body" id="changePwBody" style="display:none">
-              <div class="form-field">
-                <label>New Password</label>
-                <div style="position:relative">
-                  <input type="password" id="newPwInput" class="change-pw-input" placeholder="Min 6 characters">
-                  <button type="button" class="pw-eye-btn" id="toggleNewPw" title="Show/Hide">👁</button>
-                </div>
-              </div>
-              <div class="form-field">
-                <label>Confirm New Password</label>
-                <div style="position:relative">
-                  <input type="password" id="confirmPwInput" class="change-pw-input" placeholder="Repeat new password">
-                  <button type="button" class="pw-eye-btn" id="toggleConfirmPw" title="Show/Hide">👁</button>
-                </div>
-              </div>
-              <button class="account-primary-btn" id="sendPwOtpBtn" style="width:100%;margin-top:4px">📧 Send OTP to Email</button>
-              <div class="otp-section" id="otpSection" style="display:none">
-                <p class="otp-hint">Enter the 6-digit OTP sent to your registered email</p>
-                <div class="otp-input-row">
-                  <input type="text" id="otpInput" class="change-pw-input otp-input" placeholder="6-digit OTP" maxlength="6" inputmode="numeric">
-                  <button class="resend-otp-btn" id="resendOtpBtn">Resend</button>
-                </div>
-                <button class="account-primary-btn" id="confirmPwChangeBtn" style="width:100%">✅ Confirm & Change Password</button>
-              </div>
-              <div class="change-pw-msg" id="changePwMsg"></div>
-            </div>
-          </div>
-
           <div class="account-actions">
             <button class="account-primary-btn" id="accountCheckoutBtn">Continue Shopping</button>
             <button class="account-secondary-btn" id="logoutBtn">Logout</button>
@@ -590,7 +521,6 @@
           <button class="atab" data-tab="reviews">⭐ Reviews</button>
           <button class="atab" data-tab="coupons">🎟️ Coupons</button>
           <button class="atab" data-tab="analytics">📊 Analytics</button>
-          <button class="atab" data-tab="users">👥 Users</button>
         </div>
         <div class="admin-tab-body">
 
@@ -626,142 +556,68 @@
           <!-- SETTINGS -->
           <div class="tab-pane" id="atab-settings">
             <div class="admin-section-head">⚙️ Store Settings</div>
-            <div class="settings-grid">
+            <div class="admin-form-card">
+              <div class="form-field"><label>Announcement Text</label><input class="admin-input" id="afAnnounce" placeholder="Free shipping above ₹999..."></div>
               
-              <!-- Announcement & Banner Settings Card -->
-              <div class="settings-group">
-                <div class="settings-group-title">📣 Announcement & Store Alert</div>
-                <div class="form-field" style="margin-bottom: 0;">
-                  <label for="afAnnounce">Announcement Bar Message</label>
-                  <textarea class="admin-input" id="afAnnounce" rows="3" style="width: 100%; min-height: 90px; resize: vertical; font-family: inherit;" placeholder="e.g. Free shipping above ₹999..."></textarea>
+              <!-- Settings Checklist -->
+              <div class="admin-settings-checklist" style="margin-top: 15px; margin-bottom: 15px;">
+                <!-- Cart Toggle Switch -->
+                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                  <input type="checkbox" id="afCartEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
+                  <label for="afCartEnabled" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Enable Shopping Cart Store (If disabled, shopping cart is hidden and only direct inquiries are allowed)</label>
                 </div>
-                <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--p); padding: 12px; font-size: 0.78rem; color: var(--muted); border-radius: 8px; margin-top: 5px;">
-                  💡 This message appears at the top banner of the storefront. Keep it short and eye-catching.
+
+                <!-- Global Stock Tracking Switch -->
+                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                  <input type="checkbox" id="afTrackStock" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
+                  <label for="afTrackStock" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Track exact stock levels globally (If disabled, customers see binary In Stock/Out of Stock statuses and orders do not decrease stock quantities)</label>
+                </div>
+
+                <!-- Razorpay Switch -->
+                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                  <input type="checkbox" id="afRazorpayEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
+                  <label for="afRazorpayEnabled" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Enable Razorpay (Online Payments)</label>
                 </div>
               </div>
 
-              <!-- Store Modes and Switched Toggles -->
-              <div class="settings-group">
-                <div class="settings-group-title">🛠️ Feature Control Switches</div>
-                
-                <!-- Cart Switch -->
-                <div class="switch-container">
-                  <div class="switch-details">
-                    <span class="switch-title">Enable Shopping Cart</span>
-                    <span class="switch-desc">Allow customers to accumulate multiple items in a shopping cart and place unified orders.</span>
-                  </div>
-                  <label class="modern-switch">
-                    <input type="checkbox" id="afCartEnabled">
-                    <span class="switch-slider"></span>
-                  </label>
-                </div>
-
-                <!-- Stock tracking switch -->
-                <div class="switch-container">
-                  <div class="switch-details">
-                    <span class="switch-title">Track Inventory Levels</span>
-                    <span class="switch-desc">Verify and decrease stock quantities automatically when checkout order succeeds.</span>
-                  </div>
-                  <label class="modern-switch">
-                    <input type="checkbox" id="afTrackStock">
-                    <span class="switch-slider"></span>
-                  </label>
-                </div>
-
-                <!-- Razorpay switch -->
-                <div class="switch-container">
-                  <div class="switch-details">
-                    <span class="switch-title">Enable Online Payment (Razorpay)</span>
-                    <span class="switch-desc">Integrate card/UPI payment gateways. If disabled, defaults to WhatsApp COD checkout.</span>
-                  </div>
-                  <label class="modern-switch">
-                    <input type="checkbox" id="afRazorpayEnabled">
-                    <span class="switch-slider"></span>
-                  </label>
-                </div>
+              <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--border); padding: 10px 15px; font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; border-radius: 4px;">
+                💡 If Razorpay is disabled (unchecked), checkout will automatically default to <strong>WhatsApp COD</strong> payments only and hide the online payment selection.
               </div>
 
-              <!-- Admin Password Security Card -->
-              <div class="settings-group">
-                <div class="settings-group-title">🔑 Change Admin Password</div>
-                <div class="form-field">
-                  <label for="apCurrentPw">Current Admin Password</label>
-                  <div style="position:relative">
-                    <input type="password" id="apCurrentPw" class="admin-input" placeholder="Current admin password">
-                    <button type="button" class="pw-eye-btn" id="toggleApCurrentPw" title="Show/Hide">👁</button>
-                  </div>
-                </div>
-                <div class="form-field">
-                  <label for="apNewPw">New Admin Password</label>
-                  <div style="position:relative">
-                    <input type="password" id="apNewPw" class="admin-input" placeholder="Min 6 characters">
-                    <button type="button" class="pw-eye-btn" id="toggleApNewPw" title="Show/Hide">👁</button>
-                  </div>
-                </div>
-                <div class="form-field">
-                  <label for="apConfirmPw">Confirm New Admin Password</label>
-                  <div style="position:relative">
-                    <input type="password" id="apConfirmPw" class="admin-input" placeholder="Repeat new admin password">
-                    <button type="button" class="pw-eye-btn" id="toggleApConfirmPw" title="Show/Hide">👁</button>
-                  </div>
-                </div>
-                <button class="admin-save-btn" id="changeAdminPwBtn" style="padding: 12px 20px; font-size: 0.9rem; border-radius: var(--radius); margin-top: 6px;">🔒 Update Admin Password</button>
-                <div class="admin-ok" id="adminPwOk"></div>
-              </div>
-
-            </div>
-
-            <div style="margin-top: 20px;">
-              <button class="admin-save-btn" id="saveSettingsBtn" style="padding: 14px; font-size: 0.95rem; border-radius: var(--radius);">Save General Settings</button>
-              <div class="admin-ok" id="settingsOk">✅ Settings saved successfully!</div>
+              <button class="admin-save-btn" id="saveSettingsBtn">Save Settings</button>
+              <div class="admin-ok" id="settingsOk">✅ Settings saved!</div>
             </div>
           </div>
 
           <!-- BILLING & CHARGES -->
           <div class="tab-pane" id="atab-billing-settings">
-            <div class="admin-section-head">💳 Billing &amp; Shipping Charges</div>
-            <div class="settings-grid">
-              
-              <!-- Shipping rate card -->
-              <div class="settings-group">
-                <div class="settings-group-title">🚚 Shipping Rates</div>
+            <div class="admin-section-head">Billing &amp; Charges Settings</div>
+            <div class="admin-form-card">
+              <div class="form-row-2">
                 <div class="form-field">
-                  <label for="afShippingRate">Flat Shipping Fee (₹)</label>
+                  <label>Flat Shipping Rate (₹)</label>
                   <input class="admin-input" type="number" step="0.01" id="afShippingRate" placeholder="60">
                 </div>
                 <div class="form-field">
-                  <label for="afShippingThreshold">Free Shipping Threshold (₹)</label>
+                  <label>Free Shipping Threshold (₹)</label>
                   <input class="admin-input" type="number" step="0.01" id="afShippingThreshold" placeholder="999">
                 </div>
-                <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--p); padding: 10px 14px; font-size: 0.78rem; color: var(--muted); border-radius: 8px;">
-                  💡 Orders with subtotal exceeding the threshold will get 100% free delivery.
-                </div>
               </div>
-
-              <!-- Other charges card -->
-              <div class="settings-group">
-                <div class="settings-group-title">🏷️ Taxes & Extra Fees</div>
+              <div class="form-row-2">
                 <div class="form-field">
-                  <label for="afOtherCharges">Charges / Fee Amount</label>
+                  <label>Other Charges Value</label>
                   <input class="admin-input" type="number" step="0.01" id="afOtherCharges" placeholder="0">
                 </div>
                 <div class="form-field">
-                  <label for="afOtherChargesType">Fee Calculation Method</label>
-                  <select class="admin-input" id="afOtherChargesType" style="height: 42px; padding: 0 10px; background: var(--white); color: var(--ink); border: 1px solid var(--border); border-radius: 8px;">
-                    <option value="flat">Flat Charge (₹)</option>
-                    <option value="percentage">Percentage of Total (%)</option>
+                  <label>Other Charges Type</label>
+                  <select class="admin-input" id="afOtherChargesType" style="height: 40px; padding: 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); box-sizing: border-box;">
+                    <option value="flat">Flat (₹)</option>
+                    <option value="percentage">Percentage (%)</option>
                   </select>
                 </div>
-                <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--p); padding: 10px 14px; font-size: 0.78rem; color: var(--muted); border-radius: 8px;">
-                  💡 Use this to collect service charges, packaging fees, or local trade tax rates.
-                </div>
               </div>
-
-            </div>
-
-            <div style="margin-top: 20px;">
-              <button class="admin-save-btn" id="saveBillingSettingsBtn" style="padding: 14px; font-size: 0.95rem; border-radius: var(--radius);">Save Billing Settings</button>
-              <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved successfully!</div>
+              <button class="admin-save-btn" id="saveBillingSettingsBtn">Save Billing Settings</button>
+              <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved!</div>
             </div>
           </div>
 
@@ -1020,137 +876,156 @@
           <!-- ANALYTICS -->
           <div class="tab-pane" id="atab-analytics">
             <div class="admin-section-head">
-              Sales & Performance Analytics
+              Store Activity Dashboard
               <button class="refresh-btn" id="refreshAnalyticsBtn" style="margin-left: auto;">Refresh</button>
             </div>
+            
+            <!-- Summary stats cards -->
+            <div class="form-row-3" style="margin-bottom: 24px;">
+              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">People Visited Store</div>
+                  <div id="statTotalVisitors" style="font-size: 1.8rem; font-weight: 900; color: var(--ink);">0</div>
+                </div>
+                <div style="font-size: 2rem;">👥</div>
+              </div>
+              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">New / Returning</div>
+                  <div id="statVisitorRatio" style="font-size: 1.05rem; font-weight: 900; color: var(--ink); margin-top: 8px;">0 New / 0 Ret</div>
+                </div>
+                <div style="font-size: 2rem;">🔄</div>
+              </div>
+              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Blocked Visitors</div>
+                  <div id="statBlockedIps" style="font-size: 1.8rem; font-weight: 900; color: #dc2626;">0</div>
+                </div>
+                <div style="font-size: 2rem;">🚫</div>
+              </div>
+            </div>
 
-            <!-- Financial summary cards -->
+            <!-- Geographic & ISP Distribution grids -->
             <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-                <div>
-                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Total Sales / Revenue</div>
-                  <div id="statTotalRevenue" style="font-size: 1.8rem; font-weight: 900; color: var(--green);">₹0</div>
-                </div>
-                <div style="font-size: 2.2rem;">💰</div>
-              </div>
-              <div class="admin-form-card" style="margin: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-                <div>
-                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Total Orders Paid</div>
-                  <div id="statTotalOrders" style="font-size: 1.8rem; font-weight: 900; color: var(--p);">0</div>
-                </div>
-                <div style="font-size: 2.2rem;">📦</div>
-              </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-              <!-- Chart 1: Sales Trend -->
-              <div class="admin-form-card" style="margin: 0; min-height: 320px; display: flex; flex-direction: column;">
-                <div class="afc-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                  <span>Sales Trend (Last 7 Days)</span>
-                  <small style="font-size: 0.72rem; color: var(--muted); font-weight: normal;">Daily Revenue</small>
-                </div>
-                <div id="salesTrendChartContainer" style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
-                  <!-- SVG chart gets injected here -->
+              <div class="admin-form-card" style="margin: 0;">
+                <div class="afc-title">Top Customer Areas</div>
+                <div style="overflow-x: auto; max-height: 240px;">
+                  <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                    <thead>
+                      <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted);">
+                        <th style="padding: 8px 10px;">Area</th>
+                        <th style="padding: 8px 10px; text-align: right; width: 80px;">Visits</th>
+                      </tr>
+                    </thead>
+                    <tbody id="analyticsLocationsList">
+                      <tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No visitor locations recorded yet.</td></tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
-
-              <!-- Chart 2: Category Distribution -->
-              <div class="admin-form-card" style="margin: 0; min-height: 320px; display: flex; flex-direction: column;">
-                <div class="afc-title" style="margin-bottom: 12px;">Category Sales</div>
-                <div id="categoryChartContainer" style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative;">
-                  <!-- SVG donut/pie gets injected here -->
+              
+              <div class="admin-form-card" style="margin: 0;">
+                <div class="afc-title">Visitor Network Providers</div>
+                <div style="overflow-x: auto; max-height: 240px;">
+                  <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                    <thead>
+                      <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted);">
+                        <th style="padding: 8px 10px;">Network Provider</th>
+                        <th style="padding: 8px 10px; text-align: right; width: 80px;">Visits</th>
+                      </tr>
+                    </thead>
+                    <tbody id="analyticsIspsList">
+                      <tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No networks recorded yet.</td></tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
 
-            <!-- Top Selling Products Section -->
-            <div class="admin-form-card" style="margin-bottom: 24px;">
-              <div class="afc-title">Top Selling Products</div>
-              <div id="topProductsList" style="padding: 10px 0;">
-                <!-- Horizontal progress bars injected here -->
+            <!-- Blocklist management and Security warning logs -->
+            <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px;">
+              <!-- Blocklist Manager -->
+              <div class="admin-form-card" style="margin: 0;">
+                <div class="afc-title">Blocked Visitor List</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                  <input type="text" class="admin-input" id="blockIpInput" placeholder="Visitor IP address" style="flex: 1; min-height: 38px;">
+                  <button class="admin-save-btn" id="blockIpBtn" style="padding: 0 16px; min-height: 38px; border-radius: 8px; font-weight: 800;">Block</button>
+                </div>
+                <div style="overflow-y: auto; max-height: 180px;">
+                  <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                    <thead>
+                      <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted);">
+                        <th style="padding: 8px 10px;">Blocked Visitor</th>
+                        <th style="padding: 8px 10px; text-align: right; width: 80px;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="blockedIpsList">
+                      <tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked visitors.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Security Logs -->
+              <div class="admin-form-card" style="margin: 0;">
+                <div class="afc-title">Security Alerts</div>
+                <div style="overflow-y: auto; max-height: 240px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.01);">
+                  <div id="securityLogsList" style="padding: 4px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No risky activity found.</div>
+                  </div>
+                </div>
               </div>
             </div>
 
+            <!-- User & Admin Login History -->
+            <div class="admin-form-card" style="margin: 0; margin-bottom: 24px;">
+              <div class="afc-title">Login Activity</div>
+              <div style="overflow-x: auto; max-height: 280px;">
+                <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                  <thead>
+                    <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted); background: var(--bg);">
+                      <th style="padding: 8px 10px; width: 180px;">When</th>
+                      <th style="padding: 8px 10px;">Account</th>
+                      <th style="padding: 8px 10px; width: 100px;">Type</th>
+                      <th style="padding: 8px 10px; width: 120px;">Visitor IP</th>
+                      <th style="padding: 8px 10px; width: 220px;">Area</th>
+                    </tr>
+                  </thead>
+                  <tbody id="analyticsLoginHistoryList">
+                    <tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--muted);">No login activity yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Developer Access Logs -->
+            <div class="admin-form-card" style="margin: 0;">
+              <div class="afc-title">Recent Website Activity</div>
+              <div style="overflow-x: auto; max-height: 340px;">
+                <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.78rem; font-family: monospace;">
+                  <thead>
+                    <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted); background: var(--bg);">
+                      <th style="padding: 8px 10px; width: 140px;">When</th>
+                      <th style="padding: 8px 10px; width: 100px;">Visitor IP</th>
+                      <th style="padding: 8px 10px; width: 70px;">Action</th>
+                      <th style="padding: 8px 10px;">Page Opened</th>
+                      <th style="padding: 8px 10px; width: 80px;">Result</th>
+                      <th style="padding: 8px 10px; width: 90px;">Time Taken</th>
+                      <th style="padding: 8px 10px; width: 140px;">Area</th>
+                    </tr>
+                  </thead>
+                  <tbody id="developerLogsList">
+                    <tr><td colspan="7" style="padding: 16px; text-align: center; color: var(--muted);">No website activity yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
-          <!-- USERS TAB -->
-          <div class="tab-pane" id="atab-users">
-            <div class="admin-section-head">
-              👥 Registered Users
-              <button class="refresh-btn" id="refreshUsersBtn">↻ Refresh</button>
-            </div>
-            <div class="users-search-bar">
-              <input type="text" id="usersSearchInput" class="admin-input" placeholder="🔍 Search by name, email or phone…" style="max-width:360px">
-              <span class="users-count-badge" id="usersCountBadge">0 users</span>
-            </div>
-            <div id="adminUserList" class="admin-list" style="max-height:600px;overflow-y:auto"></div>
-          </div>
-
-        <!-- USER EDIT MODAL -->
-        <div class="modal-overlay" id="userEditModalOverlay" style="display:none">
-          <div class="modal-box user-edit-modal">
-            <button class="modal-close" id="closeUserEditModal">&times;</button>
-            <h3 class="modal-title" style="display:flex;align-items:center;justify-content:space-between;margin:0 0 20px;border-bottom: 1.5px solid var(--border);padding-bottom:12px;">
-              <span style="display:flex;align-items:center;gap:8px;">✏️ Edit User Profile</span>
-              <span class="admin-rights-badge">⚡ Admin Rights (No OTP)</span>
-            </h3>
-            <input type="hidden" id="editUserId">
-            <div class="form-field">
-              <label>Full Name</label>
-              <input type="text" id="euName" class="admin-input" placeholder="Full name">
-            </div>
-            <div class="form-row-2">
-              <div class="form-field">
-                <label>Email</label>
-                <input type="email" id="euEmail" class="admin-input" placeholder="user@email.com">
-              </div>
-              <div class="form-field">
-                <label>Phone</label>
-                <input type="tel" id="euPhone" class="admin-input" placeholder="Phone number">
-              </div>
-            </div>
-            <div class="form-field">
-              <label>Address</label>
-              <textarea id="euAddress" class="admin-input" rows="2" placeholder="Address"></textarea>
-            </div>
-            <div class="form-row-2">
-              <div class="form-field"><label>City</label><input type="text" id="euCity" class="admin-input" placeholder="City"></div>
-              <div class="form-field"><label>PIN</label><input type="text" id="euPin" class="admin-input" placeholder="PIN Code"></div>
-            </div>
-            <hr style="border:none;border-top:1.5px dashed var(--border);margin:18px 0">
-            <div class="form-field">
-              <label>Login Password <span style="font-weight:400;color:var(--muted);font-size:0.78rem">(view/edit password directly)</span></label>
-              <div class="password-input-wrapper">
-                <input type="password" id="euPassword" class="admin-input" placeholder="User's login password" autocomplete="new-password">
-                <button type="button" class="pw-eye-btn" id="toggleEuPw" title="Show/Hide">👁</button>
-              </div>
-            </div>
-            <div class="admin-form-actions" style="margin-top:22px">
-              <button class="admin-save-btn" id="saveUserEditBtn">💾 Save Changes</button>
-              <button class="admin-cancel-btn" id="cancelUserEditBtn">Cancel</button>
-            </div>
-            <div class="admin-ok" id="userEditMsg"></div>
-          </div>
         </div>
-
-        <!-- USER DELETE CONFIRM -->
-        <div class="modal-overlay" id="userDeleteModalOverlay" style="display:none">
-          <div class="modal-box" style="max-width:380px;text-align:center;padding:32px 28px">
-            <div style="font-size:2.4rem;margin-bottom:10px">⚠️</div>
-            <h3 style="margin:0 0 8px">Delete User?</h3>
-            <p id="userDeleteMsg" style="color:var(--muted);font-size:0.88rem;margin:0 0 22px">This action cannot be undone.</p>
-            <div style="display:flex;gap:12px;justify-content:center">
-              <button class="admin-save-btn" id="confirmUserDeleteBtn" style="background:var(--red);border-color:var(--red)">🗑️ Delete</button>
-              <button class="admin-cancel-btn" id="cancelUserDeleteBtn">Cancel</button>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
-</div>
 
   <!-- BANNER ZOOM MODAL -->
   <div id="bannerZoomModal" class="zoom-modal" style="display:none">
@@ -1176,21 +1051,6 @@
     <span class="cart-badge" id="cartBadge">0</span>
   </button>
 
-  <!-- jsPDF for invoice generation (deferred, non-blocking) -->
-  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
-  <!-- heic-to for modern iPhone HEIC image conversion (deferred, non-blocking) -->
-  <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js" defer></script>
-  <!-- Razorpay: loaded lazily on checkout click to prevent browser preload warnings -->
-  <script>
-    window.__razorpayLoaded = false;
-    function loadRazorpay(cb) {
-      if (window.__razorpayLoaded) { if (cb) cb(); return; }
-      const s = document.createElement('script');
-      s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      s.onload = () => { window.__razorpayLoaded = true; if (cb) cb(); };
-      document.head.appendChild(s);
-    }
-  </script>
   <script src="/js/api.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/wishlist.js"></script>

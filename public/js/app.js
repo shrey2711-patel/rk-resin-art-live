@@ -18,8 +18,6 @@ const App = {
     razorpayEnabled: true,
     cartEnabled: true,
     trackStock: true,
-    internalProductNav: false,
-    activeProductId: null,
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -48,17 +46,11 @@ const App = {
     this.bindMobileNav();
     Auth.init();
     if (typeof Cart !== 'undefined') {
-      if (typeof API !== 'undefined' && API.isUserLoggedIn()) {
-        Cart.syncWithServer();
-      }
-      // Start real-time cross-device cart synchronization every 4 seconds when logged in
-      if (!window.__cartSyncInterval) {
-        window.__cartSyncInterval = setInterval(() => {
-          if (typeof Cart !== 'undefined' && typeof API !== 'undefined' && API.isUserLoggedIn()) {
-            Cart.syncWithServer(true);
-          }
-        }, 4000);
-      }
+      Cart.syncWithServer();
+      // Start real-time cross-device cart synchronization every 4 seconds
+      setInterval(() => {
+        Cart.syncWithServer(true);
+      }, 4000);
     }
     // Coupon apply listener
     const applyBtn = document.getElementById('applyPromoBtn');
@@ -125,20 +117,10 @@ const App = {
       const match = hash.match(/^#collection\/(.+)$/);
       const prodMatch = hash.match(/^#product\/(.+)$/);
       if (match) {
-        this.state.activeProductId = null;
         this.showCollectionPage(decodeURIComponent(match[1]));
       } else if (prodMatch) {
-        const prodId = Number(prodMatch[1]);
-        if (this.state.internalProductNav || this.state.activeProductId === null || this.state.activeProductId === prodId) {
-          this.state.internalProductNav = false;
-          this.state.activeProductId = prodId;
-          this.showProductPage(prodId);
-        } else {
-          // Revert hash to the active product ID to block manual typing
-          window.location.hash = `#product/${this.state.activeProductId}`;
-        }
+        this.showProductPage(Number(prodMatch[1]));
       } else if (hash === '' || hash === '#') {
-        this.state.activeProductId = null;
         this.showHomePage();
       }
     };
@@ -154,54 +136,18 @@ const App = {
     const prodBackBtn = document.getElementById('productPageBack');
     if (prodBackBtn) {
       prodBackBtn.onclick = () => {
-        let returnHash = '';
-        try {
-          const raw = sessionStorage.getItem('rk_nav_state');
-          if (raw) {
-            const state = JSON.parse(raw);
-            if (state.returnHash !== undefined) {
-              returnHash = state.returnHash;
-            }
-          }
-        } catch (e) {
-          console.error("Storage access failed:", e);
-        }
-
-        // Reset active product tracking
-        this.state.activeProductId = null;
-
-        if (window.location.hash === returnHash) {
-          // If the hash is already equal to target, trigger routing manually
-          if (returnHash.startsWith('#collection/')) {
-            this.showCollectionPage(decodeURIComponent(returnHash.replace('#collection/', '')));
-          } else {
-            this.showHomePage();
-          }
+        if (window.history.length > 1) {
+          window.history.back();
         } else {
-          window.location.hash = returnHash;
+          window.location.hash = '';
         }
       };
     }
   },
 
-  navigateToProduct(id) {
-    this.state.internalProductNav = true;
-    window.location.hash = `#product/${id}`;
-  },
-
-  showSection(el) {
-    if (!el) return;
-    el.style.display = '';
-    el.classList.remove('fade-in-up');
-    void el.offsetWidth; // Trigger reflow
-    el.classList.add('fade-in-up');
-  },
-
   saveNavigationState() {
     const state = {
       activeCategory: this.state.activeCategory,
-      activeSubcategory: this.state.activeSubcategory,
-      returnHash: window.location.hash,
       searchQuery: this.state.searchQuery,
       page: this.state.page,
       sortBy: this.state.sortBy,
@@ -223,7 +169,6 @@ const App = {
       sessionStorage.removeItem('rk_nav_state');
 
       this.state.activeCategory = state.activeCategory || 'All';
-      this.state.activeSubcategory = state.activeSubcategory || null;
       this.state.searchQuery = state.searchQuery || '';
       this.state.page = state.page || 1;
       this.state.sortBy = state.sortBy || '';
@@ -274,9 +219,9 @@ const App = {
 
     if (banner)  banner.style.display  = 'none';
     if (colls)   colls.style.display   = 'none';
-    if (header)  this.showSection(header);
+    if (header)  header.style.display  = '';
     if (prodPage) prodPage.style.display = 'none';
-    if (shopMain) this.showSection(shopMain);
+    if (shopMain) shopMain.style.display = '';
     if (siteHeader) siteHeader.style.display = '';
     if (announceBar) announceBar.style.display = '';
 
@@ -394,11 +339,11 @@ const App = {
     const siteHeader = document.getElementById('siteHeader');
     const announceBar = document.getElementById('announceBar');
 
-    if (banner)  this.showSection(banner);
-    if (colls)   this.showSection(colls);
+    if (banner)  banner.style.display  = '';
+    if (colls)   colls.style.display   = '';
     if (header)  header.style.display  = 'none';
     if (prodPage) prodPage.style.display = 'none';
-    if (shopMain) this.showSection(shopMain);
+    if (shopMain) shopMain.style.display = '';
     if (siteHeader) siteHeader.style.display = '';
     if (announceBar) announceBar.style.display = '';
 
@@ -447,34 +392,12 @@ const App = {
     if (shopMain) shopMain.style.display = 'none';
     if (siteHeader) siteHeader.style.display = 'none';
     if (announceBar) announceBar.style.display = 'none';
-    this.showSection(prodPage);
+    prodPage.style.display = '';
 
     prodContent.innerHTML = `
-      <div class="pp-layout" style="pointer-events: none; padding: 20px 0;">
-        <div class="pp-top-grid">
-          <!-- Left: Image -->
-          <div class="pp-image-col">
-            <div class="modal-prod-thumb pp-thumb skeleton-shimmer skeleton-detail-img" style="aspect-ratio: 1 / 1;"></div>
-          </div>
-
-          <!-- Right: Actions -->
-          <div class="pp-action-col">
-            <div class="skeleton-shimmer skeleton-detail-cat"></div>
-            <div class="skeleton-shimmer skeleton-detail-title"></div>
-            <div class="skeleton-shimmer skeleton-detail-price"></div>
-            
-            <div style="margin-top: 20px;">
-              <div class="skeleton-shimmer skeleton-detail-line"></div>
-              <div class="skeleton-shimmer skeleton-detail-line" style="width: 80%;"></div>
-              <div class="skeleton-shimmer skeleton-detail-line" style="width: 50%;"></div>
-            </div>
-
-            <div class="pp-action-btns" style="margin-top: 30px; display: flex; gap: 10px;">
-              <div class="skeleton-shimmer skeleton-detail-btn" style="flex: 1;"></div>
-              <div class="skeleton-shimmer skeleton-detail-btn" style="flex: 1;"></div>
-            </div>
-          </div>
-        </div>
+      <div class="loading-state" style="padding: 100px 0;">
+        <div class="spinner"></div>
+        <p>Loading product details...</p>
       </div>`;
 
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -769,15 +692,13 @@ const App = {
       displayImageUrl = product.variants[0].imageUrl;
     }
 
-    const emojiFallback = product.emoji || '📦';
-
     if (displayImageUrl) {
       return `
         <div class="prod-image-wrap ${size}" style="background:${fallbackBg}; ${aspectStyle}">
-          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy" onerror="this.onerror=null; this.parentElement.className='prod-emoji-fallback ${size}'; this.parentElement.style.background='${fallbackBg}'; this.parentElement.innerHTML='${emojiFallback}';">
+          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy">
         </div>`;
     }
-    return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${emojiFallback}</div>`;
+    return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;
   },
 
   async getRelatedProducts(product, sourceProducts = []) {
@@ -862,7 +783,7 @@ const App = {
         if (context === 'modal') {
           this.openProductModal(relatedId, productPool);
         } else {
-          this.navigateToProduct(relatedId);
+          window.location.hash = `#product/${relatedId}`;
         }
       };
     });
@@ -1181,25 +1102,22 @@ const App = {
       }
     });
 
-    const onMouseMove = (e) => {
+    window.addEventListener('mousemove', (e) => {
       if (isMouseDown && scale > 1) {
         translateX = e.clientX - mouseStartX;
         translateY = e.clientY - mouseStartY;
         updateTransform();
       }
-    };
+    });
 
-    const onMouseUp = () => {
+    window.addEventListener('mouseup', () => {
       if (isMouseDown) {
         isMouseDown = false;
         newImg.style.cursor = 'zoom-in';
         lastTranslateX = translateX;
         lastTranslateY = translateY;
       }
-    };
-
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    window.addEventListener('mouseup', onMouseUp, { passive: true });
+    });
 
     // Wheel / Trackpad pinch-to-zoom for laptops and desktops
     newImg.addEventListener('wheel', (e) => {
@@ -1271,8 +1189,6 @@ const App = {
     // Close logic
     const closeBtn = document.getElementById('closeZoomModal');
     const closeModal = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
       modal.style.display = 'none';
       document.body.style.overflow = '';
       newImg.src = '';
@@ -1546,25 +1462,7 @@ const App = {
   // ── Products ──────────────────────────────────────────────
   async loadProducts() {
     const grid = document.getElementById('prodGrid');
-    let skeletonsHTML = '';
-    for (let i = 0; i < 8; i++) {
-      skeletonsHTML += `
-        <div class="prod-card skeleton-card">
-          <div class="prod-thumb skeleton-shimmer"></div>
-          <div class="prod-body">
-            <div class="prod-body-header">
-              <span class="skeleton-shimmer skeleton-cat"></span>
-            </div>
-            <div class="skeleton-shimmer skeleton-title"></div>
-            <div class="skeleton-shimmer skeleton-price"></div>
-            <div class="prod-card-btns">
-              <div class="skeleton-shimmer skeleton-button"></div>
-              <div class="skeleton-shimmer skeleton-button"></div>
-            </div>
-          </div>
-        </div>`;
-    }
-    grid.innerHTML = skeletonsHTML;
+    grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading products...</p></div>';
 
     try {
       const params = { page: this.state.page, limit: 20 };
@@ -1658,8 +1556,7 @@ const App = {
       const totalStock = (p.variants && p.variants.length > 0)
         ? p.variants.reduce((sum, v) => sum + (v.stock !== undefined ? Number(v.stock) : 0), 0)
         : (p.stock !== undefined ? Number(p.stock) : 0);
-      const isStockTracked = this.state.trackStock && p.trackStock !== false;
-      const stockHTML = (isStockTracked && totalStock > 1 && totalStock <= 10) ? `<div class="stock-low">⚡ Only ${totalStock} left!</div>` : '';
+      const stockHTML = totalStock > 0 && totalStock <= 10 ? `<div class="stock-low">⚡ Only ${totalStock} left!</div>` : '';
       const avgRating = p._avgRating || 0;
       const ratingCount = p._ratingCount || 0;
       const starsHTML = avgRating > 0
@@ -1704,7 +1601,7 @@ const App = {
         if (!e.target.classList.contains('add-to-cart-btn') && 
             !e.target.classList.contains('buy-now-btn') && 
             !e.target.closest('.wishlist-card-btn')) {
-          this.navigateToProduct(Number(card.dataset.pid));
+          window.location.hash = `#product/${Number(card.dataset.pid)}`;
         }
       };
     });
@@ -1730,7 +1627,7 @@ const App = {
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
-            this.navigateToProduct(prod.id);
+            window.location.hash = `#product/${prod.id}`;
             return;
           }
           const cat = catMap[prod.category] || {};
@@ -1749,7 +1646,7 @@ const App = {
         const prod = products.find(p => p.id === Number(btn.dataset.pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
-            this.navigateToProduct(prod.id);
+            window.location.hash = `#product/${prod.id}`;
             return;
           }
           const cat = catMap[prod.category] || {};
@@ -1820,169 +1717,314 @@ const App = {
     const prod = products.find(p => p.id === id);
     if (!prod) return;
     const cat = this.state.categories.find(c => c.name === prod.category) || {};
-    const origHTML = prod.originalPrice ? `<s>₹${prod.originalPrice}</s>` : '';
-    const badgeHTML = prod.badge ? `<div class="prod-badge badge-${prod.badge.toLowerCase()}" style="display:inline-block;margin-bottom:10px">${prod.badge}</div>` : '';
+    const origHTML = prod.originalPrice ? `<s style="color:#9CA3AF;font-size:0.85em">₹${prod.originalPrice}</s>` : '';
+    const discountPct = (prod.originalPrice && prod.price < prod.originalPrice)
+      ? Math.round((1 - prod.price / prod.originalPrice) * 100)
+      : 0;
 
     const isWl = typeof Wishlist !== 'undefined' && Wishlist.has(prod.id);
-    const wlIcon = isWl
-      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
-      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
 
     // Build variants HTML
     const hasVariants = prod.variants && prod.variants.length > 0 && prod.variantLabel;
     const variantLabel = prod.variantLabel || 'Variant';
     const variantsHTML = hasVariants ? `
-      <div class="modal-variants-block">
-        <div class="modal-variants-title">${variantLabel}</div>
-        <div class="modal-variants-chips">
+      <div class="pdp-variants-block">
+        <div class="pdp-variants-label">${variantLabel}</div>
+        <div class="pdp-variants-chips">
           ${prod.variants.map((v, i) => `
-            <button class="variant-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" data-label="${v.label}" data-price="${v.price}" type="button">
-              ${v.label}
-            </button>`).join('')}
+            <button class="pdp-chip${i === 0 ? ' selected' : ''}" data-vi="${i}" data-label="${v.label}" data-price="${v.price}" type="button">${v.label}</button>`).join('')}
         </div>
       </div>` : '';
 
     const initPrice = hasVariants ? prod.variants[0].price : prod.price;
     const initStock = hasVariants ? (prod.variants[0].stock !== undefined ? prod.variants[0].stock : 0) : prod.stock;
     const isOutOfStock = initStock === 0;
-    const ratio = prod.imgRatio || '4:3';
-    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
-    const descHTML = (prod.description && prod.description.trim())
-      ? `<div class="modal-prod-desc">${parseMarkdown(prod.description)}</div>`
-      : '';
-    const relatedProducts = await this.getRelatedProducts(prod, products);
+    const isLowStock = !isOutOfStock && initStock > 0 && initStock <= 5;
 
-    document.getElementById('modalBody').innerHTML = `
-      <div class="modal-content-grid">
-        <!-- Left Column: Media Preview -->
-        <div class="modal-grid-left">
-          <div class="modal-prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-            ${this.productMedia(prod, cat.color || '#f0eef8', 'modal')}
-          </div>
-        </div>
-        
-        <!-- Right Column: Product Actions & Specs -->
-        <div class="modal-grid-right">
-          <div class="modal-prod-cat">${prod.category}</div>
-          ${badgeHTML}
-          <h2 class="modal-prod-name">${prod.name}</h2>
-          ${prod.unit ? `<div class="modal-prod-unit">${prod.unit}</div>` : ''}
-          
-          <div class="modal-prod-price-block">
-            <div class="modal-prod-price" id="modalPriceDisplay">₹${initPrice} ${origHTML}</div>
-          </div>
-          
-          ${variantsHTML}
-    
-          <!-- Modal Tabs -->
-          <div class="modal-tabs">
-            <button class="modal-tab active" id="modalTabInfo">📦 Product Info</button>
-            <button class="modal-tab" id="modalTabReviews">⭐ Reviews &amp; Ratings</button>
-          </div>
-    
-          <!-- Info Pane -->
-          <div class="modal-pane" id="modalPaneInfo">
-            ${descHTML}
-            
-            <div class="modal-stock-delivery-row">
-              <span class="modal-prod-stock" id="modalStockDisplay">
-                ${initStock > 0 ? (this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock') : '❌ Out of Stock'}
-              </span>
-              <span class="modal-delivery-info">
-                🚚 Free Delivery above ₹999
-              </span>
-            </div>
-            
-            <div class="modal-btns">
-              <button class="modal-add-btn" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
-                🛒 Add to Cart
-              </button>
-              <button class="modal-buy-now-btn" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
-                ⚡ ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
-              </button>
-              <button class="modal-wishlist-btn ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}">
-                ${wlIcon}
-              </button>
-            </div>
-          </div>
-    
-          <!-- Reviews Pane -->
-          <div class="modal-pane" id="modalPaneReviews" style="display:none">
-            <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
-          </div>
-        </div>
-        ${this.relatedProductsHTML(prod, relatedProducts, 'modal')}
+    const badgeHTML = prod.badge ? `<span class="pdp-badge pdp-badge-${prod.badge.toLowerCase()}">${prod.badge}</span>` : '';
+
+    const stockBadge = isOutOfStock
+      ? `<span class="pdp-stock-badge oos">❌ Out of Stock</span>`
+      : isLowStock
+        ? `<span class="pdp-stock-badge low">⚡ Only ${initStock} left!</span>`
+        : `<span class="pdp-stock-badge in">${this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock'}</span>`;
+
+    const descHTML = (prod.description && prod.description.trim())
+      ? `<div class="pdp-desc">${parseMarkdown(prod.description)}</div>`
+      : '';
+
+    const avgRating = prod._avgRating || 0;
+    const ratingCount = prod._ratingCount || 0;
+    const starsHTML = avgRating > 0
+      ? `<div class="pdp-rating-row">
+          <span class="pdp-stars">${'★'.repeat(Math.round(avgRating))}${'☆'.repeat(5 - Math.round(avgRating))}</span>
+          <span class="pdp-rating-val">${(Math.round(avgRating * 10) / 10).toFixed(1)}</span>
+          <a class="pdp-rating-count" id="goToReviewsTab" href="#">(${ratingCount} review${ratingCount !== 1 ? 's' : ''})</a>
+        </div>`
+      : `<div class="pdp-rating-row"><span class="pdp-no-rating">No reviews yet</span></div>`;
+
+    const relatedProducts = await this.getRelatedProducts(prod, products);
+    const catMap = {};
+    this.state.categories.forEach(c => catMap[c.name] = c);
+
+    // Gallery images: collect all available images
+    const galleryImages = [];
+    if (prod.imageUrl) galleryImages.push(prod.imageUrl);
+    if (prod.variants && prod.variants.length > 0) {
+      prod.variants.forEach(v => { if (v.imageUrl && !galleryImages.includes(v.imageUrl)) galleryImages.push(v.imageUrl); });
+    }
+    const hasGallery = galleryImages.length > 1;
+
+    // Payment icons SVG
+    const paymentIconsHTML = `
+      <div class="pdp-payment-icons">
+        <span class="pdp-pay-label">Pay with</span>
+        <svg class="pdp-pay-icon" viewBox="0 0 50 30" title="Visa"><rect width="50" height="30" rx="4" fill="#1A1F71"/><text x="5" y="22" font-family="Arial" font-size="16" font-weight="900" fill="#FFFFFF" font-style="italic">VISA</text></svg>
+        <svg class="pdp-pay-icon" viewBox="0 0 50 30" title="Mastercard"><rect width="50" height="30" rx="4" fill="#252525"/><circle cx="18" cy="15" r="9" fill="#EB001B"/><circle cx="32" cy="15" r="9" fill="#F79E1B"/></svg>
+        <svg class="pdp-pay-icon" viewBox="0 0 50 30" title="UPI"><rect width="50" height="30" rx="4" fill="#5F259F"/><text x="7" y="21" font-family="Arial" font-size="13" font-weight="900" fill="#FFFFFF">UPI</text></svg>
+        <svg class="pdp-pay-icon" viewBox="0 0 50 30" title="GPay"><rect width="50" height="30" rx="4" fill="#FFFFFF"/><text x="3" y="21" font-family="Arial" font-size="12" font-weight="700" fill="#4285F4">GPay</text></svg>
       </div>`;
 
-    this.bindRelatedProductLinks(relatedProducts, '#modalBody', 'modal', products);
+    const highlightsHTML = `
+      <div class="pdp-highlights">
+        <div class="pdp-highlight"><span class="pdp-hl-icon">✓</span><span>Premium Quality</span></div>
+        <div class="pdp-highlight"><span class="pdp-hl-icon">✓</span><span>Fast Shipping</span></div>
+        <div class="pdp-highlight"><span class="pdp-hl-icon">✓</span><span>Secure Payment</span></div>
+        <div class="pdp-highlight"><span class="pdp-hl-icon">✓</span><span>Easy Returns</span></div>
+        <div class="pdp-highlight"><span class="pdp-hl-icon">✓</span><span>Handmade</span></div>
+        <div class="pdp-highlight"><span class="pdp-hl-icon">✓</span><span>1000+ Customers</span></div>
+      </div>`;
+
+    const deliveryHTML = `
+      <div class="pdp-delivery-row">
+        <div class="pdp-delivery-item"><span>🚚</span><span>Free Delivery above ₹999</span></div>
+        <div class="pdp-delivery-item"><span>📦</span><span>Ships within 24 hours</span></div>
+        <div class="pdp-delivery-item"><span>🔒</span><span>Secure Checkout</span></div>
+      </div>`;
+
+    // Similar products mini carousel
+    const similarHTML = relatedProducts.length > 0 ? `
+      <section class="pdp-similar">
+        <h3 class="pdp-similar-title">Similar Products</h3>
+        <div class="pdp-similar-carousel">
+          ${relatedProducts.map(item => {
+            const itemCat = catMap[item.category] || {};
+            const itemPrice = item.price !== undefined ? item.price : (item.variants && item.variants[0] ? item.variants[0].price : 0);
+            return `
+              <button class="pdp-similar-card" type="button" data-related-pid="${item.id}" data-related-context="modal">
+                <div class="pdp-similar-img" style="background:${itemCat.color || '#f0eef8'}">
+                  ${this.productMedia(item, itemCat.color || '#f0eef8', 'related')}
+                </div>
+                <div class="pdp-similar-info">
+                  <div class="pdp-similar-name">${item.name}</div>
+                  <div class="pdp-similar-price">₹${itemPrice}</div>
+                </div>
+              </button>`;
+          }).join('')}
+        </div>
+      </section>` : '';
+
+    // Main image HTML
+    const mainImgSrc = galleryImages[0] || null;
+    const mainImgHTML = mainImgSrc
+      ? `<div class="pdp-main-img-wrap" id="pdpMainImgWrap">
+          <img class="pdp-main-img" id="pdpMainImg" src="${mainImgSrc}" alt="${prod.name}">
+        </div>`
+      : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="pdpMainImgWrap" style="background:${cat.color || '#f0eef8'}">
+          <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
+        </div>`;
+
+    const thumbnailsHTML = hasGallery ? `
+      <div class="pdp-thumbs" id="pdpThumbs">
+        ${galleryImages.map((img, i) => `
+          <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-img="${img}" type="button">
+            <img src="${img}" alt="view ${i+1}">
+          </button>`).join('')}
+      </div>` : '';
+
+    document.getElementById('modalBody').innerHTML = `
+      <div class="pdp-container">
+        <!-- LEFT: Image Gallery -->
+        <div class="pdp-left">
+          <div class="pdp-gallery">
+            ${thumbnailsHTML}
+            ${mainImgHTML}
+          </div>
+          ${highlightsHTML}
+        </div>
+
+        <!-- RIGHT: Product Info & Purchase -->
+        <div class="pdp-right">
+          <div class="pdp-sticky-panel">
+            <!-- Header -->
+            <div class="pdp-meta">
+              <span class="pdp-category">${prod.category || ''}</span>
+              ${badgeHTML}
+            </div>
+            <h1 class="pdp-title">${prod.name}</h1>
+            ${prod.unit ? `<div class="pdp-unit">${prod.unit}</div>` : ''}
+            ${starsHTML}
+
+            <!-- Price -->
+            <div class="pdp-price-block">
+              <div class="pdp-price" id="modalPriceDisplay">₹${initPrice}</div>
+              ${origHTML ? `<div class="pdp-orig-price">${origHTML}</div>` : ''}
+              ${discountPct > 0 ? `<span class="pdp-discount-badge">Save ${discountPct}%</span>` : ''}
+            </div>
+
+            <!-- Stock -->
+            <div class="pdp-stock-row">
+              <span id="modalStockDisplay">${stockBadge}</span>
+            </div>
+
+            <!-- Variants -->
+            ${variantsHTML}
+
+            <!-- Quantity -->
+            <div class="pdp-qty-row">
+              <span class="pdp-qty-label">Quantity</span>
+              <div class="pdp-qty-ctrl">
+                <button type="button" class="pdp-qty-btn" id="pdpQtyMinus">−</button>
+                <span class="pdp-qty-val" id="pdpQtyVal">1</span>
+                <button type="button" class="pdp-qty-btn" id="pdpQtyPlus">+</button>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="pdp-actions">
+              <button class="pdp-btn-primary" id="modalAddBtn" ${isOutOfStock ? 'disabled' : ''}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Add to Cart
+              </button>
+              <button class="pdp-btn-secondary" id="modalBuyNowBtn" ${isOutOfStock ? 'disabled' : ''}>
+                ${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}
+              </button>
+              <button class="pdp-btn-wish ${isWl ? 'active' : ''}" id="modalWishlistBtn" data-pid="${prod.id}" title="${isWl ? 'Remove from Wishlist' : 'Add to Wishlist'}" type="button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="${isWl ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+            </div>
+
+            <!-- Delivery -->
+            ${deliveryHTML}
+
+            <!-- Payment -->
+            ${paymentIconsHTML}
+          </div>
+        </div>
+
+        <!-- FULL WIDTH BOTTOM: Tabs + Similar -->
+        <div class="pdp-bottom">
+          <!-- Tabs -->
+          <div class="pdp-tabs" id="pdpTabs">
+            <button class="pdp-tab active" data-tab="info" type="button">📦 Description</button>
+            <button class="pdp-tab" data-tab="reviews" type="button" id="modalTabReviews">⭐ Reviews</button>
+          </div>
+
+          <div class="pdp-tab-pane active" id="pdpPaneInfo" data-pane="info">
+            <div class="pdp-desc-content" id="modalPaneInfo">
+              ${descHTML || '<p style="color:#9CA3AF">No description available.</p>'}
+            </div>
+          </div>
+
+          <div class="pdp-tab-pane" id="pdpPaneReviews" data-pane="reviews" style="display:none">
+            <div id="reviewsContent"><div class="reviews-empty">Loading reviews...</div></div>
+          </div>
+
+          <!-- Similar -->
+          ${similarHTML}
+        </div>
+      </div>`;
+
+    // Bind thumbnail gallery
+    const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
+    const mainImg = document.getElementById('pdpMainImg');
+    thumbBtns.forEach(btn => {
+      btn.onclick = () => {
+        thumbBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (mainImg) {
+          mainImg.style.opacity = '0';
+          setTimeout(() => { mainImg.src = btn.dataset.img; mainImg.style.opacity = '1'; }, 150);
+        }
+      };
+    });
+
+    // Quantity stepper
+    let qty = 1;
+    const qtyValEl = document.getElementById('pdpQtyVal');
+    document.getElementById('pdpQtyMinus').onclick = () => { if (qty > 1) { qty--; qtyValEl.textContent = qty; } };
+    document.getElementById('pdpQtyPlus').onclick = () => { qty++; qtyValEl.textContent = qty; };
+
+    // Reviews tab link
+    const goToReviewsLink = document.getElementById('goToReviewsTab');
+    if (goToReviewsLink) {
+      goToReviewsLink.onclick = (e) => { e.preventDefault(); document.querySelector('[data-tab="reviews"]')?.click(); };
+    }
+
+    // Tab switching
+    document.querySelectorAll('.pdp-tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.pdp-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.pdp-tab-pane').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+        tab.classList.add('active');
+        const pane = document.getElementById(`pdpPane${tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1)}`);
+        if (pane) { pane.classList.add('active'); pane.style.display = ''; }
+        if (tab.dataset.tab === 'reviews') this.loadReviewsForModal(prod.id);
+      };
+    });
+    // Legacy tab IDs for backward compat
+    document.getElementById('modalTabInfo') && (document.getElementById('modalTabInfo').onclick = () => document.querySelector('[data-tab="info"]')?.click());
 
     // Track currently selected variant
     let selectedVariant = hasVariants ? prod.variants[0] : null;
 
     // Variant chip selection
     if (hasVariants) {
-      // Show initial first variant's image if it has one
       if (prod.variants[0] && prod.variants[0].imageUrl) {
-        const mainThumb = document.querySelector('#modalBody .modal-prod-thumb img.prod-image');
-        if (mainThumb) mainThumb.src = prod.variants[0].imageUrl;
+        if (mainImg) mainImg.src = prod.variants[0].imageUrl;
       }
 
-      document.querySelectorAll('.variant-chip').forEach(chip => {
+      document.querySelectorAll('.pdp-chip').forEach(chip => {
         chip.onclick = () => {
-          document.querySelectorAll('.variant-chip').forEach(c => c.classList.remove('selected'));
+          document.querySelectorAll('.pdp-chip').forEach(c => c.classList.remove('selected'));
           chip.classList.add('selected');
           const vi = parseInt(chip.dataset.vi);
           selectedVariant = prod.variants[vi];
           const priceEl = document.getElementById('modalPriceDisplay');
-          if (priceEl) priceEl.innerHTML = `₹${selectedVariant.price} ${origHTML}`;
+          if (priceEl) priceEl.innerHTML = `₹${selectedVariant.price}`;
 
-          // Update stock display and buttons
           const stockEl = document.getElementById('modalStockDisplay');
           const addBtn = document.getElementById('modalAddBtn');
           const buyBtn = document.getElementById('modalBuyNowBtn');
           const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
-          
+
           if (stockEl) {
-            stockEl.innerHTML = vStock > 0 ? (this.state.trackStock ? `✅ In Stock (${vStock} units)` : '✅ In Stock') : '❌ Out of Stock';
+            const vLow = vStock > 0 && vStock <= 5;
+            stockEl.innerHTML = vStock === 0
+              ? `<span class="pdp-stock-badge oos">❌ Out of Stock</span>`
+              : vLow
+                ? `<span class="pdp-stock-badge low">⚡ Only ${vStock} left!</span>`
+                : `<span class="pdp-stock-badge in">${this.state.trackStock ? `✅ In Stock (${vStock} units)` : '✅ In Stock'}</span>`;
           }
           if (addBtn) addBtn.disabled = (vStock === 0);
           if (buyBtn) buyBtn.disabled = (vStock === 0);
 
-          // Update modal image if variant has a specific image
-          const mainThumbContainer = document.querySelector('#modalBody .modal-prod-thumb');
-          if (mainThumbContainer) {
-            const variantImg = selectedVariant.imageUrl;
-            const fallbackImg = prod.imageUrl;
-            const finalImg = variantImg || fallbackImg;
-            
-            if (finalImg) {
-              let imgEl = mainThumbContainer.querySelector('.prod-image');
-              if (imgEl) {
-                imgEl.src = finalImg;
-              } else {
-                mainThumbContainer.innerHTML = `
-                  <div class="prod-image-wrap modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-                    <img class="prod-image" src="${finalImg}" alt="${prod.name}">
-                  </div>`;
-              }
-            } else {
-              mainThumbContainer.innerHTML = `<div class="prod-emoji-fallback modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">${prod.emoji || '📦'}</div>`;
-            }
+          if (selectedVariant.imageUrl && mainImg) {
+            mainImg.style.opacity = '0';
+            setTimeout(() => { mainImg.src = selectedVariant.imageUrl; mainImg.style.opacity = '1'; }, 150);
           }
         };
       });
     }
 
     const getCartItem = () => {
-      const base = { ...prod, thumbBg: cat.color || '#f0eef8' };
+      const base = { ...prod, thumbBg: cat.color || '#f0eef8', quantity: qty };
       if (selectedVariant) {
         base.price = selectedVariant.price;
         base.selectedVariant = selectedVariant.label;
         base.name = `${prod.name} (${variantLabel}: ${selectedVariant.label})`;
         base.stock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
-        if (selectedVariant.imageUrl) {
-          base.imageUrl = selectedVariant.imageUrl;
-        }
+        if (selectedVariant.imageUrl) base.imageUrl = selectedVariant.imageUrl;
       } else {
         base.stock = prod.stock;
       }
@@ -1990,17 +2032,16 @@ const App = {
     };
 
     document.getElementById('modalAddBtn').onclick = () => {
-      if (hasVariants && !selectedVariant) {
-        showToast(`Please select a ${variantLabel} first`, 'error'); return;
-      }
-      Cart.add(getCartItem());
+      if (hasVariants && !selectedVariant) { showToast(`Please select a ${variantLabel} first`, 'error'); return; }
+      const item = getCartItem();
+      for (let i = 0; i < qty; i++) Cart.add(item);
+      const btn = document.getElementById('modalAddBtn');
+      if (btn) { btn.textContent = '✓ Added!'; btn.classList.add('added'); setTimeout(() => { btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Add to Cart`; btn.classList.remove('added'); }, 1500); }
       document.getElementById('productModalOverlay').classList.remove('open');
     };
 
     document.getElementById('modalBuyNowBtn').onclick = () => {
-      if (hasVariants && !selectedVariant) {
-        showToast(`Please select a ${variantLabel} first`, 'error'); return;
-      }
+      if (hasVariants && !selectedVariant) { showToast(`Please select a ${variantLabel} first`, 'error'); return; }
       document.getElementById('productModalOverlay').classList.remove('open');
       this.openBuyNowCheckout(getCartItem(), cat);
     };
@@ -2008,26 +2049,20 @@ const App = {
     document.getElementById('modalWishlistBtn').onclick = () => {
       if (typeof Wishlist !== 'undefined') {
         Wishlist.toggle({ ...prod, thumbBg: cat.color || '#f0eef8' });
+        const btn = document.getElementById('modalWishlistBtn');
+        if (btn) {
+          const nowWl = typeof Wishlist !== 'undefined' && Wishlist.has(prod.id);
+          btn.classList.toggle('active', nowWl);
+          btn.querySelector('svg').setAttribute('fill', nowWl ? 'currentColor' : 'none');
+        }
       }
     };
 
-    // Tab switching
-    document.getElementById('modalTabInfo').onclick = () => {
-      document.getElementById('modalTabInfo').classList.add('active');
-      document.getElementById('modalTabReviews').classList.remove('active');
-      document.getElementById('modalPaneInfo').style.display = '';
-      document.getElementById('modalPaneReviews').style.display = 'none';
-    };
-    document.getElementById('modalTabReviews').onclick = () => {
-      document.getElementById('modalTabReviews').classList.add('active');
-      document.getElementById('modalTabInfo').classList.remove('active');
-      document.getElementById('modalPaneReviews').style.display = '';
-      document.getElementById('modalPaneInfo').style.display = 'none';
-    };
+    this.bindRelatedProductLinks(relatedProducts, '#modalBody', 'modal', products);
 
     document.getElementById('productModalOverlay').classList.add('open');
 
-    // Load reviews asynchronously (preload in background)
+    // Load reviews in background
     this.loadReviewsForModal(prod.id);
   },
 
@@ -2299,173 +2334,6 @@ const Auth = {
     };
 
     document.getElementById('saveProfileBtn').onclick = () => this.saveProfile();
-
-    // ── Change Password OTP flow ─────────────────────────────
-    // Toggle expand/collapse of change password card
-    const changePwToggle = document.getElementById('changePwToggle');
-    if (changePwToggle) {
-      changePwToggle.onclick = () => {
-        const body = document.getElementById('changePwBody');
-        const arrow = document.getElementById('changePwArrow');
-        const open = body.style.display !== 'none';
-        body.style.display = open ? 'none' : '';
-        if (arrow) arrow.textContent = open ? '▼' : '▲';
-      };
-    }
-
-    // Show/hide password toggles
-    const toggleNewPw = document.getElementById('toggleNewPw');
-    const toggleConfirmPw = document.getElementById('toggleConfirmPw');
-    if (toggleNewPw) {
-      toggleNewPw.onclick = () => {
-        const inp = document.getElementById('newPwInput');
-        inp.type = inp.type === 'password' ? 'text' : 'password';
-        toggleNewPw.textContent = inp.type === 'password' ? '👁' : '🙈';
-      };
-    }
-    if (toggleConfirmPw) {
-      toggleConfirmPw.onclick = () => {
-        const inp = document.getElementById('confirmPwInput');
-        inp.type = inp.type === 'password' ? 'text' : 'password';
-        toggleConfirmPw.textContent = inp.type === 'password' ? '👁' : '🙈';
-      };
-    }
-
-    const changePwMsg = (text, type = '') => {
-      const el = document.getElementById('changePwMsg');
-      if (!el) return;
-      el.textContent = text;
-      el.className = `change-pw-msg ${type}`;
-    };
-
-    const sendOtp = async () => {
-      if (!this.user) return this.message('Please log in first.', 'error');
-      const newPw = (document.getElementById('newPwInput').value || '').trim();
-      const confirmPw = (document.getElementById('confirmPwInput').value || '').trim();
-      if (!newPw || newPw.length < 6) return changePwMsg('New password must be at least 6 characters.', 'error');
-      if (newPw !== confirmPw) return changePwMsg('Passwords do not match.', 'error');
-      const btn = document.getElementById('sendPwOtpBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Sending OTP…';
-      changePwMsg('');
-      try {
-        await API.requestPasswordOtp(newPw);
-        document.getElementById('otpSection').style.display = '';
-        document.getElementById('otpInput').value = '';
-        changePwMsg(`✅ OTP sent to ${this.user.email}. Check your inbox!`, 'success');
-      } catch (e) {
-        changePwMsg(e.message || 'Failed to send OTP', 'error');
-      }
-      btn.disabled = false;
-      btn.textContent = '📧 Send OTP to Email';
-    };
-
-    const sendPwOtpBtn = document.getElementById('sendPwOtpBtn');
-    if (sendPwOtpBtn) sendPwOtpBtn.onclick = sendOtp;
-
-    const resendOtpBtn = document.getElementById('resendOtpBtn');
-    if (resendOtpBtn) resendOtpBtn.onclick = sendOtp;
-
-    const confirmPwChangeBtn = document.getElementById('confirmPwChangeBtn');
-    if (confirmPwChangeBtn) {
-      confirmPwChangeBtn.onclick = async () => {
-        const otp = (document.getElementById('otpInput').value || '').trim();
-        const newPw = (document.getElementById('newPwInput').value || '').trim();
-        if (!otp || otp.length !== 6) return changePwMsg('Please enter the 6-digit OTP from your email.', 'error');
-        confirmPwChangeBtn.disabled = true;
-        confirmPwChangeBtn.textContent = '⏳ Verifying…';
-        changePwMsg('');
-        try {
-          await API.changePassword(otp, newPw);
-          changePwMsg('🎉 Password changed successfully! You can now log in with your new password.', 'success');
-          document.getElementById('newPwInput').value = '';
-          document.getElementById('confirmPwInput').value = '';
-          document.getElementById('otpInput').value = '';
-          document.getElementById('otpSection').style.display = 'none';
-          showToast('Password changed successfully!', 'success');
-        } catch (e) {
-          changePwMsg(e.message || 'Invalid OTP or session expired', 'error');
-        }
-        confirmPwChangeBtn.disabled = false;
-        confirmPwChangeBtn.textContent = '✅ Confirm & Change Password';
-      };
-    }
-
-    // ── Forgot Password OTP (Login Screen) ─────────────────────
-    const forgotPwLink = document.getElementById('forgotPwLink');
-    if (forgotPwLink) {
-      forgotPwLink.onclick = (e) => {
-        e.preventDefault();
-        const loginEmail = (document.getElementById('loginEmail')?.value || '').trim();
-        if (loginEmail) {
-          document.getElementById('fpEmail').value = loginEmail;
-        }
-        this.switchTab('forgot-pw');
-      };
-    }
-
-    const fpBackToLogin = document.getElementById('fpBackToLogin');
-    if (fpBackToLogin) {
-      fpBackToLogin.onclick = (e) => {
-        e.preventDefault();
-        this.switchTab('login');
-      };
-    }
-
-    const fpMsg = (text, type = '') => {
-      const el = document.getElementById('fpMsg');
-      if (!el) return;
-      el.textContent = text;
-      el.className = `change-pw-msg ${type}`;
-    };
-
-    const fpSendOtpBtn = document.getElementById('fpSendOtpBtn');
-    if (fpSendOtpBtn) {
-      fpSendOtpBtn.onclick = async () => {
-        const email = (document.getElementById('fpEmail')?.value || '').trim();
-        if (!email || !email.includes('@')) return fpMsg('Please enter a valid registered email address', 'error');
-        fpSendOtpBtn.disabled = true;
-        fpSendOtpBtn.textContent = '⏳ Sending OTP…';
-        fpMsg('');
-        try {
-          await API.forgotPasswordOtp(email);
-          document.getElementById('fpOtpSection').style.display = 'block';
-          fpMsg(`✅ 6-digit OTP sent to ${email}! Check your email.`, 'success');
-        } catch (e) {
-          fpMsg(e.message || 'Failed to send OTP', 'error');
-        }
-        fpSendOtpBtn.disabled = false;
-        fpSendOtpBtn.textContent = '📧 Send OTP to Email';
-      };
-    }
-
-    const fpResetBtn = document.getElementById('fpResetBtn');
-    if (fpResetBtn) {
-      fpResetBtn.onclick = async () => {
-        const email = (document.getElementById('fpEmail')?.value || '').trim();
-        const otp = (document.getElementById('fpOtpInput')?.value || '').trim();
-        const newPw = (document.getElementById('fpNewPwInput')?.value || '').trim();
-        const confirmPw = (document.getElementById('fpConfirmPwInput')?.value || '').trim();
-
-        if (!email) return fpMsg('Please enter your email', 'error');
-        if (!otp || otp.length !== 6) return fpMsg('Please enter the 6-digit OTP code', 'error');
-        if (!newPw || newPw.length < 6) return fpMsg('New password must be at least 6 characters', 'error');
-        if (newPw !== confirmPw) return fpMsg('Passwords do not match', 'error');
-
-        fpResetBtn.disabled = true;
-        fpResetBtn.textContent = '⏳ Verifying & Logging in…';
-        fpMsg('');
-        try {
-          await API.resetPasswordOtp(email, otp, newPw);
-          showToast('🎉 Password reset & logged in successfully!', 'success');
-          this.render();
-        } catch (e) {
-          fpMsg(e.message || 'Failed to reset password', 'error');
-        }
-        fpResetBtn.disabled = false;
-        fpResetBtn.textContent = '✅ Reset Password & Login';
-      };
-    }
   },
 
   open() {
@@ -2487,7 +2355,6 @@ const Auth = {
       btn.classList.toggle('active', btn.dataset.accountTab === tab);
     });
     document.querySelectorAll('.account-pane[id^="account-"]').forEach(pane => {
-      pane.style.display = pane.id === `account-${tab}` ? 'block' : 'none';
       pane.classList.toggle('active', pane.id === `account-${tab}`);
     });
     this.message('');
@@ -3053,127 +2920,125 @@ document.getElementById('placeOrderBtn').onclick = async () => {
   const WHATSAPP_NUMBER = '918141994995';
 
   if (isOnline) {
-    loadRazorpay(async () => {
-      try {
-        btn.textContent = 'Preparing Payment...';
-        btn.disabled = true;
+    try {
+      btn.textContent = 'Preparing Payment...';
+      btn.disabled = true;
 
-        // 1. Create Razorpay order on the server
-        const reqPayload = { items: cartItems };
-        if (App.state.appliedCoupon) {
-          reqPayload.couponCode = App.state.appliedCoupon.code;
-        }
-        const resOrder = await API.createPaymentOrder(reqPayload);
-        const { keyId, order: razorpayOrder } = resOrder;
-
-        // 2. Open Razorpay checkout modal
-        const options = {
-          key: keyId,
-          amount: razorpayOrder.amount,
-          currency: razorpayOrder.currency,
-          name: 'RK Resin Art',
-          description: 'Premium Craft Supplies Order',
-          order_id: razorpayOrder.id,
-          prefill: {
-            name: `${firstName} ${customer.lastName}`.trim(),
-            email: customer.email || '',
-            contact: phone
-          },
-          theme: { color: '#0f766e' },
-          handler: async function (response) {
-            try {
-              btn.textContent = 'Verifying Payment...';
-              
-              // 3. Cryptographically verify signature & place order
-              const verifyPayload = {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                items: cartItems,
-                customer
-              };
-              if (App.state.appliedCoupon) {
-                verifyPayload.couponCode = App.state.appliedCoupon.code;
-              }
-              const verifyRes = await API.verifyPayment(verifyPayload);
-
-              App.state.lastOrderData = verifyRes.order;
-
-              if (!isBuyNow) Cart.clear();
-
-              btn.textContent = 'Pay securely with Razorpay';
-              btn.disabled = false;
-              btn._isBuyNow = false;
-              btn._buyNowItems = null;
-
-              // Invoice download button
-              const invoiceBtn = document.getElementById('invoiceDownloadBtn');
-              invoiceBtn.style.display = 'flex';
-              invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
-
-              showToast(`Order #${verifyRes.orderId} placed & paid successfully! 🎉`, 'success');
-
-              // WhatsApp message to admin
-              const orderLines = cartItems.map((i, index) =>
-                `${index + 1}. ${i.name}\n` +
-                `   Category: ${i.category || 'Product'}\n` +
-                `   Qty: ${i.qty}\n` +
-                `   Rate: ₹${Number(i.price).toLocaleString('en-IN')}\n` +
-                `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
-              ).join('\n\n');
-              const fullName = `${firstName} ${customer.lastName}`.trim();
-              const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
-              
-              const discountAmount = verifyRes.order.discount || 0;
-              const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
-              const otherChargesAmount = verifyRes.order.otherChargesAmount || 0;
-              const otherLine = otherChargesAmount > 0 ? `Other Charges${verifyRes.order.otherChargesType === 'percentage' ? ' (' + verifyRes.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
-
-              const msg = encodeURIComponent(
-                `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
-                `Order ID: #${verifyRes.orderId}\n` +
-                `Payment Status: Paid online via Razorpay\n` +
-                `Payment ID: ${response.razorpay_payment_id}\n` +
-                `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
-                `📦 ORDER DETAILS\n${orderLines}\n\n` +
-                `💰 PAYMENT SUMMARY\n` +
-                `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
-                discountLine +
-                `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
-                otherLine +
-                `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
-                `👤 CUSTOMER DETAILS\n` +
-                `Name: ${fullName}\n` +
-                `Phone: ${phone}\n` +
-                `Email: ${customer.email || '-'}\n` +
-                `Address: ${fullAddress}`
-              );
-              window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
-              App.loadProducts();
-              document.getElementById('checkoutModalOverlay').classList.remove('open');
-            } catch (e) {
-              btn.textContent = 'Pay securely with Razorpay';
-              btn.disabled = false;
-              showToast(e.message || 'Payment verification failed', 'error');
-            }
-          },
-          modal: {
-            ondismiss: function () {
-              btn.textContent = 'Pay securely with Razorpay';
-              btn.disabled = false;
-              showToast('Payment cancelled by user', 'error');
-            }
-          }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.open();
-      } catch (e) {
-        btn.textContent = 'Pay securely with Razorpay';
-        btn.disabled = false;
-        showToast(e.message || 'Failed to initiate payment', 'error');
+      // 1. Create Razorpay order on the server
+      const reqPayload = { items: cartItems };
+      if (App.state.appliedCoupon) {
+        reqPayload.couponCode = App.state.appliedCoupon.code;
       }
-    });
+      const resOrder = await API.createPaymentOrder(reqPayload);
+      const { keyId, order: razorpayOrder } = resOrder;
+
+      // 2. Open Razorpay checkout modal
+      const options = {
+        key: keyId,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'RK Resin Art',
+        description: 'Premium Craft Supplies Order',
+        order_id: razorpayOrder.id,
+        prefill: {
+          name: `${firstName} ${customer.lastName}`.trim(),
+          email: customer.email || '',
+          contact: phone
+        },
+        theme: { color: '#0f766e' },
+        handler: async function (response) {
+          try {
+            btn.textContent = 'Verifying Payment...';
+            
+            // 3. Cryptographically verify signature & place order
+            const verifyPayload = {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              items: cartItems,
+              customer
+            };
+            if (App.state.appliedCoupon) {
+              verifyPayload.couponCode = App.state.appliedCoupon.code;
+            }
+            const verifyRes = await API.verifyPayment(verifyPayload);
+
+            App.state.lastOrderData = verifyRes.order;
+
+            if (!isBuyNow) Cart.clear();
+
+            btn.textContent = 'Pay securely with Razorpay';
+            btn.disabled = false;
+            btn._isBuyNow = false;
+            btn._buyNowItems = null;
+
+            // Invoice download button
+            const invoiceBtn = document.getElementById('invoiceDownloadBtn');
+            invoiceBtn.style.display = 'flex';
+            invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
+
+            showToast(`Order #${verifyRes.orderId} placed & paid successfully! 🎉`, 'success');
+
+            // WhatsApp message to admin
+            const orderLines = cartItems.map((i, index) =>
+              `${index + 1}. ${i.name}\n` +
+              `   Category: ${i.category || 'Product'}\n` +
+              `   Qty: ${i.qty}\n` +
+              `   Rate: ₹${Number(i.price).toLocaleString('en-IN')}\n` +
+              `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
+            ).join('\n\n');
+            const fullName = `${firstName} ${customer.lastName}`.trim();
+            const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
+            
+            const discountAmount = verifyRes.order.discount || 0;
+            const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
+            const otherChargesAmount = verifyRes.order.otherChargesAmount || 0;
+            const otherLine = otherChargesAmount > 0 ? `Other Charges${verifyRes.order.otherChargesType === 'percentage' ? ' (' + verifyRes.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
+
+            const msg = encodeURIComponent(
+              `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
+              `Order ID: #${verifyRes.orderId}\n` +
+              `Payment Status: Paid online via Razorpay\n` +
+              `Payment ID: ${response.razorpay_payment_id}\n` +
+              `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
+              `📦 ORDER DETAILS\n${orderLines}\n\n` +
+              `💰 PAYMENT SUMMARY\n` +
+              `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
+              discountLine +
+              `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
+              otherLine +
+              `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
+              `👤 CUSTOMER DETAILS\n` +
+              `Name: ${fullName}\n` +
+              `Phone: ${phone}\n` +
+              `Email: ${customer.email || '-'}\n` +
+              `Address: ${fullAddress}`
+            );
+            window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+            App.loadProducts();
+            document.getElementById('checkoutModalOverlay').classList.remove('open');
+          } catch (e) {
+            btn.textContent = 'Pay securely with Razorpay';
+            btn.disabled = false;
+            showToast(e.message || 'Payment verification failed', 'error');
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            btn.textContent = 'Pay securely with Razorpay';
+            btn.disabled = false;
+            showToast('Payment cancelled by user', 'error');
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (e) {
+      btn.textContent = 'Pay securely with Razorpay';
+      btn.disabled = false;
+      showToast(e.message || 'Failed to initiate payment', 'error');
+    }
   } else {
     // WhatsApp Inquiry flow
     try {
