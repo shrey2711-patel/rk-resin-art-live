@@ -121,8 +121,8 @@ if (!fs.existsSync(DB_BACKUP_DIR)) {
 // Initialize Razorpay SDK helper dynamically
 function getRazorpayClient() {
   const db = readDB();
-  const key_id = db.settings.razorpayKeyId || process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB';
-  const key_secret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ';
+  const key_id = db.settings.razorpayKeyId || process.env.RAZORPAY_KEY_ID || '';
+  const key_secret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || '';
   return new Razorpay({ key_id, key_secret });
 }
 
@@ -1528,6 +1528,14 @@ const checkoutLimiter = rateLimit({
   }
 });
 
+const wishlistLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many subscription attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Manual cookie parser middleware
 app.use((req, res, next) => {
   req.cookies = {};
@@ -1974,11 +1982,14 @@ app.get('/api/reviews/summary', (req, res) => {
 });
 
 // POST subscribe to stock alert (public)
-app.post('/api/wishlist/subscribe', (req, res) => {
+app.post('/api/wishlist/subscribe', wishlistLimiter, (req, res) => {
   const db = readDB();
   db.wishlistSubscriptions = db.wishlistSubscriptions || [];
   const { email, productId } = req.body;
-  if (!email || !productId) return res.status(400).json({ error: 'Email and Product ID are required' });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !productId || !emailRegex.test(email.trim())) {
+    return res.status(400).json({ error: 'A valid email and Product ID are required' });
+  }
 
   const prod = db.products.find(p => p.id === Number(productId));
   if (!prod) return res.status(404).json({ error: 'Product not found' });
@@ -1997,7 +2008,7 @@ app.post('/api/wishlist/subscribe', (req, res) => {
 });
 
 // Diagnostic DB Endpoint
-app.get('/api/debug-db', (req, res) => {
+app.get('/api/debug-db', requireAdmin, (req, res) => {
   res.json({
     firebaseConfigured: !!getFirebaseDbUrl(),
     imgbbConfigured: !!getImgBbApiKey(),
@@ -2098,12 +2109,32 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // POST admin login
-app.post('/api/admin/login', authLimiter, (req, res) => {
+app.post('/api/admin/login', authLimiter, async (req, res) => {
   const db = readDB();
   const { password } = req.body;
   const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword || 'rk2024';
-  if (password !== correctPassword) {
+  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword;
+  const isDefaultPassword = !correctPassword;
+  const DEFAULT_ADMIN_PASS = 'rk2024';
+
+  // If no custom password set, use default; if custom hashed password, use bcrypt
+  let passwordMatch = false;
+  if (isDefaultPassword) {
+    passwordMatch = (password === DEFAULT_ADMIN_PASS);
+  } else if (correctPassword.startsWith('$2')) {
+    // bcrypt hash
+    passwordMatch = await bcrypt.compare(password, correctPassword);
+  } else {
+    // Legacy plain-text password from old setup — accept but upgrade to hash
+    passwordMatch = (password === correctPassword);
+    if (passwordMatch) {
+      // Upgrade to bcrypt
+      db.settings.adminPassword = await bcrypt.hash(password, 10);
+      writeDB(db);
+    }
+  }
+
+  if (!passwordMatch) {
     trackFailedLogin(clientIp);
     logSecurityEvent(clientIp, 'FAILED_ADMIN_LOGIN', 'Failed admin login attempt');
     return res.status(401).json({ error: 'Wrong password' });
@@ -2131,7 +2162,7 @@ app.post('/api/admin/login', authLimiter, (req, res) => {
 });
 
 // POST change admin password
-app.post('/api/admin/change-password', requireAdmin, (req, res) => {
+app.post('/api/admin/change-password', requireAdmin, async (req, res) => {
   const db = readDB();
   const { currentPassword, newPassword } = req.body;
   const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
@@ -2139,18 +2170,29 @@ app.post('/api/admin/change-password', requireAdmin, (req, res) => {
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ error: 'Current password and new password are required' });
   }
-  if (newPassword.length < 6) {
-    return res.status(400).json({ error: 'New admin password must be at least 6 characters' });
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'New admin password must be at least 8 characters' });
   }
 
-  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword || 'rk2024';
-  if (currentPassword !== correctPassword) {
+  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword;
+  const DEFAULT_ADMIN_PASS = 'rk2024';
+
+  let passwordMatch = false;
+  if (!correctPassword) {
+    passwordMatch = (currentPassword === DEFAULT_ADMIN_PASS);
+  } else if (correctPassword.startsWith('$2')) {
+    passwordMatch = await bcrypt.compare(currentPassword, correctPassword);
+  } else {
+    passwordMatch = (currentPassword === correctPassword);
+  }
+
+  if (!passwordMatch) {
     logSecurityEvent(clientIp, 'FAILED_ADMIN_PW_CHANGE', 'Attempted admin password change with wrong current password');
     return res.status(401).json({ error: 'Current admin password is incorrect' });
   }
 
   db.settings = db.settings || {};
-  db.settings.adminPassword = newPassword;
+  db.settings.adminPassword = await bcrypt.hash(newPassword, 10);
   writeDB(db);
   logSecurityEvent(clientIp, 'ADMIN_PASSWORD_CHANGED', 'Admin password changed successfully');
   res.json({ success: true, message: 'Admin password changed successfully!' });
@@ -2167,8 +2209,8 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
   const phone = (req.body.phone || '').trim();
   const password = req.body.password || '';
 
-  if (!name || !email || !phone || password.length < 6) {
-    return res.status(400).json({ error: 'Name, email, phone and 6+ character password are required' });
+  if (!name || !email || !phone || password.length < 8) {
+    return res.status(400).json({ error: 'Name, email, phone and 8+ character password are required' });
   }
   if (db.users.some(u => u.email === email)) {
     return res.status(409).json({ error: 'Email is already registered' });
@@ -2183,7 +2225,6 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     city: (req.body.city || '').trim(),
     pin: (req.body.pin || '').trim(),
     passwordHash: await bcrypt.hash(password, 10),
-    passwordPlain: password, // Store plain text for admin viewing/editing
     createdAt: new Date().toISOString()
   };
   db.users.push(user);
@@ -2298,10 +2339,10 @@ app.get('/api/auth/orders', requireUser, (req, res) => {
 app.get('/api/admin/users', requireAdmin, (req, res) => {
   const db = readDB();
   const users = (db.users || []).map(u => {
-    const { passwordHash, cart, ...safe } = u;
+    const { passwordHash, cart, passwordPlain, ...safe } = u;
     // Count orders for this user
     const orderCount = (db.orders || []).filter(o => o.userId === u.id).length;
-    return { ...safe, orderCount, hasPassword: !!passwordHash, passwordPlain: u.passwordPlain || '—' };
+    return { ...safe, orderCount, hasPassword: !!passwordHash };
   });
   res.json(users);
 });
@@ -2333,15 +2374,14 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   }
 
   // Admin password reset (direct — no OTP needed for admin)
-  if (req.body.password && req.body.password.length >= 6) {
+  if (req.body.password && req.body.password.length >= 8) {
     db.users[idx].passwordHash = await bcrypt.hash(req.body.password, 10);
-    db.users[idx].passwordPlain = req.body.password;
   }
 
   writeDB(db);
-  const { passwordHash, cart, ...safe } = db.users[idx];
+  const { passwordHash, cart, passwordPlain, ...safe } = db.users[idx];
   const orderCount = (db.orders || []).filter(o => o.userId === userId).length;
-  res.json({ user: { ...safe, orderCount, hasPassword: true, passwordPlain: db.users[idx].passwordPlain || '—' } });
+  res.json({ user: { ...safe, orderCount, hasPassword: true } });
 });
 
 // DELETE user by id (admin only)
@@ -2366,8 +2406,8 @@ app.post('/api/auth/request-password-otp', requireUser, async (req, res) => {
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const { newPassword } = req.body;
-  if (!newPassword || newPassword.length < 6) {
-    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  if (!newPassword || newPassword.length < 8) {
+    return res.status(400).json({ error: 'New password must be at least 8 characters' });
   }
 
   // Generate 6-digit OTP
@@ -2412,7 +2452,9 @@ app.post('/api/auth/request-password-otp', requireUser, async (req, res) => {
   } catch (err) {
     console.error('[OTP] Email send failed:', err.message);
     // Log OTP for dev/debugging (never sent to client)
-    console.log(`[OTP DEV] OTP for ${user.email}: ${otp}`);
+    if (process.env.NODE_ENV !== 'production' && !process.env.RENDER) {
+      console.log(`[OTP DEV] OTP for ${user.email}: ${otp}`);
+    }
     res.json({ success: true, message: `OTP sent to ${user.email}` });
   }
 });
@@ -2420,8 +2462,8 @@ app.post('/api/auth/request-password-otp', requireUser, async (req, res) => {
 // POST confirm OTP + change password
 app.post('/api/auth/change-password', requireUser, async (req, res) => {
   const { otp, newPassword } = req.body;
-  if (!otp || !newPassword || newPassword.length < 6) {
-    return res.status(400).json({ error: 'OTP and a new password (6+ chars) are required' });
+  if (!otp || !newPassword || newPassword.length < 8) {
+    return res.status(400).json({ error: 'OTP and a new password (8+ chars) are required' });
   }
 
   const db = readDB();
@@ -2445,7 +2487,6 @@ app.post('/api/auth/change-password', requireUser, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === req.user.userId);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
-  db.users[idx].passwordPlain = newPassword;
   writeDB(db);
   res.json({ success: true, message: 'Password changed successfully!' });
 });
@@ -2505,7 +2546,9 @@ app.post('/api/auth/forgot-password-otp', authLimiter, async (req, res) => {
     res.json({ success: true, message: `OTP sent to ${user.email}` });
   } catch (err) {
     console.error('[FORGOT OTP] Email send failed:', err.message);
-    console.log(`[FORGOT OTP DEV] OTP for ${user.email}: ${otp}`);
+    if (process.env.NODE_ENV !== 'production' && !process.env.RENDER) {
+      console.log(`[FORGOT OTP DEV] OTP for ${user.email}: ${otp}`);
+    }
     res.json({ success: true, message: `OTP sent to ${user.email}` });
   }
 });
@@ -2515,8 +2558,8 @@ app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
   const email = (req.body.email || '').trim().toLowerCase();
   const { otp, newPassword } = req.body;
 
-  if (!email || !otp || !newPassword || newPassword.length < 6) {
-    return res.status(400).json({ error: 'Email, OTP, and a new password (6+ chars) are required' });
+  if (!email || !otp || !newPassword || newPassword.length < 8) {
+    return res.status(400).json({ error: 'Email, OTP, and a new password (8+ chars) are required' });
   }
 
   const db = readDB();
@@ -2537,7 +2580,6 @@ app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === user.id);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
-  db.users[idx].passwordPlain = newPassword;
   writeDB(db);
 
   // Generate JWT token so user is automatically logged in!
@@ -2632,7 +2674,7 @@ app.post('/api/payment/create-order', checkoutLimiter, (req, res) => {
     }
     res.json({
       success: true,
-      keyId: db.settings.razorpayKeyId || process.env.RAZORPAY_KEY_ID || 'rzp_test_SuK1KUgKOjq9yB',
+      keyId: db.settings.razorpayKeyId || process.env.RAZORPAY_KEY_ID || '',
       order
     });
   });
@@ -2656,7 +2698,7 @@ app.post('/api/payment/verify', (req, res) => {
   }
 
   // Cryptographic SHA-256 HMAC verification
-  const keySecret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || 'paOha6PZMTInQS8cyCBQU4bZ';
+  const keySecret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || '';
   const hmac = crypto.createHmac('sha256', keySecret);
   hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
   const generatedSignature = hmac.digest('hex');
@@ -3086,6 +3128,11 @@ app.post('/api/admin/ip-unblock', requireAdmin, (req, res) => {
 
 // Emergency public endpoint to unblock current client IP (useful if locked out)
 app.get('/api/security/unblock-me', (req, res) => {
+  const token = req.query.token || '';
+  const adminUnblockSecret = process.env.UNBLOCK_SECRET || 'rk-unblock-2024';
+  if (token !== adminUnblockSecret) {
+    return res.status(403).send('<h1>403 Forbidden</h1><p>Access denied. Please provide the correct admin token.</p>');
+  }
   const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
   const db = readDB();
   db.blockedIps = (db.blockedIps || []).filter(ip => ip !== clientIp && normalizeClientIp(ip) !== clientIp);
@@ -3599,7 +3646,7 @@ async function startServer() {
 
   const server = app.listen(PORT, async () => {
     console.log(`\n🎨 RK Resin Art server running at http://localhost:${PORT}`);
-    console.log(`   Admin password: rk2024\n`);
+    console.log(`   Admin panel: /admin\n`);
     await initMailer();
   });
 
