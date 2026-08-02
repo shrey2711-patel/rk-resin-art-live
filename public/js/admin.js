@@ -178,33 +178,16 @@ const Admin = {
   },
 
   async resizeImageForUpload(file) {
+    // ── HEIC/HEIF: send raw to server — sharp converts it reliably on all platforms ──
+    // We do NOT attempt browser-side conversion (heicTo library is unreliable on Windows
+    // and requires an extra CDN dependency). The server handles it with sharp instead.
     if (this.isHeicImage(file)) {
-      this.updateConversionStatus('Converting iPhone HEIC image... (please wait)');
-      try {
-        const converter = window.heicTo || (typeof heicTo !== 'undefined' ? heicTo : null);
-        if (!converter) {
-          throw new Error('HEIC converter library not loaded.');
-        }
-        
-        let convertedBlob = await converter({
-          blob: file,
-          type: 'image/jpeg',
-          quality: 0.9
-        });
-        
-        if (Array.isArray(convertedBlob)) {
-          convertedBlob = convertedBlob[0];
-        }
-        
-        const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
-        file = new File([convertedBlob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
-        this.updateConversionStatus('HEIC converted successfully. Compressing...');
-      } catch (err) {
-        console.error('HEIC conversion failed:', err);
-        showToast('HEIC conversion failed: ' + err.message, 'error');
-      }
+      this.updateConversionStatus('📷 HEIC detected — sending to server for conversion...');
+      // Return the raw file immediately; server will convert to JPEG with sharp
+      return file;
     }
 
+    // ── Standard images: resize + compress to WebP in browser ──
     try {
       const imageUrl = URL.createObjectURL(file);
       const img = new Image();
