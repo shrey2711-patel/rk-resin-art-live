@@ -92,6 +92,8 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const geoip = require('geoip-lite');
 const rateLimit = require('express-rate-limit');
+let sharp = null;
+try { sharp = require('sharp'); } catch (e) { console.warn('⚠️ sharp not installed — HEIC conversion disabled. Run: npm install sharp'); }
 
 const app = express();
 if (process.env.RENDER) {
@@ -1184,18 +1186,22 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
-const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
+const HEIC_EXTS = new Set(['.heic', '.heif']);
+
 const uploadStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
+    // HEIC/HEIF files will be converted to JPEG — save with .jpg extension
+    const outputExt = HEIC_EXTS.has(ext) ? '.jpg' : ext;
     const safeBase = path
       .basename(file.originalname, ext)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
       .slice(0, 40) || 'product';
-    cb(null, `${safeBase}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+    cb(null, `${safeBase}-${Date.now()}-${Math.round(Math.random() * 1e9)}${outputExt}`);
   }
 });
 
@@ -1204,10 +1210,11 @@ const uploadProductImage = multer({
   limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    const isAllowedExt = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
+    const isAllowedExt = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'].includes(ext);
     const isAllowedMime = allowedImageTypes.has(file.mimetype);
+    // Some browsers send HEIC with octet-stream MIME — allow by extension too
     if (!isAllowedMime && !isAllowedExt) {
-      return cb(new Error('Only JPG, PNG and WEBP images are allowed'));
+      return cb(new Error('Only JPG, PNG, WEBP, HEIC and HEIF images are allowed'));
     }
     cb(null, true);
   }
@@ -3200,6 +3207,36 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
       return res.status(status).json({ error: message });
     }
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+
+    // ── HEIC/HEIF → JPEG conversion ──────────────────────────
+    const originalExt = path.extname(req.file.originalname).toLowerCase();
+    const isHeic = HEIC_EXTS.has(originalExt) ||
+      req.file.mimetype === 'image/heic' ||
+      req.file.mimetype === 'image/heif';
+
+    if (isHeic) {
+      if (!sharp) {
+        // Clean up the uploaded file and reject
+        try { fs.unlinkSync(req.file.path); } catch (_) {}
+        return res.status(400).json({ error: 'HEIC conversion is unavailable. Run "npm install sharp" on the server.' });
+      }
+      try {
+        const heicPath = req.file.path;
+        // sharp converts the HEIC file and overwrites the already-renamed .jpg file in place
+        await sharp(heicPath)
+          .rotate()           // respect EXIF orientation
+          .jpeg({ quality: 88 })
+          .toFile(heicPath + '.converted.jpg');
+        // Replace the original HEIC file with the converted JPEG
+        fs.renameSync(heicPath + '.converted.jpg', heicPath);
+        console.log(`🖼️ HEIC image converted to JPEG: ${req.file.filename}`);
+      } catch (convErr) {
+        try { fs.unlinkSync(req.file.path); } catch (_) {}
+        console.error('❌ HEIC conversion failed:', convErr.message);
+        return res.status(500).json({ error: 'Failed to convert HEIC image: ' + convErr.message });
+      }
+    }
+    // ─────────────────────────────────────────────────────────
 
     const imgbbApiKey = getImgBbApiKey();
     if (imgbbApiKey) {
