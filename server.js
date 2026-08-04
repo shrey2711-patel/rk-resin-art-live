@@ -3208,7 +3208,7 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
     }
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
-    // ── HEIC/HEIF → JPEG conversion ──────────────────────────
+    // ── HEIC/HEIF → JPEG conversion ────────────────────────────
     const originalExt = path.extname(req.file.originalname).toLowerCase();
     const isHeic = HEIC_EXTS.has(originalExt) ||
       req.file.mimetype === 'image/heic' ||
@@ -3216,27 +3216,61 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
 
     if (isHeic) {
       if (!sharp) {
-        // Clean up the uploaded file and reject
         try { fs.unlinkSync(req.file.path); } catch (_) {}
         return res.status(400).json({ error: 'HEIC conversion is unavailable. Run "npm install sharp" on the server.' });
       }
       try {
         const heicPath = req.file.path;
-        // sharp converts the HEIC file and overwrites the already-renamed .jpg file in place
         await sharp(heicPath)
-          .rotate()           // respect EXIF orientation
-          .jpeg({ quality: 88 })
+          .rotate()
+          .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 82, mozjpeg: true })
           .toFile(heicPath + '.converted.jpg');
-        // Replace the original HEIC file with the converted JPEG
         fs.renameSync(heicPath + '.converted.jpg', heicPath);
-        console.log(`🖼️ HEIC image converted to JPEG: ${req.file.filename}`);
+        console.log(`🖼️ HEIC converted to JPEG: ${req.file.filename}`);
       } catch (convErr) {
         try { fs.unlinkSync(req.file.path); } catch (_) {}
         console.error('❌ HEIC conversion failed:', convErr.message);
         return res.status(500).json({ error: 'Failed to convert HEIC image: ' + convErr.message });
       }
     }
-    // ─────────────────────────────────────────────────────────
+
+    // ── Compress ALL images to ≤ 1 MB using sharp ──────────────
+    // Handles HEIC (already converted above), JPG, PNG, WebP from any device/OS.
+    if (sharp) {
+      try {
+        const filePath  = req.file.path;
+        const fileExt   = path.extname(req.file.filename).toLowerCase();
+        const TARGET    = 1 * 1024 * 1024; // 1 MB
+        let quality     = 82;
+        let outputBuf;
+
+        do {
+          const inst = sharp(filePath)
+            .rotate() // honour EXIF orientation
+            .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true });
+
+          // PNG stays PNG only if still small; everything else → JPEG
+          if (fileExt === '.png' && quality > 50) {
+            outputBuf = await inst.png({ compressionLevel: 9, quality }).toBuffer();
+          } else {
+            outputBuf = await inst.jpeg({ quality, mozjpeg: true }).toBuffer();
+          }
+
+          if (outputBuf.length <= TARGET) break;
+          quality -= 12; // step down ~12 points each pass
+        } while (quality >= 20);
+
+        fs.writeFileSync(filePath, outputBuf);
+        const finalKB = Math.round(outputBuf.length / 1024);
+        console.log(`🗜️ Image compressed to ${finalKB} KB (q${quality + 12}) → ${req.file.filename}`);
+      } catch (compErr) {
+        // Non-fatal: log and continue with original file
+        console.error('⚠️ Image compression step failed:', compErr.message);
+      }
+    }
+    // ────────────────────────────────────────────────────────────
+
 
     const imgbbApiKey = getImgBbApiKey();
     if (imgbbApiKey) {

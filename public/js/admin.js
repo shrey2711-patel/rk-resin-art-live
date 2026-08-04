@@ -179,48 +179,60 @@ const Admin = {
 
   async resizeImageForUpload(file) {
     // ── HEIC/HEIF: send raw to server — sharp converts it reliably on all platforms ──
-    // We do NOT attempt browser-side conversion (heicTo library is unreliable on Windows
-    // and requires an extra CDN dependency). The server handles it with sharp instead.
     if (this.isHeicImage(file)) {
-      this.updateConversionStatus('📷 HEIC detected — sending to server for conversion...');
-      // Return the raw file immediately; server will convert to JPEG with sharp
+      this.updateConversionStatus('📷 HEIC detected — sending to server for conversion & compression...');
       return file;
     }
 
-    // ── Standard images: resize + compress to WebP in browser ──
+    // ── Standard images: resize + progressive compress to ≤1MB in browser ──
     try {
       const imageUrl = URL.createObjectURL(file);
       const img = new Image();
-      
+
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = () => reject(new Error('Failed to load image for resize'));
         img.src = imageUrl;
       });
 
-      const maxW = 1200;
+      // Max 1920px wide — keeps quality high while limiting raw pixel count
+      const maxW = 1920;
       const scale = Math.min(1, maxW / img.width);
 
       const canvas = document.createElement('canvas');
-      canvas.width = Math.round(img.width * scale);
+      canvas.width  = Math.round(img.width  * scale);
       canvas.height = Math.round(img.height * scale);
-      
+
       const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        URL.revokeObjectURL(imageUrl);
-        return file;
-      }
-      
+      if (!ctx) { URL.revokeObjectURL(imageUrl); return file; }
+
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(imageUrl);
 
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.80));
+      // Progressive quality loop — keep reducing until ≤ 1 MB or quality floor
+      const TARGET_BYTES = 1 * 1024 * 1024; // 1 MB
+      const MIN_QUALITY  = 0.15;
+      let quality = 0.85;
+      let blob    = null;
+
+      this.updateConversionStatus('🗜️ Compressing image...');
+
+      do {
+        blob = await new Promise(resolve =>
+          canvas.toBlob(resolve, 'image/webp', quality)
+        );
+        if (!blob || blob.size <= TARGET_BYTES) break;
+        quality = Math.max(MIN_QUALITY, quality - 0.07);
+      } while (quality >= MIN_QUALITY);
+
       if (!blob) return file;
 
-      const baseName = (file.name || 'image').replace(/\.[^/.]+$/, "");
-      const newName = `${baseName}.webp`;
+      const finalKB = Math.round(blob.size / 1024);
+      const usedQ   = Math.round((quality + 0.07) * 100); // quality before last decrement
+      this.updateConversionStatus(`✅ Compressed to ${finalKB} KB (quality ${Math.min(85, usedQ)}%)`);
 
-      return new File([blob], newName, { type: 'image/webp', lastModified: Date.now() });
+      const baseName = (file.name || 'image').replace(/\.[^/.]+$/, '');
+      return new File([blob], `${baseName}.webp`, { type: 'image/webp', lastModified: Date.now() });
     } catch (e) {
       console.error('Image compression failed, using original file:', e);
       return file;
