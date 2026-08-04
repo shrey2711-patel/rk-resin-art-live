@@ -530,7 +530,13 @@ const App = {
       if (hasVariants) {
         if (prod.variants[0] && prod.variants[0].imageUrl) {
           const mainThumb = document.querySelector('#productPageContent .modal-prod-thumb img.prod-image');
-          if (mainThumb) mainThumb.src = prod.variants[0].imageUrl;
+          if (mainThumb) {
+            mainThumb.src = prod.variants[0].imageUrl;
+            mainThumb.onerror = function() {
+              this.style.display = 'none';
+              if (this.parentElement) this.parentElement.innerHTML = `<div class="prod-emoji-fallback modal" style="aspect-ratio:1/1;background:#fff">${prod.emoji || '📦'}</div>`;
+            };
+          }
         }
 
         document.querySelectorAll('#productPageContent .variant-chip').forEach(chip => {
@@ -566,10 +572,15 @@ const App = {
                 let imgEl = mainThumbContainer.querySelector('.prod-image');
                 if (imgEl) {
                   imgEl.src = finalImg;
+                  imgEl.onerror = function() {
+                    this.style.display = 'none';
+                    if (this.parentElement) this.parentElement.innerHTML = `<div class="prod-emoji-fallback modal" style="aspect-ratio:1/1;background:${cat.color || '#f0eef8'}">${prod.emoji || '📦'}</div>`;
+                  };
                 } else {
                   mainThumbContainer.innerHTML = `
                     <div class="prod-image-wrap modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-                      <img class="prod-image" src="${finalImg}" alt="${prod.name}">
+                      <img class="prod-image" src="${finalImg}" alt="${prod.name}"
+                        onerror="this.style.display='none';if(this.parentElement)this.parentElement.innerHTML='<div class=\'prod-emoji-fallback modal\' style=\'aspect-ratio:1/1;background:${cat.color || '#f0eef8'}\'>${prod.emoji || '📦'}</div>';">
                     </div>`;
                 }
               } else {
@@ -693,9 +704,11 @@ const App = {
     }
 
     if (displayImageUrl) {
+      const emojiHtml = product.emoji || '📦';
       return `
         <div class="prod-image-wrap ${size}" style="background:${fallbackBg}; ${aspectStyle}">
-          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy">
+          <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy"
+            onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'prod-emoji-fallback ${size}\' style=\'background:${fallbackBg}; ${aspectStyle}\'>${emojiHtml}</div>';">
         </div>`;
     }
     return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;
