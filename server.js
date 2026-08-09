@@ -95,6 +95,13 @@ const rateLimit = require('express-rate-limit');
 let sharp = null;
 try { sharp = require('sharp'); } catch (e) { console.warn('⚠️ sharp not installed — HEIC conversion disabled. Run: npm install sharp'); }
 
+let S3Client, PutObjectCommand;
+try {
+  const s3mod = require('@aws-sdk/client-s3');
+  S3Client = s3mod.S3Client;
+  PutObjectCommand = s3mod.PutObjectCommand;
+} catch (e) { console.warn('⚠️ @aws-sdk/client-s3 not installed — R2 upload disabled. Run: npm install @aws-sdk/client-s3'); }
+
 const app = express();
 if (process.env.RENDER) {
   app.set('trust proxy', 1); // Trust Render's single-hop load balancer
@@ -1657,6 +1664,17 @@ function firebaseRestUrl() {
   return secret ? `${baseUrl}?auth=${secret}` : baseUrl;
 }
 
+function getR2Config() {
+  const accountId  = process.env.R2_ACCOUNT_ID;
+  const accessKey  = process.env.R2_ACCESS_KEY_ID;
+  const secretKey  = process.env.R2_SECRET_ACCESS_KEY;
+  const bucketName = process.env.R2_BUCKET_NAME;
+  const publicUrl  = process.env.R2_PUBLIC_URL; // e.g. https://pub-xxxx.r2.dev  or your custom domain
+  if (!accountId || !accessKey || !secretKey || !bucketName || !publicUrl) return null;
+  return { accountId, accessKey, secretKey, bucketName, publicUrl };
+}
+
+// Keep legacy ImgBB helper so existing stored URLs still display correctly
 function getImgBbApiKey() {
   return process.env.IMGBB_API_KEY ||
     process.env.IMGBB_KEY ||
@@ -2018,6 +2036,7 @@ app.post('/api/wishlist/subscribe', wishlistLimiter, (req, res) => {
 app.get('/api/debug-db', requireAdmin, (req, res) => {
   res.json({
     firebaseConfigured: !!getFirebaseDbUrl(),
+    r2Configured: !!getR2Config(),
     imgbbConfigured: !!getImgBbApiKey(),
     nodeEnv: process.env.NODE_ENV || 'development',
     persistentDisk: !!process.env.PERSISTENT_DISK_PATH
@@ -3192,6 +3211,12 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+app.get('/api/admin/r2-status', requireAdmin, (req, res) => {
+  const cfg = getR2Config();
+  res.json({ configured: !!cfg, bucket: cfg ? cfg.bucketName : null, publicUrl: cfg ? cfg.publicUrl : null });
+});
+
+// Legacy ImgBB key endpoint (kept for backwards compat)
 app.get('/api/admin/imgbb-key', requireAdmin, (req, res) => {
   res.json({ key: getImgBbApiKey() });
 });
@@ -3272,70 +3297,94 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
     // ────────────────────────────────────────────────────────────
 
 
+    // ── Upload to Cloudflare R2 ───────────────────────────────
+    const r2cfg = getR2Config();
+    if (r2cfg && S3Client && PutObjectCommand) {
+      try {
+        const filePath   = req.file.path;
+        const fileBuffer = fs.readFileSync(filePath);
+        const fileExt    = path.extname(req.file.filename).toLowerCase();
+        const mimeMap    = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
+        const contentType = mimeMap[fileExt] || 'image/jpeg';
+
+        // Build a clean R2 object key: images/filename
+        const r2Key = `images/${req.file.filename}`;
+
+        const client = new S3Client({
+          region: 'auto',
+          endpoint: `https://${r2cfg.accountId}.r2.cloudflarestorage.com`,
+          credentials: {
+            accessKeyId:     r2cfg.accessKey,
+            secretAccessKey: r2cfg.secretKey
+          }
+        });
+
+        await client.send(new PutObjectCommand({
+          Bucket:      r2cfg.bucketName,
+          Key:         r2Key,
+          Body:        fileBuffer,
+          ContentType: contentType
+        }));
+
+        // Delete local temp file after successful R2 upload
+        try { fs.unlinkSync(filePath); } catch (_) {}
+
+        const publicUrl = `${r2cfg.publicUrl.replace(/\/$/, '')}/${r2Key}`;
+        console.log(`☁️ Image uploaded to Cloudflare R2: ${publicUrl}`);
+        return res.json({ success: true, url: publicUrl, filename: req.file.filename });
+
+      } catch (r2Err) {
+        console.error('❌ Cloudflare R2 upload failed, falling back to local storage:', r2Err.message);
+        return res.json({
+          success: true,
+          url: `/uploads/${req.file.filename}`,
+          filename: req.file.filename,
+          warning: `R2 upload failed, stored locally: ${r2Err.message}`
+        });
+      }
+    }
+
+    // ── Legacy ImgBB fallback (if R2 not configured but ImgBB key exists) ────
     const imgbbApiKey = getImgBbApiKey();
     if (imgbbApiKey) {
       try {
         const filePath = req.file.path;
         const fileBuffer = fs.readFileSync(filePath);
         const base64Image = fileBuffer.toString('base64');
-        
-        // Upload to ImgBB
         const formData = new URLSearchParams();
         formData.append('image', base64Image);
-        
-        // Wrap fetch in a timeout promise to prevent hanging requests
         const fetchPromise = fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
           method: 'POST',
           body: formData,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0'
           }
         });
-        
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('ImgBB API response timed out after 15 seconds')), 15000)
+          setTimeout(() => reject(new Error('ImgBB API timed out after 15 seconds')), 15000)
         );
-        
         const imgbbRes = await Promise.race([fetchPromise, timeoutPromise]);
-        
         const responseBodyText = await imgbbRes.text();
-        if (!imgbbRes.ok) {
-          throw new Error(`ImgBB API responded with status ${imgbbRes.status}: ${responseBodyText}`);
-        }
-        
-        let imgbbData;
-        try {
-          imgbbData = JSON.parse(responseBodyText);
-        } catch (e) {
-          throw new Error(`Failed to parse ImgBB response: ${e.message}. Raw response: ${responseBodyText}`);
-        }
-        
-        // Delete local temporary file since it is now stored in cloud
-        try { fs.unlinkSync(filePath); } catch (e) {}
-        
+        if (!imgbbRes.ok) throw new Error(`ImgBB error ${imgbbRes.status}: ${responseBodyText}`);
+        const imgbbData = JSON.parse(responseBodyText);
+        try { fs.unlinkSync(filePath); } catch (_) {}
         if (imgbbData && imgbbData.data && imgbbData.data.url) {
-          return res.json({
-            success: true,
-            url: imgbbData.data.url,
-            filename: req.file.filename
-          });
-        } else {
-          throw new Error(`Invalid response structure from ImgBB: ${responseBodyText}`);
+          return res.json({ success: true, url: imgbbData.data.url, filename: req.file.filename });
         }
+        throw new Error('Invalid ImgBB response structure');
       } catch (uploadError) {
-        console.error("❌ ImgBB cloud upload failed, falling back to local storage:", uploadError.message);
-        // DO NOT delete the temp file because we are going to use it locally as a fallback
+        console.error('❌ ImgBB upload failed, falling back to local storage:', uploadError.message);
         return res.json({
           success: true,
           url: `/uploads/${req.file.filename}`,
           filename: req.file.filename,
-          warning: `Cloud image upload failed, fell back to local storage: ${uploadError.message}`
+          warning: `Cloud upload failed, stored locally: ${uploadError.message}`
         });
       }
     }
 
-    // Default local fallback when no API key is present
+    // ── Local storage (no cloud configured) ──────────────────────
     res.json({
       success: true,
       url: `/uploads/${req.file.filename}`,
