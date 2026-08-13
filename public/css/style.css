@@ -1692,9 +1692,9 @@ input, select, textarea { font-family: inherit; }
 
   .site-nav { display: none; }
 
-  .banner-section { aspect-ratio: 16 / 15; height: auto; max-height: 620px; }
+  .banner-section { aspect-ratio: 16 / 7; height: auto; max-height: 320px; }
   .banner-slide { height: 100%; }
-  .bs-background-image { height: 100%; width: 100%; object-fit: cover; }
+  .bs-background-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center center; }
   .banner-arrow { width: 28px; height: 28px; font-size: 1rem; }
 
   .shop-main { padding: 1rem; }
@@ -1746,9 +1746,9 @@ input, select, textarea { font-family: inherit; }
   .logo-text small { display: none; }
   .shop-main { padding: 0.5rem; }
   .modal-prod-thumb { height: auto !important; }
-  .banner-section { aspect-ratio: 1 / 1; height: auto; max-height: 550px; }
+  .banner-section { aspect-ratio: 16 / 7; height: auto; max-height: 260px; }
   .banner-slide { height: 100%; }
-  .bs-background-image { height: 100%; width: 100%; object-fit: cover; }
+  .bs-background-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center center; }
 }
 
 /* ─── Reviews & Ratings ─────────────────────────────────── */
