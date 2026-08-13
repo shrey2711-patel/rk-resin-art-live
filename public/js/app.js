@@ -1881,11 +1881,11 @@ const App = {
 
     document.getElementById('modalBody').innerHTML = `
       <div class="pdp-container">
-        <!-- LEFT: Image Gallery (Main image on top, photo selection bar BELOW) -->
+        <!-- LEFT: Image Gallery (Vertical Left Selector Bar + Main Image) -->
         <div class="pdp-left">
           <div class="pdp-gallery">
-            ${mainImgHTML}
             ${thumbnailsHTML}
+            ${mainImgHTML}
           </div>
           ${highlightsHTML}
         </div>
