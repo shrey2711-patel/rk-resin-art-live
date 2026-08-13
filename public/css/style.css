@@ -96,10 +96,16 @@ input, select, textarea { font-family: inherit; }
 }
 @keyframes marqueeMove { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
+/* ─── Sticky Top Wrapper (announce bar + header) ───────── */
+.sticky-top-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
 /* ─── Header ────────────────────────────────────────────── */
 .header {
   background: var(--white); border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 90;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transition: background 0.3s;
 }
