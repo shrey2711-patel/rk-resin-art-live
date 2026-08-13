@@ -1802,8 +1802,8 @@ const App = {
     };
 
     let selectedVariant = hasVariants ? prod.variants[0] : null;
-    const galleryImages = getGalleryImagesForSelection(selectedVariant, prod);
-    const hasGallery = galleryImages.length > 1;
+    let currentGallery = getGalleryImagesForSelection(selectedVariant, prod);
+    let currentImgIdx = 0;
 
     // Payment icons SVG
     const paymentIconsHTML = `
@@ -1854,31 +1854,38 @@ const App = {
         </div>
       </section>` : '';
 
-    // Main image HTML
-    const mainImgSrc = galleryImages[0] || null;
+    // Main image HTML with floating < > switch arrows
+    const mainImgSrc = currentGallery[0] || null;
+    const arrowsHTML = currentGallery.length > 1 ? `
+      <button class="pdp-img-arrow prev" id="pdpImgPrev" type="button" aria-label="Previous photo">‹</button>
+      <button class="pdp-img-arrow next" id="pdpImgNext" type="button" aria-label="Next photo">›</button>
+    ` : '';
+
     const mainImgHTML = mainImgSrc
       ? `<div class="pdp-main-img-wrap" id="pdpMainImgWrap">
+          ${arrowsHTML}
           <img class="pdp-main-img" id="pdpMainImg" src="${mainImgSrc}" alt="${prod.name}">
         </div>`
       : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="pdpMainImgWrap" style="background:${cat.color || '#f0eef8'}">
           <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
         </div>`;
 
-    const thumbnailsHTML = hasGallery ? `
-      <div class="pdp-thumbs" id="pdpThumbs">
-        ${galleryImages.map((img, i) => `
-          <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-img="${img}" type="button">
+    // Photo selection bar BELOW main image
+    const thumbnailsHTML = currentGallery.length > 0 ? `
+      <div class="pdp-thumbs" id="pdpThumbs" style="${currentGallery.length <= 1 ? 'display:none' : ''}">
+        ${currentGallery.map((img, i) => `
+          <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-index="${i}" data-img="${img}" type="button">
             <img src="${img}" alt="view ${i+1}">
           </button>`).join('')}
       </div>` : `<div class="pdp-thumbs" id="pdpThumbs" style="display:none"></div>`;
 
     document.getElementById('modalBody').innerHTML = `
       <div class="pdp-container">
-        <!-- LEFT: Image Gallery -->
+        <!-- LEFT: Image Gallery (Main image on top, photo selection bar BELOW) -->
         <div class="pdp-left">
           <div class="pdp-gallery">
-            ${thumbnailsHTML}
             ${mainImgHTML}
+            ${thumbnailsHTML}
           </div>
           ${highlightsHTML}
         </div>
@@ -1965,23 +1972,40 @@ const App = {
         </div>
       </div>`;
 
-    const bindGalleryThumbnails = () => {
-      const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
+    const setModalActiveImage = (idx) => {
+      if (!currentGallery.length) return;
+      currentImgIdx = (idx + currentGallery.length) % currentGallery.length;
       const mainImg = document.getElementById('pdpMainImg');
+      if (mainImg) {
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+          mainImg.src = currentGallery[currentImgIdx];
+          mainImg.style.opacity = '1';
+        }, 120);
+      }
+      const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
+      thumbBtns.forEach((btn, i) => {
+        btn.classList.toggle('active', i === currentImgIdx);
+      });
+    };
+
+    const bindGalleryControls = () => {
+      const prevBtn = document.getElementById('pdpImgPrev');
+      const nextBtn = document.getElementById('pdpImgNext');
+      if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); setModalActiveImage(currentImgIdx - 1); };
+      if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); setModalActiveImage(currentImgIdx + 1); };
+
+      const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
       thumbBtns.forEach(btn => {
         btn.onclick = () => {
-          thumbBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          if (mainImg) {
-            mainImg.style.opacity = '0';
-            setTimeout(() => { mainImg.src = btn.dataset.img; mainImg.style.opacity = '1'; }, 150);
-          }
+          const idx = parseInt(btn.dataset.index);
+          setModalActiveImage(idx);
         };
       });
     };
 
-    // Initial thumbnail click bindings
-    bindGalleryThumbnails();
+    // Initial thumbnail & arrow click bindings
+    bindGalleryControls();
 
     // Quantity stepper
     let qty = 1;
@@ -2011,8 +2035,6 @@ const App = {
 
     // Variant chip selection
     if (hasVariants) {
-      const mainImg = document.getElementById('pdpMainImg');
-
       document.querySelectorAll('.pdp-chip').forEach(chip => {
         chip.onclick = () => {
           document.querySelectorAll('.pdp-chip').forEach(c => c.classList.remove('selected'));
@@ -2039,12 +2061,35 @@ const App = {
           if (buyBtn) buyBtn.disabled = (vStock === 0);
 
           // Update gallery thumbs for the newly selected variant
-          const vGallery = getGalleryImagesForSelection(selectedVariant, prod);
+          currentGallery = getGalleryImagesForSelection(selectedVariant, prod);
+          currentImgIdx = 0;
+
           const thumbsEl = document.getElementById('pdpThumbs');
+          const mainImgWrap = document.getElementById('pdpMainImgWrap');
+
+          if (mainImgWrap) {
+            let prevArrow = document.getElementById('pdpImgPrev');
+            let nextArrow = document.getElementById('pdpImgNext');
+            if (currentGallery.length > 1) {
+              if (!prevArrow) {
+                mainImgWrap.insertAdjacentHTML('afterbegin', `
+                  <button class="pdp-img-arrow prev" id="pdpImgPrev" type="button" aria-label="Previous photo">‹</button>
+                  <button class="pdp-img-arrow next" id="pdpImgNext" type="button" aria-label="Next photo">›</button>
+                `);
+              } else {
+                prevArrow.style.display = '';
+                if (nextArrow) nextArrow.style.display = '';
+              }
+            } else {
+              if (prevArrow) prevArrow.style.display = 'none';
+              if (nextArrow) nextArrow.style.display = 'none';
+            }
+          }
+
           if (thumbsEl) {
-            if (vGallery.length > 1) {
-              thumbsEl.innerHTML = vGallery.map((img, i) => `
-                <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-img="${img}" type="button">
+            if (currentGallery.length > 1) {
+              thumbsEl.innerHTML = currentGallery.map((img, i) => `
+                <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-index="${i}" data-img="${img}" type="button">
                   <img src="${img}" alt="view ${i+1}">
                 </button>`).join('');
               thumbsEl.style.display = '';
@@ -2052,13 +2097,10 @@ const App = {
               thumbsEl.innerHTML = '';
               thumbsEl.style.display = 'none';
             }
-            bindGalleryThumbnails();
           }
 
-          if (vGallery.length > 0 && mainImg) {
-            mainImg.style.opacity = '0';
-            setTimeout(() => { mainImg.src = vGallery[0]; mainImg.style.opacity = '1'; }, 150);
-          }
+          setModalActiveImage(0);
+          bindGalleryControls();
         };
       });
     }
