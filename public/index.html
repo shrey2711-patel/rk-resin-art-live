@@ -838,18 +838,60 @@
                 <div class="form-field"><label>Image Ratio</label><select class="admin-input" id="pfImgRatio"><option value="4:3">4:3 (Standard)</option><option value="16:9">16:9 (Wide)</option></select></div>
               </div>
               <div class="form-field" id="pfBaseImageContainer">
-                <label>Product Image</label>
-                <input type="hidden" id="pfImageUrl">
-                <input class="product-file-input" type="file" id="pfImageFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream">
-                <label class="product-upload-box" id="productUploadBox" for="pfImageFile">
-                  <span class="upload-icon">+</span>
-                  <span class="upload-title">Drop product image here or choose file</span>
-                  <span class="upload-sub">JPG, PNG, WEBP or HEIC up to 15MB. Image is uploaded automatically.</span>
+                <label style="display:flex;align-items:center;justify-content:space-between">
+                  <span>Product Photos <span style="font-weight:400;color:var(--muted);font-size:0.8rem">(Up to 3 Angle Photos)</span></span>
                 </label>
-                <div class="product-image-preview" id="productImagePreview" style="display:none">
-                  <img id="pfImagePreviewImg" alt="Product preview">
-                  <button type="button" class="image-remove-btn" id="removeProductImageBtn">Remove Image</button>
+
+                <!-- Hidden inputs for 3 image URLs -->
+                <input type="hidden" id="pfImageUrl">
+                <input type="hidden" id="pfImageUrl2">
+                <input type="hidden" id="pfImageUrl3">
+
+                <!-- 3 Photo Upload Grid -->
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:6px;">
+                  <!-- Slot 1 (Main) -->
+                  <div class="pf-img-slot" data-slot="1" style="border:2px dashed var(--border); border-radius:10px; padding:10px; text-align:center; background:var(--bg); position:relative;">
+                    <div style="font-size:0.72rem; font-weight:700; color:var(--p); margin-bottom:4px;">Main Photo</div>
+                    <div class="slot-preview-box" id="pfSlotPreview1" style="display:none; margin-bottom:6px;">
+                      <img id="pfSlotImg1" style="width:100%; height:90px; object-fit:cover; border-radius:6px;">
+                      <button type="button" class="slot-remove-btn" id="pfSlotRemove1" style="background:var(--red); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; margin-top:4px; cursor:pointer;">Remove</button>
+                    </div>
+                    <label class="slot-upload-label" id="pfSlotBox1" for="pfFile1" style="cursor:pointer; display:block;">
+                      <span style="font-size:1.4rem;">📷</span>
+                      <div style="font-size:0.75rem; font-weight:600; color:var(--muted); margin-top:2px;">Upload Photo 1</div>
+                    </label>
+                    <input type="file" id="pfFile1" accept="image/*" style="display:none">
+                  </div>
+
+                  <!-- Slot 2 (Angle 2) -->
+                  <div class="pf-img-slot" data-slot="2" style="border:2px dashed var(--border); border-radius:10px; padding:10px; text-align:center; background:var(--bg); position:relative;">
+                    <div style="font-size:0.72rem; font-weight:700; color:var(--muted); margin-bottom:4px;">Angle 2</div>
+                    <div class="slot-preview-box" id="pfSlotPreview2" style="display:none; margin-bottom:6px;">
+                      <img id="pfSlotImg2" style="width:100%; height:90px; object-fit:cover; border-radius:6px;">
+                      <button type="button" class="slot-remove-btn" id="pfSlotRemove2" style="background:var(--red); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; margin-top:4px; cursor:pointer;">Remove</button>
+                    </div>
+                    <label class="slot-upload-label" id="pfSlotBox2" for="pfFile2" style="cursor:pointer; display:block;">
+                      <span style="font-size:1.4rem;">📷</span>
+                      <div style="font-size:0.75rem; font-weight:600; color:var(--muted); margin-top:2px;">Upload Photo 2</div>
+                    </label>
+                    <input type="file" id="pfFile2" accept="image/*" style="display:none">
+                  </div>
+
+                  <!-- Slot 3 (Angle 3) -->
+                  <div class="pf-img-slot" data-slot="3" style="border:2px dashed var(--border); border-radius:10px; padding:10px; text-align:center; background:var(--bg); position:relative;">
+                    <div style="font-size:0.72rem; font-weight:700; color:var(--muted); margin-bottom:4px;">Angle 3</div>
+                    <div class="slot-preview-box" id="pfSlotPreview3" style="display:none; margin-bottom:6px;">
+                      <img id="pfSlotImg3" style="width:100%; height:90px; object-fit:cover; border-radius:6px;">
+                      <button type="button" class="slot-remove-btn" id="pfSlotRemove3" style="background:var(--red); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; margin-top:4px; cursor:pointer;">Remove</button>
+                    </div>
+                    <label class="slot-upload-label" id="pfSlotBox3" for="pfFile3" style="cursor:pointer; display:block;">
+                      <span style="font-size:1.4rem;">📷</span>
+                      <div style="font-size:0.75rem; font-weight:600; color:var(--muted); margin-top:2px;">Upload Photo 3</div>
+                    </label>
+                    <input type="file" id="pfFile3" accept="image/*" style="display:none">
+                  </div>
                 </div>
+
                 <div class="upload-status" id="productUploadStatus"></div>
               </div>
               <div class="form-field"><label>Description</label><textarea class="admin-input" id="pfDesc" rows="2" placeholder="Product description..."></textarea></div>

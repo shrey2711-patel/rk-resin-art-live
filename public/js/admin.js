@@ -148,20 +148,44 @@ const Admin = {
     }
   },
 
-  updateImagePreview(url) {
-    const hidden = document.getElementById('pfImageUrl');
-    const wrap = document.getElementById('productImagePreview');
-    const img = document.getElementById('pfImagePreviewImg');
+  updateProductSlotPreview(slotIndex, url) {
+    const hiddenId = slotIndex === 1 ? 'pfImageUrl' : `pfImageUrl${slotIndex}`;
+    const hidden = document.getElementById(hiddenId);
+    const previewBox = document.getElementById(`pfSlotPreview${slotIndex}`);
+    const img = document.getElementById(`pfSlotImg${slotIndex}`);
+    const uploadBox = document.getElementById(`pfSlotBox${slotIndex}`);
     if (hidden) hidden.value = url || '';
-    if (!wrap || !img) return;
-
     if (url) {
-      img.src = url;
-      wrap.style.display = '';
+      if (img) img.src = url;
+      if (previewBox) previewBox.style.display = 'block';
+      if (uploadBox) uploadBox.style.display = 'none';
     } else {
-      img.removeAttribute('src');
-      wrap.style.display = 'none';
+      if (img) img.removeAttribute('src');
+      if (previewBox) previewBox.style.display = 'none';
+      if (uploadBox) uploadBox.style.display = 'block';
     }
+  },
+
+  async uploadProductSlotFile(slotIndex, file) {
+    if (!file) return;
+    if (!this.isValidImageType(file)) {
+      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
+      return;
+    }
+    this.setUploadStatus(`Uploading Photo ${slotIndex}...`, 'loading');
+    try {
+      const optimizedFile = await this.resizeImageForUpload(file);
+      const result = await API.uploadImage(optimizedFile);
+      this.updateProductSlotPreview(slotIndex, result.url);
+      this.setUploadStatus(`Photo ${slotIndex} uploaded successfully!`, 'success');
+    } catch (e) {
+      showToast(`Upload failed: ${e.message}`, 'error');
+      this.setUploadStatus(`Upload failed: ${e.message}`, 'error');
+    }
+  },
+
+  updateImagePreview(url) {
+    this.updateProductSlotPreview(1, url);
   },
 
   updateConversionStatus(msg) {
@@ -394,18 +418,17 @@ const Admin = {
   },
 
   resetProductForm() {
-    ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfUnit'].forEach(id => {
+    ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfImageUrl2', 'pfImageUrl3', 'pfUnit'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    [1, 2, 3].forEach(idx => this.updateProductSlotPreview(idx, ''));
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = '4:3';
     document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
     this.populateProdSubcatSelect();
     const pfSub = document.getElementById('pfSubcat');
     if (pfSub) pfSub.value = '';
-    document.getElementById('pfImageFile').value = '';
-    this.updateImagePreview('');
     this.setUploadStatus('');
     const btn = document.getElementById('addProdBtn');
     const cancel = document.getElementById('cancelProdBtn');
@@ -452,7 +475,6 @@ const Admin = {
     document.getElementById('pfDesc').value = product.description || '';
     const unitEl = document.getElementById('pfUnit');
     if (unitEl) unitEl.value = product.unit || '';
-    document.getElementById('pfImageFile').value = '';
 
     const btn = document.getElementById('addProdBtn');
     const cancel = document.getElementById('cancelProdBtn');
@@ -480,9 +502,14 @@ const Admin = {
       this.setStockStatusButtonState(isOut ? '0' : '1');
       this.updateStockFieldsVisibility();
 
-      document.getElementById('pfImageUrl').value = product.imageUrl || '';
-      this.updateImagePreview(product.imageUrl || '');
-      this.setUploadStatus(product.imageUrl ? 'Current product image loaded.' : '');
+      const prodImages = (product.images && Array.isArray(product.images) && product.images.length > 0)
+        ? product.images
+        : (product.imageUrl ? [product.imageUrl] : []);
+
+      this.updateProductSlotPreview(1, prodImages[0] || '');
+      this.updateProductSlotPreview(2, prodImages[1] || '');
+      this.updateProductSlotPreview(3, prodImages[2] || '');
+      this.setUploadStatus(prodImages.length ? `${prodImages.length} product image(s) loaded.` : '');
 
       // Reset variants
       const vlSel = document.getElementById('pfVariantLabel');
@@ -501,8 +528,7 @@ const Admin = {
       document.getElementById('pfPrice').value = '';
       document.getElementById('pfOrig').value = '';
       document.getElementById('pfStock').value = '';
-      document.getElementById('pfImageUrl').value = '';
-      this.updateImagePreview('');
+      [1, 2, 3].forEach(idx => this.updateProductSlotPreview(idx, ''));
       this.setUploadStatus('');
 
       const vlSel = document.getElementById('pfVariantLabel');
@@ -511,93 +537,30 @@ const Admin = {
       const rowsEl = document.getElementById('pfVariantRows');
       if (vlSel && rowsEl) {
         rowsEl.innerHTML = '';
-        const knownLabels = ['Size','Weight','Grams','Litre','Volume','Pack','Colour'];
+        const knownLabels = ['Size','Weight','Grams','Litre','Volume','Pack','Colour','Color'];
         if (knownLabels.includes(vl)) {
           vlSel.value = vl;
           if (customInp) customInp.style.display = 'none';
           if (addBtn) addBtn.style.display = '';
-          (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || ''));
+          (product.variants || []).forEach(v => {
+            const vImgs = (v.images && Array.isArray(v.images) && v.images.length > 0)
+              ? v.images
+              : (v.imageUrl ? [v.imageUrl] : []);
+            this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || '', vImgs);
+          });
         } else {
           vlSel.value = 'Custom';
           if (customInp) { customInp.value = vl; customInp.style.display = ''; }
           if (addBtn) addBtn.style.display = '';
-          (product.variants || []).forEach(v => this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || ''));
+          (product.variants || []).forEach(v => {
+            const vImgs = (v.images && Array.isArray(v.images) && v.images.length > 0)
+              ? v.images
+              : (v.imageUrl ? [v.imageUrl] : []);
+            this.addVariantRow(v.label, v.price, v.stock, v.imageUrl || '', vImgs);
+          });
         }
       }
     }
-  },
-
-  async saveBannerForm() {
-    const imageUrl = document.getElementById('bfImageUrl').value.trim();
-    if (!imageUrl) { showToast('Please upload a banner image first', 'error'); return; }
-    if (imageUrl.startsWith('blob:')) {
-      showToast('Please wait for the banner image to finish uploading!', 'error');
-      return;
-    }
-    const payload = {
-      imageUrl
-    };
-    if (this.editState.section === 'banner' && this.editState.id) {
-      await API.updateBanner(this.editState.id, payload);
-      showToast('Banner updated', 'success');
-    } else {
-      await API.addBanner(payload);
-      showOk('bannerOk');
-    }
-    this.resetBannerForm();
-    await this.loadAll();
-    this.renderBanners();
-    App.loadBanners();
-  },
-
-  async saveNavForm() {
-    const label = document.getElementById('nfLabel').value.trim();
-    if (!label) { showToast('Nav label is required', 'error'); return; }
-    const payload = {
-      label,
-      row: Number(document.getElementById('nfRow').value),
-      featured: document.getElementById('nfFeat').value === 'true'
-    };
-    if (this.editState.section === 'nav' && this.editState.id) {
-      await API.updateNav(this.editState.id, payload);
-      showToast('Nav link updated', 'success');
-    } else {
-      await API.addNav(payload);
-      showOk('navOk');
-    }
-    this.resetNavForm();
-    await this.loadAll();
-    this.renderNav();
-    App.loadNav();
-  },
-
-  async saveCategoryForm() {
-    const name = document.getElementById('cfName').value.trim();
-    if (!name) { showToast('Category name is required', 'error'); return; }
-    
-    const imageUrl = document.getElementById('cfImageUrl').value.trim();
-    if (imageUrl.startsWith('blob:')) {
-      showToast('Please wait for the category image to finish uploading!', 'error');
-      return;
-    }
-
-    const payload = {
-      name,
-      emoji: document.getElementById('cfEmoji').value.trim() || '📦',
-      color: document.getElementById('cfColor').value,
-      imageUrl: imageUrl || null
-    };
-    if (this.editState.section === 'category' && this.editState.id) {
-      await API.updateCategory(this.editState.id, payload);
-      showToast('Category updated', 'success');
-    } else {
-      await API.addCategory(payload);
-      showOk('catOk');
-    }
-    this.resetCategoryForm();
-    await this.loadAll();
-    this.renderCategories();
-    App.loadCategories();
   },
 
   async saveProductForm() {
@@ -611,6 +574,7 @@ const Admin = {
     let originalPrice = null;
     let stock = 0;
     let imageUrl = '';
+    let images = [];
     let variantLabel = null;
     let variants = null;
 
@@ -629,10 +593,14 @@ const Admin = {
         stock = parseInt(document.getElementById('pfStockStatus').value) || 1;
       }
 
-      
-      imageUrl = document.getElementById('pfImageUrl').value.trim();
-      if (imageUrl.startsWith('blob:')) {
-        showToast('Please wait for the product image to finish uploading!', 'error');
+      const pImg1 = document.getElementById('pfImageUrl')?.value.trim() || '';
+      const pImg2 = document.getElementById('pfImageUrl2')?.value.trim() || '';
+      const pImg3 = document.getElementById('pfImageUrl3')?.value.trim() || '';
+      images = [pImg1, pImg2, pImg3].filter(Boolean);
+      imageUrl = images[0] || '';
+
+      if (images.some(url => url.startsWith('blob:'))) {
+        showToast('Please wait for product images to finish uploading!', 'error');
         return;
       }
     } else {
@@ -642,7 +610,7 @@ const Admin = {
       variantLabel = vlSel ? vlSel.value : '';
       if (variantLabel === 'Custom') variantLabel = (customInp ? customInp.value.trim() : '') || '';
       if (!variantLabel) {
-        showToast('Please select a variant type (e.g. Size, Grams)!', 'error');
+        showToast('Please select a variant type (e.g. Size, Color)!', 'error');
         return;
       }
 
@@ -657,13 +625,19 @@ const Admin = {
         } else {
           stk = parseInt(row.querySelector('.vr-stock-value')?.value || '1');
         }
-        const img = row.querySelector('.vr-image')?.value.trim() || null;
+
+        const vImg1 = row.querySelector('.vr-image-1')?.value.trim() || '';
+        const vImg2 = row.querySelector('.vr-image-2')?.value.trim() || '';
+        const vImg3 = row.querySelector('.vr-image-3')?.value.trim() || '';
+        const vImages = [vImg1, vImg2, vImg3].filter(Boolean);
+
         if (lbl) {
           vrList.push({
             label: lbl,
             price: isNaN(prc) ? null : prc,
             stock: isNaN(stk) ? 0 : stk,
-            imageUrl: img
+            imageUrl: vImages[0] || null,
+            images: vImages
           });
         }
       });
@@ -674,7 +648,7 @@ const Admin = {
       }
 
       // Check if any variant image is still uploading (blob:)
-      const stillUploading = vrList.some(v => v.imageUrl && v.imageUrl.startsWith('blob:'));
+      const stillUploading = vrList.some(v => (v.images || []).some(url => url && url.startsWith('blob:')));
       if (stillUploading) {
         showToast('Please wait for all variant images to finish uploading!', 'error');
         return;
@@ -693,6 +667,7 @@ const Admin = {
       originalPrice = null;
       stock = vrList.reduce((sum, v) => sum + (v.stock || 0), 0);
       imageUrl = vrList[0].imageUrl || '';
+      images = vrList[0].images || [];
       variants = vrList;
     }
 
@@ -709,6 +684,7 @@ const Admin = {
       badge: document.getElementById('pfBadge').value,
       description: document.getElementById('pfDesc').value.trim(),
       imageUrl,
+      images,
       imgRatio,
       variantLabel,
       variants,
@@ -808,11 +784,12 @@ const Admin = {
     }
   },
 
-  addVariantRow(label = '', price = '', stock = '', imageUrl = '') {
+  addVariantRow(label = '', price = '', stock = '', imageUrl = '', images = []) {
     const rowsEl = document.getElementById('pfVariantRows');
     if (!rowsEl) return;
     const row = document.createElement('div');
     row.className = 'admin-variant-row';
+    row.style.cssText = 'display:flex; flex-direction:column; gap:8px; padding:10px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; background:var(--card);';
     
     const vlSel = document.getElementById('pfVariantLabel');
     const hasLabel = vlSel && vlSel.value;
@@ -820,9 +797,10 @@ const Admin = {
     const labelVal = hasLabel ? label : 'Standard';
     const removeBtnStyle = hasLabel ? '' : 'display:none;';
 
-    const thumbHtml = imageUrl
-      ? `<img class="vr-thumb-img" src="${imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
-      : `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
+    // Parse images array (up to 3 photos per variant)
+    let imgList = Array.isArray(images) ? [...images] : [];
+    if (!imgList.length && imageUrl) imgList = [imageUrl];
+    while (imgList.length < 3) imgList.push('');
 
     const isTracking = this.data.settings && this.data.settings.trackStock !== false;
     let stockFieldHtml = '';
@@ -835,7 +813,7 @@ const Admin = {
       const isOut = Number(stock) === 0;
       stockFieldHtml = `
         <span class="admin-variant-row-label">Status:</span>
-        <button type="button" class="vr-stock-btn" style="min-height: 32px; min-width: 110px; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-weight: 800; cursor: pointer; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px; justify-content: center; outline: none; transition: all 0.2s;">
+        <button type="button" class="vr-stock-btn" style="min-height: 32px; min-width: 100px; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-weight: 800; cursor: pointer; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px; justify-content: center; outline: none; transition: all 0.2s;">
           <span class="toggle-dot" style="width: 6px; height: 6px; border-radius: 50%; display: inline-block;"></span>
           <span class="toggle-text">In Stock</span>
         </button>
@@ -843,36 +821,60 @@ const Admin = {
       `;
     }
 
-    row.innerHTML = `
-      <span class="admin-variant-row-label" style="${labelStyle}">Option:</span>
-      <input class="vr-label" placeholder="e.g. Size 6 / 100g" value="${labelVal}" maxlength="50" style="${labelStyle}">
-      <span class="admin-variant-row-label">Price ₹:</span>
-      <input class="vr-price" type="number" placeholder="Price" value="${price}" min="0" style="max-width:90px">
-      ${stockFieldHtml}
-      
-      <!-- Variant Image Controls -->
-      <div class="vr-image-section" style="display:inline-flex; align-items:center; gap:6px;">
-        <div class="vr-thumb-wrap" style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
-          ${thumbHtml}
+    const renderSlotsHtml = [1, 2, 3].map(slotNum => {
+      const url = imgList[slotNum - 1] || '';
+      const thumb = url
+        ? `<img class="vr-thumb-img-${slotNum}" src="${url}" style="width:34px; height:34px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
+        : `<span style="font-size:0.72rem; color:var(--muted)">📷 Angle ${slotNum}</span>`;
+      return `
+        <div class="vr-slot-box" data-slot="${slotNum}" style="display:inline-flex; align-items:center; gap:4px; background:var(--bg); border:1px dashed var(--border); border-radius:6px; padding:3px 6px;">
+          <div class="vr-thumb-wrap-${slotNum}" style="display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Click to upload Angle ${slotNum}">
+            ${thumb}
+          </div>
+          <input class="vr-image-${slotNum}" type="hidden" value="${url}">
+          <button type="button" class="vr-upload-btn-${slotNum}" style="padding:2px 6px; font-size:0.7rem; border-radius:4px; background:var(--pl); border:1px solid var(--border); color:var(--ink); cursor:pointer;">${url ? 'Change' : '+Upload'}</button>
+          ${url ? `<button type="button" class="vr-remove-btn-${slotNum}" style="padding:2px 5px; font-size:0.68rem; border-radius:3px; background:var(--red); color:#fff; border:none; cursor:pointer;" title="Remove Photo ${slotNum}">✕</button>` : ''}
+          <input class="vr-file-${slotNum}" type="file" accept="image/*" style="display:none">
         </div>
-        <input class="vr-image" type="hidden" value="${imageUrl}">
-        <button type="button" class="vr-upload-trigger-btn" style="padding:4px 8px; font-size:0.72rem; border-radius:4px; background:var(--pl); border:1px solid var(--border); color:var(--text); cursor:pointer;">📷 Upload</button>
-        <input class="vr-file-input" type="file" accept="image/*" style="display:none">
+      `;
+    }).join('');
+
+    row.innerHTML = `
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; width:100%;">
+        <span class="admin-variant-row-label" style="${labelStyle}">Option Name:</span>
+        <input class="vr-label" placeholder="e.g. Black / Size M" value="${labelVal}" maxlength="50" style="${labelStyle}; max-width:140px;">
+        <span class="admin-variant-row-label">Price ₹:</span>
+        <input class="vr-price" type="number" placeholder="Price" value="${price}" min="0" style="max-width:85px">
+        ${stockFieldHtml}
+        <button type="button" class="admin-remove-variant-btn" title="Remove Option" style="${removeBtnStyle}; margin-left:auto; background:var(--red); color:#fff; border:none; border-radius:4px; padding:4px 8px; font-size:0.75rem; cursor:pointer;">✕ Remove Option</button>
       </div>
-      
-      <button type="button" class="admin-remove-variant-btn" title="Remove" style="${removeBtnStyle}">✕</button>`;
 
-    // Wire events
-    row.querySelector('.vr-upload-trigger-btn').onclick = () => {
-      row.querySelector('.vr-file-input').click();
-    };
+      <!-- Variant Angles (Up to 3 Photos) -->
+      <div style="display:flex; align-items:center; gap:8px; margin-top:4px; width:100%; font-size:0.75rem; color:var(--muted); flex-wrap:wrap;">
+        <span style="font-weight:700; color:var(--ink);">Angle Photos (max 3):</span>
+        <div class="vr-images-container" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          ${renderSlotsHtml}
+        </div>
+      </div>`;
 
-    row.querySelector('.vr-file-input').onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        this.uploadVariantImage(file, row);
+    // Wire up events for the 3 angle slots
+    [1, 2, 3].forEach(slotNum => {
+      const uploadBtn = row.querySelector(`.vr-upload-btn-${slotNum}`);
+      const thumbWrap = row.querySelector(`.vr-thumb-wrap-${slotNum}`);
+      const fileInput = row.querySelector(`.vr-file-${slotNum}`);
+
+      if (uploadBtn && fileInput) uploadBtn.onclick = () => fileInput.click();
+      if (thumbWrap && fileInput) thumbWrap.onclick = () => fileInput.click();
+
+      if (fileInput) {
+        fileInput.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file) this.uploadVariantSlotImage(file, row, slotNum);
+        };
       }
-    };
+
+      this.bindVariantSlotRemove(row, slotNum);
+    });
 
     // Wire up variant toggle button if present
     const vrBtn = row.querySelector('.vr-stock-btn');
@@ -882,7 +884,6 @@ const Admin = {
         vrInput.value = val;
         const dot = vrBtn.querySelector('.toggle-dot');
         const text = vrBtn.querySelector('.toggle-text');
-        
         if (val === '1' || val === 1) {
           vrBtn.style.background = '#25D366';
           vrBtn.style.color = '#ffffff';
@@ -897,22 +898,61 @@ const Admin = {
           if (text) text.textContent = 'Out of Stock';
         }
       };
-
-      // Set initial color state
       updateVrBtnState(vrInput.value);
-
-      // Handle toggling
       vrBtn.onclick = () => {
         const newVal = vrInput.value === '1' ? '0' : '1';
         updateVrBtnState(newVal);
       };
     }
 
-    row.querySelector('.admin-remove-variant-btn').onclick = () => row.remove();
+    const removeOptBtn = row.querySelector('.admin-remove-variant-btn');
+    if (removeOptBtn) removeOptBtn.onclick = () => row.remove();
     rowsEl.appendChild(row);
   },
 
-  async uploadVariantImage(file, row) {
+  bindVariantSlotRemove(row, slotNum) {
+    const removeBtn = row.querySelector(`.vr-remove-btn-${slotNum}`);
+    if (removeBtn) {
+      removeBtn.onclick = () => {
+        row.querySelector(`.vr-image-${slotNum}`).value = '';
+        this.refreshVariantSlotHtml(row, slotNum, '');
+      };
+    }
+  },
+
+  refreshVariantSlotHtml(row, slotNum, url) {
+    const slotBox = row.querySelector(`.vr-slot-box[data-slot="${slotNum}"]`);
+    if (!slotBox) return;
+    const thumbWrap = slotBox.querySelector(`.vr-thumb-wrap-${slotNum}`);
+    const uploadBtn = slotBox.querySelector(`.vr-upload-btn-${slotNum}`);
+    const hiddenInput = slotBox.querySelector(`.vr-image-${slotNum}`);
+
+    if (hiddenInput) hiddenInput.value = url || '';
+    if (thumbWrap) {
+      thumbWrap.innerHTML = url
+        ? `<img class="vr-thumb-img-${slotNum}" src="${url}" style="width:34px; height:34px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`
+        : `<span style="font-size:0.72rem; color:var(--muted)">📷 Angle ${slotNum}</span>`;
+    }
+    if (uploadBtn) uploadBtn.textContent = url ? 'Change' : '+Upload';
+
+    let removeBtn = slotBox.querySelector(`.vr-remove-btn-${slotNum}`);
+    if (url) {
+      if (!removeBtn) {
+        removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = `vr-remove-btn-${slotNum}`;
+        removeBtn.style.cssText = 'padding:2px 5px; font-size:0.68rem; border-radius:3px; background:var(--red); color:#fff; border:none; cursor:pointer;';
+        removeBtn.title = `Remove Photo ${slotNum}`;
+        removeBtn.textContent = '✕';
+        slotBox.appendChild(removeBtn);
+      }
+      this.bindVariantSlotRemove(row, slotNum);
+    } else if (removeBtn) {
+      removeBtn.remove();
+    }
+  },
+
+  async uploadVariantSlotImage(file, row, slotNum) {
     if (!file) return;
 
     if (this.isHeicImage(file)) {
@@ -925,41 +965,21 @@ const Admin = {
       return;
     }
 
-    const thumbWrap = row.querySelector('.vr-thumb-wrap');
-    const uploadBtn = row.querySelector('.vr-upload-trigger-btn');
-    const hiddenInput = row.querySelector('.vr-image');
-
-    if (thumbWrap) thumbWrap.innerHTML = `<span style="font-size:0.75rem; color:var(--muted);">...</span>`;
+    const uploadBtn = row.querySelector(`.vr-upload-btn-${slotNum}`);
     if (uploadBtn) {
       uploadBtn.disabled = true;
       uploadBtn.textContent = '...';
-      uploadBtn.style.opacity = '0.6';
     }
 
     try {
       const optimizedFile = await this.resizeImageForUpload(file);
       const result = await API.uploadImage(optimizedFile);
-      
-      if (hiddenInput) hiddenInput.value = result.url;
-      if (thumbWrap) {
-        thumbWrap.innerHTML = `<img class="vr-thumb-img" src="${result.url}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">`;
-      }
-      if (uploadBtn) {
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = '📷 Upload';
-        uploadBtn.style.opacity = '';
-      }
-      showToast('Variant image uploaded!', 'success');
+      this.refreshVariantSlotHtml(row, slotNum, result.url);
+      showToast(`Angle ${slotNum} photo uploaded!`, 'success');
     } catch (e) {
-      if (thumbWrap) {
-        thumbWrap.innerHTML = `<span class="vr-thumb-fallback" style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--pl); border-radius:4px; border:1px solid var(--border)">🖼️</span>`;
-      }
-      if (uploadBtn) {
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = '📷 Upload';
-        uploadBtn.style.opacity = '';
-      }
-      showToast('Variant image upload failed', 'error');
+      showToast(`Upload failed: ${e.message}`, 'error');
+    } finally {
+      if (uploadBtn) uploadBtn.disabled = false;
     }
   },
 
@@ -1805,34 +1825,24 @@ if (pfStockStatusBtn) {
   };
 }
 
-// Add / Update Product
-document.getElementById('pfImageFile').onchange = async (e) => {
-  await Admin.uploadProductImage(e.target.files[0]);
-};
-
-document.getElementById('removeProductImageBtn').onclick = () => {
-  document.getElementById('pfImageFile').value = '';
-  Admin.updateImagePreview('');
-  Admin.setUploadStatus('Image removed. Save product to keep this change.', 'success');
-};
-
-const productUploadBox = document.getElementById('productUploadBox');
-['dragenter', 'dragover'].forEach(eventName => {
-  productUploadBox.addEventListener(eventName, (e) => {
-    e.preventDefault();
-    productUploadBox.classList.add('dragging');
-  });
-});
-['dragleave', 'drop'].forEach(eventName => {
-  productUploadBox.addEventListener(eventName, (e) => {
-    e.preventDefault();
-    productUploadBox.classList.remove('dragging');
-  });
-});
-productUploadBox.addEventListener('drop', async (e) => {
-  const file = e.dataTransfer.files[0];
-  document.getElementById('pfImageFile').files = e.dataTransfer.files;
-  await Admin.uploadProductImage(file);
+// Add / Update Product 3-Photo Slots
+[1, 2, 3].forEach(slotIdx => {
+  const fileEl = document.getElementById(`pfFile${slotIdx}`);
+  if (fileEl) {
+    fileEl.onchange = async (e) => {
+      if (e.target.files[0]) {
+        await Admin.uploadProductSlotFile(slotIdx, e.target.files[0]);
+      }
+    };
+  }
+  const removeEl = document.getElementById(`pfSlotRemove${slotIdx}`);
+  if (removeEl) {
+    removeEl.onclick = () => {
+      if (fileEl) fileEl.value = '';
+      Admin.updateProductSlotPreview(slotIdx, '');
+      Admin.setUploadStatus(`Photo ${slotIdx} removed. Save product to keep this change.`, 'success');
+    };
+  }
 });
 
 // Banner Image upload events

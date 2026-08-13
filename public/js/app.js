@@ -697,10 +697,14 @@ const App = {
     const ratio = (size === 'modal' || size === 'product') ? '1:1' : (product.imgRatio || '4:3');
     const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : (ratio === '1:1' ? 'aspect-ratio: 1 / 1;' : 'aspect-ratio: 4 / 3;');
     
-    // Fallback to first variant's image if product.imageUrl is not directly defined but variants exist
+    // Fallback image resolution (images array or variant images)
     let displayImageUrl = product.imageUrl;
+    if (!displayImageUrl && product.images && product.images.length > 0) {
+      displayImageUrl = product.images[0];
+    }
     if (!displayImageUrl && product.variants && product.variants.length > 0) {
-      displayImageUrl = product.variants[0].imageUrl;
+      const firstV = product.variants[0];
+      displayImageUrl = (firstV.images && firstV.images[0]) || firstV.imageUrl || null;
     }
 
     if (displayImageUrl) {
@@ -1780,12 +1784,25 @@ const App = {
     const catMap = {};
     this.state.categories.forEach(c => catMap[c.name] = c);
 
-    // Gallery images: collect all available images
-    const galleryImages = [];
-    if (prod.imageUrl) galleryImages.push(prod.imageUrl);
-    if (prod.variants && prod.variants.length > 0) {
-      prod.variants.forEach(v => { if (v.imageUrl && !galleryImages.includes(v.imageUrl)) galleryImages.push(v.imageUrl); });
-    }
+    // Helper to extract up to 3 angle photos for selected variant or base product
+    const getGalleryImagesForSelection = (v, p) => {
+      if (v && v.images && Array.isArray(v.images) && v.images.length > 0) {
+        return v.images.slice(0, 3);
+      }
+      if (v && v.imageUrl) {
+        return [v.imageUrl];
+      }
+      if (p && p.images && Array.isArray(p.images) && p.images.length > 0) {
+        return p.images.slice(0, 3);
+      }
+      if (p && p.imageUrl) {
+        return [p.imageUrl];
+      }
+      return [];
+    };
+
+    let selectedVariant = hasVariants ? prod.variants[0] : null;
+    const galleryImages = getGalleryImagesForSelection(selectedVariant, prod);
     const hasGallery = galleryImages.length > 1;
 
     // Payment icons SVG
@@ -1853,7 +1870,7 @@ const App = {
           <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-img="${img}" type="button">
             <img src="${img}" alt="view ${i+1}">
           </button>`).join('')}
-      </div>` : '';
+      </div>` : `<div class="pdp-thumbs" id="pdpThumbs" style="display:none"></div>`;
 
     document.getElementById('modalBody').innerHTML = `
       <div class="pdp-container">
@@ -1948,19 +1965,23 @@ const App = {
         </div>
       </div>`;
 
-    // Bind thumbnail gallery
-    const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
-    const mainImg = document.getElementById('pdpMainImg');
-    thumbBtns.forEach(btn => {
-      btn.onclick = () => {
-        thumbBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if (mainImg) {
-          mainImg.style.opacity = '0';
-          setTimeout(() => { mainImg.src = btn.dataset.img; mainImg.style.opacity = '1'; }, 150);
-        }
-      };
-    });
+    const bindGalleryThumbnails = () => {
+      const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
+      const mainImg = document.getElementById('pdpMainImg');
+      thumbBtns.forEach(btn => {
+        btn.onclick = () => {
+          thumbBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          if (mainImg) {
+            mainImg.style.opacity = '0';
+            setTimeout(() => { mainImg.src = btn.dataset.img; mainImg.style.opacity = '1'; }, 150);
+          }
+        };
+      });
+    };
+
+    // Initial thumbnail click bindings
+    bindGalleryThumbnails();
 
     // Quantity stepper
     let qty = 1;
@@ -1988,14 +2009,9 @@ const App = {
     // Legacy tab IDs for backward compat
     document.getElementById('modalTabInfo') && (document.getElementById('modalTabInfo').onclick = () => document.querySelector('[data-tab="info"]')?.click());
 
-    // Track currently selected variant
-    let selectedVariant = hasVariants ? prod.variants[0] : null;
-
     // Variant chip selection
     if (hasVariants) {
-      if (prod.variants[0] && prod.variants[0].imageUrl) {
-        if (mainImg) mainImg.src = prod.variants[0].imageUrl;
-      }
+      const mainImg = document.getElementById('pdpMainImg');
 
       document.querySelectorAll('.pdp-chip').forEach(chip => {
         chip.onclick = () => {
@@ -2022,9 +2038,26 @@ const App = {
           if (addBtn) addBtn.disabled = (vStock === 0);
           if (buyBtn) buyBtn.disabled = (vStock === 0);
 
-          if (selectedVariant.imageUrl && mainImg) {
+          // Update gallery thumbs for the newly selected variant
+          const vGallery = getGalleryImagesForSelection(selectedVariant, prod);
+          const thumbsEl = document.getElementById('pdpThumbs');
+          if (thumbsEl) {
+            if (vGallery.length > 1) {
+              thumbsEl.innerHTML = vGallery.map((img, i) => `
+                <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-img="${img}" type="button">
+                  <img src="${img}" alt="view ${i+1}">
+                </button>`).join('');
+              thumbsEl.style.display = '';
+            } else {
+              thumbsEl.innerHTML = '';
+              thumbsEl.style.display = 'none';
+            }
+            bindGalleryThumbnails();
+          }
+
+          if (vGallery.length > 0 && mainImg) {
             mainImg.style.opacity = '0';
-            setTimeout(() => { mainImg.src = selectedVariant.imageUrl; mainImg.style.opacity = '1'; }, 150);
+            setTimeout(() => { mainImg.src = vGallery[0]; mainImg.style.opacity = '1'; }, 150);
           }
         };
       });
