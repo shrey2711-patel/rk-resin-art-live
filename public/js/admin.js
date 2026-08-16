@@ -417,6 +417,43 @@ const Admin = {
     this.editState = { section: 'category', id: category.id };
   },
 
+  async saveCategoryForm() {
+    const name = document.getElementById('cfName')?.value.trim();
+    if (!name) { showToast('Category name is required', 'error'); return; }
+
+    const emoji = document.getElementById('cfEmoji')?.value.trim() || '';
+    const color = document.getElementById('cfColor')?.value || '#EDE8FF';
+    const imageUrl = document.getElementById('cfImageUrl')?.value.trim() || '';
+
+    const payload = { name, emoji, color, imageUrl };
+
+    try {
+      const btn = document.getElementById('addCatBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+      if (this.editState.section === 'category' && this.editState.id) {
+        await API.updateCategory(this.editState.id, payload);
+        showToast('Category updated!', 'success');
+      } else {
+        await API.addCategory(payload);
+        showToast('Category added!', 'success');
+      }
+
+      this.resetCategoryForm();
+      await this.loadAll();
+      this.renderCategories();
+    } catch (err) {
+      showToast('Save failed: ' + err.message, 'error');
+      const btn = document.getElementById('addCatBtn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = this.editState.section === 'category' ? 'Update Category' : '+ Add Category';
+      }
+    }
+  },
+
+
+
   resetProductForm() {
     ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfImageUrl2', 'pfImageUrl3', 'pfUnit'].forEach(id => {
       const el = document.getElementById(id);
