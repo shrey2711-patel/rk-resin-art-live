@@ -582,7 +582,7 @@ const App = {
         ? `<div class="pdp-main-img-wrap" id="ppMainImgWrap" title="Click to view full screen">
             ${arrowsHTML}
             <img class="pdp-main-img" id="ppMainImg" src="${mainImgSrc}" alt="${prod.name}">
-            <span class="pdp-zoom-badge">🔍 Fullscreen</span>
+            <button class="pdp-zoom-badge" id="ppZoomBadge" type="button">🔍 Fullscreen</button>
           </div>`
         : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="ppMainImgWrap" style="background:${cat.color || '#f0eef8'}">
             <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
@@ -694,6 +694,16 @@ const App = {
         const nextBtn = document.getElementById('ppImgNext');
         if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); setPpActiveImage(currentImgIdx - 1); };
         if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); setPpActiveImage(currentImgIdx + 1); };
+
+        // Fullscreen badge click opens lightbox
+        const zoomBadge = document.getElementById('ppZoomBadge');
+        if (zoomBadge) {
+          zoomBadge.onclick = (e) => {
+            e.stopPropagation();
+            const imgs = currentGallery && currentGallery.length ? currentGallery : (prod.imageUrl ? [prod.imageUrl] : []);
+            if (imgs.length > 0) Lightbox.open(imgs, currentImgIdx);
+          };
+        }
 
         const thumbBtns = document.querySelectorAll('#ppThumbs .pdp-thumb');
         thumbBtns.forEach(btn => {
@@ -2046,10 +2056,10 @@ const App = {
     ` : '';
 
     const mainImgHTML = mainImgSrc
-      ? `<div class="pdp-main-img-wrap" id="pdpMainImgWrap" title="Click to view full screen">
+      ? `<div class="pdp-main-img-wrap" id="pdpMainImgWrap">
           ${arrowsHTML}
           <img class="pdp-main-img" id="pdpMainImg" src="${mainImgSrc}" alt="${prod.name}">
-          <span class="pdp-zoom-badge">🔍 Fullscreen</span>
+          <button class="pdp-zoom-badge" id="pdpZoomBadge" type="button" title="View fullscreen">🔍 Fullscreen</button>
         </div>`
       : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="pdpMainImgWrap" style="background:${cat.color || '#f0eef8'}">
           <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
@@ -2180,11 +2190,13 @@ const App = {
       if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); setModalActiveImage(currentImgIdx - 1); };
       if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); setModalActiveImage(currentImgIdx + 1); };
 
-      const mainImgWrap = document.getElementById('pdpMainImgWrap');
-      if (mainImgWrap) {
-        mainImgWrap.onclick = (e) => {
-          if (e.target.closest('.pdp-img-arrow')) return;
-          if (currentGallery.length > 0) Lightbox.open(currentGallery, currentImgIdx);
+      // Fullscreen badge click opens lightbox
+      const zoomBadge = document.getElementById('pdpZoomBadge');
+      if (zoomBadge) {
+        zoomBadge.onclick = (e) => {
+          e.stopPropagation();
+          const imgs = currentGallery && currentGallery.length ? currentGallery : (prod.imageUrl ? [prod.imageUrl] : []);
+          if (imgs.length > 0) Lightbox.open(imgs, currentImgIdx);
         };
       }
 

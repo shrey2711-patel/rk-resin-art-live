@@ -4367,15 +4367,18 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transition: all 0.2s ease;
   z-index: 4;
 }
 
+.pdp-zoom-badge:hover,
 .pdp-main-img-wrap:hover .pdp-zoom-badge {
   background: #111111;
   color: #ffffff;
+  transform: scale(1.05);
 }
 
 @media (max-width: 576px) {
