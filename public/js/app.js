@@ -1,4 +1,104 @@
 // ── App State ────────────────────────────────────────────────
+const Lightbox = {
+  images: [],
+  currentIndex: 0,
+  open(images, index = 0) {
+    if (!images || !images.length) return;
+    this.images = images;
+    this.currentIndex = index;
+    const overlay = document.getElementById('imageLightbox');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => overlay.classList.add('active'));
+    this.update();
+    document.addEventListener('keydown', this.handleKeyDown);
+  },
+  close() {
+    const overlay = document.getElementById('imageLightbox');
+    if (!overlay) return;
+    overlay.classList.remove('active');
+    setTimeout(() => { overlay.style.display = 'none'; }, 250);
+    document.removeEventListener('keydown', this.handleKeyDown);
+  },
+  next() {
+    if (!this.images.length) return;
+    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+    this.update();
+  },
+  prev() {
+    if (!this.images.length) return;
+    this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+    this.update();
+  },
+  setIndex(idx) {
+    this.currentIndex = idx;
+    this.update();
+  },
+  update() {
+    const imgEl = document.getElementById('lightboxImg');
+    const counterEl = document.getElementById('lightboxCounter');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+    const thumbsEl = document.getElementById('lightboxThumbs');
+    if (imgEl) {
+      imgEl.style.opacity = '0';
+      imgEl.style.transform = 'scale(0.96)';
+      setTimeout(() => {
+        imgEl.src = this.images[this.currentIndex];
+        imgEl.style.opacity = '1';
+        imgEl.style.transform = 'scale(1)';
+      }, 100);
+    }
+    if (counterEl) counterEl.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
+    if (prevBtn && nextBtn) {
+      const showArrows = this.images.length > 1;
+      prevBtn.style.display = showArrows ? 'flex' : 'none';
+      nextBtn.style.display = showArrows ? 'flex' : 'none';
+    }
+    if (thumbsEl) {
+      if (this.images.length > 1) {
+        thumbsEl.style.display = 'flex';
+        thumbsEl.innerHTML = this.images.map((img, i) => `
+          <button class="lightbox-thumb${i === this.currentIndex ? ' active' : ''}" data-idx="${i}" type="button">
+            <img src="${img}" alt="thumb ${i+1}">
+          </button>
+        `).join('');
+        thumbsEl.querySelectorAll('.lightbox-thumb').forEach(btn => {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            Lightbox.setIndex(parseInt(btn.dataset.idx));
+          };
+        });
+      } else {
+        thumbsEl.style.display = 'none';
+      }
+    }
+  },
+  handleKeyDown(e) {
+    if (e.key === 'Escape') Lightbox.close();
+    else if (e.key === 'ArrowRight') Lightbox.next();
+    else if (e.key === 'ArrowLeft') Lightbox.prev();
+  },
+  init() {
+    const overlay = document.getElementById('imageLightbox');
+    const closeBtn = document.getElementById('lightboxClose');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+    const imgEl = document.getElementById('lightboxImg');
+    if (closeBtn) closeBtn.onclick = () => Lightbox.close();
+    if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); Lightbox.prev(); };
+    if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); Lightbox.next(); };
+    if (imgEl) imgEl.onclick = (e) => { e.stopPropagation(); Lightbox.close(); };
+    if (overlay) {
+      overlay.onclick = (e) => {
+        if (e.target === overlay || e.target.classList.contains('lightbox-stage')) {
+          Lightbox.close();
+        }
+      };
+    }
+  }
+};
+
 const App = {
   state: {
     activeCategory: 'All',
@@ -23,6 +123,7 @@ const App = {
   // ── Boot ──────────────────────────────────────────────────
   async init() {
     ThemeManager.init();
+    Lightbox.init();
     
     // Check if we are on the dedicated admin route (case-insensitive, handles trailing slashes)
     const normPath = window.location.pathname.toLowerCase().replace(/\/$/, '');
@@ -478,9 +579,10 @@ const App = {
       ` : '';
 
       const mainImgHTML = mainImgSrc
-        ? `<div class="pdp-main-img-wrap" id="ppMainImgWrap">
+        ? `<div class="pdp-main-img-wrap" id="ppMainImgWrap" title="Click to view full screen">
             ${arrowsHTML}
             <img class="pdp-main-img" id="ppMainImg" src="${mainImgSrc}" alt="${prod.name}">
+            <span class="pdp-zoom-badge">🔍 Fullscreen</span>
           </div>`
         : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="ppMainImgWrap" style="background:${cat.color || '#f0eef8'}">
             <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
@@ -1944,9 +2046,10 @@ const App = {
     ` : '';
 
     const mainImgHTML = mainImgSrc
-      ? `<div class="pdp-main-img-wrap" id="pdpMainImgWrap">
+      ? `<div class="pdp-main-img-wrap" id="pdpMainImgWrap" title="Click to view full screen">
           ${arrowsHTML}
           <img class="pdp-main-img" id="pdpMainImg" src="${mainImgSrc}" alt="${prod.name}">
+          <span class="pdp-zoom-badge">🔍 Fullscreen</span>
         </div>`
       : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="pdpMainImgWrap" style="background:${cat.color || '#f0eef8'}">
           <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
@@ -2076,6 +2179,14 @@ const App = {
       const nextBtn = document.getElementById('pdpImgNext');
       if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); setModalActiveImage(currentImgIdx - 1); };
       if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); setModalActiveImage(currentImgIdx + 1); };
+
+      const mainImgWrap = document.getElementById('pdpMainImgWrap');
+      if (mainImgWrap) {
+        mainImgWrap.onclick = (e) => {
+          if (e.target.closest('.pdp-img-arrow')) return;
+          if (currentGallery.length > 0) Lightbox.open(currentGallery, currentImgIdx);
+        };
+      }
 
       const thumbBtns = document.querySelectorAll('#pdpThumbs .pdp-thumb');
       thumbBtns.forEach(btn => {
