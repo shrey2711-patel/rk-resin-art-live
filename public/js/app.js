@@ -450,14 +450,59 @@ const App = {
 
       const relatedProducts = await this.getRelatedProducts(prod);
 
+      // Multi-photo gallery setup for full product page view
+      const getGalleryImagesForSelection = (v, p) => {
+        if (v && v.images && Array.isArray(v.images) && v.images.length > 0) {
+          return v.images.slice(0, 3);
+        }
+        if (v && v.imageUrl) {
+          return [v.imageUrl];
+        }
+        if (p && p.images && Array.isArray(p.images) && p.images.length > 0) {
+          return p.images.slice(0, 3);
+        }
+        if (p && p.imageUrl) {
+          return [p.imageUrl];
+        }
+        return [];
+      };
+
+      let selectedVariant = hasVariants ? prod.variants[0] : null;
+      let currentGallery = getGalleryImagesForSelection(selectedVariant, prod);
+      let currentImgIdx = 0;
+
+      const mainImgSrc = currentGallery[0] || null;
+      const arrowsHTML = currentGallery.length > 1 ? `
+        <button class="pdp-img-arrow prev" id="ppImgPrev" type="button" aria-label="Previous photo">‹</button>
+        <button class="pdp-img-arrow next" id="ppImgNext" type="button" aria-label="Next photo">›</button>
+      ` : '';
+
+      const mainImgHTML = mainImgSrc
+        ? `<div class="pdp-main-img-wrap" id="ppMainImgWrap">
+            ${arrowsHTML}
+            <img class="pdp-main-img" id="ppMainImg" src="${mainImgSrc}" alt="${prod.name}">
+          </div>`
+        : `<div class="pdp-main-img-wrap pdp-emoji-wrap" id="ppMainImgWrap" style="background:${cat.color || '#f0eef8'}">
+            <div class="pdp-emoji-big">${prod.emoji || '📦'}</div>
+          </div>`;
+
+      const thumbnailsHTML = currentGallery.length > 0 ? `
+        <div class="pdp-thumbs" id="ppThumbs" style="${currentGallery.length <= 1 ? 'display:none' : ''}">
+          ${currentGallery.map((img, i) => `
+            <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-index="${i}" data-img="${img}" type="button">
+              <img src="${img}" alt="view ${i+1}">
+            </button>`).join('')}
+        </div>` : `<div class="pdp-thumbs" id="ppThumbs" style="display:none"></div>`;
+
       prodContent.innerHTML = `
         <div class="pp-layout">
           <!-- Top Section: Image + Action Panel side by side -->
           <div class="pp-top-grid">
-            <!-- Left: Image -->
+            <!-- Left: Vertical Thumbnail Selector Column + Main Image with < > Arrows -->
             <div class="pp-image-col">
-              <div class="modal-prod-thumb pp-thumb" style="background:#fff; aspect-ratio: 1 / 1;">
-                ${this.productMedia(prod, '#fff', 'modal')}
+              <div class="pdp-gallery" style="position:relative; top:0;">
+                ${thumbnailsHTML}
+                ${mainImgHTML}
               </div>
             </div>
 
@@ -525,20 +570,41 @@ const App = {
 
       this.bindRelatedProductLinks(relatedProducts, '#productPageContent', 'page');
 
-      let selectedVariant = hasVariants ? prod.variants[0] : null;
+      const setPpActiveImage = (idx) => {
+        if (!currentGallery.length) return;
+        currentImgIdx = (idx + currentGallery.length) % currentGallery.length;
+        const mainImg = document.getElementById('ppMainImg');
+        if (mainImg) {
+          mainImg.style.opacity = '0';
+          setTimeout(() => {
+            mainImg.src = currentGallery[currentImgIdx];
+            mainImg.style.opacity = '1';
+          }, 120);
+        }
+        const thumbBtns = document.querySelectorAll('#ppThumbs .pdp-thumb');
+        thumbBtns.forEach((btn, i) => {
+          btn.classList.toggle('active', i === currentImgIdx);
+        });
+      };
+
+      const bindPpGalleryControls = () => {
+        const prevBtn = document.getElementById('ppImgPrev');
+        const nextBtn = document.getElementById('ppImgNext');
+        if (prevBtn) prevBtn.onclick = (e) => { e.stopPropagation(); setPpActiveImage(currentImgIdx - 1); };
+        if (nextBtn) nextBtn.onclick = (e) => { e.stopPropagation(); setPpActiveImage(currentImgIdx + 1); };
+
+        const thumbBtns = document.querySelectorAll('#ppThumbs .pdp-thumb');
+        thumbBtns.forEach(btn => {
+          btn.onclick = () => {
+            const idx = parseInt(btn.dataset.index);
+            setPpActiveImage(idx);
+          };
+        });
+      };
+
+      bindPpGalleryControls();
 
       if (hasVariants) {
-        if (prod.variants[0] && prod.variants[0].imageUrl) {
-          const mainThumb = document.querySelector('#productPageContent .modal-prod-thumb img.prod-image');
-          if (mainThumb) {
-            mainThumb.src = prod.variants[0].imageUrl;
-            mainThumb.onerror = function() {
-              this.style.display = 'none';
-              if (this.parentElement) this.parentElement.innerHTML = `<div class="prod-emoji-fallback modal" style="aspect-ratio:1/1;background:#fff">${prod.emoji || '📦'}</div>`;
-            };
-          }
-        }
-
         document.querySelectorAll('#productPageContent .variant-chip').forEach(chip => {
           chip.onclick = () => {
             document.querySelectorAll('#productPageContent .variant-chip').forEach(c => c.classList.remove('selected'));
@@ -562,31 +628,47 @@ const App = {
             if (addBtn) addBtn.disabled = (vStock === 0);
             if (buyBtn) buyBtn.disabled = (vStock === 0);
 
-            const mainThumbContainer = document.querySelector('#productPageContent .modal-prod-thumb');
-            if (mainThumbContainer) {
-              const variantImg = selectedVariant.imageUrl;
-              const fallbackImg = prod.imageUrl;
-              const finalImg = variantImg || fallbackImg;
-              
-              if (finalImg) {
-                let imgEl = mainThumbContainer.querySelector('.prod-image');
-                if (imgEl) {
-                  imgEl.src = finalImg;
-                  imgEl.onerror = function() {
-                    this.style.display = 'none';
-                    if (this.parentElement) this.parentElement.innerHTML = `<div class="prod-emoji-fallback modal" style="aspect-ratio:1/1;background:${cat.color || '#f0eef8'}">${prod.emoji || '📦'}</div>`;
-                  };
+            // Update gallery thumbs and arrows for newly selected variant
+            currentGallery = getGalleryImagesForSelection(selectedVariant, prod);
+            currentImgIdx = 0;
+
+            const thumbsEl = document.getElementById('ppThumbs');
+            const mainImgWrap = document.getElementById('ppMainImgWrap');
+
+            if (mainImgWrap) {
+              let prevArrow = document.getElementById('ppImgPrev');
+              let nextArrow = document.getElementById('ppImgNext');
+              if (currentGallery.length > 1) {
+                if (!prevArrow) {
+                  mainImgWrap.insertAdjacentHTML('afterbegin', `
+                    <button class="pdp-img-arrow prev" id="ppImgPrev" type="button" aria-label="Previous photo">‹</button>
+                    <button class="pdp-img-arrow next" id="ppImgNext" type="button" aria-label="Next photo">›</button>
+                  `);
                 } else {
-                  mainThumbContainer.innerHTML = `
-                    <div class="prod-image-wrap modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-                      <img class="prod-image" src="${finalImg}" alt="${prod.name}"
-                        onerror="this.style.display='none';if(this.parentElement)this.parentElement.innerHTML='<div class=\'prod-emoji-fallback modal\' style=\'aspect-ratio:1/1;background:${cat.color || '#f0eef8'}\'>${prod.emoji || '📦'}</div>';">
-                    </div>`;
+                  prevArrow.style.display = '';
+                  if (nextArrow) nextArrow.style.display = '';
                 }
               } else {
-                mainThumbContainer.innerHTML = `<div class="prod-emoji-fallback modal" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">${prod.emoji || '📦'}</div>`;
+                if (prevArrow) prevArrow.style.display = 'none';
+                if (nextArrow) nextArrow.style.display = 'none';
               }
             }
+
+            if (thumbsEl) {
+              if (currentGallery.length > 1) {
+                thumbsEl.innerHTML = currentGallery.map((img, i) => `
+                  <button class="pdp-thumb${i === 0 ? ' active' : ''}" data-index="${i}" data-img="${img}" type="button">
+                    <img src="${img}" alt="view ${i+1}">
+                  </button>`).join('');
+                thumbsEl.style.display = '';
+              } else {
+                thumbsEl.innerHTML = '';
+                thumbsEl.style.display = 'none';
+              }
+            }
+
+            setPpActiveImage(0);
+            bindPpGalleryControls();
           };
         });
       }
