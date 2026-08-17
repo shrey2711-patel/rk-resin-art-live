@@ -1045,6 +1045,8 @@ const Admin = {
       if (trackStockEl) trackStockEl.checked = s.trackStock !== false;
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
+      const subcatEl = document.getElementById('afSubcategoriesEnabled');
+      if (subcatEl) subcatEl.checked = s.subcategoriesEnabled !== false;
 
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
@@ -1107,11 +1109,26 @@ const Admin = {
       // Populate Payments settings
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
+      const subcatEl = document.getElementById('afSubcategoriesEnabled');
+      if (subcatEl) subcatEl.checked = s.subcategoriesEnabled !== false;
     }
 
     this.initVariantBuilder();
     this.updateStockFieldsVisibility();
+    this.updateSubcategoriesVisibility();
     this.resetProductForm();
+  },
+
+  updateSubcategoriesVisibility() {
+    const isEnabled = this.data.settings ? (this.data.settings.subcategoriesEnabled !== false) : true;
+    const adminSubcatSection = document.getElementById('adminSubcategorySection');
+    if (adminSubcatSection) {
+      adminSubcatSection.style.display = isEnabled ? '' : 'none';
+    }
+    const pfSubcatField = document.getElementById('pfSubcatField');
+    if (pfSubcatField) {
+      pfSubcatField.style.display = isEnabled ? '' : 'none';
+    }
   },
 
 
@@ -1135,6 +1152,7 @@ const Admin = {
       this.data.orders = orders;
       this.data.coupons = coupons;
       this.data.settings = settings;
+      this.updateSubcategoriesVisibility();
     } catch (e) {
       showToast('Error loading admin data', 'error');
     }
@@ -1728,12 +1746,14 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   const cartEnabled = document.getElementById('afCartEnabled').checked;
   const trackStock = document.getElementById('afTrackStock').checked;
   const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
+  const subcategoriesEnabled = document.getElementById('afSubcategoriesEnabled').checked;
 
   await API.updateSettings({ 
     announce: text, 
     cartEnabled: cartEnabled,
     trackStock: trackStock,
-    razorpayEnabled: razorpayEnabled
+    razorpayEnabled: razorpayEnabled,
+    subcategoriesEnabled: subcategoriesEnabled
   });
 
   // Update local settings cache
@@ -1742,9 +1762,11 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   Admin.data.settings.cartEnabled = cartEnabled;
   Admin.data.settings.trackStock = trackStock;
   Admin.data.settings.razorpayEnabled = razorpayEnabled;
+  Admin.data.settings.subcategoriesEnabled = subcategoriesEnabled;
 
-  // Instantly toggle the visibility of the stock inputs
+  // Instantly toggle the visibility of the stock & subcategories inputs
   Admin.updateStockFieldsVisibility();
+  Admin.updateSubcategoriesVisibility();
 
   const announceTextEl = document.getElementById('announceText');
   if (announceTextEl) announceTextEl.textContent = text;

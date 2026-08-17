@@ -385,10 +385,10 @@ const App = {
     // Subcategory UI Handling
     const subcatSection = document.getElementById('subcatSection');
     const subcatGrid = document.getElementById('subcatGrid');
+    const isSubcatEnabled = this.state.settings ? (this.state.settings.subcategoriesEnabled !== false) : true;
+    const list = isSubcatEnabled ? (this.state.subcategories || []).filter(s => s.category === parentCat) : [];
     
     // Find subcategories for this parent category
-    const list = (this.state.subcategories || []).filter(s => s.category === parentCat);
-    
     if (list.length > 0 && !subcatName) {
       // We have subcategories, and the user hasn't selected one yet!
       // Show subcategories grid, hide product grid
