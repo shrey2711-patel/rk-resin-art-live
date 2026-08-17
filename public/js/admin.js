@@ -189,7 +189,7 @@ const Admin = {
   },
 
   updateConversionStatus(msg) {
-    const ids = ['categoryUploadStatus', 'subcategoryUploadStatus', 'bannerUploadStatus'];
+    const ids = ['categoryUploadStatus', 'bannerUploadStatus'];
     ids.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.textContent = msg;
@@ -463,14 +463,6 @@ const Admin = {
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = '4:3';
     document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
-    // Reset subcategory checkbox
-    const pfHasSubcat = document.getElementById('pfHasSubcat');
-    const pfSubcatDropWrap = document.getElementById('pfSubcatDropWrap');
-    if (pfHasSubcat) pfHasSubcat.checked = false;
-    if (pfSubcatDropWrap) pfSubcatDropWrap.style.display = 'none';
-    this.populateProdSubcatSelect();
-    const pfSub = document.getElementById('pfSubcat');
-    if (pfSub) pfSub.value = '';
     this.setUploadStatus('');
     const btn = document.getElementById('addProdBtn');
     const cancel = document.getElementById('cancelProdBtn');
@@ -507,15 +499,6 @@ const Admin = {
   setProductEdit(product) {
     document.getElementById('pfName').value = product.name || '';
     document.getElementById('pfCat').value = product.category || this.data.categories[0]?.name || '';
-    // Set subcategory checkbox based on whether product has a subcategory
-    const pfHasSubcatEdit = document.getElementById('pfHasSubcat');
-    const pfSubcatDropWrapEdit = document.getElementById('pfSubcatDropWrap');
-    const hasSub = !!(product.subcategory && product.subcategory.trim());
-    if (pfHasSubcatEdit) pfHasSubcatEdit.checked = hasSub;
-    if (pfSubcatDropWrapEdit) pfSubcatDropWrapEdit.style.display = hasSub ? '' : 'none';
-    this.populateProdSubcatSelect();
-    const pfSub = document.getElementById('pfSubcat');
-    if (pfSub) pfSub.value = product.subcategory || '';
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = product.imgRatio || '4:3';
     document.getElementById('pfEmoji').value = product.emoji || '';
@@ -726,7 +709,6 @@ const Admin = {
       price,
       originalPrice,
       category: document.getElementById('pfCat').value,
-      subcategory: document.getElementById('pfHasSubcat')?.checked ? (document.getElementById('pfSubcat')?.value || '') : '',
       stock,
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',
       badge: document.getElementById('pfBadge').value,
@@ -1045,8 +1027,6 @@ const Admin = {
       if (trackStockEl) trackStockEl.checked = s.trackStock !== false;
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
-      const subcatEl = document.getElementById('afSubcategoriesEnabled');
-      if (subcatEl) subcatEl.checked = s.subcategoriesEnabled !== false;
 
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
@@ -1081,7 +1061,6 @@ const Admin = {
     this.renderBanners();
     this.renderNav();
     this.renderCategories();
-    this.renderSubcategories();
     this.renderProducts();
     this.renderOrders();
     if (this.renderReviews) this.renderReviews();
@@ -1109,36 +1088,20 @@ const Admin = {
       // Populate Payments settings
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
-      const subcatEl = document.getElementById('afSubcategoriesEnabled');
-      if (subcatEl) subcatEl.checked = s.subcategoriesEnabled !== false;
     }
 
     this.initVariantBuilder();
     this.updateStockFieldsVisibility();
-    this.updateSubcategoriesVisibility();
     this.resetProductForm();
-  },
-
-  updateSubcategoriesVisibility() {
-    const isEnabled = this.data.settings ? (this.data.settings.subcategoriesEnabled !== false) : true;
-    const adminSubcatSection = document.getElementById('adminSubcategorySection');
-    if (adminSubcatSection) {
-      adminSubcatSection.style.display = isEnabled ? '' : 'none';
-    }
-    const pfSubcatField = document.getElementById('pfSubcatField');
-    if (pfSubcatField) {
-      pfSubcatField.style.display = isEnabled ? '' : 'none';
-    }
   },
 
 
   async loadAll() {
     try {
-      const [banners, nav, cats, subcats, prodRes, orders, coupons, settings] = await Promise.all([
+      const [banners, nav, cats, prodRes, orders, coupons, settings] = await Promise.all([
         API.getBanners(),
         API.getNav(),
         API.getCategories(),
-        API.getSubcategories().catch(() => []),
         API.getProducts({ limit: 200 }),
         API.getOrders(),
         API.getCoupons().catch(() => []),
@@ -1147,12 +1110,10 @@ const Admin = {
       this.data.banners = banners;
       this.data.nav = nav;
       this.data.categories = cats;
-      this.data.subcategories = subcats;
       this.data.products = prodRes.products;
       this.data.orders = orders;
       this.data.coupons = coupons;
       this.data.settings = settings;
-      this.updateSubcategoriesVisibility();
     } catch (e) {
       showToast('Error loading admin data', 'error');
     }
@@ -1267,175 +1228,6 @@ const Admin = {
     const sel = document.getElementById('pfCat');
     if (sel) {
       sel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
-      sel.onchange = () => this.populateProdSubcatSelect();
-    }
-    const scSel = document.getElementById('scfParentCat');
-    if (scSel) {
-      scSel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
-    }
-    this.populateProdSubcatSelect();
-  },
-
-  renderSubcategories() {
-    const list = document.getElementById('adminSubcatList');
-    if (!list) return;
-    this.data.subcategories = this.data.subcategories || [];
-    list.innerHTML = this.data.subcategories.map(s => {
-      const imgHtml = s.imageUrl ? `<img src="${s.imageUrl}" style="width:30px;height:30px;border-radius:4px;object-fit:cover;margin-right:8px;">` : '';
-      return `
-        <div class="admin-list-item">
-          ${imgHtml}
-          <div class="ali-info">
-            <div class="ali-name">${s.emoji || '✨'} ${s.name} <span style="font-size:0.75rem;color:var(--muted)">(${s.category})</span></div>
-          </div>
-          <div class="ali-actions">
-            <button class="ali-edit" data-edit-scid="${s.id}">Edit</button>
-            <button class="ali-del" data-scid="${s.id}">Delete</button>
-          </div>
-        </div>`;
-    }).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No subcategories.</div>';
-
-    list.querySelectorAll('[data-edit-scid]').forEach(btn => {
-      btn.onclick = () => {
-        const subcat = this.data.subcategories.find(item => item.id === Number(btn.dataset.editScid));
-        if (subcat) this.setSubcategoryEdit(subcat);
-      };
-    });
-
-    list.querySelectorAll('[data-scid]').forEach(btn => {
-      btn.onclick = async () => {
-        if (!confirm('Delete this subcategory?')) return;
-        await API.deleteSubcategory(Number(btn.dataset.scid));
-        await this.loadAll();
-        this.renderSubcategories();
-        this.populateProdSubcatSelect();
-      };
-    });
-    this.populateProdSubcatSelect();
-  },
-
-  setSubcategoryEdit(subcat) {
-    document.getElementById('scfParentCat').value = subcat.category || '';
-    document.getElementById('scfName').value = subcat.name || '';
-    document.getElementById('scfEmoji').value = subcat.emoji || '';
-    document.getElementById('scfImageUrl').value = subcat.imageUrl || '';
-    
-    const preview = document.getElementById('subcategoryImagePreview');
-    const previewImg = document.getElementById('scfImagePreviewImg');
-    if (preview && previewImg) {
-      if (subcat.imageUrl) {
-        previewImg.src = subcat.imageUrl;
-        preview.style.display = '';
-      } else {
-        preview.style.display = 'none';
-      }
-    }
-
-    const btn = document.getElementById('addSubcatBtn');
-    const cancel = document.getElementById('cancelSubcatBtn');
-    if (btn) btn.textContent = 'Update Subcategory';
-    if (cancel) cancel.style.display = '';
-    this.editStateSubcat = { id: subcat.id };
-  },
-
-  resetSubcategoryForm() {
-    document.getElementById('scfName').value = '';
-    document.getElementById('scfEmoji').value = '';
-    document.getElementById('scfImageUrl').value = '';
-    document.getElementById('scfImageFile').value = '';
-    const preview = document.getElementById('subcategoryImagePreview');
-    if (preview) preview.style.display = 'none';
-    const status = document.getElementById('subcategoryUploadStatus');
-    if (status) status.textContent = '';
-    
-    const btn = document.getElementById('addSubcatBtn');
-    const cancel = document.getElementById('cancelSubcatBtn');
-    if (btn) btn.textContent = '+ Add Subcategory';
-    if (cancel) cancel.style.display = 'none';
-    this.editStateSubcat = { id: null };
-  },
-
-  async saveSubcategoryForm() {
-    const parentCat = document.getElementById('scfParentCat').value;
-    const name = document.getElementById('scfName').value.trim();
-    const emoji = document.getElementById('scfEmoji').value.trim() || '✨';
-    const imageUrl = document.getElementById('scfImageUrl').value;
-
-    if (!parentCat || !name) {
-      showToast('Parent Category and Subcategory Name are required', 'error');
-      return;
-    }
-
-    const payload = { category: parentCat, name, emoji, imageUrl };
-
-    try {
-      if (this.editStateSubcat && this.editStateSubcat.id) {
-        await API.updateSubcategory(this.editStateSubcat.id, payload);
-        showToast('Subcategory updated', 'success');
-      } else {
-        await API.addSubcategory(payload);
-        showToast('Subcategory created', 'success');
-        showOk('subcatOk');
-      }
-      this.resetSubcategoryForm();
-      await this.loadAll();
-      this.renderSubcategories();
-    } catch (e) {
-      showToast(e.message || 'Error saving subcategory', 'error');
-    }
-  },
-
-  cancelSubcategoryEdit() {
-    this.resetSubcategoryForm();
-  },
-
-  async uploadSubcategoryImage(file) {
-    if (!file) return;
-
-    if (!this.isValidImageType(file)) {
-      showToast('Please choose a JPG, PNG, WEBP or HEIC image', 'error');
-      return;
-    }
-
-    this.setSubcategoryUploadStatus('Compressing & uploading image...', 'info');
-    try {
-      const optimizedFile = await this.resizeImageForUpload(file);
-      const result = await API.uploadImage(optimizedFile);
-      document.getElementById('scfImageUrl').value = result.url;
-      
-      const preview = document.getElementById('subcategoryImagePreview');
-      const previewImg = document.getElementById('scfImagePreviewImg');
-      if (preview && previewImg) {
-        previewImg.src = result.url;
-        preview.style.display = '';
-      }
-      this.setSubcategoryUploadStatus('Image uploaded successfully!', 'success');
-    } catch (e) {
-      this.setSubcategoryUploadStatus('Upload failed: ' + e.message, 'error');
-    }
-  },
-
-  setSubcategoryUploadStatus(msg, type = 'info') {
-    const status = document.getElementById('subcategoryUploadStatus');
-    if (!status) return;
-    status.textContent = msg;
-    status.className = 'upload-status ' + type;
-  },
-
-  populateProdSubcatSelect() {
-    const pfSub = document.getElementById('pfSubcat');
-    if (!pfSub) return;
-    const catVal = document.getElementById('pfCat').value;
-    const filtered = (this.data.subcategories || []).filter(s => s.category === catVal);
-    pfSub.innerHTML = '<option value="">— Select Subcategory —</option>' + filtered.map(s => `<option value="${s.name}">${s.emoji || '✨'} ${s.name}</option>`).join('');
-    // If no subcategories exist for this category, auto-uncheck and hide
-    const pfHasSubcat = document.getElementById('pfHasSubcat');
-    const pfSubcatDropWrap = document.getElementById('pfSubcatDropWrap');
-    if (filtered.length === 0) {
-      if (pfHasSubcat) { pfHasSubcat.checked = false; pfHasSubcat.disabled = true; }
-      if (pfSubcatDropWrap) pfSubcatDropWrap.style.display = 'none';
-    } else {
-      if (pfHasSubcat) pfHasSubcat.disabled = false;
     }
   },
 
@@ -1746,14 +1538,12 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   const cartEnabled = document.getElementById('afCartEnabled').checked;
   const trackStock = document.getElementById('afTrackStock').checked;
   const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
-  const subcategoriesEnabled = document.getElementById('afSubcategoriesEnabled').checked;
 
   await API.updateSettings({ 
     announce: text, 
     cartEnabled: cartEnabled,
     trackStock: trackStock,
-    razorpayEnabled: razorpayEnabled,
-    subcategoriesEnabled: subcategoriesEnabled
+    razorpayEnabled: razorpayEnabled
   });
 
   // Update local settings cache
@@ -1762,11 +1552,9 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   Admin.data.settings.cartEnabled = cartEnabled;
   Admin.data.settings.trackStock = trackStock;
   Admin.data.settings.razorpayEnabled = razorpayEnabled;
-  Admin.data.settings.subcategoriesEnabled = subcategoriesEnabled;
 
-  // Instantly toggle the visibility of the stock & subcategories inputs
+  // Instantly toggle the visibility of the stock inputs
   Admin.updateStockFieldsVisibility();
-  Admin.updateSubcategoriesVisibility();
 
   const announceTextEl = document.getElementById('announceText');
   if (announceTextEl) announceTextEl.textContent = text;
@@ -1851,48 +1639,6 @@ if (categoryUploadBox) {
   });
 }
 
-// Add / Update Subcategory
-document.getElementById('addSubcatBtn').onclick = async () => {
-  await Admin.saveSubcategoryForm();
-};
-document.getElementById('cancelSubcatBtn').onclick = () => {
-  Admin.cancelSubcategoryEdit();
-};
-
-// Subcategory Image upload events
-document.getElementById('scfImageFile').onchange = async (e) => {
-  await Admin.uploadSubcategoryImage(e.target.files[0]);
-};
-
-document.getElementById('removeSubcategoryImageBtn').onclick = () => {
-  document.getElementById('scfImageFile').value = '';
-  document.getElementById('scfImageUrl').value = '';
-  const preview = document.getElementById('subcategoryImagePreview');
-  if (preview) preview.style.display = 'none';
-  Admin.setSubcategoryUploadStatus('Image removed. Save subcategory to keep this change.', 'success');
-};
-
-const subcategoryUploadBox = document.getElementById('subcategoryUploadBox');
-if (subcategoryUploadBox) {
-  ['dragenter', 'dragover'].forEach(eventName => {
-    subcategoryUploadBox.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      subcategoryUploadBox.classList.add('dragging');
-    });
-  });
-  ['dragleave', 'drop'].forEach(eventName => {
-    subcategoryUploadBox.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      subcategoryUploadBox.classList.remove('dragging');
-    });
-  });
-  subcategoryUploadBox.addEventListener('drop', async (e) => {
-    const file = e.dataTransfer.files[0];
-    document.getElementById('scfImageFile').files = e.dataTransfer.files;
-    await Admin.uploadSubcategoryImage(file);
-  });
-}
-
 // Stock status toggle button
 const pfStockStatusBtn = document.getElementById('pfStockStatusBtn');
 if (pfStockStatusBtn) {
@@ -1901,19 +1647,6 @@ if (pfStockStatusBtn) {
     const currentVal = input ? input.value : '1';
     const newVal = currentVal === '1' ? '0' : '1';
     Admin.setStockStatusButtonState(newVal);
-  };
-}
-
-// Subcategory checkbox toggle
-const pfHasSubcatChk = document.getElementById('pfHasSubcat');
-if (pfHasSubcatChk) {
-  pfHasSubcatChk.onchange = () => {
-    const dropWrap = document.getElementById('pfSubcatDropWrap');
-    if (dropWrap) dropWrap.style.display = pfHasSubcatChk.checked ? '' : 'none';
-    if (!pfHasSubcatChk.checked) {
-      const pfSub = document.getElementById('pfSubcat');
-      if (pfSub) pfSub.value = '';
-    }
   };
 }
 

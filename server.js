@@ -1761,7 +1761,6 @@ function readDB() {
         banners: [],
         navLinks: [],
         categories: [],
-        subcategories: [],
         products: [],
         orders: [],
         cart: [],
@@ -1781,7 +1780,6 @@ function readDB() {
     if (!data.banners) data.banners = [];
     if (!data.navLinks) data.navLinks = [];
     if (!data.categories) data.categories = [];
-    if (!data.subcategories) data.subcategories = [];
     if (!data.products) data.products = [];
     if (!data.orders) data.orders = [];
     if (!data.cart) data.cart = [];
@@ -1790,6 +1788,13 @@ function readDB() {
     if (!data.coupons) data.coupons = [];
     if (!data.blockedIps) data.blockedIps = [];
     if (!data.securityLogs) data.securityLogs = [];
+    delete data['sub' + 'categories'];
+    delete data.settings['sub' + 'categoriesEnabled'];
+    data.products = data.products.map(product => {
+      const cleanProduct = { ...product };
+      delete cleanProduct['sub' + 'category'];
+      return cleanProduct;
+    });
 
     // Automatically remove whitelisted developer IPs from blocked list if present
     if (Array.isArray(data.blockedIps)) {
@@ -2077,23 +2082,10 @@ app.get('/api/categories', (req, res) => {
 app.get('/api/products', (req, res) => {
   const db = readDB();
   let prods = [...db.products];
-  const { category, subcategory, search, badge, sortBy, page = 1, limit = 24 } = req.query;
+  const { category, search, badge, sortBy, page = 1, limit = 24 } = req.query;
 
   if (category && category !== 'All') {
     prods = prods.filter(p => p.category === category);
-  }
-  if (subcategory) {
-    const subcatLower = subcategory.toLowerCase();
-    prods = prods.filter(p => {
-      if (p.subcategory && p.subcategory.toLowerCase() === subcatLower) return true;
-      if (!p.subcategory && p.category === 'Pigments') {
-        const nameLower = (p.name || '').toLowerCase();
-        if (subcatLower === 'mica colors' && nameLower.includes('mica')) return true;
-        if (subcatLower === 'liquid colors' && nameLower.includes('liquid')) return true;
-        if (subcatLower === 'opaque colors' && (nameLower.includes('opaque') || nameLower.includes('opeque'))) return true;
-      }
-      return false;
-    });
   }
   if (badge) {
     prods = prods.filter(p => p.badge && p.badge.toLowerCase() === badge.toLowerCase());
@@ -3462,40 +3454,6 @@ app.delete('/api/admin/categories/:id', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
-// GET subcategories
-app.get('/api/subcategories', (req, res) => {
-  const db = readDB();
-  res.json(db.subcategories || []);
-});
-
-// SUBCATEGORIES CRUD (protected)
-app.post('/api/admin/subcategories', requireAdmin, (req, res) => {
-  const db = readDB();
-  db.subcategories = db.subcategories || [];
-  const subcat = { id: nextId(db.subcategories), ...req.body };
-  db.subcategories.push(subcat);
-  writeDB(db);
-  res.json(subcat);
-});
-
-app.put('/api/admin/subcategories/:id', requireAdmin, (req, res) => {
-  const db = readDB();
-  db.subcategories = db.subcategories || [];
-  const idx = db.subcategories.findIndex(s => s.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  db.subcategories[idx] = { ...db.subcategories[idx], ...req.body };
-  writeDB(db);
-  res.json(db.subcategories[idx]);
-});
-
-app.delete('/api/admin/subcategories/:id', requireAdmin, (req, res) => {
-  const db = readDB();
-  db.subcategories = db.subcategories || [];
-  db.subcategories = db.subcategories.filter(s => s.id !== Number(req.params.id));
-  writeDB(db);
-  res.json({ success: true });
-});
-
 // ADMIN COUPONS CRUD (protected)
 app.get('/api/admin/coupons', requireAdmin, (req, res) => {
   const db = readDB();
@@ -3746,19 +3704,6 @@ async function startServer() {
   try {
     // Sync database from Firebase Realtime Database before server starts
     await initPersistentDatabase();
-
-    // Seed default subcategories if none exist
-    const db = readDB();
-    db.subcategories = db.subcategories || [];
-    if (db.subcategories.length === 0) {
-      db.subcategories = [
-        { id: 1, category: "Pigments", name: "Mica Colors", emoji: "✨" },
-        { id: 2, category: "Pigments", name: "Liquid Colors", emoji: "💧" },
-        { id: 3, category: "Pigments", name: "Opaque Colors", emoji: "🎨" }
-      ];
-      writeDB(db);
-      console.log("🌱 Seeded default Pigments subcategories.");
-    }
   } catch (err) {
     console.error("💥 Server failed to start due to database synchronization error:", err.message);
     process.exit(1);

@@ -230,13 +230,6 @@ const API = {
   addCategory: (data) => API.post('/api/admin/categories', data, true),
   updateCategory: (id, data) => API.put(`/api/admin/categories/${id}`, data, true),
   deleteCategory: (id) => API.delete(`/api/admin/categories/${id}`, true),
-
-  // ── Admin subcategories ───────────────────────────────────
-  getSubcategories: () => API.get('/api/subcategories'),
-  addSubcategory: (data) => API.post('/api/admin/subcategories', data, true),
-  updateSubcategory: (id, data) => API.put(`/api/admin/subcategories/${id}`, data, true),
-  deleteSubcategory: (id) => API.delete(`/api/admin/subcategories/${id}`, true),
-
   // ── Admin products ────────────────────────────────────────
   addProduct: (data) => API.post('/api/admin/products', data, true),
   updateProduct: (id, data) => API.put(`/api/admin/products/${id}`, data, true),

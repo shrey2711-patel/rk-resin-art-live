@@ -3,26 +3,6 @@
   "banners": [],
   "navLinks": [],
   "categories": [],
-  "subcategories": [
-    {
-      "id": 1,
-      "category": "Pigments",
-      "name": "Mica Colors",
-      "emoji": "✨"
-    },
-    {
-      "id": 2,
-      "category": "Pigments",
-      "name": "Liquid Colors",
-      "emoji": "💧"
-    },
-    {
-      "id": 3,
-      "category": "Pigments",
-      "name": "Opaque Colors",
-      "emoji": "🎨"
-    }
-  ],
   "products": [],
   "orders": [],
   "cart": [],
