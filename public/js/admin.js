@@ -195,7 +195,7 @@ const Admin = {
       if (el) el.textContent = msg;
     });
     // For products, update both elements
-    const prodStatus = document.getElementById('prodUploadStatus');
+    const prodStatus = document.getElementById('productUploadStatus');
     if (prodStatus) prodStatus.textContent = msg;
     const uploadStatus = document.querySelector('.upload-status');
     if (uploadStatus) uploadStatus.textContent = msg;
@@ -864,7 +864,7 @@ const Admin = {
           <input class="vr-image-${slotNum}" type="hidden" value="${url}">
           <button type="button" class="vr-upload-btn-${slotNum}" style="padding:2px 6px; font-size:0.7rem; border-radius:4px; background:var(--pl); border:1px solid var(--border); color:var(--ink); cursor:pointer;">${url ? 'Change' : '+Upload'}</button>
           ${url ? `<button type="button" class="vr-remove-btn-${slotNum}" style="padding:2px 5px; font-size:0.68rem; border-radius:3px; background:var(--red); color:#fff; border:none; cursor:pointer;" title="Remove Photo ${slotNum}">✕</button>` : ''}
-          <input class="vr-file-${slotNum}" type="file" accept="image/*" style="display:none">
+          <input class="vr-file-${slotNum}" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display:none">
         </div>
       `;
     }).join('');

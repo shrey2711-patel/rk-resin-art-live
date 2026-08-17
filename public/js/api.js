@@ -104,12 +104,14 @@ const API = {
   async uploadImage(file) {
     const headers = {};
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
+    const ext = (file.name || '').split('.').pop().toLowerCase();
+    const isHeic = ['heic', 'heif'].includes(ext) || ['image/heic', 'image/heif'].includes((file.type || '').toLowerCase());
 
     try {
       // 1. Fetch ImgBB key securely from the server
       const keyData = await API.get('/api/admin/imgbb-key', true);
       
-      if (keyData && keyData.key) {
+      if (!isHeic && keyData && keyData.key) {
         // Convert optimized file to base64 for direct ImgBB POST request
         const reader = new FileReader();
         const base64Promise = new Promise((resolve, reject) => {
