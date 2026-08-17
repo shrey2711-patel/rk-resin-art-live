@@ -463,6 +463,11 @@ const Admin = {
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = '4:3';
     document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
+    // Reset subcategory checkbox
+    const pfHasSubcat = document.getElementById('pfHasSubcat');
+    const pfSubcatDropWrap = document.getElementById('pfSubcatDropWrap');
+    if (pfHasSubcat) pfHasSubcat.checked = false;
+    if (pfSubcatDropWrap) pfSubcatDropWrap.style.display = 'none';
     this.populateProdSubcatSelect();
     const pfSub = document.getElementById('pfSubcat');
     if (pfSub) pfSub.value = '';
@@ -502,6 +507,12 @@ const Admin = {
   setProductEdit(product) {
     document.getElementById('pfName').value = product.name || '';
     document.getElementById('pfCat').value = product.category || this.data.categories[0]?.name || '';
+    // Set subcategory checkbox based on whether product has a subcategory
+    const pfHasSubcatEdit = document.getElementById('pfHasSubcat');
+    const pfSubcatDropWrapEdit = document.getElementById('pfSubcatDropWrap');
+    const hasSub = !!(product.subcategory && product.subcategory.trim());
+    if (pfHasSubcatEdit) pfHasSubcatEdit.checked = hasSub;
+    if (pfSubcatDropWrapEdit) pfSubcatDropWrapEdit.style.display = hasSub ? '' : 'none';
     this.populateProdSubcatSelect();
     const pfSub = document.getElementById('pfSubcat');
     if (pfSub) pfSub.value = product.subcategory || '';
@@ -715,7 +726,7 @@ const Admin = {
       price,
       originalPrice,
       category: document.getElementById('pfCat').value,
-      subcategory: document.getElementById('pfSubcat')?.value || '',
+      subcategory: document.getElementById('pfHasSubcat')?.checked ? (document.getElementById('pfSubcat')?.value || '') : '',
       stock,
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',
       badge: document.getElementById('pfBadge').value,
@@ -1398,7 +1409,16 @@ const Admin = {
     if (!pfSub) return;
     const catVal = document.getElementById('pfCat').value;
     const filtered = (this.data.subcategories || []).filter(s => s.category === catVal);
-    pfSub.innerHTML = '<option value="">None / General</option>' + filtered.map(s => `<option value="${s.name}">${s.emoji || '✨'} ${s.name}</option>`).join('');
+    pfSub.innerHTML = '<option value="">— Select Subcategory —</option>' + filtered.map(s => `<option value="${s.name}">${s.emoji || '✨'} ${s.name}</option>`).join('');
+    // If no subcategories exist for this category, auto-uncheck and hide
+    const pfHasSubcat = document.getElementById('pfHasSubcat');
+    const pfSubcatDropWrap = document.getElementById('pfSubcatDropWrap');
+    if (filtered.length === 0) {
+      if (pfHasSubcat) { pfHasSubcat.checked = false; pfHasSubcat.disabled = true; }
+      if (pfSubcatDropWrap) pfSubcatDropWrap.style.display = 'none';
+    } else {
+      if (pfHasSubcat) pfHasSubcat.disabled = false;
+    }
   },
 
   // ── Products ──────────────────────────────────────────────
@@ -1859,6 +1879,19 @@ if (pfStockStatusBtn) {
     const currentVal = input ? input.value : '1';
     const newVal = currentVal === '1' ? '0' : '1';
     Admin.setStockStatusButtonState(newVal);
+  };
+}
+
+// Subcategory checkbox toggle
+const pfHasSubcatChk = document.getElementById('pfHasSubcat');
+if (pfHasSubcatChk) {
+  pfHasSubcatChk.onchange = () => {
+    const dropWrap = document.getElementById('pfSubcatDropWrap');
+    if (dropWrap) dropWrap.style.display = pfHasSubcatChk.checked ? '' : 'none';
+    if (!pfHasSubcatChk.checked) {
+      const pfSub = document.getElementById('pfSubcat');
+      if (pfSub) pfSub.value = '';
+    }
   };
 }
 

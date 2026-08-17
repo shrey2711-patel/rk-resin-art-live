@@ -810,11 +810,17 @@
               <div class="form-row-3">
                 <div class="form-field"><label>Product Name *</label><input class="admin-input" id="pfName" placeholder="e.g. Rose Gold Mica 10g"></div>
                 <div class="form-field"><label>Category *</label><select class="admin-input" id="pfCat"></select></div>
-                <div class="form-field">
+                <div class="form-field" id="pfSubcatField">
                   <label>Subcategory</label>
-                  <select class="admin-input" id="pfSubcat">
-                    <option value="">None / General</option>
-                  </select>
+                  <label class="subcat-toggle-row" for="pfHasSubcat" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;font-size:0.9rem;font-weight:600;color:var(--ink);">
+                    <input type="checkbox" id="pfHasSubcat" style="width:16px;height:16px;accent-color:var(--p);cursor:pointer;">
+                    <span>This product has a subcategory</span>
+                  </label>
+                  <div id="pfSubcatDropWrap" style="display:none;">
+                    <select class="admin-input" id="pfSubcat">
+                      <option value="">— Select Subcategory —</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div class="form-row-3" id="pfBasePriceStockContainer">
