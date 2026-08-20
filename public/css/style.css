@@ -2728,11 +2728,17 @@ body.admin-page-active .admin-panel {
   background: var(--white);
 }
 
-.variant-chip:hover,
+.variant-chip:hover {
+  border-color: #111111;
+  color: #111111;
+  background: #f9fafb;
+}
+
 .variant-chip.selected {
-  border-color: var(--ink);
-  background: var(--white);
-  box-shadow: 0 0 0 1px var(--ink);
+  border-color: #111111 !important;
+  background: #111111 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .modal-tabs {
@@ -3756,6 +3762,29 @@ body {
   gap: 8px;
   margin-top: 24px;
 }
+.variant-chip {
+  background: #ffffff;
+  border: 2px solid #E5E7EB;
+  border-radius: 999px;
+  padding: 7px 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111111;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  line-height: 1.2;
+}
+.variant-chip:hover {
+  border-color: #111111;
+  color: #111111;
+  background: #f9fafb;
+}
+.variant-chip.selected {
+  border-color: #111111 !important;
+  background: #111111 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
 .pdp-highlight {
   display: flex;
   align-items: center;
@@ -3904,22 +3933,23 @@ body {
 }
 .pdp-variants-chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .pdp-chip {
-  padding: 6px 16px;
-  border-radius: 10px;
+  padding: 7px 18px;
+  border-radius: 999px;
   border: 2px solid #E5E7EB;
-  background: #fff;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #374151;
+  background: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111111;
   cursor: pointer;
   transition: all 0.18s ease;
+  line-height: 1.2;
 }
-.pdp-chip:hover { border-color: #111111; color: #111111; }
+.pdp-chip:hover { border-color: #111111; color: #111111; background: #f9fafb; }
 .pdp-chip.selected {
-  background: #111111;
-  color: #fff;
-  border-color: #111111;
-  transform: scale(1.04);
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Quantity stepper */

@@ -103,6 +103,7 @@ try {
 } catch (e) { console.warn('⚠️ @aws-sdk/client-s3 not installed — R2 upload disabled. Run: npm install @aws-sdk/client-s3'); }
 
 const app = express();
+app.disable('x-powered-by');
 if (process.env.RENDER) {
   app.set('trust proxy', 1); // Trust Render's single-hop load balancer
 } else {
@@ -1525,9 +1526,6 @@ const authLimiter = rateLimit({
   handler: (req, res, next, options) => {
     const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
     logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Auth rate limit exceeded on ${req.originalUrl || req.url}`);
-    res.status(options.statusCode).send(options.message);
-  }
-});
 
 const checkoutLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -1693,6 +1691,152 @@ function hasLiveStoreData(data) {
   );
 }
 
+    res.status(options.statusCode).send(options.message);
+  }
+});
+
+const wishlistLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many subscription attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Manual cookie parser middleware
+app.use((req, res, next) => {
+  req.cookies = {};
+  const rc = req.headers.cookie;
+  if (rc) {
+    rc.split(';').forEach(cookie => {
+      const parts = cookie.split('=');
+      req.cookies[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+  }
+  next();
+});
+
+// Blocklist enforcement middleware
+app.use((req, res, next) => {
+  const normalizedIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
+  
+  if (isWhitelistedIp(normalizedIp)) {
+    return next();
+  }
+
+  const db = readDB();
+  const blockedIps = db.blockedIps || [];
+
+  if (blockedIps.includes(normalizedIp)) {
+    return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
+  }
+  next();
+});
+
+// Developer request logger & analytics collector middleware
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+  
+  let visitorId = req.cookies.visitor_id;
+  let isNewVisitor = false;
+  if (!visitorId) {
+    visitorId = crypto.randomBytes(16).toString('hex');
+    res.cookie('visitor_id', visitorId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true });
+    isNewVisitor = true;
+  }
+
+  const originalEnd = res.end;
+  res.end = function(chunk, encoding) {
+    res.end = originalEnd;
+    res.end(chunk, encoding);
+    
+    const duration = Date.now() - startTime;
+    const statusCode = res.statusCode;
+    
+    const ext = path.extname(req.url);
+    const isAsset = ext && ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'].includes(ext.toLowerCase());
+    
+    if (!isAsset && !req.url.startsWith('/uploads/')) {
+      const geo = getIpLocation(clientIp);
+      
+      // Disabled to prevent automatic visitor analytics updates from triggering database writes on every page load, saving Render bandwidth.
+      /*
+      try {
+        updateAggregatedAnalytics({
+          ip: clientIp,
+          isNew: isNewVisitor,
+          country: geo.country,
+          region: geo.region,
+          city: geo.city,
+          isp: geo.isp
+        });
+      } catch (err) {
+        console.error('Error updating analytics:', err.message);
+      }
+      */
+
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        ip: clientIp,
+        url: req.originalUrl || req.url,
+        method: req.method,
+        userAgent: req.headers['user-agent'] || 'Unknown',
+        status: statusCode,
+        duration: `${duration}ms`,
+        location: formatLocationLabel(geo)
+      };
+      
+      logVisitorRequest(logEntry);
+    }
+  };
+  
+  next();
+});
+
+// Apply global rate limiting to all APIs
+app.use('/api/', globalLimiter);
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(UPLOAD_DIR));
+
+
+function getFirebaseDbUrl() {
+  return process.env.FIREBASE_DB_URL ||
+    process.env.FIREBASE_DATABASE_URL ||
+    process.env.FIREBASE_RTDB_URL ||
+    process.env.FIREBASE_REALTIME_DATABASE_URL ||
+    null;
+}
+
+function firebaseRestUrl() {
+  const dbUrl = getFirebaseDbUrl();
+  if (!dbUrl) return null;
+  const secret = process.env.FIREBASE_DB_SECRET || process.env.FIREBASE_SECRET;
+  const baseUrl = dbUrl.endsWith('/') ? `${dbUrl}.json` : `${dbUrl}/.json`;
+  return secret ? `${baseUrl}?auth=${secret}` : baseUrl;
+}
+
+function getR2Config() {
+  const accountId  = process.env.R2_ACCOUNT_ID;
+  const accessKey  = process.env.R2_ACCESS_KEY_ID;
+  const secretKey  = process.env.R2_SECRET_ACCESS_KEY;
+  const bucketName = process.env.R2_BUCKET_NAME;
+  const publicUrl  = process.env.R2_PUBLIC_URL;
+  if (!accountId || !accessKey || !secretKey || !bucketName || !publicUrl) return null;
+  return { accountId, accessKey, secretKey, bucketName, publicUrl };
+}
+
+function hasLiveStoreData(data) {
+  if (!data || typeof data !== 'object') return false;
+  return Boolean(
+    (Array.isArray(data.products) && data.products.length > 0) ||
+    (Array.isArray(data.orders) && data.orders.length > 0) ||
+    (Array.isArray(data.users) && data.users.length > 0) ||
+    (Array.isArray(data.banners) && data.banners.length > 0)
+  );
+}
+
 function backupDatabaseSnapshot(data, reason = 'write') {
   try {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -1753,6 +1897,25 @@ async function initPersistentDatabase() {
   }
 }
 
+// Keep legacy ImgBB helper so existing stored URLs still display correctly
+function getImgBbApiKey() {
+  return process.env.IMGBB_API_KEY ||
+    process.env.IMGBB_KEY ||
+    process.env.IMG_BB_API_KEY ||
+    process.env.IMG_BB_KEY ||
+    null;
+}
+
+function hasLiveStoreData(data) {
+  if (!data || typeof data !== 'object') return false;
+  return Boolean(
+    (Array.isArray(data.products) && data.products.length > 0) ||
+    (Array.isArray(data.orders) && data.orders.length > 0) ||
+    (Array.isArray(data.users) && data.users.length > 0) ||
+    (Array.isArray(data.banners) && data.banners.length > 0)
+  );
+}
+
 function readDB() {
   try {
     if (!fs.existsSync(DB_PATH)) {
@@ -1788,13 +1951,6 @@ function readDB() {
     if (!data.coupons) data.coupons = [];
     if (!data.blockedIps) data.blockedIps = [];
     if (!data.securityLogs) data.securityLogs = [];
-    delete data['sub' + 'categories'];
-    delete data.settings['sub' + 'categoriesEnabled'];
-    data.products = data.products.map(product => {
-      const cleanProduct = { ...product };
-      delete cleanProduct['sub' + 'category'];
-      return cleanProduct;
-    });
 
     // Automatically remove whitelisted developer IPs from blocked list if present
     if (Array.isArray(data.blockedIps)) {
@@ -1803,16 +1959,13 @@ function readDB() {
         return !DEVELOPER_WHITELIST_IPS.includes(norm) && !DEVELOPER_WHITELIST_IPS.includes(ip);
       });
     }
-    
+
     return data;
   } catch (err) {
     console.error("❌ CRITICAL ERROR reading/parsing DB file:", err.message);
-    throw err; // Fail-safe: crash instead of overwriting with empty DB
+    throw err;
   }
 }
-
-let isSyncingToFirebase = false;
-let pendingFirebaseSyncData = null;
 
 function writeDB(data) {
   try {
@@ -1831,8 +1984,10 @@ function writeDB(data) {
     console.error('Could not create pre-write DB backup:', err.message);
   }
 
-  // 1. Instant local write (ensures zero latency and consistency for immediate readDB calls)
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  // 1. Crash-safe atomic local write (write to temp file then renameSync to prevent zero-byte corruption)
+  const tempPath = DB_PATH + '.tmp.' + Date.now();
+  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+  fs.renameSync(tempPath, DB_PATH);
 
   // 2. Queue background push to Firebase to prevent race conditions
   triggerFirebaseSync(data);
