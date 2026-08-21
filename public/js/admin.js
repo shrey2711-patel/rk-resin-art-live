@@ -1,3 +1,13 @@
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ── Admin Panel ──────────────────────────────────────────────
 const Admin = {
   data: { banners: [], nav: [], categories: [], products: [], orders: [], reviews: [], coupons: [] },
@@ -2333,11 +2343,11 @@ Admin.renderReviews = async function() {
       return `
         <div class="admin-review-card">
           <div class="arc-header">
-            <span class="arc-product">${prodName}</span>
+            <span class="arc-product">${escapeHtml(prodName)}</span>
             <button class="arc-delete" data-rid="${r.id}">🗑 Delete</button>
           </div>
-          <div class="arc-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)} &nbsp;<span class="arc-meta">by ${r.userName} &nbsp;·&nbsp; ${new Date(r.createdAt).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</span></div>
-          <div class="arc-comment">${r.comment}</div>
+          <div class="arc-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)} &nbsp;<span class="arc-meta">by ${escapeHtml(r.userName || 'Customer')} &nbsp;·&nbsp; ${new Date(r.createdAt).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</span></div>
+          <div class="arc-comment">${escapeHtml(r.comment)}</div>
         </div>`;
     }).join('');
 

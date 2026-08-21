@@ -1,3 +1,13 @@
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ── App State ────────────────────────────────────────────────
 const Lightbox = {
   images: [],
@@ -2320,11 +2330,11 @@ const App = {
         ? `<div class="review-list">${reviews.map(r => `
             <div class="review-card">
               <div class="review-card-header">
-                <span class="review-card-user">👤 ${r.userName}</span>
+                <span class="review-card-user">👤 ${escapeHtml(r.userName || 'Customer')}</span>
                 <span class="review-card-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
               </div>
               <div class="review-card-date">${new Date(r.createdAt).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})}</div>
-              <div class="review-card-comment">${r.comment}</div>
+              <div class="review-card-comment">${escapeHtml(r.comment)}</div>
             </div>`).join('')}</div>`
         : '<p class="reviews-empty">No reviews yet — be the first! 👇</p>';
 

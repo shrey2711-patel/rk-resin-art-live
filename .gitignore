@@ -13,5 +13,9 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Live uploaded images
+# Live uploaded images & database backups
 data/uploads/
+data/backups/
+data/visitor_logs.json
+data/*.tmp*
+

@@ -40,12 +40,422 @@
       ]
     }
   ],
-  "orders": [],
+  "orders": [
+    {
+      "id": 1,
+      "userId": 3,
+      "items": [
+        {
+          "id": 2,
+          "name": "QA In-Stock Resin",
+          "selectedVariant": "50g",
+          "price": 350,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "name": "QA Orderer",
+        "email": "qa_test_1787346498626@example.com",
+        "phone": "8141994995",
+        "address": "Test Street",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 350,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 410,
+      "status": "confirmed",
+      "createdAt": "2026-08-21T21:08:19.600Z",
+      "trackingNumber": "DEL12345678IN"
+    },
+    {
+      "id": 2,
+      "userId": 4,
+      "items": [
+        {
+          "id": 2,
+          "name": "QA In-Stock Resin",
+          "selectedVariant": "50g",
+          "price": 350,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "name": "QA Orderer",
+        "email": "qa_test_1787346714681@example.com",
+        "phone": "8141994995",
+        "address": "Test Street",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 350,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 410,
+      "status": "confirmed",
+      "createdAt": "2026-08-21T21:11:56.747Z",
+      "trackingNumber": "DEL12345678IN"
+    },
+    {
+      "id": 3,
+      "userId": 5,
+      "items": [
+        {
+          "id": 2,
+          "name": "QA In-Stock Resin",
+          "selectedVariant": "50g",
+          "price": 350,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "name": "QA Orderer",
+        "email": "qa_test_1787346744222@example.com",
+        "phone": "8141994995",
+        "address": "Test Street",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 350,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 410,
+      "status": "confirmed",
+      "createdAt": "2026-08-21T21:12:25.477Z",
+      "trackingNumber": "DEL12345678IN"
+    },
+    {
+      "id": 4,
+      "userId": 6,
+      "items": [
+        {
+          "id": 2,
+          "name": "QA In-Stock Resin",
+          "selectedVariant": "50g",
+          "price": 350,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "name": "QA Orderer",
+        "email": "qa_test_1787346824140@example.com",
+        "phone": "8141994995",
+        "address": "Test Street",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 350,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 410,
+      "status": "confirmed",
+      "createdAt": "2026-08-21T21:13:45.174Z",
+      "trackingNumber": "DEL12345678IN"
+    },
+    {
+      "id": 5,
+      "userId": 8,
+      "items": [
+        {
+          "id": 2,
+          "name": "QA In-Stock Resin",
+          "selectedVariant": "50g",
+          "price": 350,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "name": "QA Orderer",
+        "email": "qa_test_1787347594925@example.com",
+        "phone": "8141994995",
+        "address": "Test Street",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 350,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 410,
+      "status": "confirmed",
+      "createdAt": "2026-08-21T21:26:35.939Z",
+      "trackingNumber": "DEL12345678IN"
+    },
+    {
+      "id": 6,
+      "userId": 9,
+      "items": [
+        {
+          "id": 2,
+          "name": "Verified Epoxy Starter Kit",
+          "selectedVariant": "300ml",
+          "price": 450,
+          "qty": 2
+        }
+      ],
+      "customer": {
+        "name": "Shrey Verification User",
+        "email": "final_verified_1787347950454@example.com",
+        "phone": "9876543210",
+        "address": "Surendranagar Main Rd",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 900,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 960,
+      "status": "shipped",
+      "createdAt": "2026-08-21T21:32:31.012Z",
+      "courierName": "Delhivery Express",
+      "trackingId": "DEL9988776655IN"
+    }
+  ],
   "cart": [],
-  "users": [],
-  "reviews": [],
+  "users": [
+    {
+      "id": 1,
+      "name": "QA Customer Updated",
+      "email": "qa_test_1787346432247@example.com",
+      "phone": "9876543210",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$VZdyoj64qL27rlzwahhSSOlu/73GevMrJG26QAWl0h6ECx0N5WMji",
+      "createdAt": "2026-08-21T21:07:12.683Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Inspect User",
+      "email": "inspect_1787346446950@example.com",
+      "phone": "9876543210",
+      "address": "",
+      "city": "",
+      "pin": "",
+      "passwordHash": "$2a$10$MkU3aXjFtXl2CD68X7kA8uJJ79RR5PF85cibdc0dyrDdEFZtneF6O",
+      "createdAt": "2026-08-21T21:07:27.178Z"
+    },
+    {
+      "id": 3,
+      "name": "QA Customer Updated",
+      "email": "qa_test_1787346498626@example.com",
+      "phone": "9876543210",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$ERUKZ9QpgyEv3zooD64aleQpk0N4S34PtmZibhqC0UiMzmhcSNZWy",
+      "createdAt": "2026-08-21T21:08:19.104Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "QA Customer Admin-Modified",
+      "email": "qa_test_1787346714681@example.com",
+      "phone": "9998887776",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$HIjat.ALydnBzm6M18lhxOME9Mwf0/J7B4qe2LjF4rP46whqViNNK",
+      "createdAt": "2026-08-21T21:11:55.477Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "QA Customer Admin-Modified",
+      "email": "qa_test_1787346744222@example.com",
+      "phone": "9998887776",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$PRJoCjSG7akSqTwikbYXSuIH4zlkfu7Ht6sopngfARLmn6ar85Sga",
+      "createdAt": "2026-08-21T21:12:24.628Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "QA Customer Admin-Modified",
+      "email": "qa_test_1787346824140@example.com",
+      "phone": "9998887776",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$IQa.diUCjt4vCqCAwqfvBOPc2PbGNpYooBB91h76VRs6OmGVGSRiW",
+      "createdAt": "2026-08-21T21:13:44.483Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "QA Customer Admin-Modified",
+      "email": "qa_test_1787347574400@example.com",
+      "phone": "9998887776",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$5A6jXgHXmsDRFJkBYEGi4e5ySD2CVT3NY2tq9/DcidBKURgqHTZiu",
+      "createdAt": "2026-08-21T21:26:14.834Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "QA Customer Admin-Modified",
+      "email": "qa_test_1787347594925@example.com",
+      "phone": "9998887776",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$OlZVG.htsbfEZq6U7y.0Ye8xFaNm6xCApLYrwMjOFbk8ZStCtYPY2",
+      "createdAt": "2026-08-21T21:26:35.389Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Shrey Verified Updated",
+      "email": "final_verified_1787347950454@example.com",
+      "phone": "9876543210",
+      "address": "Surendranagar Main Rd",
+      "city": "Surendranagar",
+      "pin": "363020",
+      "passwordHash": "$2a$10$epIF.duaZ4WA5MUbWhlZO.eHs9Y91JQ80ECr48jxq5Mo0t9sfj7pG",
+      "createdAt": "2026-08-21T21:32:30.645Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 101,
+          "name": "Crystal UV Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "productId": 2,
+      "userId": 9,
+      "userName": "Shrey Verified Updated",
+      "rating": 5,
+      "comment": "Exceptional resin clarity and bubble release! 5/5 stars.",
+      "createdAt": "2026-08-21T21:32:31.251Z"
+    }
+  ],
   "wishlistSubscriptions": [],
-  "coupons": [],
+  "coupons": [
+    {
+      "id": 1,
+      "code": "INSPECT10",
+      "type": "percent",
+      "value": 10,
+      "minPurchase": 500,
+      "isActive": true,
+      "createdAt": "2026-08-21T21:07:27.265Z"
+    }
+  ],
   "analytics": {
     "totalVisitors": 1,
     "newVisitors": 0,
@@ -67,7 +477,92 @@
     ]
   },
   "blockedIps": [],
-  "securityLogs": [],
+  "securityLogs": [
+    {
+      "timestamp": "2026-08-21T21:07:13.150Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787346432247@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:08:19.474Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787346498626@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:11:56.425Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787346714681@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:12:25.259Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787346744222@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:13:44.807Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787346824140@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:26:15.261Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787347574400@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:26:35.810Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: qa_test_1787347594925@example.com",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    }
+  ],
   "loginLogs": [
     {
       "timestamp": "2026-08-21T17:55:46.242Z",
@@ -84,6 +579,102 @@
       "ip": "127.0.0.1",
       "location": "Mumbai, MH, IN",
       "status": "Success"
+    },
+    {
+      "timestamp": "2026-08-21T21:07:12.908Z",
+      "email": "qa_test_1787346432247@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:08:19.313Z",
+      "email": "qa_test_1787346498626@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:11:55.999Z",
+      "email": "qa_test_1787346714681@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:12:24.885Z",
+      "email": "qa_test_1787346744222@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:13:44.668Z",
+      "email": "qa_test_1787346824140@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:26:15.074Z",
+      "email": "qa_test_1787347574400@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:26:35.634Z",
+      "email": "qa_test_1787347594925@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-08-21T21:32:30.850Z",
+      "email": "final_verified_1787347950454@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
     }
   ]
 }

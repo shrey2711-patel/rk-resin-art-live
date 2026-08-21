@@ -559,6 +559,7 @@
           <button class="atab" data-tab="reviews">⭐ Reviews</button>
           <button class="atab" data-tab="coupons">🎟️ Coupons</button>
           <button class="atab" data-tab="analytics">📊 Analytics</button>
+          <button class="atab" data-tab="users">👥 Users</button>
         </div>
         <div class="admin-tab-body">
 
@@ -738,6 +739,39 @@
 
               <button class="admin-save-btn" id="saveSettingsBtn">Save Settings</button>
               <div class="admin-ok" id="settingsOk">✅ Settings saved!</div>
+            </div>
+
+            <!-- Admin Password Security Card -->
+            <div class="admin-form-card" style="margin-top: 24px;">
+              <div class="afc-title">🔒 Change Admin Master Password</div>
+              <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 14px;">Keep your master admin credentials secure. Password changes take effect immediately.</div>
+              <div class="form-row-3">
+                <div class="form-field">
+                  <label>Current Password</label>
+                  <div style="position: relative;">
+                    <input type="password" class="admin-input" id="apCurrentPw" placeholder="Current master password" style="padding-right: 36px;">
+                    <button type="button" id="toggleApCurrentPw" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.85rem;">👁</button>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label>New Password (min 6 chars)</label>
+                  <div style="position: relative;">
+                    <input type="password" class="admin-input" id="apNewPw" placeholder="New secure password" style="padding-right: 36px;">
+                    <button type="button" id="toggleApNewPw" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.85rem;">👁</button>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label>Confirm New Password</label>
+                  <div style="position: relative;">
+                    <input type="password" class="admin-input" id="apConfirmPw" placeholder="Repeat new password" style="padding-right: 36px;">
+                    <button type="button" id="toggleApConfirmPw" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 0.85rem;">👁</button>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 14px;">
+                <button type="button" class="admin-save-btn" id="changeAdminPwBtn">🔒 Update Admin Password</button>
+              </div>
+              <div class="admin-ok" id="adminPwOk" style="display:none; margin-top:10px;"></div>
             </div>
           </div>
 
@@ -1032,8 +1066,50 @@
           <!-- ANALYTICS -->
           <div class="tab-pane" id="atab-analytics">
             <div class="admin-section-head">
-              Store Activity Dashboard
-              <button class="refresh-btn" id="refreshAnalyticsBtn" style="margin-left: auto;">Refresh</button>
+              Store Activity & Financial Dashboard
+              <button class="refresh-btn" id="refreshAnalyticsBtn" style="margin-left: auto;">↻ Refresh</button>
+            </div>
+
+            <!-- Financial KPIs -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+              <div class="admin-form-card" style="margin: 0; padding: 18px; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(16,185,129,0.06)); border: 1.5px solid var(--border); border-radius: 12px;">
+                <div>
+                  <div style="font-size: 0.76rem; font-weight: 800; color: var(--p); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Total Gross Revenue</div>
+                  <div id="statTotalRevenue" style="font-size: 1.85rem; font-weight: 900; color: var(--ink);">₹0</div>
+                </div>
+                <div style="font-size: 2rem;">💰</div>
+              </div>
+              <div class="admin-form-card" style="margin: 0; padding: 18px; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px;">
+                <div>
+                  <div style="font-size: 0.76rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Total Orders Placed</div>
+                  <div id="statTotalOrders" style="font-size: 1.85rem; font-weight: 900; color: var(--ink);">0</div>
+                </div>
+                <div style="font-size: 2rem;">📦</div>
+              </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px;">
+              <div class="admin-form-card" style="margin: 0; position: relative;">
+                <div class="afc-title">📈 7-Day Sales Trend</div>
+                <div id="salesTrendChartContainer" style="height: 240px; position: relative; display: flex; align-items: center; justify-content: center;">
+                  <div style="color: var(--muted); font-size: 0.84rem;">Loading sales trend...</div>
+                </div>
+              </div>
+              <div class="admin-form-card" style="margin: 0; position: relative;">
+                <div class="afc-title">🍩 Category Distribution</div>
+                <div id="categoryChartContainer" style="height: 240px; position: relative; display: flex; align-items: center; justify-content: center;">
+                  <div style="color: var(--muted); font-size: 0.84rem;">Loading categories...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Products Sold Card -->
+            <div class="admin-form-card" style="margin: 0; margin-bottom: 24px;">
+              <div class="afc-title">🔥 Top Selling Products</div>
+              <div id="topProductsList" style="padding: 6px 0;">
+                <div style="color: var(--muted); font-size: 0.84rem;">Loading top products...</div>
+              </div>
             </div>
             
             <!-- Summary stats cards -->
@@ -1178,7 +1254,70 @@
             </div>
           </div>
 
+          <!-- USERS TAB -->
+          <div class="tab-pane" id="atab-users">
+            <div class="admin-section-head" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>Registered Customer Accounts</span>
+                <span id="usersCountBadge" style="font-size:0.8rem; background:var(--pl); color:var(--p); padding:3px 10px; border-radius:99px; font-weight:800;">0 users</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <input type="text" class="admin-input" id="usersSearchInput" placeholder="Search by name, email, phone..." style="min-width:220px; font-size:0.82rem; padding:6px 12px;">
+                <button class="refresh-btn" id="refreshUsersBtn">↻ Refresh</button>
+              </div>
+            </div>
+            <div id="adminUserList" class="admin-list" style="max-height:600px;"></div>
+          </div>
+
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Edit Modal Overlay -->
+  <div class="modal-overlay" id="userEditModalOverlay" style="display:none;">
+    <div class="admin-form-card" style="max-width:550px; width:92%; margin:auto; background:var(--card); border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.3); border:1.5px solid var(--border);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+        <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:var(--ink);">✏️ Edit Customer Profile</h3>
+        <button type="button" id="closeUserEditModal" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--muted);">&times;</button>
+      </div>
+      <input type="hidden" id="editUserId">
+      <div class="form-row-2">
+        <div class="form-field"><label>Full Name</label><input class="admin-input" id="euName" placeholder="Full name"></div>
+        <div class="form-field"><label>Email (Read-only)</label><input class="admin-input" id="euEmail" readonly style="background:var(--bg); opacity:0.8;"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-field"><label>Phone Number</label><input class="admin-input" id="euPhone" placeholder="Mobile phone"></div>
+        <div class="form-field"><label>City</label><input class="admin-input" id="euCity" placeholder="City"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-field"><label>Delivery Address</label><input class="admin-input" id="euAddress" placeholder="Address"></div>
+        <div class="form-field"><label>PIN Code</label><input class="admin-input" id="euPin" placeholder="PIN Code"></div>
+      </div>
+      <div class="form-field" style="margin-top:10px;">
+        <label>Set / Reset Password (Optional)</label>
+        <div style="position:relative;">
+          <input type="password" class="admin-input" id="euPassword" placeholder="Leave blank to keep current password" style="padding-right:36px;">
+          <button type="button" id="toggleEuPw" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:0.85rem;">👁</button>
+        </div>
+      </div>
+      <div id="userEditMsg" style="font-size:0.82rem; margin-top:8px;"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+        <button type="button" class="admin-cancel-btn" id="cancelUserEditBtn" style="padding:8px 16px; border-radius:8px; cursor:pointer;">Cancel</button>
+        <button type="button" class="admin-save-btn" id="saveUserEditBtn" style="padding:8px 20px; border-radius:8px; cursor:pointer;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Delete Confirmation Modal Overlay -->
+  <div class="modal-overlay" id="userDeleteModalOverlay" style="display:none;">
+    <div class="admin-form-card" style="max-width:440px; width:92%; margin:auto; background:var(--card); border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.3); border:1.5px solid var(--border); text-align:center; padding:24px;">
+      <div style="font-size:2.4rem; margin-bottom:10px;">⚠️</div>
+      <h3 style="margin:0 0 8px; font-size:1.2rem; font-weight:800; color:var(--ink);">Confirm Deletion</h3>
+      <div id="userDeleteMsg" style="font-size:0.88rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Are you sure you want to permanently delete this customer account?</div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" class="admin-cancel-btn" id="cancelUserDeleteBtn" style="padding:8px 18px; border-radius:8px; cursor:pointer;">Cancel</button>
+        <button type="button" class="admin-save-btn" id="confirmUserDeleteBtn" style="background:var(--red); color:#fff; border:none; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:800;">🗑️ Delete</button>
       </div>
     </div>
   </div>

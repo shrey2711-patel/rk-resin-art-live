@@ -1835,6 +1835,19 @@ function backupDatabaseSnapshot(data, reason = 'write') {
     const safeReason = String(reason).replace(/[^a-z0-9-]/gi, '-').toLowerCase();
     const backupPath = path.join(DB_BACKUP_DIR, `db-${safeReason}-${timestamp}.json`);
     fs.writeFileSync(backupPath, JSON.stringify(data, null, 2));
+
+    // Keep only the 5 most recent backup files to prevent disk clutter
+    const files = fs.readdirSync(DB_BACKUP_DIR)
+      .filter(f => f.startsWith('db-') && f.endsWith('.json'))
+      .map(f => ({ name: f, time: fs.statSync(path.join(DB_BACKUP_DIR, f)).mtime.getTime() }))
+      .sort((a, b) => b.time - a.time);
+
+    if (files.length > 5) {
+      files.slice(5).forEach(f => {
+        try { fs.unlinkSync(path.join(DB_BACKUP_DIR, f.name)); } catch (e) {}
+      });
+    }
+
     return backupPath;
   } catch (err) {
     console.error('Failed to create DB backup:', err.message);
@@ -1960,26 +1973,26 @@ function readDB() {
 }
 
 function writeDB(data) {
+  // 1. Safety check: warn if products were accidentally wiped
   try {
     if (fs.existsSync(DB_PATH)) {
       const previousData = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
       const previousProducts = Array.isArray(previousData.products) ? previousData.products.length : 0;
       const nextProducts = Array.isArray(data.products) ? data.products.length : 0;
       if (previousProducts > 0 && nextProducts === 0) {
-        const backupPath = backupDatabaseSnapshot(previousData, 'before-empty-products');
-        console.warn(`Product list is being written as empty. Previous DB backup saved: ${backupPath || 'backup failed'}`);
-      } else if (previousProducts !== nextProducts || nextProducts > 0) {
-        backupDatabaseSnapshot(previousData, 'before-write');
+        console.warn('⚠️ WARNING: Product list is being written as empty.');
       }
     }
   } catch (err) {
-    console.error('Could not create pre-write DB backup:', err.message);
+    // Non-critical check
   }
 
-  // 1. Crash-safe atomic local write (write to temp file then renameSync to prevent zero-byte corruption)
-  const tempPath = DB_PATH + '.tmp.' + Date.now();
-  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
-  fs.renameSync(tempPath, DB_PATH);
+  // 1. Direct local file write (Windows/OneDrive safe)
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error('❌ Failed to write local DB file:', err.message);
+  }
 
   // 2. Queue background push to Firebase to prevent race conditions
   triggerFirebaseSync(data);
@@ -2047,7 +2060,7 @@ function validatePromoCode(code, subtotal) {
 
   // Calculate discount
   let discount = 0;
-  if (coupon.type === 'percentage') {
+  if (coupon.type === 'percentage' || coupon.type === 'percent') {
     discount = Math.round((subtotal * Number(coupon.value)) / 100);
   } else {
     discount = Number(coupon.value);
@@ -2581,7 +2594,8 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   writeDB(db);
   const { passwordHash, cart, passwordPlain, ...safe } = db.users[idx];
   const orderCount = (db.orders || []).filter(o => o.userId === userId).length;
-  res.json({ user: { ...safe, orderCount, hasPassword: true } });
+  const userPayload = { ...safe, orderCount, hasPassword: true };
+  res.json({ success: true, user: userPayload, ...userPayload });
 });
 
 // DELETE user by id (admin only)
@@ -3883,9 +3897,26 @@ app.get('/sitemap.xml', (req, res) => {
   }
 });
 
-// Serve index.html for all other routes (SPA)
+// Catch unhandled API routes with clean JSON 404
+app.all('/api/*', (req, res) => {
+  res.status(404).json({ error: `API endpoint '${req.method} ${req.path}' not found` });
+});
+
+// Serve index.html for all other frontend routes (SPA)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Global Express error handler (Catches JSON parse errors, Multer errors, etc.)
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Malformed JSON payload in request body' });
+  }
+  if (err.name === 'MulterError') {
+    return res.status(400).json({ error: `File upload error: ${err.message}` });
+  }
+  console.error('💥 Uncaught server error:', err);
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
 function validateEnvironment() {
