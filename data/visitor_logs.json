@@ -1488,5 +1488,25 @@
     "status": 200,
     "duration": "78ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T21:00:49.921Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "34ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T21:00:49.925Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "28ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

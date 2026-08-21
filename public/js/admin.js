@@ -740,13 +740,21 @@ const Admin = {
     const isMulti = document.getElementById('pfMultiVariant')?.checked;
     const isTracking = this.data.settings && this.data.settings.trackStock !== false;
 
+    // Always read product images from the top upload slots
+    const pImg1 = document.getElementById('pfImageUrl')?.value.trim() || '';
+    const pImg2 = document.getElementById('pfImageUrl2')?.value.trim() || '';
+    const pImg3 = document.getElementById('pfImageUrl3')?.value.trim() || '';
+    const mainImages = [pImg1, pImg2, pImg3].filter(Boolean);
+    const mainImageUrl = mainImages[0] || '';
+
     let price = 0;
     let originalPrice = null;
     let stock = 0;
-    let imageUrl = '';
-    let images = [];
+    let imageUrl = mainImageUrl;
+    let images = mainImages;
     let variantLabel = null;
     let variants = null;
+    let hasCommonVariantImages = false;
 
     if (!isMulti) {
       // Simple Product Mode
@@ -763,12 +771,6 @@ const Admin = {
         stock = parseInt(document.getElementById('pfStockStatus').value) || 1;
       }
 
-      const pImg1 = document.getElementById('pfImageUrl')?.value.trim() || '';
-      const pImg2 = document.getElementById('pfImageUrl2')?.value.trim() || '';
-      const pImg3 = document.getElementById('pfImageUrl3')?.value.trim() || '';
-      images = [pImg1, pImg2, pImg3].filter(Boolean);
-      imageUrl = images[0] || '';
-
       if (images.some(url => url.startsWith('blob:'))) {
         showToast('Please wait for product images to finish uploading!', 'error');
         return;
@@ -784,6 +786,9 @@ const Admin = {
         return;
       }
 
+      const isCommon = Boolean(document.getElementById('pfCommonImages')?.checked);
+      hasCommonVariantImages = isCommon;
+
       const variantRows = document.querySelectorAll('.admin-variant-row');
       const vrList = [];
       variantRows.forEach(row => {
@@ -796,17 +801,28 @@ const Admin = {
           stk = parseInt(row.querySelector('.vr-stock-value')?.value || '1');
         }
 
-        const vImg1 = row.querySelector('.vr-image-1')?.value.trim() || '';
-        const vImg2 = row.querySelector('.vr-image-2')?.value.trim() || '';
-        const vImg3 = row.querySelector('.vr-image-3')?.value.trim() || '';
-        const vImages = [vImg1, vImg2, vImg3].filter(Boolean);
+        let vImages = [];
+        let vImgUrl = null;
+
+        if (isCommon) {
+          // In common image mode, copy the top common photos to each variant
+          vImages = [...mainImages];
+          vImgUrl = mainImageUrl || null;
+        } else {
+          // In individual photo mode, read photos from variant slots
+          const vImg1 = row.querySelector('.vr-image-1')?.value.trim() || '';
+          const vImg2 = row.querySelector('.vr-image-2')?.value.trim() || '';
+          const vImg3 = row.querySelector('.vr-image-3')?.value.trim() || '';
+          vImages = [vImg1, vImg2, vImg3].filter(Boolean);
+          vImgUrl = vImages[0] || mainImageUrl || null;
+        }
 
         if (lbl) {
           vrList.push({
             label: lbl,
             price: isNaN(prc) ? null : prc,
             stock: isNaN(stk) ? 0 : stk,
-            imageUrl: vImages[0] || null,
+            imageUrl: vImgUrl,
             images: vImages
           });
         }
@@ -817,11 +833,19 @@ const Admin = {
         return;
       }
 
-      // Check if any variant image is still uploading (blob:)
-      const stillUploading = vrList.some(v => (v.images || []).some(url => url && url.startsWith('blob:')));
-      if (stillUploading) {
-        showToast('Please wait for all variant images to finish uploading!', 'error');
-        return;
+      if (isCommon) {
+        imageUrl = mainImageUrl;
+        images = mainImages;
+      } else {
+        // Check if any variant image is still uploading (blob:)
+        const stillUploading = vrList.some(v => (v.images || []).some(url => url && url.startsWith('blob:')));
+        if (stillUploading) {
+          showToast('Please wait for all variant images to finish uploading!', 'error');
+          return;
+        }
+        const firstVariantImgs = vrList[0].images && vrList[0].images.length > 0 ? vrList[0].images : mainImages;
+        imageUrl = vrList[0].imageUrl || mainImageUrl || '';
+        images = firstVariantImgs;
       }
 
       const firstPrice = vrList[0].price;
@@ -836,8 +860,6 @@ const Admin = {
       });
       originalPrice = null;
       stock = vrList.reduce((sum, v) => sum + (v.stock || 0), 0);
-      imageUrl = vrList[0].imageUrl || '';
-      images = vrList[0].images || [];
       variants = vrList;
     }
 
@@ -857,6 +879,7 @@ const Admin = {
       imgRatio,
       variantLabel,
       variants,
+      hasCommonVariantImages,
       unit: document.getElementById('pfUnit')?.value.trim() || '',
     };
 

@@ -5,41 +5,7 @@
   "banners": [],
   "navLinks": [],
   "categories": [],
-  "products": [
-    {
-      "id": 1,
-      "stock": 0,
-      "name": "UV RESIN",
-      "category": "Resin",
-      "price": 280,
-      "imageUrl": "https://i.ibb.co/6PZkVrP/uv-resin.jpg",
-      "images": [
-        "https://i.ibb.co/6PZkVrP/uv-resin.jpg"
-      ],
-      "variantLabel": "Weight",
-      "hasCommonVariantImages": true,
-      "variants": [
-        {
-          "label": "50g",
-          "price": 280,
-          "stock": 10,
-          "imageUrl": "https://i.ibb.co/6PZkVrP/uv-resin.jpg",
-          "images": [
-            "https://i.ibb.co/6PZkVrP/uv-resin.jpg"
-          ]
-        },
-        {
-          "label": "100g",
-          "price": 499,
-          "stock": 8,
-          "imageUrl": "https://i.ibb.co/6PZkVrP/uv-resin.jpg",
-          "images": [
-            "https://i.ibb.co/6PZkVrP/uv-resin.jpg"
-          ]
-        }
-      ]
-    }
-  ],
+  "products": [],
   "orders": [],
   "cart": [],
   "users": [],
