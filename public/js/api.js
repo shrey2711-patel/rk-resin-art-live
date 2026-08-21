@@ -227,11 +227,13 @@ const API = {
   addNav: (data) => API.post('/api/admin/nav', data, true),
   updateNav: (id, data) => API.put(`/api/admin/nav/${id}`, data, true),
   deleteNav: (id) => API.delete(`/api/admin/nav/${id}`, true),
+  reorderNav: (orderedIds) => API.put('/api/admin/nav/reorder', { orderedIds }, true),
 
   // ── Admin categories ──────────────────────────────────────
   addCategory: (data) => API.post('/api/admin/categories', data, true),
   updateCategory: (id, data) => API.put(`/api/admin/categories/${id}`, data, true),
   deleteCategory: (id) => API.delete(`/api/admin/categories/${id}`, true),
+  reorderCategories: (orderedIds) => API.put('/api/admin/categories/reorder', { orderedIds }, true),
   // ── Admin products ────────────────────────────────────────
   addProduct: (data) => API.post('/api/admin/products', data, true),
   updateProduct: (id, data) => API.put(`/api/admin/products/${id}`, data, true),

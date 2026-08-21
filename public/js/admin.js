@@ -1297,19 +1297,26 @@ const Admin = {
   renderNav() {
     const list = document.getElementById('adminNavList');
     if (!list) return;
+
     list.innerHTML = this.data.nav.map(n => `
-      <div class="admin-list-item">
+      <div class="admin-list-item draggable-item" draggable="true" data-nid="${n.id}" style="cursor: default;">
+        <div class="drag-handle" title="Hold and drag to reorder position" style="cursor: grab; padding: 6px 8px; color: var(--muted); font-size: 1.25rem; display: flex; align-items: center; user-select: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>
+        </div>
         <div class="ali-dot" style="background:${n.featured ? 'var(--red)' : 'var(--pl)'}"></div>
         <div class="ali-info">
-          <div class="ali-name">${n.label}</div>
+          <div class="ali-name" style="font-weight:700;">${n.label}</div>
           <div class="ali-sub">Row ${n.row}${n.featured ? ' · Featured' : ''}</div>
         </div>
-        <div class="ali-actions">
+        <div class="ali-actions" style="display:flex; align-items:center; gap:6px;">
+          <button class="ali-reorder-btn" data-nav-up="${n.id}" title="Move Up" style="padding:4px 8px; font-size:0.75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); cursor:pointer;">▲</button>
+          <button class="ali-reorder-btn" data-nav-down="${n.id}" title="Move Down" style="padding:4px 8px; font-size:0.75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); cursor:pointer;">▼</button>
           <button class="ali-edit" data-edit-nid="${n.id}">Edit</button>
           <button class="ali-del" data-nid="${n.id}">Delete</button>
         </div>
       </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No links yet.</div>';
 
+    // Edit and Delete
     list.querySelectorAll('[data-edit-nid]').forEach(btn => {
       btn.onclick = () => {
         const item = this.data.nav.find(row => row.id === Number(btn.dataset.editNid));
@@ -1317,13 +1324,54 @@ const Admin = {
       };
     });
 
-    list.querySelectorAll('[data-nid]').forEach(btn => {
+    list.querySelectorAll('.ali-del[data-nid]').forEach(btn => {
       btn.onclick = async () => {
+        if (!confirm('Delete this navigation link?')) return;
         await API.deleteNav(Number(btn.dataset.nid));
         await this.loadAll();
         this.renderNav();
         App.loadNav();
       };
+    });
+
+    // Move Up / Move Down buttons
+    list.querySelectorAll('[data-nav-up]').forEach(btn => {
+      btn.onclick = async () => {
+        const id = Number(btn.dataset.navUp);
+        const idx = this.data.nav.findIndex(n => n.id === id);
+        if (idx > 0) {
+          const item = this.data.nav.splice(idx, 1)[0];
+          this.data.nav.splice(idx - 1, 0, item);
+          const orderedIds = this.data.nav.map(n => n.id);
+          this.renderNav();
+          await API.reorderNav(orderedIds);
+          App.loadNav();
+          showToast('Nav link position updated!', 'success');
+        }
+      };
+    });
+
+    list.querySelectorAll('[data-nav-down]').forEach(btn => {
+      btn.onclick = async () => {
+        const id = Number(btn.dataset.navDown);
+        const idx = this.data.nav.findIndex(n => n.id === id);
+        if (idx !== -1 && idx < this.data.nav.length - 1) {
+          const item = this.data.nav.splice(idx, 1)[0];
+          this.data.nav.splice(idx + 1, 0, item);
+          const orderedIds = this.data.nav.map(n => n.id);
+          this.renderNav();
+          await API.reorderNav(orderedIds);
+          App.loadNav();
+          showToast('Nav link position updated!', 'success');
+        }
+      };
+    });
+
+    // Drag & Drop event bindings
+    Admin.bindDragAndDropReordering(list, this.data.nav, async (orderedIds) => {
+      await API.reorderNav(orderedIds);
+      App.loadNav();
+      showToast('Nav link position updated!', 'success');
     });
   },
 
@@ -1331,18 +1379,25 @@ const Admin = {
   renderCategories() {
     const list = document.getElementById('adminCatList');
     if (!list) return;
+
     list.innerHTML = this.data.categories.map(c => `
-      <div class="admin-list-item">
-        <div class="ali-dot" style="background:${c.color}"></div>
-        <div class="ali-info">
-          <div class="ali-name">${c.emoji} ${c.name}</div>
+      <div class="admin-list-item draggable-item" draggable="true" data-cat-id="${c.id}" style="cursor: default;">
+        <div class="drag-handle" title="Hold and drag to reorder position (first, last, or any position)" style="cursor: grab; padding: 6px 8px; color: var(--muted); font-size: 1.25rem; display: flex; align-items: center; user-select: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>
         </div>
-        <div class="ali-actions">
+        <div class="ali-dot" style="background:${c.color || 'var(--pl)'}"></div>
+        <div class="ali-info">
+          <div class="ali-name" style="font-weight:700;">${c.emoji} ${c.name}</div>
+        </div>
+        <div class="ali-actions" style="display:flex; align-items:center; gap:6px;">
+          <button class="ali-reorder-btn" data-cat-up="${c.id}" title="Move Up" style="padding:4px 8px; font-size:0.75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); cursor:pointer;">▲</button>
+          <button class="ali-reorder-btn" data-cat-down="${c.id}" title="Move Down" style="padding:4px 8px; font-size:0.75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); cursor:pointer;">▼</button>
           <button class="ali-edit" data-edit-cid="${c.id}">Edit</button>
           <button class="ali-del" data-cid="${c.id}">Delete</button>
         </div>
       </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No categories.</div>';
 
+    // Edit and Delete
     list.querySelectorAll('[data-edit-cid]').forEach(btn => {
       btn.onclick = () => {
         const category = this.data.categories.find(item => item.id === Number(btn.dataset.editCid));
@@ -1350,15 +1405,136 @@ const Admin = {
       };
     });
 
-    list.querySelectorAll('[data-cid]').forEach(btn => {
+    list.querySelectorAll('.ali-del[data-cid]').forEach(btn => {
       btn.onclick = async () => {
+        if (!confirm('Delete this category?')) return;
         await API.deleteCategory(Number(btn.dataset.cid));
         await this.loadAll();
         this.renderCategories();
         App.loadCategories();
       };
     });
-    this.populateProdCatSelect();
+
+    // Move Up / Move Down buttons
+    list.querySelectorAll('[data-cat-up]').forEach(btn => {
+      btn.onclick = async () => {
+        const id = Number(btn.dataset.catUp);
+        const idx = this.data.categories.findIndex(c => c.id === id);
+        if (idx > 0) {
+          const item = this.data.categories.splice(idx, 1)[0];
+          this.data.categories.splice(idx - 1, 0, item);
+          const orderedIds = this.data.categories.map(c => c.id);
+          this.renderCategories();
+          await API.reorderCategories(orderedIds);
+          App.loadCategories();
+          showToast('Category position updated!', 'success');
+        }
+      };
+    });
+
+    list.querySelectorAll('[data-cat-down]').forEach(btn => {
+      btn.onclick = async () => {
+        const id = Number(btn.dataset.catDown);
+        const idx = this.data.categories.findIndex(c => c.id === id);
+        if (idx !== -1 && idx < this.data.categories.length - 1) {
+          const item = this.data.categories.splice(idx, 1)[0];
+          this.data.categories.splice(idx + 1, 0, item);
+          const orderedIds = this.data.categories.map(c => c.id);
+          this.renderCategories();
+          await API.reorderCategories(orderedIds);
+          App.loadCategories();
+          showToast('Category position updated!', 'success');
+        }
+      };
+    });
+
+    // Drag & Drop event bindings
+    Admin.bindDragAndDropReordering(list, this.data.categories, async (orderedIds) => {
+      await API.reorderCategories(orderedIds);
+      App.loadCategories();
+      showToast('Category position updated!', 'success');
+    });
+  },
+
+  bindDragAndDropReordering(containerEl, dataArray, onSaveCallback) {
+    if (!containerEl) return;
+    let draggedItem = null;
+    let draggedId = null;
+
+    const items = containerEl.querySelectorAll('.draggable-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        draggedItem = item;
+        draggedId = Number(item.dataset.catId || item.dataset.nid);
+        item.classList.add('is-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(draggedId));
+      });
+
+      item.addEventListener('dragend', () => {
+        if (draggedItem) draggedItem.classList.remove('is-dragging');
+        items.forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom'));
+        draggedItem = null;
+        draggedId = null;
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (!draggedItem || draggedItem === item) return;
+
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+          item.classList.add('drag-over-top');
+          item.classList.remove('drag-over-bottom');
+        } else {
+          item.classList.add('drag-over-bottom');
+          item.classList.remove('drag-over-top');
+        }
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+
+      item.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        items.forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom'));
+        if (!draggedItem || draggedItem === item) return;
+
+        const targetId = Number(item.dataset.catId || item.dataset.nid);
+        const fromIdx = dataArray.findIndex(x => x.id === draggedId);
+        let toIdx = dataArray.findIndex(x => x.id === targetId);
+
+        if (fromIdx === -1 || toIdx === -1) return;
+
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const placeAfter = (e.clientY >= midY);
+
+        // Move element in data array
+        const [moved] = dataArray.splice(fromIdx, 1);
+        toIdx = dataArray.findIndex(x => x.id === targetId);
+        if (placeAfter) {
+          dataArray.splice(toIdx + 1, 0, moved);
+        } else {
+          dataArray.splice(toIdx, 0, moved);
+        }
+
+        const orderedIds = dataArray.map(x => x.id);
+
+        if (item.dataset.catId) {
+          Admin.renderCategories();
+        } else if (item.dataset.nid) {
+          Admin.renderNav();
+        }
+
+        if (typeof onSaveCallback === 'function') {
+          await onSaveCallback(orderedIds);
+        }
+      });
+    });
   },
 
   populateProdCatSelect() {

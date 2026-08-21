@@ -1308,5 +1308,85 @@
     "status": 403,
     "duration": "13ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:28:51.280Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "32ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:28:51.286Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "29ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:28:51.307Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/nav/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 404,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:28:51.311Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/nav/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 404,
+    "duration": "8ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:29:34.861Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "25ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:29:34.865Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "23ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:29:34.886Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/nav/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:29:34.890Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/nav/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "13ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

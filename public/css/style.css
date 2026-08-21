@@ -4923,3 +4923,44 @@ body {
     gap: 12px;
   }
 }
+
+
+/* ─── Admin Drag & Drop Position Reordering ──────────────── */
+.draggable-item {
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  user-select: none;
+}
+.draggable-item.is-dragging {
+  opacity: 0.35;
+  background: var(--pl) !important;
+  border: 1.5px dashed var(--p) !important;
+  transform: scale(0.98);
+}
+.draggable-item.drag-over-top {
+  border-top: 3px solid var(--p) !important;
+}
+.draggable-item.drag-over-bottom {
+  border-bottom: 3px solid var(--p) !important;
+}
+.drag-handle {
+  cursor: grab !important;
+  cursor: -webkit-grab !important;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.drag-handle:hover {
+  color: var(--p) !important;
+  transform: scale(1.15);
+}
+.drag-handle:active, .is-dragging .drag-handle {
+  cursor: grabbing !important;
+  cursor: -webkit-grabbing !important;
+}
+.ali-reorder-btn {
+  transition: all 0.18s ease;
+}
+.ali-reorder-btn:hover {
+  background: var(--p) !important;
+  color: #ffffff !important;
+  border-color: var(--p) !important;
+}

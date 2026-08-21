@@ -3595,6 +3595,26 @@ app.delete('/api/admin/banners/:id', requireAdmin, (req, res) => {
 });
 
 // NAV CRUD
+app.put('/api/admin/nav/reorder', requireAdmin, (req, res) => {
+  const db = readDB();
+  const { orderedIds } = req.body;
+  if (!Array.isArray(orderedIds)) return res.status(400).json({ error: 'orderedIds must be an array' });
+  
+  const navMap = new Map((db.navLinks || []).map(n => [n.id, n]));
+  const newOrder = [];
+  orderedIds.forEach(id => {
+    if (navMap.has(Number(id))) {
+      newOrder.push(navMap.get(Number(id)));
+      navMap.delete(Number(id));
+    }
+  });
+  for (const remaining of navMap.values()) {
+    newOrder.push(remaining);
+  }
+  db.navLinks = newOrder;
+  writeDB(db);
+  res.json({ success: true, navLinks: db.navLinks });
+});
 app.post('/api/admin/nav', requireAdmin, (req, res) => {
   const db = readDB();
   const link = { id: nextId(db.navLinks), ...req.body };
@@ -3618,6 +3638,26 @@ app.delete('/api/admin/nav/:id', requireAdmin, (req, res) => {
 });
 
 // CATEGORIES CRUD
+app.put('/api/admin/categories/reorder', requireAdmin, (req, res) => {
+  const db = readDB();
+  const { orderedIds } = req.body;
+  if (!Array.isArray(orderedIds)) return res.status(400).json({ error: 'orderedIds must be an array' });
+  
+  const catMap = new Map((db.categories || []).map(c => [c.id, c]));
+  const newOrder = [];
+  orderedIds.forEach(id => {
+    if (catMap.has(Number(id))) {
+      newOrder.push(catMap.get(Number(id)));
+      catMap.delete(Number(id));
+    }
+  });
+  for (const remaining of catMap.values()) {
+    newOrder.push(remaining);
+  }
+  db.categories = newOrder;
+  writeDB(db);
+  res.json({ success: true, categories: db.categories });
+});
 app.post('/api/admin/categories', requireAdmin, (req, res) => {
   const db = readDB();
   const cat = { id: nextId(db.categories), ...req.body };
