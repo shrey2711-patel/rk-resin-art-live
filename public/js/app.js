@@ -1705,7 +1705,7 @@ const App = {
       const totalStock = (p.variants && p.variants.length > 0)
         ? p.variants.reduce((sum, v) => sum + (v.stock !== undefined ? Number(v.stock) : 0), 0)
         : (p.stock !== undefined ? Number(p.stock) : 0);
-      const stockHTML = totalStock > 0 && totalStock <= 10 ? `<div class="stock-low">⚡ Only ${totalStock} left!</div>` : '';
+      const stockHTML = '';
       const avgRating = p._avgRating || 0;
       const ratingCount = p._ratingCount || 0;
       const starsHTML = avgRating > 0
@@ -1894,9 +1894,7 @@ const App = {
 
     const stockBadge = isOutOfStock
       ? `<span class="pdp-stock-badge oos">❌ Out of Stock</span>`
-      : isLowStock
-        ? `<span class="pdp-stock-badge low">⚡ Only ${initStock} left!</span>`
-        : `<span class="pdp-stock-badge in">${this.state.trackStock ? `✅ In Stock (${initStock} units)` : '✅ In Stock'}</span>`;
+      : `<span class="pdp-stock-badge in">✅ In Stock</span>`;
 
     const descHTML = (prod.description && prod.description.trim())
       ? `<div class="pdp-desc">${parseMarkdown(prod.description)}</div>`
@@ -2193,12 +2191,9 @@ const App = {
           const vStock = selectedVariant.stock !== undefined ? selectedVariant.stock : 0;
 
           if (stockEl) {
-            const vLow = vStock > 0 && vStock <= 5;
             stockEl.innerHTML = vStock === 0
               ? `<span class="pdp-stock-badge oos">❌ Out of Stock</span>`
-              : vLow
-                ? `<span class="pdp-stock-badge low">⚡ Only ${vStock} left!</span>`
-                : `<span class="pdp-stock-badge in">${this.state.trackStock ? `✅ In Stock (${vStock} units)` : '✅ In Stock'}</span>`;
+              : `<span class="pdp-stock-badge in">✅ In Stock</span>`;
           }
           if (addBtn) addBtn.disabled = (vStock === 0);
           if (buyBtn) buyBtn.disabled = (vStock === 0);
@@ -2442,12 +2437,14 @@ const App = {
   bindFooter() {
     document.querySelectorAll('[data-footer-cat]').forEach(btn => {
       btn.onclick = () => {
-        this.filterByCategory(btn.dataset.footerCat);
-        document.getElementById('shopMain').scrollIntoView({ behavior: 'smooth' });
+        const resolved = this.resolveCategoryName(btn.dataset.footerCat);
+        this.filterByCategory(resolved);
       };
     });
-    document.getElementById('footerCartBtn').onclick = () => Cart.openDrawer();
-    document.getElementById('footerAccountBtn').onclick = () => Auth.open();
+    const fCart = document.getElementById('footerCartBtn');
+    if (fCart) fCart.onclick = () => Cart.openDrawer();
+    const fAcc = document.getElementById('footerAccountBtn');
+    if (fAcc) fAcc.onclick = () => Auth.open();
   },
 
   bindMobileNav() {

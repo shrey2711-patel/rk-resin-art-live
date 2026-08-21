@@ -1188,5 +1188,125 @@
     "status": 400,
     "duration": "4ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.644Z",
+    "ip": "127.0.0.1",
+    "url": "/api/products",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "35ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.649Z",
+    "ip": "127.0.0.1",
+    "url": "/api/products",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "16ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.670Z",
+    "ip": "127.0.0.1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.673Z",
+    "ip": "127.0.0.1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.688Z",
+    "ip": "127.0.0.1",
+    "url": "/api/banners",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.691Z",
+    "ip": "127.0.0.1",
+    "url": "/api/banners",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.710Z",
+    "ip": "127.0.0.1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.715Z",
+    "ip": "127.0.0.1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.731Z",
+    "ip": "127.0.0.1",
+    "url": "/api/nav",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.734Z",
+    "ip": "127.0.0.1",
+    "url": "/api/nav",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.767Z",
+    "ip": "127.0.0.1",
+    "url": "/api/security/unblock-me",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 403,
+    "duration": "19ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:16:13.771Z",
+    "ip": "127.0.0.1",
+    "url": "/api/security/unblock-me",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 403,
+    "duration": "13ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

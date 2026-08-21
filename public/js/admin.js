@@ -2213,6 +2213,127 @@ if (refreshCouponsBtn) {
 }
 
 // ── Admin Analytics & Developer Logs ────────────────────────────
+Admin.renderAnalytics = async function() {
+  try {
+    const data = await API.get('/api/admin/analytics', true);
+    
+    // Render financial statistics and charts
+    const orderStats = data.orderStats || {
+      totalRevenue: 0,
+      orderCount: 0,
+      salesHistory: [],
+      topProducts: [],
+      categoryDistribution: []
+    };
+
+    const revEl = document.getElementById('statTotalRevenue');
+    if (revEl) revEl.textContent = `₹${orderStats.totalRevenue.toLocaleString('en-IN')}`;
+    const ordEl = document.getElementById('statTotalOrders');
+    if (ordEl) ordEl.textContent = orderStats.orderCount;
+
+    // Render sales trend line chart
+    Admin.renderSalesTrendChart(orderStats.salesHistory);
+
+    // Render category donut chart
+    Admin.renderCategoryDonutChart(orderStats.categoryDistribution);
+
+    // Render top selling products progress bars
+    Admin.renderTopProductsList(orderStats.topProducts);
+
+    // Render Blocked IPs
+    const blockedList = document.getElementById('blockedIpsList');
+    if (blockedList) {
+      const ips = data.blockedIps || [];
+      if (!ips.length) {
+        blockedList.innerHTML = '<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked visitors.</td></tr>';
+      } else {
+        blockedList.innerHTML = ips.map(ip => `
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 8px 10px; font-family: monospace; font-weight: 700;">${ip}</td>
+            <td style="padding: 8px 10px; text-align: right;">
+              <button class="unblock-ip-btn" data-ip="${ip}" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; background: #ef4444; color: #fff; border: none; cursor: pointer; font-weight: 700;">Unblock</button>
+            </td>
+          </tr>
+        `).join('');
+
+        blockedList.querySelectorAll('.unblock-ip-btn').forEach(btn => {
+          btn.onclick = async () => {
+            try {
+              await API.post('/api/admin/ip-unblock', { ip: btn.dataset.ip }, true);
+              showToast(`IP ${btn.dataset.ip} unblocked`, 'success');
+              Admin.renderAnalytics();
+            } catch (e) {
+              showToast('Unblock failed: ' + e.message, 'error');
+            }
+          };
+        });
+      }
+    }
+
+    // Render Security Logs
+    const secList = document.getElementById('securityLogsList');
+    if (secList) {
+      const logs = data.securityLogs || [];
+      if (!logs.length) {
+        secList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No risky activity found.</div>';
+      } else {
+        secList.innerHTML = logs.slice(0, 15).map(l => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--surface); border-radius: 6px; font-size: 0.78rem; border: 1px solid var(--border);">
+            <div>
+              <span style="font-weight: 800; color: #ef4444;">${l.type || 'ALERT'}</span>
+              <span style="color: var(--muted); margin-left: 6px;">${l.details || ''}</span>
+            </div>
+            <div style="font-family: monospace; font-size: 0.72rem; color: var(--muted);">${l.ip || ''} &nbsp;|&nbsp; ${l.timestamp ? new Date(l.timestamp).toLocaleTimeString() : ''}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Render Login Activity
+    const loginList = document.getElementById('analyticsLoginHistoryList');
+    if (loginList) {
+      const logins = data.loginLogs || [];
+      if (!logins.length) {
+        loginList.innerHTML = '<tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--muted);">No login activity yet.</td></tr>';
+      } else {
+        loginList.innerHTML = logins.slice(0, 10).map(l => `
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 8px 10px; font-size: 0.78rem; color: var(--muted);">${l.timestamp ? new Date(l.timestamp).toLocaleString('en-IN') : '—'}</td>
+            <td style="padding: 8px 10px; font-weight: 700;">${l.email || 'Admin'}</td>
+            <td style="padding: 8px 10px;"><span style="background: var(--pl); color: var(--p); padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">${l.role || 'Admin'}</span></td>
+            <td style="padding: 8px 10px; font-family: monospace; font-size: 0.78rem;">${l.ip || '—'}</td>
+            <td style="padding: 8px 10px; font-size: 0.78rem; color: var(--muted);">${l.location || '—'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+  } catch (err) {
+    showToast('Failed to load analytics: ' + err.message, 'error');
+  }
+};
+
+// Bind Block IP Button
+const blockIpBtn = document.getElementById('blockIpBtn');
+if (blockIpBtn) {
+  blockIpBtn.onclick = async () => {
+    const input = document.getElementById('blockIpInput');
+    const ip = input ? input.value.trim() : '';
+    if (!ip) {
+      showToast('Please enter an IP address to block', 'error');
+      return;
+    }
+    try {
+      await API.post('/api/admin/ip-block', { ip }, true);
+      if (input) input.value = '';
+      showToast(`IP ${ip} blocked`, 'success');
+      Admin.renderAnalytics();
+    } catch (e) {
+      showToast('Block failed: ' + e.message, 'error');
+    }
+  };
+};
+
 Admin.formatReadableLocation = function(location) {
   if (!location) return 'Location not available';
   if (typeof location === 'string') {
