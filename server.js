@@ -2235,7 +2235,14 @@ app.get('/api/products', (req, res) => {
   const { category, search, badge, sortBy, page = 1, limit = 24 } = req.query;
 
   if (category && category !== 'All') {
-    prods = prods.filter(p => p.category === category);
+    const catLower = category.toLowerCase().trim();
+    prods = prods.filter(p => {
+      if (!p.category) return false;
+      const pCatLower = p.category.toLowerCase().trim();
+      return pCatLower === catLower ||
+             (catLower === 'resin' && pCatLower === 'resins') ||
+             (catLower === 'resins' && pCatLower === 'resin');
+    });
   }
   if (badge) {
     prods = prods.filter(p => p.badge && p.badge.toLowerCase() === badge.toLowerCase());

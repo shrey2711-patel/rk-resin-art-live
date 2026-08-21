@@ -1571,7 +1571,9 @@ const App = {
     // Click: navigate to dedicated collection page via hash
     grid.querySelectorAll('.collection-card').forEach(card => {
       const handler = () => {
-        window.location.hash = `#collection/${encodeURIComponent(card.dataset.coll)}`;
+        const collName = card.dataset.coll;
+        const resolved = this.resolveCategoryName(collName);
+        this.filterByCategory(resolved);
       };
       card.onclick = handler;
       card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') handler(); };
@@ -1595,12 +1597,18 @@ const App = {
       this.renderCatFilters(this.state.categories);
       this.syncNavbarActiveState();
       this.loadProducts();
+      if (window.location.hash !== '') {
+        window.location.hash = '';
+      }
       return;
     }
 
-    window.location.hash = `#collection/${encodeURIComponent(name)}`;
-    const shopMain = document.getElementById('shopMain');
-    if (shopMain) shopMain.scrollIntoView({ behavior: 'smooth' });
+    const hashVal = `#collection/${encodeURIComponent(name)}`;
+    if (window.location.hash === hashVal) {
+      this.showCollectionPage(name);
+    } else {
+      window.location.hash = hashVal;
+    }
   },
 
   // ── Products ──────────────────────────────────────────────
