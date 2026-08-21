@@ -1035,20 +1035,23 @@ const App = {
       d.onclick = () => this.goBanner(Number(d.dataset.bi), banners);
     });
 
-    // Setup robust click-to-zoom that works perfectly on desktops, touchscreen laptops, and standard phones
+    // Setup touch swipe & click-to-zoom for mobile & desktop
     track.querySelectorAll('.banner-slide').forEach((slide, idx) => {
       let touchStartX = 0;
       let touchStartY = 0;
+      let touchEndX = 0;
       let isDrag = false;
 
       slide.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
+        touchEndX = touchStartX;
         isDrag = false;
       }, { passive: true });
 
       slide.addEventListener('touchmove', (e) => {
-        const moveX = Math.abs(e.touches[0].clientX - touchStartX);
+        touchEndX = e.touches[0].clientX;
+        const moveX = Math.abs(touchEndX - touchStartX);
         const moveY = Math.abs(e.touches[0].clientY - touchStartY);
         if (moveX > 10 || moveY > 10) {
           isDrag = true;
