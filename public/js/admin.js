@@ -1904,7 +1904,7 @@ document.getElementById('seedDemoProductsBtn').onclick = async () => {
       name: "Premium Ultra-Clear Fast Cast Resin 1:1",
       price: 899,
       originalPrice: 1199,
-      category: "Resins",
+      category: "Resin",
       emoji: "🧪",
       stock: 50,
       badge: "Hot",

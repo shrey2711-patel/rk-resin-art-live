@@ -1466,7 +1466,7 @@ const App = {
         return cat.name;
       }
     }
-    if (lbl === 'resin') return 'Resins';
+    if (lbl === 'resin' || lbl === 'resins') return 'Resin';
     if (lbl === 'candle material') return 'Candle';
     return label;
   },
@@ -3406,6 +3406,77 @@ function showOk(id) {
   if (!el) return;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+
+// ── Legal & Policy Modal Handlers ───────────────────────────
+function openPolicyModal(policyTab = 'terms') {
+  const overlay = document.getElementById('policyModalOverlay');
+  if (!overlay) return;
+
+  // Set active tab
+  document.querySelectorAll('.policy-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.ptab === policyTab);
+  });
+
+  // Set active pane
+  document.querySelectorAll('.policy-pane').forEach(pane => {
+    pane.classList.toggle('active', pane.id === `pane-${policyTab}`);
+  });
+
+  // Update modal heading
+  const headingEl = document.getElementById('policyModalHeading');
+  const headings = {
+    terms: 'Terms & Conditions',
+    privacy: 'Privacy Policy',
+    cookies: 'Cookie Policy',
+    shipping: 'Shipping & Delivery Policy',
+    refund: 'Returns & Refund Policy',
+    operator: 'Business & Developer Information'
+  };
+  if (headingEl) headingEl.textContent = headings[policyTab] || 'Terms & Conditions';
+
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closePolicyModal() {
+  const overlay = document.getElementById('policyModalOverlay');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Global hook
+window.openPolicyModal = openPolicyModal;
+window.closePolicyModal = closePolicyModal;
+
+// Bind footer policy buttons
+document.querySelectorAll('.policy-btn, .policy-link').forEach(btn => {
+  btn.onclick = (e) => {
+    e.preventDefault();
+    const policy = btn.dataset.policy || 'terms';
+    openPolicyModal(policy);
+  };
+});
+
+// Bind policy tabs navigation
+document.querySelectorAll('.policy-tab').forEach(tab => {
+  tab.onclick = () => {
+    const target = tab.dataset.ptab;
+    openPolicyModal(target);
+  };
+});
+
+// Close policy modal buttons
+const closePolicyBtn = document.getElementById('closePolicyModal');
+if (closePolicyBtn) closePolicyBtn.onclick = closePolicyModal;
+
+const policyOverlayEl = document.getElementById('policyModalOverlay');
+if (policyOverlayEl) {
+  policyOverlayEl.onclick = (e) => {
+    if (e.target === policyOverlayEl) closePolicyModal();
+  };
 }
 
 // ── Boot ──────────────────────────────────────────────────────

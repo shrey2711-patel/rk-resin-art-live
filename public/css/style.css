@@ -4421,3 +4421,235 @@ body {
   .lightbox-thumb { width: 44px; height: 44px; }
 }
 
+
+
+/* ─── Modern Professional Footer & Developer Credit ───────── */
+.footer-tagline {
+  font-size: 0.84rem;
+  color: #9ca3af;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.footer-operator-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+.foc-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.foc-title {
+  font-size: 0.82rem;
+  color: #f3f4f6;
+  line-height: 1.4;
+}
+.foc-title strong {
+  color: #ffffff;
+}
+.foc-sub {
+  font-size: 0.74rem;
+  color: #9ca3af;
+  margin-top: 3px;
+}
+
+.footer-bottom-bar {
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+.footer-copyright strong {
+  color: #ffffff;
+}
+
+.footer-dev-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+.dev-text {
+  color: #9ca3af;
+}
+.dev-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff !important;
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dev-link:hover {
+  background: #ffffff;
+  color: #111111 !important;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25);
+}
+.dev-link:hover .dev-gh-icon {
+  color: #111111;
+}
+.dev-gh-icon {
+  color: #f3f4f6;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+/* Policy Button in Footer */
+.policy-btn {
+  text-align: left;
+  background: none;
+  border: none;
+  color: #f5f3f4;
+  font-size: 0.86rem;
+  line-height: 1.8;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.policy-btn:hover {
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+/* ─── Legal & Policy Modal ────────────────────────────────── */
+.policy-modal {
+  background: var(--card);
+  border-radius: 16px;
+  max-width: 820px;
+  width: 94%;
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border);
+}
+.policy-modal-head {
+  padding: 22px 26px 16px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--surface);
+}
+.pm-title-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--p);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.policy-modal-head h2 {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.policy-modal-head p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.policy-tabs-nav {
+  display: flex;
+  gap: 6px;
+  padding: 10px 24px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.policy-tab {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+.policy-tab:hover {
+  border-color: var(--p);
+  color: var(--ink);
+}
+.policy-tab.active {
+  background: var(--p);
+  color: #fff;
+  border-color: var(--p);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+.policy-modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.policy-pane {
+  display: none;
+}
+.policy-pane.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+.policy-pane h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 18px 0 6px;
+}
+.policy-pane h3:first-child {
+  margin-top: 0;
+}
+.policy-pane p {
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.policy-pane ul {
+  margin: 0 0 14px 20px;
+  color: var(--muted);
+}
+.policy-pane li {
+  margin-bottom: 6px;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
