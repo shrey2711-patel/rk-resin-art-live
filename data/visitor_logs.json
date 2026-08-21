@@ -1388,5 +1388,45 @@
     "status": 200,
     "duration": "13ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:46:04.130Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "21ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:46:04.134Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "18ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:46:04.154Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products/1",
+    "method": "DELETE",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "13ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:46:04.156Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products/1",
+    "method": "DELETE",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "13ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

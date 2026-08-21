@@ -1,0 +1,55 @@
+{
+  "settings": {
+    "adminPassword": "$2a$10$/zKd4EE/5RDFB6xCf0oCTOpErvyjiRz3UbX./OMzDT0UWYQ2UMgje"
+  },
+  "banners": [],
+  "navLinks": [],
+  "categories": [],
+  "products": [],
+  "orders": [],
+  "cart": [],
+  "users": [],
+  "reviews": [],
+  "wishlistSubscriptions": [],
+  "coupons": [],
+  "analytics": {
+    "totalVisitors": 1,
+    "newVisitors": 0,
+    "returningVisitors": 1,
+    "countries": {
+      "IN": 1
+    },
+    "regions": {
+      "GJ": 1
+    },
+    "cities": {
+      "Ahmedabad": 1
+    },
+    "isps": {
+      "Reliance Jio Infocomm": 1
+    },
+    "recentIps": [
+      "::1"
+    ]
+  },
+  "blockedIps": [],
+  "securityLogs": [],
+  "loginLogs": [
+    {
+      "timestamp": "2026-08-21T17:55:46.242Z",
+      "email": "Admin",
+      "role": "Admin",
+      "ip": "127.0.0.1",
+      "location": "Mumbai, MH, IN",
+      "status": "Success"
+    },
+    {
+      "timestamp": "2026-08-21T17:59:46.607Z",
+      "email": "Admin",
+      "role": "Admin",
+      "ip": "127.0.0.1",
+      "location": "Mumbai, MH, IN",
+      "status": "Success"
+    }
+  ]
+}

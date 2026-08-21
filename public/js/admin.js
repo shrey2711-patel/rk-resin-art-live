@@ -581,6 +581,8 @@ const Admin = {
     // Reset multi variant checkbox and hide variant section
     const multiVariantChk = document.getElementById('pfMultiVariant');
     if (multiVariantChk) multiVariantChk.checked = false;
+    const commonImagesChk = document.getElementById('pfCommonImages');
+    if (commonImagesChk) commonImagesChk.checked = false;
     const adminVariantsSection = document.getElementById('adminVariantsSection');
     if (adminVariantsSection) adminVariantsSection.style.display = 'none';
 
@@ -654,15 +656,25 @@ const Admin = {
     } else {
       // Variable Product Mode
       if (multiVariantChk) multiVariantChk.checked = true;
+      const isCommon = Boolean(product.hasCommonVariantImages || (!product.variants?.some(v => v.imageUrl && v.imageUrl !== product.imageUrl)));
+      const commonImagesChk = document.getElementById('pfCommonImages');
+      if (commonImagesChk) commonImagesChk.checked = isCommon;
+
       if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
-      if (baseImageContainer) baseImageContainer.style.display = 'none';
       if (adminVariantsSection) adminVariantsSection.style.display = '';
 
       document.getElementById('pfPrice').value = '';
       document.getElementById('pfOrig').value = '';
       document.getElementById('pfStock').value = '';
-      [1, 2, 3].forEach(idx => this.updateProductSlotPreview(idx, ''));
-      this.setUploadStatus('');
+
+      const prodImages = (product.images && Array.isArray(product.images) && product.images.length > 0)
+        ? product.images
+        : (product.imageUrl ? [product.imageUrl] : []);
+
+      this.updateProductSlotPreview(1, prodImages[0] || '');
+      this.updateProductSlotPreview(2, prodImages[1] || '');
+      this.updateProductSlotPreview(3, prodImages[2] || '');
+      this.setUploadStatus(prodImages.length ? `${prodImages.length} product image(s) loaded.` : '');
 
       const vlSel = document.getElementById('pfVariantLabel');
       const customInp = document.getElementById('pfVariantLabelCustom');
@@ -693,6 +705,7 @@ const Admin = {
           });
         }
       }
+      this.updateCommonImagesState();
     }
   },
 
@@ -888,17 +901,19 @@ const Admin = {
     if (multiVariantChk) {
       multiVariantChk.onchange = () => this.toggleMultiVariant();
     }
+    const commonImagesChk = document.getElementById('pfCommonImages');
+    if (commonImagesChk) {
+      commonImagesChk.onchange = () => this.updateCommonImagesState();
+    }
   },
 
   toggleMultiVariant() {
-    const isMulti = document.getElementById('pfMultiVariant').checked;
+    const isMulti = document.getElementById('pfMultiVariant')?.checked;
     const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
-    const baseImageContainer = document.getElementById('pfBaseImageContainer');
     const adminVariantsSection = document.getElementById('adminVariantsSection');
     
     if (isMulti) {
       if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
-      if (baseImageContainer) baseImageContainer.style.display = 'none';
       if (adminVariantsSection) adminVariantsSection.style.display = '';
       
       const vlSel = document.getElementById('pfVariantLabel');
@@ -908,11 +923,34 @@ const Admin = {
       }
     } else {
       if (basePriceStockContainer) basePriceStockContainer.style.display = '';
-      if (baseImageContainer) baseImageContainer.style.display = '';
       if (adminVariantsSection) adminVariantsSection.style.display = 'none';
       
       const rowsEl = document.getElementById('pfVariantRows');
       if (rowsEl) rowsEl.innerHTML = '';
+    }
+    this.updateCommonImagesState();
+  },
+
+  updateCommonImagesState() {
+    const isMulti = document.getElementById('pfMultiVariant')?.checked;
+    const isCommon = document.getElementById('pfCommonImages')?.checked;
+    const baseImageContainer = document.getElementById('pfBaseImageContainer');
+
+    if (!isMulti) {
+      if (baseImageContainer) baseImageContainer.style.display = '';
+    } else {
+      if (baseImageContainer) baseImageContainer.style.display = isCommon ? '' : 'none';
+    }
+
+    // Toggle angle photo upload row on variant rows
+    const rowsEl = document.getElementById('pfVariantRows');
+    if (rowsEl) {
+      rowsEl.querySelectorAll('.admin-variant-row').forEach(row => {
+        const anglesSec = row.querySelector('.vr-angles-section');
+        const noteEl = row.querySelector('.vr-common-image-note');
+        if (anglesSec) anglesSec.style.display = (isMulti && isCommon) ? 'none' : 'flex';
+        if (noteEl) noteEl.style.display = (isMulti && isCommon) ? 'block' : 'none';
+      });
     }
   },
 
@@ -982,11 +1020,14 @@ const Admin = {
       </div>
 
       <!-- Variant Angles (Up to 3 Photos) -->
-      <div style="display:flex; align-items:center; gap:8px; margin-top:4px; width:100%; font-size:0.75rem; color:var(--muted); flex-wrap:wrap;">
+      <div class="vr-angles-section" style="display:flex; align-items:center; gap:8px; margin-top:4px; width:100%; font-size:0.75rem; color:var(--muted); flex-wrap:wrap;">
         <span style="font-weight:700; color:var(--ink);">Angle Photos (max 3):</span>
         <div class="vr-images-container" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           ${renderSlotsHtml}
         </div>
+      </div>
+      <div class="vr-common-image-note" style="display:none; font-size:0.75rem; color:var(--p); margin-top:2px;">
+        🖼️ <em>Using product's common photo(s) uploaded above.</em>
       </div>`;
 
     // Wire up events for the 3 angle slots
