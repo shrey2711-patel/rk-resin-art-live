@@ -67,11 +67,13 @@ const Admin = {
     }
   },
 
-  setBannerUploadStatus(message, type = '') {
-    const el = document.getElementById('bannerUploadStatus');
-    if (!el) return;
-    el.textContent = message;
-    el.className = `upload-status ${type}`;
+  setBannerUploadStatus(message, type = '', target = 'desktop') {
+    const elId = target === 'mobile' ? 'bannerMobileUploadStatus' : 'bannerUploadStatus';
+    const el = document.getElementById(elId);
+    if (el) {
+      el.textContent = message;
+      el.className = `upload-status ${type}`;
+    }
 
     const saveBtn = document.getElementById('addBannerBtn');
     if (saveBtn) {
@@ -81,24 +83,29 @@ const Admin = {
         saveBtn.style.cursor = 'not-allowed';
         saveBtn.textContent = 'Uploading...';
       } else {
-        saveBtn.disabled = false;
-        saveBtn.style.opacity = '';
-        saveBtn.style.cursor = '';
+        const atLimit = (this.data?.banners?.length >= 3) && (this.editState?.section !== 'banner');
+        saveBtn.disabled = atLimit;
+        saveBtn.style.opacity = atLimit ? '0.6' : '';
+        saveBtn.style.cursor = atLimit ? 'not-allowed' : '';
         saveBtn.textContent = this.editState.section === 'banner' ? 'Update Banner' : '+ Add Banner';
       }
     }
   },
 
-  updateBannerImagePreview(url) {
-    const hidden = document.getElementById('bfImageUrl');
-    const wrap = document.getElementById('bannerImagePreview');
-    const img = document.getElementById('bfImagePreviewImg');
+  updateBannerImagePreview(url, target = 'desktop') {
+    const hiddenId = target === 'mobile' ? 'bfMobileImageUrl' : 'bfImageUrl';
+    const wrapId = target === 'mobile' ? 'bannerMobileImagePreview' : 'bannerImagePreview';
+    const imgId = target === 'mobile' ? 'bfMobilePreviewImg' : 'bfImagePreviewImg';
+
+    const hidden = document.getElementById(hiddenId);
+    const wrap = document.getElementById(wrapId);
+    const img = document.getElementById(imgId);
     if (hidden) hidden.value = url || '';
     if (!wrap || !img) return;
 
     if (url) {
       img.src = url;
-      wrap.style.display = '';
+      wrap.style.display = 'block';
     } else {
       img.removeAttribute('src');
       wrap.style.display = 'none';
@@ -126,7 +133,7 @@ const Admin = {
     return false;
   },
 
-  async uploadBannerImage(file) {
+  async uploadBannerImage(file, target = 'desktop') {
     if (!file) return;
 
     if (!this.isValidImageType(file)) {
@@ -134,16 +141,16 @@ const Admin = {
       return;
     }
 
-    this.updateBannerImagePreview(URL.createObjectURL(file));
-    this.setBannerUploadStatus('Uploading image...', 'loading');
+    this.updateBannerImagePreview(URL.createObjectURL(file), target);
+    this.setBannerUploadStatus('Uploading image...', 'loading', target);
     try {
       const optimizedFile = await this.resizeImageForUpload(file);
       const result = await API.uploadImage(optimizedFile);
-      this.updateBannerImagePreview(result.url);
-      this.setBannerUploadStatus('Image uploaded and ready to save.', 'success');
+      this.updateBannerImagePreview(result.url, target);
+      this.setBannerUploadStatus(`${target === 'mobile' ? 'Mobile (3:4)' : 'Desktop (16:9)'} poster uploaded & ready to save.`, 'success', target);
     } catch (e) {
-      this.updateBannerImagePreview('');
-      this.setBannerUploadStatus(`Upload failed: ${e.message}`, 'error');
+      this.updateBannerImagePreview('', target);
+      this.setBannerUploadStatus(`Upload failed: ${e.message}`, 'error', target);
       showToast(`Upload failed: ${e.message}`, 'error');
     }
   },
@@ -346,25 +353,120 @@ const Admin = {
   },
 
   resetBannerForm() {
-    document.getElementById('bfImageFile').value = '';
-    this.updateBannerImagePreview('');
-    this.setBannerUploadStatus('');
+    const fileDesktop = document.getElementById('bfImageFile');
+    const fileMobile = document.getElementById('bfMobileImageFile');
+    if (fileDesktop) fileDesktop.value = '';
+    if (fileMobile) fileMobile.value = '';
+
+    this.updateBannerImagePreview('', 'desktop');
+    this.updateBannerImagePreview('', 'mobile');
+    this.setBannerUploadStatus('', '', 'desktop');
+    this.setBannerUploadStatus('', '', 'mobile');
+
+    const formTitle = document.getElementById('bannerFormTitle');
+    if (formTitle) formTitle.textContent = 'Add New Banner (Desktop 16:9 & Mobile 3:4)';
+
     const btn = document.getElementById('addBannerBtn');
     const cancel = document.getElementById('cancelBannerBtn');
-    if (btn) btn.textContent = '+ Add Banner';
+    const limitNotice = document.getElementById('bannerLimitNotice');
+    const atLimit = (this.data?.banners?.length >= 3);
+
+    if (btn) {
+      btn.textContent = '+ Add Banner';
+      btn.disabled = atLimit;
+      btn.style.opacity = atLimit ? '0.6' : '';
+      btn.style.cursor = atLimit ? 'not-allowed' : '';
+    }
     if (cancel) cancel.style.display = 'none';
+    if (limitNotice) limitNotice.style.display = atLimit ? 'block' : 'none';
+
     this.editState = { section: null, id: null };
   },
 
   setBannerEdit(banner) {
-    document.getElementById('bfImageFile').value = '';
-    this.updateBannerImagePreview(banner.imageUrl || '');
-    this.setBannerUploadStatus(banner.imageUrl ? 'Current banner image loaded.' : '');
+    const fileDesktop = document.getElementById('bfImageFile');
+    const fileMobile = document.getElementById('bfMobileImageFile');
+    if (fileDesktop) fileDesktop.value = '';
+    if (fileMobile) fileMobile.value = '';
+
+    const desktopUrl = banner.imageUrl || banner.desktopImageUrl || '';
+    const mobileUrl = banner.mobileImageUrl || '';
+
+    this.updateBannerImagePreview(desktopUrl, 'desktop');
+    this.updateBannerImagePreview(mobileUrl, 'mobile');
+
+    this.setBannerUploadStatus(desktopUrl ? 'Current 16:9 desktop poster loaded.' : '', '', 'desktop');
+    this.setBannerUploadStatus(mobileUrl ? 'Current 3:4 mobile poster loaded.' : 'No mobile poster uploaded (will use 16:9 fallback)', '', 'mobile');
+
+    const formTitle = document.getElementById('bannerFormTitle');
+    if (formTitle) formTitle.textContent = `Edit Banner #${banner.id} (Desktop 16:9 & Mobile 3:4)`;
+
     const btn = document.getElementById('addBannerBtn');
     const cancel = document.getElementById('cancelBannerBtn');
-    if (btn) btn.textContent = 'Update Banner';
-    if (cancel) cancel.style.display = '';
+    const limitNotice = document.getElementById('bannerLimitNotice');
+
+    if (btn) {
+      btn.textContent = 'Update Banner';
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+    }
+    if (cancel) cancel.style.display = 'inline-block';
+    if (limitNotice) limitNotice.style.display = 'none';
+
     this.editState = { section: 'banner', id: banner.id };
+
+    const card = document.getElementById('bannerFormCard');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  },
+
+  async saveBannerForm() {
+    const imageUrl = document.getElementById('bfImageUrl')?.value.trim();
+    const mobileImageUrl = document.getElementById('bfMobileImageUrl')?.value.trim() || null;
+
+    if (!imageUrl) {
+      showToast('Please upload the 16:9 Desktop / Tablet banner image first', 'error');
+      return;
+    }
+
+    if (this.editState.section !== 'banner' && this.data.banners.length >= 3) {
+      showToast('Maximum limit of 3 banners reached. Please delete or edit an existing banner.', 'error');
+      return;
+    }
+
+    const payload = {
+      imageUrl,
+      desktopImageUrl: imageUrl,
+      mobileImageUrl
+    };
+
+    try {
+      const btn = document.getElementById('addBannerBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+      if (this.editState.section === 'banner' && this.editState.id) {
+        await API.updateBanner(this.editState.id, payload);
+        showToast('Banner updated successfully!', 'success');
+      } else {
+        await API.addBanner(payload);
+        showToast('Banner added successfully!', 'success');
+      }
+
+      showOk('bannerOk');
+      await this.loadAll();
+      this.renderBanners();
+      this.resetBannerForm();
+      if (typeof App !== 'undefined' && typeof App.loadBanners === 'function') {
+        await App.loadBanners();
+      }
+    } catch (err) {
+      showToast('Save failed: ' + err.message, 'error');
+      const btn = document.getElementById('addBannerBtn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = this.editState.section === 'banner' ? 'Update Banner' : '+ Add Banner';
+      }
+    }
   },
 
   resetNavForm() {
@@ -1122,21 +1224,52 @@ const Admin = {
   // ── Banners ───────────────────────────────────────────────
   renderBanners() {
     const list = document.getElementById('adminBannerList');
+    const badge = document.getElementById('bannerCounterBadge');
+    const count = Array.isArray(this.data?.banners) ? this.data.banners.length : 0;
+
+    if (badge) {
+      badge.textContent = `${count} / 3`;
+      badge.style.color = count >= 3 ? '#b45309' : 'var(--ink)';
+      badge.style.background = count >= 3 ? '#fef3c7' : 'var(--surface)';
+      badge.style.borderColor = count >= 3 ? '#fde68a' : 'var(--border)';
+    }
+
+    const limitNotice = document.getElementById('bannerLimitNotice');
+    const addBtn = document.getElementById('addBannerBtn');
+    if (this.editState.section !== 'banner') {
+      if (limitNotice) limitNotice.style.display = count >= 3 ? 'block' : 'none';
+      if (addBtn) {
+        addBtn.disabled = count >= 3;
+        addBtn.style.opacity = count >= 3 ? '0.6' : '';
+        addBtn.style.cursor = count >= 3 ? 'not-allowed' : '';
+      }
+    }
+
     if (!list) return;
-    list.innerHTML = this.data.banners.map(b => `
-      <div class="admin-list-item">
-        <div class="ali-thumb" style="width: 80px; height: 50px; border-radius: 4px; overflow: hidden; background: #eee; border: 1px solid var(--border)">
-          ${b.imageUrl ? `<img src="${b.imageUrl}" style="width:100%; height:100%; object-fit:cover;" alt="Banner">` : '🖼️'}
-        </div>
-        <div class="ali-info">
-          <div class="ali-name">Banner #${b.id}</div>
-          <div class="ali-sub">Pure Visual Image Slide</div>
+    list.innerHTML = this.data.banners.map((b, idx) => `
+      <div class="admin-list-item" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <!-- 16:9 Desktop Thumbnail -->
+          <div class="ali-thumb" style="width: 80px; height: 45px; aspect-ratio:16/9; border-radius: 4px; overflow: hidden; background: #eee; border: 1.5px solid var(--border); flex-shrink:0;">
+            ${(b.imageUrl || b.desktopImageUrl) ? `<img src="${b.imageUrl || b.desktopImageUrl}" style="width:100%; height:100%; object-fit:cover;" alt="Desktop 16:9 Banner">` : '🖥️'}
+          </div>
+          <!-- 3:4 Mobile Thumbnail -->
+          <div class="ali-thumb" style="width: 34px; height: 45px; aspect-ratio:3/4; border-radius: 4px; overflow: hidden; background: #eee; border: 1.5px solid var(--border); flex-shrink:0;">
+            ${b.mobileImageUrl ? `<img src="${b.mobileImageUrl}" style="width:100%; height:100%; object-fit:cover;" alt="Mobile 3:4 Banner">` : `<div style="font-size:0.6rem; color:var(--muted); height:100%; display:flex; align-items:center; justify-content:center; text-align:center;">Auto</div>`}
+          </div>
+          <div class="ali-info">
+            <div class="ali-name" style="font-weight:700;">Banner #${idx + 1} (ID: ${b.id})</div>
+            <div class="ali-sub" style="font-size:0.75rem; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+              <span style="color:#0f766e; background:#ccfbf1; padding:1px 5px; border-radius:4px; font-weight:600;">16:9 Desktop</span>
+              ${b.mobileImageUrl ? '<span style="color:#1d4ed8; background:#dbeafe; padding:1px 5px; border-radius:4px; font-weight:600;">3:4 Mobile Active</span>' : '<span style="color:#6b7280; background:#f3f4f6; padding:1px 5px; border-radius:4px;">Mobile: Auto Fallback</span>'}
+            </div>
+          </div>
         </div>
         <div class="ali-actions">
           <button class="ali-edit" data-edit-bid="${b.id}">Edit</button>
           <button class="ali-del" data-bid="${b.id}">Delete</button>
         </div>
-      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No banners yet.</div>';
+      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No banners uploaded yet. (Maximum 3)</div>';
 
     list.querySelectorAll('[data-edit-bid]').forEach(btn => {
       btn.onclick = () => {
@@ -1147,11 +1280,15 @@ const Admin = {
 
     list.querySelectorAll('[data-bid]').forEach(btn => {
       btn.onclick = async () => {
+        if (!confirm('Are you sure you want to delete this banner?')) return;
         await API.deleteBanner(Number(btn.dataset.bid));
         showOk('bannerOk');
         await this.loadAll();
         this.renderBanners();
-        App.loadBanners();
+        this.resetBannerForm();
+        if (typeof App !== 'undefined' && typeof App.loadBanners === 'function') {
+          App.loadBanners();
+        }
       };
     });
   },
@@ -1670,17 +1807,44 @@ if (pfStockStatusBtn) {
   }
 });
 
-// Banner Image upload events
-document.getElementById('bfImageFile').onchange = async (e) => {
-  await Admin.uploadBannerImage(e.target.files[0]);
-};
+// Banner Image upload events (Desktop 16:9 & Mobile 3:4)
+const bfImageFileEl = document.getElementById('bfImageFile');
+if (bfImageFileEl) {
+  bfImageFileEl.onchange = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      await Admin.uploadBannerImage(e.target.files[0], 'desktop');
+    }
+  };
+}
 
-document.getElementById('removeBannerImageBtn').onclick = () => {
-  document.getElementById('bfImageFile').value = '';
-  Admin.updateBannerImagePreview('');
-  Admin.setBannerUploadStatus('Image removed. Save banner to keep this change.', 'success');
-};
+const bfMobileImageFileEl = document.getElementById('bfMobileImageFile');
+if (bfMobileImageFileEl) {
+  bfMobileImageFileEl.onchange = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      await Admin.uploadBannerImage(e.target.files[0], 'mobile');
+    }
+  };
+}
 
+const removeBannerImageBtnEl = document.getElementById('removeBannerImageBtn');
+if (removeBannerImageBtnEl) {
+  removeBannerImageBtnEl.onclick = () => {
+    if (document.getElementById('bfImageFile')) document.getElementById('bfImageFile').value = '';
+    Admin.updateBannerImagePreview('', 'desktop');
+    Admin.setBannerUploadStatus('16:9 Desktop image removed.', 'success', 'desktop');
+  };
+}
+
+const removeBannerMobileImageBtnEl = document.getElementById('removeBannerMobileImageBtn');
+if (removeBannerMobileImageBtnEl) {
+  removeBannerMobileImageBtnEl.onclick = () => {
+    if (document.getElementById('bfMobileImageFile')) document.getElementById('bfMobileImageFile').value = '';
+    Admin.updateBannerImagePreview('', 'mobile');
+    Admin.setBannerUploadStatus('3:4 Mobile image removed.', 'success', 'mobile');
+  };
+}
+
+// Drag & Drop for Desktop 16:9 Banner
 const bannerUploadBox = document.getElementById('bannerUploadBox');
 if (bannerUploadBox) {
   ['dragenter', 'dragover'].forEach(eventName => {
@@ -1697,8 +1861,30 @@ if (bannerUploadBox) {
   });
   bannerUploadBox.addEventListener('drop', async (e) => {
     const file = e.dataTransfer.files[0];
-    document.getElementById('bfImageFile').files = e.dataTransfer.files;
-    await Admin.uploadBannerImage(file);
+    if (document.getElementById('bfImageFile')) document.getElementById('bfImageFile').files = e.dataTransfer.files;
+    await Admin.uploadBannerImage(file, 'desktop');
+  });
+}
+
+// Drag & Drop for Mobile 3:4 Banner
+const bannerMobileUploadBox = document.getElementById('bannerMobileUploadBox');
+if (bannerMobileUploadBox) {
+  ['dragenter', 'dragover'].forEach(eventName => {
+    bannerMobileUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      bannerMobileUploadBox.classList.add('dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    bannerMobileUploadBox.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      bannerMobileUploadBox.classList.remove('dragging');
+    });
+  });
+  bannerMobileUploadBox.addEventListener('drop', async (e) => {
+    const file = e.dataTransfer.files[0];
+    if (document.getElementById('bfMobileImageFile')) document.getElementById('bfMobileImageFile').files = e.dataTransfer.files;
+    await Admin.uploadBannerImage(file, 'mobile');
   });
 }
 

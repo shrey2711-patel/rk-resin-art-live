@@ -1108,5 +1108,85 @@
     "status": 200,
     "duration": "190ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:41.955Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "36ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:41.959Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "19ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:41.980Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:41.983Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:41.994Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:41.996Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:42.005Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 400,
+    "duration": "4ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T19:24:42.006Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/banners",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 400,
+    "duration": "4ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

@@ -3563,6 +3563,10 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
 // BANNERS CRUD
 app.post('/api/admin/banners', requireAdmin, (req, res) => {
   const db = readDB();
+  db.banners = db.banners || [];
+  if (db.banners.length >= 3) {
+    return res.status(400).json({ error: 'Maximum 3 banners allowed. Please delete or edit an existing banner.' });
+  }
   const banner = { id: nextId(db.banners), ...req.body };
   db.banners.push(banner);
   writeDB(db);

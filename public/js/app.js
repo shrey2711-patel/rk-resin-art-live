@@ -1020,10 +1020,17 @@ const App = {
     if (!track || !banners.length) return;
     const cur = this.state.bannerCur;
 
-    track.innerHTML = banners.map(b => `
-      <div class="banner-slide" style="cursor: zoom-in;">
-        ${b.imageUrl ? `<img class="bs-background-image" src="${b.imageUrl}" alt="Banner">` : ''}
-      </div>`).join('');
+    track.innerHTML = banners.map(b => {
+      const desktopImg = b.imageUrl || b.desktopImageUrl || '';
+      const mobileImg = b.mobileImageUrl || desktopImg;
+      return `
+      <div class="banner-slide" style="cursor: zoom-in;" data-desktop-url="${desktopImg}" data-mobile-url="${mobileImg}">
+        <picture class="banner-picture" style="width:100%; height:100%; display:block; position:absolute; top:0; left:0;">
+          ${b.mobileImageUrl ? `<source media="(max-width: 768px)" srcset="${b.mobileImageUrl}">` : ''}
+          <img class="bs-background-image" src="${desktopImg || mobileImg}" alt="RK Resin Art Banner">
+        </picture>
+      </div>`;
+    }).join('');
 
     dots.innerHTML = banners.map((_, i) =>
       `<button class="bdot ${i === cur ? 'active' : ''}" data-bi="${i}"></button>`
