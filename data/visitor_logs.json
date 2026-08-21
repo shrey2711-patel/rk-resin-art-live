@@ -1428,5 +1428,65 @@
     "status": 200,
     "duration": "13ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:53:46.586Z",
+    "ip": "127.0.0.1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "14ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:53:46.591Z",
+    "ip": "127.0.0.1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "11ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:53:46.618Z",
+    "ip": "127.0.0.1",
+    "url": "/api/products",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "8ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:53:46.621Z",
+    "ip": "127.0.0.1",
+    "url": "/api/products",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:53:46.705Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/analytics",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "78ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T20:53:46.708Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/analytics",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "78ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

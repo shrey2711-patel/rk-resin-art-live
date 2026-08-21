@@ -602,7 +602,31 @@ const Admin = {
 
   setProductEdit(product) {
     document.getElementById('pfName').value = product.name || '';
-    document.getElementById('pfCat').value = product.category || this.data.categories[0]?.name || '';
+    
+    // Ensure category dropdown is populated and selected
+    this.populateProdCatSelect();
+    const pfCat = document.getElementById('pfCat');
+    if (pfCat) {
+      const targetCat = (product.category || '').trim();
+      if (targetCat) {
+        const match = Array.from(pfCat.options).find(opt => 
+          opt.value.toLowerCase() === targetCat.toLowerCase() ||
+          opt.value.toLowerCase().replace(/s$/, '') === targetCat.toLowerCase().replace(/s$/, '')
+        );
+        if (match) {
+          pfCat.value = match.value;
+        } else {
+          const opt = document.createElement('option');
+          opt.value = targetCat;
+          opt.textContent = targetCat;
+          opt.selected = true;
+          pfCat.appendChild(opt);
+          pfCat.value = targetCat;
+        }
+      } else if (this.data.categories && this.data.categories.length > 0) {
+        pfCat.value = this.data.categories[0].name;
+      }
+    }
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = product.imgRatio || '4:3';
     document.getElementById('pfEmoji').value = product.emoji || '';
@@ -1580,13 +1604,26 @@ const Admin = {
 
   populateProdCatSelect() {
     const sel = document.getElementById('pfCat');
-    if (sel) {
-      sel.innerHTML = this.data.categories.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
+    if (!sel) return;
+    const currentVal = sel.value;
+    const cats = this.data.categories || [];
+    if (!cats.length) {
+      sel.innerHTML = '<option value="">-- No Categories Created Yet --</option>';
+      return;
+    }
+    sel.innerHTML = cats.map(c => `<option value="${c.name}">${c.emoji || '✨'} ${c.name}</option>`).join('');
+    if (currentVal) {
+      const match = Array.from(sel.options).find(o => 
+        o.value.toLowerCase() === currentVal.toLowerCase() || 
+        o.value.toLowerCase().replace(/s$/, '') === currentVal.toLowerCase().replace(/s$/, '')
+      );
+      if (match) sel.value = match.value;
     }
   },
 
   // ── Products ──────────────────────────────────────────────
   renderProducts() {
+    this.populateProdCatSelect();
     const list = document.getElementById('adminProdList');
     if (!list) return;
     list.innerHTML = this.data.products.map(p => `
