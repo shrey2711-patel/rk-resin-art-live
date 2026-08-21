@@ -1017,80 +1017,68 @@ const App = {
   renderBanners(banners) {
     const track = document.getElementById('bannerTrack');
     const dots = document.getElementById('bannerDots');
-    const bPrev = document.getElementById('bPrev');
-    const bNext = document.getElementById('bNext');
     if (!track || !banners.length) return;
     const cur = this.state.bannerCur;
 
-    // Render slides
     track.innerHTML = banners.map(b => `
       <div class="banner-slide" style="cursor: zoom-in;">
-        ${b.imageUrl ? `<img class="bs-background-image" src="${b.imageUrl}" alt="Banner" loading="lazy" draggable="false">` : ''}
+        ${b.imageUrl ? `<img class="bs-background-image" src="${b.imageUrl}" alt="Banner">` : ''}
       </div>`).join('');
 
-    // Render dots
-    if (dots) {
-      dots.innerHTML = banners.map((_, i) =>
-        `<button class="bdot${i === cur ? ' active' : ''}" data-bi="${i}" aria-label="Go to slide ${i + 1}"></button>`
-      ).join('');
-      dots.querySelectorAll('.bdot').forEach(d => {
-        d.onclick = () => this.goBanner(Number(d.dataset.bi), banners);
-      });
-    }
+    dots.innerHTML = banners.map((_, i) =>
+      `<button class="bdot ${i === cur ? 'active' : ''}" data-bi="${i}"></button>`
+    ).join('');
 
-    // Apply position
     track.style.transform = `translateX(-${cur * 100}%)`;
 
-    // Show/hide arrows based on slide count
-    if (bPrev) bPrev.style.display = banners.length > 1 ? '' : 'none';
-    if (bNext) bNext.style.display = banners.length > 1 ? '' : 'none';
-
-    // Touch swipe + tap-to-zoom
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-    let isSwiping = false;
-
-    const onTouchStart = (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchEndX = touchStartX;
-      touchEndY = touchStartY;
-      isSwiping = false;
-    };
-
-    const onTouchMove = (e) => {
-      touchEndX = e.touches[0].clientX;
-      touchEndY = e.touches[0].clientY;
-      const dx = Math.abs(touchEndX - touchStartX);
-      const dy = Math.abs(touchEndY - touchStartY);
-      if (dx > 8 || dy > 8) isSwiping = true;
-    };
-
-    track.addEventListener('touchstart', onTouchStart, { passive: true });
-    track.addEventListener('touchmove', onTouchMove, { passive: true });
-    track.addEventListener('touchend', onTouchEnd, { passive: true });
-
-    // Click to zoom (desktop + tap on mobile if not swipe)
-    // Click to zoom (desktop + tap on mobile if not swipe)
-    track.querySelectorAll('.banner-slide').forEach((slide, idx) => {
-      slide.addEventListener('click', () => {
-        if (isSwiping) { isSwiping = false; return; }
-        const b = banners[idx];
-        if (b && b.imageUrl) this.openBannerZoom(b.imageUrl);
-      });
+    dots.querySelectorAll('.bdot').forEach(d => {
+      d.onclick = () => this.goBanner(Number(d.dataset.bi), banners);
     });
 
-    // Arrow buttons
-    if (bPrev) bPrev.onclick = () => this.goBanner((cur - 1 + banners.length) % banners.length, banners);
-    if (bNext) bNext.onclick = () => this.goBanner((cur + 1) % banners.length, banners);
+    // Setup touch swipe & click-to-zoom for mobile & desktop
+    track.querySelectorAll('.banner-slide').forEach((slide, idx) => {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchEndX = 0;
+      let isDrag = false;
 
-    // Auto-advance every 5s
+      slide.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchEndX = touchStartX;
+        isDrag = false;
+      }, { passive: true });
+
+      slide.addEventListener('touchmove', (e) => {
+        touchEndX = e.touches[0].clientX;
+        const moveX = Math.abs(touchEndX - touchStartX);
+        const moveY = Math.abs(e.touches[0].clientY - touchStartY);
+        if (moveX > 10 || moveY > 10) {
+          isDrag = true;
+        }
+      }, { passive: true });
+
+      slide.onclick = () => {
+        if (isDrag) {
+          isDrag = false;
+          return; // Dragging to slide, block zoom trigger
+        }
+        const b = banners[idx];
+        if (b && b.imageUrl) {
+          this.openBannerZoom(b.imageUrl);
+        }
+      };
+    });
+
     clearTimeout(this.state.bannerTimer);
-    if (banners.length > 1) {
-      this.state.bannerTimer = setTimeout(() => this.goBanner((cur + 1) % banners.length, banners), 5000);
-    }
+    this.state.bannerTimer = setTimeout(() => this.goBanner((cur + 1) % banners.length, banners), 5000); // 5s Autoplay
+
+    document.getElementById('bPrev').onclick = () => {
+      this.goBanner((cur - 1 + banners.length) % banners.length, banners);
+    };
+    document.getElementById('bNext').onclick = () => {
+      this.goBanner((cur + 1) % banners.length, banners);
+    };
   },
 
   goBanner(n, banners) {
