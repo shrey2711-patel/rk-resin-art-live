@@ -1526,6 +1526,9 @@ const authLimiter = rateLimit({
   handler: (req, res, next, options) => {
     const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
     logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Auth rate limit exceeded on ${req.originalUrl || req.url}`);
+    res.status(options.statusCode).send(options.message);
+  }
+});
 
 const checkoutLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -1691,17 +1694,6 @@ function hasLiveStoreData(data) {
   );
 }
 
-    res.status(options.statusCode).send(options.message);
-  }
-});
-
-const wishlistLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 10,
-  message: { error: 'Too many subscription attempts. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // Manual cookie parser middleware
 app.use((req, res, next) => {
