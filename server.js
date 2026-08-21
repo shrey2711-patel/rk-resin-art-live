@@ -2278,32 +2278,56 @@ app.post('/api/admin/login', authLimiter, async (req, res) => {
   const db = readDB();
   const { password } = req.body;
   const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword;
-  const isDefaultPassword = !correctPassword;
-  const DEFAULT_ADMIN_PASS = 'rk2024';
 
-  // If no custom password set, use default; if custom hashed password, use bcrypt
+  const envAdminPass = process.env.ADMIN_PASSWORD;
+  const storedPass = db.settings.adminPassword;
+  const ALLOWED_INITIAL_PASSWORDS = ['rk3495', 'rk2024'];
+
   let passwordMatch = false;
-  if (isDefaultPassword) {
-    passwordMatch = (password === DEFAULT_ADMIN_PASS);
-  } else if (correctPassword.startsWith('$2')) {
-    // bcrypt hash
-    passwordMatch = await bcrypt.compare(password, correctPassword);
-  } else {
-    // Legacy plain-text password from old setup — accept but upgrade to hash
-    passwordMatch = (password === correctPassword);
-    if (passwordMatch) {
-      // Upgrade to bcrypt
-      db.settings.adminPassword = await bcrypt.hash(password, 10);
-      writeDB(db);
+
+  // 1. Check environment variable if configured on Render
+  if (envAdminPass) {
+    if (envAdminPass.startsWith('$2')) {
+      passwordMatch = await bcrypt.compare(password, envAdminPass);
+    } else {
+      passwordMatch = (password === envAdminPass);
+    }
+  }
+
+  // 2. Check database stored password hash or plaintext
+  if (!passwordMatch && storedPass) {
+    if (storedPass.startsWith('$2')) {
+      passwordMatch = await bcrypt.compare(password, storedPass);
+    } else {
+      passwordMatch = (password === storedPass);
+    }
+  }
+
+  // 3. Fallback check for initial passwords (rk3495 & rk2024)
+  if (!passwordMatch) {
+    if (ALLOWED_INITIAL_PASSWORDS.includes(password)) {
+      passwordMatch = true;
+    }
+  }
+
+  if (passwordMatch) {
+    // Automatically save & hash password if not yet hashed or if logging in with rk3495
+    try {
+      if (!storedPass || !storedPass.startsWith('$2') || password === 'rk3495') {
+        db.settings.adminPassword = await bcrypt.hash(password, 10);
+        writeDB(db);
+      }
+    } catch (e) {
+      console.error('Error saving updated admin password:', e.message);
     }
   }
 
   if (!passwordMatch) {
     trackFailedLogin(clientIp);
-    logSecurityEvent(clientIp, 'FAILED_ADMIN_LOGIN', 'Failed admin login attempt');
-    return res.status(401).json({ error: 'Wrong password' });
+    logSecurityEvent(clientIp, 'FAILED_ADMIN_LOGIN', `Failed admin login attempt from ${clientIp}`);
+    return res.status(401).json({ error: 'Incorrect password' });
   }
+
   // Clear any failed login tracking on success
   delete failedLoginTracker[clientIp];
 
@@ -2315,15 +2339,13 @@ app.post('/api/admin/login', authLimiter, async (req, res) => {
     email: 'Admin',
     role: 'Admin',
     ip: clientIp,
-    location: geo
+    location: formatLocationLabel(geo),
+    status: 'Success'
   });
-  if (db.loginLogs.length > 500) {
-    db.loginLogs.shift();
-  }
   writeDB(db);
 
   const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '8h' });
-  res.json({ token, message: 'Login successful' });
+  res.json({ token, success: true });
 });
 
 // POST change admin password
@@ -2339,16 +2361,19 @@ app.post('/api/admin/change-password', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'New admin password must be at least 8 characters' });
   }
 
-  const correctPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword;
-  const DEFAULT_ADMIN_PASS = 'rk2024';
+  const envAdminPass = process.env.ADMIN_PASSWORD;
+  const storedPass = db.settings.adminPassword;
+  const ALLOWED_INITIAL_PASSWORDS = ['rk3495', 'rk2024'];
 
   let passwordMatch = false;
-  if (!correctPassword) {
-    passwordMatch = (currentPassword === DEFAULT_ADMIN_PASS);
-  } else if (correctPassword.startsWith('$2')) {
-    passwordMatch = await bcrypt.compare(currentPassword, correctPassword);
-  } else {
-    passwordMatch = (currentPassword === correctPassword);
+  if (envAdminPass) {
+    passwordMatch = envAdminPass.startsWith('$2') ? await bcrypt.compare(currentPassword, envAdminPass) : (currentPassword === envAdminPass);
+  }
+  if (!passwordMatch && storedPass) {
+    passwordMatch = storedPass.startsWith('$2') ? await bcrypt.compare(currentPassword, storedPass) : (currentPassword === storedPass);
+  }
+  if (!passwordMatch) {
+    passwordMatch = ALLOWED_INITIAL_PASSWORDS.includes(currentPassword);
   }
 
   if (!passwordMatch) {

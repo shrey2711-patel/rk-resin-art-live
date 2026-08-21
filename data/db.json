@@ -1,5 +1,7 @@
 {
-  "settings": {},
+  "settings": {
+    "adminPassword": "$2a$10$24Fc695Swh5QsCzcz4xIPOb1Jp/TBAVoeMhDf7fTJcjMJk58cyKJ6"
+  },
   "banners": [],
   "navLinks": [],
   "categories": [],
@@ -29,5 +31,17 @@
     "recentIps": [
       "::1"
     ]
-  }
+  },
+  "blockedIps": [],
+  "securityLogs": [],
+  "loginLogs": [
+    {
+      "timestamp": "2026-08-21T17:55:46.242Z",
+      "email": "Admin",
+      "role": "Admin",
+      "ip": "127.0.0.1",
+      "location": "Mumbai, MH, IN",
+      "status": "Success"
+    }
+  ]
 }

@@ -1068,5 +1068,25 @@
     "status": 304,
     "duration": "1ms",
     "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-08-21T17:55:46.254Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/login",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "137ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-08-21T17:55:46.256Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/login",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "123ms",
+    "location": "Mumbai, MH, IN"
   }
 ]
