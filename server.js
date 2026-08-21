@@ -1985,6 +1985,9 @@ function writeDB(data) {
   triggerFirebaseSync(data);
 }
 
+let isSyncingToFirebase = false;
+let pendingFirebaseSyncData = null;
+
 function triggerFirebaseSync(data) {
   const firebaseUrl = firebaseRestUrl();
   if (!firebaseUrl) return;
