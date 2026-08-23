@@ -2952,18 +2952,43 @@ Admin.renderUsers = async function () {
   }
 };
 
-Admin.downloadUserPassword = function (userId) {
+Admin.downloadUserPassword = async function (userId) {
   const user = Admin._usersCache.find(u => String(u.id) === String(userId));
   if (!user) {
     showToast('User not found', 'error');
     return;
   }
 
+  let plainPw = user.passwordPlain && user.passwordPlain !== '—' ? user.passwordPlain : '';
+
+  // If password was stored before plain password logging was introduced
+  if (!plainPw && user.hasPassword) {
+    const autoGen = `Rk${(user.phone || '9876').slice(-4)}@2026`;
+    const promptPw = prompt(
+      `Password for "${user.name || user.email}" is currently encrypted in the database.\n\nEnter a new password to assign and download (or press Cancel to download account details):`,
+      autoGen
+    );
+    if (promptPw && promptPw.trim().length >= 6) {
+      const newPw = promptPw.trim();
+      try {
+        showToast('Saving plain password to database…', 'info');
+        const resData = await API.updateAdminUser(user.id, { password: newPw });
+        if (resData && resData.user) {
+          const idx = Admin._usersCache.findIndex(u => String(u.id) === String(userId));
+          if (idx !== -1) Admin._usersCache[idx] = { ...Admin._usersCache[idx], ...resData.user };
+          Admin._renderUserList(Admin._usersCache);
+          plainPw = newPw;
+          showToast('Plain password saved to account!', 'success');
+        }
+      } catch (err) {
+        showToast('Could not save password: ' + err.message, 'error');
+      }
+    }
+  }
+
   const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
   const address = [user.address, user.city, user.pin].filter(Boolean).join(', ') || 'N/A';
-  const plainPw = user.passwordPlain && user.passwordPlain !== '—'
-    ? user.passwordPlain
-    : (user.hasPassword ? 'Encrypted / Hashed (Stored securely. Use Edit button to reset password to plain text)' : 'No password set');
+  const displayPw = plainPw || (user.hasPassword ? 'Encrypted / Hashed (Stored securely. Use Edit button to reset password to plain text)' : 'No password set');
 
   const fileContent = 
 `=============================================================
@@ -2980,7 +3005,7 @@ Account Created : ${joinDate}
 
 -------------------------------------------------------------
 ACCOUNT PASSWORD:
-${plainPw}
+${displayPw}
 -------------------------------------------------------------
 
 Exported by Administrator on: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)
