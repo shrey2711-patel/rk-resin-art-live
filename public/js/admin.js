@@ -2952,6 +2952,111 @@ Admin.renderUsers = async function () {
   }
 };
 
+Admin.downloadUserPassword = function (userId) {
+  const user = Admin._usersCache.find(u => String(u.id) === String(userId));
+  if (!user) {
+    showToast('User not found', 'error');
+    return;
+  }
+
+  const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
+  const address = [user.address, user.city, user.pin].filter(Boolean).join(', ') || 'N/A';
+  const plainPw = user.passwordPlain && user.passwordPlain !== '—'
+    ? user.passwordPlain
+    : (user.hasPassword ? 'Encrypted / Hashed (Stored securely. Use Edit button to reset password to plain text)' : 'No password set');
+
+  const fileContent = 
+`=============================================================
+             RK RESIN ART - CUSTOMER CREDENTIALS
+=============================================================
+
+Customer ID     : #${user.id}
+Customer Name   : ${user.name || 'N/A'}
+Email Address   : ${user.email || 'N/A'}
+Phone Number    : ${user.phone || 'N/A'}
+Delivery Address: ${address}
+Total Orders    : ${user.orderCount || 0}
+Account Created : ${joinDate}
+
+-------------------------------------------------------------
+ACCOUNT PASSWORD:
+${plainPw}
+-------------------------------------------------------------
+
+Exported by Administrator on: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)
+Website: https://rkresinart.com
+
+=============================================================
+CONFIDENTIAL & PRIVATE - FOR AUTHORIZED ADMIN USE ONLY
+=============================================================
+`;
+
+  const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeName = (user.name || user.email || 'user').replace(/[^a-zA-Z0-9_-]/g, '_');
+  a.href = url;
+  a.download = `RK_Password_${safeName}_ID${user.id}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`Password .txt downloaded for ${user.name || user.email} ✓`, 'success');
+};
+
+Admin.exportAllUserPasswords = function () {
+  if (!Admin._usersCache || !Admin._usersCache.length) {
+    showToast('No users available to export', 'error');
+    return;
+  }
+
+  let content = 
+`=============================================================
+          RK RESIN ART - ALL CUSTOMER CREDENTIALS
+=============================================================
+Export Date : ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} (IST)
+Total Users : ${Admin._usersCache.length}
+=============================================================
+
+`;
+
+  Admin._usersCache.forEach((user, index) => {
+    const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
+    const address = [user.address, user.city, user.pin].filter(Boolean).join(', ') || 'N/A';
+    const plainPw = user.passwordPlain && user.passwordPlain !== '—'
+      ? user.passwordPlain
+      : (user.hasPassword ? 'Encrypted / Hashed' : 'No password set');
+
+    content += `[USER #${index + 1}] ID: ${user.id}
+Name    : ${user.name || 'N/A'}
+Email   : ${user.email || 'N/A'}
+Phone   : ${user.phone || 'N/A'}
+Address : ${address}
+Orders  : ${user.orderCount || 0}
+Joined  : ${joinDate}
+PASSWORD: ${plainPw}
+-------------------------------------------------------------
+`;
+  });
+
+  content += `\n=============================================================
+CONFIDENTIAL & PRIVATE - FOR AUTHORIZED ADMIN USE ONLY
+=============================================================`;
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `RK_All_Customer_Passwords_${new Date().toISOString().slice(0, 10)}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`Exported all ${Admin._usersCache.length} user passwords to .txt ✓`, 'success');
+};
+
 Admin._renderUserList = function (users) {
   const list = document.getElementById('adminUserList');
   if (!list) return;
@@ -2976,14 +3081,29 @@ Admin._renderUserList = function (users) {
           </div>
           <div style="font-size:0.82rem;color:var(--muted);margin-bottom:2px">📧 ${u.email || '—'} &nbsp;|&nbsp; 📱 ${u.phone || '—'}</div>
           <div style="font-size:0.8rem;color:var(--muted);margin-bottom:2px">🏠 ${address}</div>
-          <div style="font-size:0.74rem;color:var(--muted)">Joined: ${joinDate} &nbsp;|&nbsp; 🔑 Password: ${passwordDisplay}</div>
+          <div style="font-size:0.74rem;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <span>Joined: ${joinDate} &nbsp;|&nbsp; 🔑 Password: ${passwordDisplay}</span>
+            <button type="button" class="download-pw-inline-btn" data-uid="${u.id}" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:0.72rem;cursor:pointer;color:var(--p);font-weight:700;display:inline-flex;align-items:center;gap:3px;" title="Download password .txt file">
+              📥 Download TXT
+            </button>
+          </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          <button class="admin-action-btn download-pw-btn" data-uid="${u.id}" title="Download customer password .txt file" style="font-size:0.8rem;padding:6px 12px;border-radius:8px;background:#0f766e;color:#fff;border:none;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:4px;transition:opacity 0.18s">📥 Show / Download Password</button>
           <button class="admin-action-btn edit-user-btn" data-uid="${u.id}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--p);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">✏️ Edit</button>
           <button class="admin-action-btn delete-user-btn" data-uid="${u.id}" data-name="${u.name || 'this user'}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">🗑️ Delete</button>
         </div>
       </div>`;
   }).join('');
+
+  // Bind download password buttons
+  list.querySelectorAll('.download-pw-btn, .download-pw-inline-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const uid = String(btn.dataset.uid);
+      Admin.downloadUserPassword(uid);
+    };
+  });
 
   // Bind edit buttons
   list.querySelectorAll('.edit-user-btn').forEach(btn => {
@@ -3032,7 +3152,7 @@ Admin._openUserEditModal = function (user) {
   }
 };
 
-// Users tab tab click
+// Users tab click
 document.querySelectorAll('.atab[data-tab]').forEach(btn => {
   if (btn.dataset.tab === 'users') {
     btn.addEventListener('click', () => Admin.renderUsers());
@@ -3045,6 +3165,25 @@ if (refreshUsersBtn) {
   refreshUsersBtn.onclick = () => {
     Admin.renderUsers();
     showToast('Users refreshed', 'success');
+  };
+}
+
+// Export all users passwords button
+const exportAllUsersBtn = document.getElementById('exportAllUsersBtn');
+if (exportAllUsersBtn) {
+  exportAllUsersBtn.onclick = () => {
+    Admin.exportAllUserPasswords();
+  };
+}
+
+// Download password from inside edit modal
+const downloadEuPwBtn = document.getElementById('downloadEuPwBtn');
+if (downloadEuPwBtn) {
+  downloadEuPwBtn.onclick = () => {
+    const id = document.getElementById('editUserId').value;
+    if (id) {
+      Admin.downloadUserPassword(id);
+    }
   };
 }
 
@@ -3123,7 +3262,7 @@ if (saveUserEditBtn) {
           overlay.style.display = 'none';
           overlay.classList.remove('open');
         }
-      }, 1200);
+      }, 1000);
     } catch (e) {
       showError(e.message || 'Failed to save user');
     }

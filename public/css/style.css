@@ -2501,8 +2501,24 @@ body.admin-page-active {
   color: var(--ink) !important;
 }
 
-body.admin-page-active > :not(#adminOverlay):not(#toast) {
+body.admin-page-active > :not(#adminOverlay):not(#toast):not(#userEditModalOverlay):not(#userDeleteModalOverlay) {
   display: none !important;
+}
+
+#userEditModalOverlay,
+#userDeleteModalOverlay {
+  z-index: 99999 !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(16, 37, 31, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+}
+#userEditModalOverlay.open,
+#userDeleteModalOverlay.open {
+  display: flex !important;
 }
 
 body.admin-page-active #closeAdminPanel {
