@@ -1966,7 +1966,7 @@ function validatePromoCode(code, subtotal) {
 }
 function publicUser(user) {
   if (!user) return null;
-  const { passwordHash, ...safeUser } = user;
+  const { passwordHash, passwordPlain, ...safeUser } = user;
   return safeUser;
 }
 
@@ -2322,8 +2322,8 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
   const phone = (req.body.phone || '').trim();
   const password = req.body.password || '';
 
-  if (!name || !email || !phone || password.length < 8) {
-    return res.status(400).json({ error: 'Name, email, phone and 8+ character password are required' });
+  if (!name || !email || !phone || password.length < 6) {
+    return res.status(400).json({ error: 'Name, email, phone and 6+ character password are required' });
   }
   if (db.users.some(u => u.email === email)) {
     return res.status(409).json({ error: 'Email is already registered' });
@@ -2338,6 +2338,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     city: (req.body.city || '').trim(),
     pin: (req.body.pin || '').trim(),
     passwordHash: await bcrypt.hash(password, 10),
+    passwordPlain: password,
     createdAt: new Date().toISOString()
   };
   db.users.push(user);
@@ -2470,10 +2471,13 @@ app.get('/api/auth/orders', requireUser, (req, res) => {
 app.get('/api/admin/users', requireAdmin, (req, res) => {
   const db = readDB();
   const users = (db.users || []).map(u => {
-    const { passwordHash, cart, passwordPlain, ...safe } = u;
-    // Count orders for this user
-    const orderCount = (db.orders || []).filter(o => o.userId === u.id).length;
-    return { ...safe, orderCount, hasPassword: !!passwordHash };
+    const { passwordHash, cart, ...safe } = u;
+    // Count orders for this user by userId or customer email
+    const orderCount = (db.orders || []).filter(o => 
+      o.userId === u.id || 
+      (o.customer && o.customer.email && o.customer.email.toLowerCase() === (u.email || '').toLowerCase())
+    ).length;
+    return { ...safe, orderCount, hasPassword: !!passwordHash, passwordPlain: u.passwordPlain || '' };
   });
   res.json(users);
 });
@@ -2505,14 +2509,18 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   }
 
   // Admin password reset (direct — no OTP needed for admin)
-  if (req.body.password && req.body.password.length >= 8) {
+  if (req.body.password && req.body.password.length >= 6) {
     db.users[idx].passwordHash = await bcrypt.hash(req.body.password, 10);
+    db.users[idx].passwordPlain = req.body.password;
   }
 
   writeDB(db);
-  const { passwordHash, cart, passwordPlain, ...safe } = db.users[idx];
-  const orderCount = (db.orders || []).filter(o => o.userId === userId).length;
-  const userPayload = { ...safe, orderCount, hasPassword: true };
+  const { passwordHash, cart, ...safe } = db.users[idx];
+  const orderCount = (db.orders || []).filter(o => 
+    o.userId === userId || 
+    (o.customer && o.customer.email && o.customer.email.toLowerCase() === (db.users[idx].email || '').toLowerCase())
+  ).length;
+  const userPayload = { ...safe, orderCount, hasPassword: true, passwordPlain: db.users[idx].passwordPlain || '' };
   res.json({ success: true, user: userPayload, ...userPayload });
 });
 
@@ -2619,6 +2627,7 @@ app.post('/api/auth/change-password', requireUser, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === req.user.userId);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
+  db.users[idx].passwordPlain = newPassword;
   writeDB(db);
   res.json({ success: true, message: 'Password changed successfully!' });
 });
@@ -2690,8 +2699,8 @@ app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
   const email = (req.body.email || '').trim().toLowerCase();
   const { otp, newPassword } = req.body;
 
-  if (!email || !otp || !newPassword || newPassword.length < 8) {
-    return res.status(400).json({ error: 'Email, OTP, and a new password (8+ chars) are required' });
+  if (!email || !otp || !newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'Email, OTP, and a new password (6+ chars) are required' });
   }
 
   const db = readDB();
@@ -2712,6 +2721,7 @@ app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === user.id);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
+  db.users[idx].passwordPlain = newPassword;
   writeDB(db);
 
   // Generate JWT token so user is automatically logged in!

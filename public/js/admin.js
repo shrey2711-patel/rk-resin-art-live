@@ -2964,6 +2964,7 @@ Admin._renderUserList = function (users) {
     const joinDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
     const address = [u.address, u.city, u.pin].filter(Boolean).join(', ') || '<span style="color:var(--muted)">No address</span>';
     const orders = u.orderCount || 0;
+    const passwordDisplay = u.passwordPlain ? `<span style="font-weight:700;color:var(--p);font-family:monospace;background:rgba(15,118,110,0.08);padding:2px 8px;border-radius:6px;">${u.passwordPlain}</span>` : (u.hasPassword ? '<span style="color:var(--muted);font-style:italic;">•••••••• (Encrypted)</span>' : '<span style="color:var(--muted)">—</span>');
     return `
       <div class="user-row" data-uid="${u.id}" style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);transition:background 0.18s">
         <div class="user-avatar-initials" style="flex-shrink:0;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--green));color:#fff;font-weight:800;font-size:1.05rem;display:flex;align-items:center;justify-content:center;letter-spacing:0.5px">${initials}</div>
@@ -2975,7 +2976,7 @@ Admin._renderUserList = function (users) {
           </div>
           <div style="font-size:0.82rem;color:var(--muted);margin-bottom:2px">📧 ${u.email || '—'} &nbsp;|&nbsp; 📱 ${u.phone || '—'}</div>
           <div style="font-size:0.8rem;color:var(--muted);margin-bottom:2px">🏠 ${address}</div>
-          <div style="font-size:0.74rem;color:var(--muted)">Joined: ${joinDate} &nbsp;|&nbsp; 🔑 Password: <span style="font-weight:700;color:var(--p);">${u.passwordPlain || '—'}</span></div>
+          <div style="font-size:0.74rem;color:var(--muted)">Joined: ${joinDate} &nbsp;|&nbsp; 🔑 Password: ${passwordDisplay}</div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
           <button class="admin-action-btn edit-user-btn" data-uid="${u.id}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--p);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">✏️ Edit</button>
