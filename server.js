@@ -282,7 +282,7 @@ async function sendAdminEmailNotification(order) {
 
     const customer = order.customer || {};
     const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
-    const fullAddress = [customer.address, customer.city, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
+    const fullAddress = [customer.address, customer.city, customer.state, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
 
     // Format order items table rows
     let itemsHTML = '';
@@ -531,7 +531,7 @@ async function sendCustomerOrderConfirmation(order) {
     }
 
     const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
-    const fullAddress = [customer.address, customer.city, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
+    const fullAddress = [customer.address, customer.city, customer.state, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
 
     // Format order items table rows
     let itemsHTML = '';
@@ -773,7 +773,7 @@ async function sendCustomerShippingNotification(order) {
     }
 
     const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
-    const fullAddress = [customer.address, customer.city, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
+    const fullAddress = [customer.address, customer.city, customer.state, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
     const courierName = order.courierName || 'Our Shipping Partner';
     const trackingId = order.trackingId || '';
     const trackingLink = trackingId ? (trackingId.startsWith('http') ? trackingId : `https://www.google.com/search?q=${encodeURIComponent(courierName + ' tracking ' + trackingId)}`) : '#';
@@ -2094,6 +2094,22 @@ app.get('/api/debug-db', requireAdmin, (req, res) => {
   });
 });
 
+function calculateShippingCharge(subtotal, state, settings = {}) {
+  const cleanState = String(state || '').trim().toLowerCase();
+  const isGujarat = cleanState === 'gujarat' || cleanState === 'gj';
+  const shippingThreshold = settings.shippingThreshold !== undefined ? Number(settings.shippingThreshold) : 999;
+  
+  if (subtotal >= shippingThreshold) {
+    return 0;
+  }
+  
+  if (isGujarat || !cleanState) {
+    return settings.shippingRate !== undefined ? Number(settings.shippingRate) : 60;
+  } else {
+    return settings.outOfStateShippingRate !== undefined ? Number(settings.outOfStateShippingRate) : 100;
+  }
+}
+
 // GET site settings (announce bar etc.)
 app.get('/api/settings', (req, res) => {
   const db = readDB();
@@ -2102,6 +2118,7 @@ app.get('/api/settings', (req, res) => {
     cartEnabled: db.settings.cartEnabled !== false,
     trackStock: db.settings.trackStock !== false,
     shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
+    outOfStateShippingRate: db.settings.outOfStateShippingRate !== undefined ? Number(db.settings.outOfStateShippingRate) : 100,
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
     otherChargesType: db.settings.otherChargesType || 'flat',
@@ -2336,6 +2353,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     phone,
     address: (req.body.address || '').trim(),
     city: (req.body.city || '').trim(),
+    state: (req.body.state || '').trim(),
     pin: (req.body.pin || '').trim(),
     passwordHash: await bcrypt.hash(password, 10),
     createdAt: new Date().toISOString()
@@ -2429,7 +2447,7 @@ app.put('/api/auth/profile', requireUser, (req, res) => {
   const idx = db.users.findIndex(u => u.id === req.user.userId);
   if (idx === -1) return res.status(404).json({ error: 'User not found' });
 
-  ['name', 'phone', 'address', 'city', 'pin'].forEach(field => {
+  ['name', 'phone', 'address', 'city', 'state', 'pin'].forEach(field => {
     if (req.body[field] !== undefined) db.users[idx][field] = String(req.body[field]).trim();
   });
   writeDB(db);
@@ -2486,7 +2504,7 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   const idx = db.users.findIndex(u => u.id === userId);
   if (idx === -1) return res.status(404).json({ error: 'User not found' });
 
-  const allowed = ['name', 'phone', 'address', 'city', 'pin'];
+  const allowed = ['name', 'phone', 'address', 'city', 'state', 'pin'];
   allowed.forEach(field => {
     if (req.body[field] !== undefined) {
       db.users[idx][field] = String(req.body[field]).trim();
@@ -2774,9 +2792,8 @@ app.post('/api/payment/create-order', checkoutLimiter, (req, res) => {
     }
   }
 
-  const shippingRate = db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60;
-  const shippingThreshold = db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999;
-  const shipping = subtotal >= shippingThreshold ? 0 : shippingRate;
+  const customerState = req.body.customer?.state || req.body.state || '';
+  const shipping = calculateShippingCharge(subtotal, customerState, db.settings);
   
   const taxableAmount = Math.max(0, subtotal - discount);
   const otherCharges = db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0;
@@ -2887,9 +2904,7 @@ app.post('/api/payment/verify', (req, res) => {
     }
   }
 
-  const shippingRate = db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60;
-  const shippingThreshold = db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999;
-  const shipping = itemTotal >= shippingThreshold ? 0 : shippingRate;
+  const shipping = calculateShippingCharge(itemTotal, customer?.state, db.settings);
   
   const taxableAmount = Math.max(0, itemTotal - discount);
   const otherCharges = db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0;
@@ -2994,9 +3009,7 @@ app.post('/api/orders', checkoutLimiter, (req, res) => {
     }
   }
 
-  const shippingRate = db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60;
-  const shippingThreshold = db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999;
-  const shipping = itemTotal >= shippingThreshold ? 0 : shippingRate;
+  const shipping = calculateShippingCharge(itemTotal, customer?.state, db.settings);
   
   const taxableAmount = Math.max(0, itemTotal - discount);
   const otherCharges = db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0;
@@ -3295,6 +3308,7 @@ app.get('/api/admin/settings', requireAdmin, (req, res) => {
     cartEnabled: db.settings.cartEnabled !== false,
     trackStock: db.settings.trackStock !== false,
     shippingRate: db.settings.shippingRate !== undefined ? Number(db.settings.shippingRate) : 60,
+    outOfStateShippingRate: db.settings.outOfStateShippingRate !== undefined ? Number(db.settings.outOfStateShippingRate) : 100,
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
     otherChargesType: db.settings.otherChargesType || 'flat',
@@ -3309,6 +3323,7 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   if (req.body.cartEnabled !== undefined) db.settings.cartEnabled = !!req.body.cartEnabled;
   if (req.body.trackStock !== undefined) db.settings.trackStock = !!req.body.trackStock;
   if (req.body.shippingRate !== undefined) db.settings.shippingRate = Number(req.body.shippingRate);
+  if (req.body.outOfStateShippingRate !== undefined) db.settings.outOfStateShippingRate = Number(req.body.outOfStateShippingRate);
   if (req.body.shippingThreshold !== undefined) db.settings.shippingThreshold = Number(req.body.shippingThreshold);
   if (req.body.otherCharges !== undefined) db.settings.otherCharges = Number(req.body.otherCharges);
   if (req.body.otherChargesType !== undefined) db.settings.otherChargesType = req.body.otherChargesType;

@@ -122,6 +122,7 @@ const App = {
     appliedCoupon: null, // active coupon metadata
     sortBy: '',
     shippingRate: 60,
+    outOfStateShippingRate: 100,
     shippingThreshold: 999,
     otherCharges: 0,
     otherChargesType: 'flat',
@@ -218,6 +219,10 @@ const App = {
     }
 
     this.setupPaymentSelector();
+    const ckStateEl = document.getElementById('ckState');
+    if (ckStateEl) {
+      ckStateEl.addEventListener('change', () => App.recalculateCheckout());
+    }
     this.initRouter();
   },
 
@@ -1006,6 +1011,7 @@ const App = {
       document.body.classList.toggle('cart-disabled', !cartEnabled);
 
       if (s.shippingRate !== undefined) this.state.shippingRate = Number(s.shippingRate);
+      if (s.outOfStateShippingRate !== undefined) this.state.outOfStateShippingRate = Number(s.outOfStateShippingRate);
       if (s.shippingThreshold !== undefined) this.state.shippingThreshold = Number(s.shippingThreshold);
       if (s.otherCharges !== undefined) this.state.otherCharges = Number(s.otherCharges);
       if (s.otherChargesType !== undefined) this.state.otherChargesType = s.otherChargesType;
@@ -2564,6 +2570,7 @@ const Auth = {
         document.getElementById('editPhone').value = this.user.phone || '';
         document.getElementById('editAddress').value = this.user.address || '';
         document.getElementById('editCity').value = this.user.city || '';
+        if (document.getElementById('editState')) document.getElementById('editState').value = this.user.state || 'Gujarat';
         document.getElementById('editPin').value = this.user.pin || '';
       }
     };
@@ -2639,7 +2646,7 @@ const Auth = {
     document.getElementById('accountName').textContent = this.user.name || 'Customer';
     document.getElementById('accountEmail').textContent = this.user.email || '';
     document.getElementById('accountPhone').textContent = this.user.phone ? `📞 ${this.user.phone}` : '';
-    document.getElementById('accountAddress').textContent = [this.user.address, this.user.city, this.user.pin]
+    document.getElementById('accountAddress').textContent = [this.user.address, this.user.city, this.user.state, this.user.pin]
       .filter(Boolean).join(', ') || 'No saved address yet.';
   },
 
@@ -2712,6 +2719,8 @@ const Auth = {
     document.getElementById('ckEmail').value = user.email || '';
     document.getElementById('ckAddress').value = user.address || '';
     document.getElementById('ckCity').value = user.city || '';
+    const stateEl = document.getElementById('ckState');
+    if (stateEl) stateEl.value = user.state || 'Gujarat';
     document.getElementById('ckPin').value = user.pin || '';
   },
 
@@ -2721,6 +2730,7 @@ const Auth = {
       phone: document.getElementById('editPhone').value.trim(),
       address: document.getElementById('editAddress').value.trim(),
       city: document.getElementById('editCity').value.trim(),
+      state: (document.getElementById('editState')?.value || '').trim(),
       pin: document.getElementById('editPin').value.trim(),
     };
     try {
@@ -2759,6 +2769,10 @@ const Auth = {
   },
 
   async register() {
+    const stateVal = (document.getElementById('regState')?.value || '').trim();
+    if (!stateVal) {
+      return this.message('Please select your state.', 'error');
+    }
     const payload = {
       name: document.getElementById('regName').value.trim(),
       email: document.getElementById('regEmail').value.trim(),
@@ -2766,6 +2780,7 @@ const Auth = {
       password: document.getElementById('regPassword').value,
       address: document.getElementById('regAddress').value.trim(),
       city: document.getElementById('regCity').value.trim(),
+      state: stateVal,
       pin: document.getElementById('regPin').value.trim()
     };
     if (!payload.name || !payload.email || !payload.phone || payload.password.length < 6) {
@@ -2861,7 +2876,7 @@ const Invoice = {
       doc.text(fullName, 20, 76);
       if (c.phone) doc.text(`Phone: ${c.phone}`, 20, 82);
       if (c.email) doc.text(`Email: ${c.email}`, 20, 88);
-      const addr = [c.address, c.city, c.pin].filter(Boolean).join(', ');
+      const addr = [c.address, c.city, c.state, c.pin].filter(Boolean).join(', ');
       if (addr) {
         const addrLines = doc.splitTextToSize(addr, 75);
         doc.text(addrLines, 20, 94);
@@ -3047,7 +3062,10 @@ App.recalculateCheckout = function() {
   const items = isBuyNow ? btn._buyNowItems : Cart.items;
 
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const shipping = subtotal >= App.state.shippingThreshold ? 0 : App.state.shippingRate;
+  const selectedState = (document.getElementById('ckState')?.value || '').trim();
+  const isGujarat = !selectedState || selectedState.toLowerCase() === 'gujarat' || selectedState.toLowerCase() === 'gj';
+  const effectiveShippingRate = isGujarat ? (App.state.shippingRate || 60) : (App.state.outOfStateShippingRate || 100);
+  const shipping = subtotal >= App.state.shippingThreshold ? 0 : effectiveShippingRate;
 
   let discount = 0;
   let promoHTML = '';
@@ -3117,14 +3135,19 @@ document.getElementById('placeOrderBtn').onclick = async () => {
   const firstName = document.getElementById('ckFirstName').value.trim();
   const phone = document.getElementById('ckPhone').value.trim();
   const address = document.getElementById('ckAddress').value.trim();
-  if (!firstName || !phone || !address) {
-    showToast('Please fill Name, Phone & Address', 'error'); return;
+  const state = (document.getElementById('ckState')?.value || '').trim();
+
+  if (!firstName || !phone || !address || !state) {
+    showToast('Please fill Name, Phone, Address & State', 'error');
+    if (!state) document.getElementById('ckState')?.focus();
+    return;
   }
 
   const customer = {
     firstName, lastName: document.getElementById('ckLastName').value.trim(),
     phone, email: document.getElementById('ckEmail').value.trim(),
     address, city: document.getElementById('ckCity').value.trim(),
+    state,
     pin: document.getElementById('ckPin').value.trim()
   };
 
@@ -3135,7 +3158,9 @@ document.getElementById('placeOrderBtn').onclick = async () => {
     : Cart.items.map(item => ({ ...item }));
 
   const cartSubtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
-  const shipping = cartSubtotal >= App.state.shippingThreshold ? 0 : App.state.shippingRate;
+  const isGujarat = state.toLowerCase() === 'gujarat' || state.toLowerCase() === 'gj';
+  const effectiveShippingRate = isGujarat ? (App.state.shippingRate || 60) : (App.state.outOfStateShippingRate || 100);
+  const shipping = cartSubtotal >= App.state.shippingThreshold ? 0 : effectiveShippingRate;
 
   // Compute discount from applied coupon
   let localDiscount = 0;
@@ -3160,7 +3185,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       btn.disabled = true;
 
       // 1. Create Razorpay order on the server
-      const reqPayload = { items: cartItems };
+      const reqPayload = { items: cartItems, customer };
       if (App.state.appliedCoupon) {
         reqPayload.couponCode = App.state.appliedCoupon.code;
       }
@@ -3223,7 +3248,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
               `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
             ).join('\n\n');
             const fullName = `${firstName} ${customer.lastName}`.trim();
-            const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
+            const fullAddress = [address, customer.city, customer.state, customer.pin].filter(Boolean).join(', ');
             
             const discountAmount = verifyRes.order.discount || 0;
             const discountLine = discountAmount > 0 ? `Discount (${verifyRes.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
@@ -3247,6 +3272,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
               `Name: ${fullName}\n` +
               `Phone: ${phone}\n` +
               `Email: ${customer.email || '-'}\n` +
+              `State: ${customer.state}\n` +
               `Address: ${fullAddress}`
             );
             window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
@@ -3311,7 +3337,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
         `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
       ).join('\n\n');
       const fullName = `${firstName} ${customer.lastName}`.trim();
-      const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
+      const fullAddress = [address, customer.city, customer.state, customer.pin].filter(Boolean).join(', ');
       
       const discountAmount = res.order.discount || 0;
       const discountLine = discountAmount > 0 ? `Discount (${res.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
@@ -3333,6 +3359,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
         `Name: ${fullName}\n` +
         `Phone: ${phone}\n` +
         `Email: ${customer.email || '-'}\n` +
+        `State: ${customer.state}\n` +
         `Address: ${fullAddress}\n\n` +
         `Please confirm this order and arrange delivery. Thank you! 🙏`
       );
