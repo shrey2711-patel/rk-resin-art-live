@@ -1230,8 +1230,6 @@ const Admin = {
 
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
-      const outRateEl = document.getElementById('afOutOfStateShippingRate');
-      if (outRateEl) outRateEl.value = s.outOfStateShippingRate !== undefined ? s.outOfStateShippingRate : 100;
       const threshEl = document.getElementById('afShippingThreshold');
       if (threshEl) threshEl.value = s.shippingThreshold !== undefined ? s.shippingThreshold : 999;
       const otherEl = document.getElementById('afOtherCharges');
@@ -1280,8 +1278,6 @@ const Admin = {
       
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
-      const outRateEl = document.getElementById('afOutOfStateShippingRate');
-      if (outRateEl) outRateEl.value = s.outOfStateShippingRate !== undefined ? s.outOfStateShippingRate : 100;
       const threshEl = document.getElementById('afShippingThreshold');
       if (threshEl) threshEl.value = s.shippingThreshold !== undefined ? s.shippingThreshold : 999;
       const otherEl = document.getElementById('afOtherCharges');
@@ -1746,7 +1742,7 @@ const Admin = {
           </div>
         </div>
         <div class="order-customer">👤 <strong>${fullName}</strong> | 📞 ${c.phone || '—'} | ${c.city || ''}</div>
-        ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.state, c.pin].filter(Boolean).join(', ')}</div>` : ''}
+        ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.pin].filter(Boolean).join(', ')}</div>` : ''}
         <div class="order-items-list">${itemsSummary}</div>
 
         <!-- Courier & Tracking Info Panel -->
@@ -1996,14 +1992,12 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
 // Save Billing & Charges Settings
 document.getElementById('saveBillingSettingsBtn').onclick = async () => {
   const shippingRate = parseFloat(document.getElementById('afShippingRate').value) || 0;
-  const outOfStateShippingRate = parseFloat(document.getElementById('afOutOfStateShippingRate').value) || 0;
   const shippingThreshold = parseFloat(document.getElementById('afShippingThreshold').value) || 0;
   const otherCharges = parseFloat(document.getElementById('afOtherCharges').value) || 0;
   const otherChargesType = document.getElementById('afOtherChargesType').value;
 
   await API.updateSettings({
     shippingRate: shippingRate,
-    outOfStateShippingRate: outOfStateShippingRate,
     shippingThreshold: shippingThreshold,
     otherCharges: otherCharges,
     otherChargesType: otherChargesType
@@ -2011,7 +2005,6 @@ document.getElementById('saveBillingSettingsBtn').onclick = async () => {
 
   if (!Admin.data.settings) Admin.data.settings = {};
   Admin.data.settings.shippingRate = shippingRate;
-  Admin.data.settings.outOfStateShippingRate = outOfStateShippingRate;
   Admin.data.settings.shippingThreshold = shippingThreshold;
   Admin.data.settings.otherCharges = otherCharges;
   Admin.data.settings.otherChargesType = otherChargesType;
@@ -2969,7 +2962,7 @@ Admin._renderUserList = function (users) {
   list.innerHTML = users.map(u => {
     const initials = (u.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     const joinDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-    const address = [u.address, u.city, u.state, u.pin].filter(Boolean).join(', ') || '<span style="color:var(--muted)">No address</span>';
+    const address = [u.address, u.city, u.pin].filter(Boolean).join(', ') || '<span style="color:var(--muted)">No address</span>';
     const orders = u.orderCount || 0;
     return `
       <div class="user-row" data-uid="${u.id}" style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);transition:background 0.18s">
@@ -3027,8 +3020,6 @@ Admin._openUserEditModal = function (user) {
   document.getElementById('euPhone').value = user.phone || '';
   document.getElementById('euAddress').value = user.address || '';
   document.getElementById('euCity').value = user.city || '';
-  const stateEl = document.getElementById('euState');
-  if (stateEl) stateEl.value = user.state || '';
   document.getElementById('euPin').value = user.pin || '';
   document.getElementById('euPassword').value = user.passwordPlain && user.passwordPlain !== '—' ? user.passwordPlain : '';
   const msg = document.getElementById('userEditMsg');
@@ -3080,7 +3071,6 @@ if (saveUserEditBtn) {
     const phone = document.getElementById('euPhone').value.trim();
     const address = document.getElementById('euAddress').value.trim();
     const city = document.getElementById('euCity').value.trim();
-    const state = (document.getElementById('euState')?.value || '').trim();
     const pin = document.getElementById('euPin').value.trim();
 
     const msg = document.getElementById('userEditMsg');
@@ -3100,7 +3090,7 @@ if (saveUserEditBtn) {
     if (!emailVal || !emailVal.includes('@')) return showError('Please enter a valid email address');
     if (!phone) return showError('Phone number is required');
 
-    const payload = { name, phone, address, city, state, pin };
+    const payload = { name, phone, address, city, pin };
     if (emailVal) payload.email = emailVal;
 
     const pw = document.getElementById('euPassword').value;

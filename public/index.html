@@ -372,55 +372,13 @@
           </div>
           <div class="form-row-2">
             <div class="form-field">
-              <label>City *</label>
+              <label>City</label>
               <input type="text" id="ckCity" placeholder="Ahmedabad">
             </div>
             <div class="form-field">
-              <label>State *</label>
-              <select id="ckState" class="address-state-select">
-                <option value="">Select State</option>
-                <option value="Gujarat" selected>Gujarat</option>
-                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                <option value="Assam">Assam</option>
-                <option value="Bihar">Bihar</option>
-                <option value="Chandigarh">Chandigarh</option>
-                <option value="Chhattisgarh">Chhattisgarh</option>
-                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Goa">Goa</option>
-                <option value="Haryana">Haryana</option>
-                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                <option value="Jharkhand">Jharkhand</option>
-                <option value="Karnataka">Karnataka</option>
-                <option value="Kerala">Kerala</option>
-                <option value="Ladakh">Ladakh</option>
-                <option value="Lakshadweep">Lakshadweep</option>
-                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                <option value="Maharashtra">Maharashtra</option>
-                <option value="Manipur">Manipur</option>
-                <option value="Meghalaya">Meghalaya</option>
-                <option value="Mizoram">Mizoram</option>
-                <option value="Nagaland">Nagaland</option>
-                <option value="Odisha">Odisha</option>
-                <option value="Puducherry">Puducherry</option>
-                <option value="Punjab">Punjab</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Sikkim">Sikkim</option>
-                <option value="Tamil Nadu">Tamil Nadu</option>
-                <option value="Telangana">Telangana</option>
-                <option value="Tripura">Tripura</option>
-                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                <option value="Uttarakhand">Uttarakhand</option>
-                <option value="West Bengal">West Bengal</option>
-              </select>
+              <label>PIN Code</label>
+              <input type="text" id="ckPin" placeholder="380001">
             </div>
-          </div>
-          <div class="form-field">
-            <label>PIN Code *</label>
-            <input type="text" id="ckPin" placeholder="380001">
           </div>
 
         <!-- Promo Code Block -->
@@ -512,50 +470,8 @@
           <div class="form-field"><label>Address</label><textarea id="regAddress" rows="2" placeholder="House no, street, area"></textarea></div>
           <div class="form-row-2">
             <div class="form-field"><label>City</label><input id="regCity" placeholder="City"></div>
-            <div class="form-field">
-              <label>State *</label>
-              <select id="regState" class="address-state-select">
-                <option value="">Select State</option>
-                <option value="Gujarat" selected>Gujarat</option>
-                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                <option value="Assam">Assam</option>
-                <option value="Bihar">Bihar</option>
-                <option value="Chandigarh">Chandigarh</option>
-                <option value="Chhattisgarh">Chhattisgarh</option>
-                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Goa">Goa</option>
-                <option value="Haryana">Haryana</option>
-                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                <option value="Jharkhand">Jharkhand</option>
-                <option value="Karnataka">Karnataka</option>
-                <option value="Kerala">Kerala</option>
-                <option value="Ladakh">Ladakh</option>
-                <option value="Lakshadweep">Lakshadweep</option>
-                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                <option value="Maharashtra">Maharashtra</option>
-                <option value="Manipur">Manipur</option>
-                <option value="Meghalaya">Meghalaya</option>
-                <option value="Mizoram">Mizoram</option>
-                <option value="Nagaland">Nagaland</option>
-                <option value="Odisha">Odisha</option>
-                <option value="Puducherry">Puducherry</option>
-                <option value="Punjab">Punjab</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Sikkim">Sikkim</option>
-                <option value="Tamil Nadu">Tamil Nadu</option>
-                <option value="Telangana">Telangana</option>
-                <option value="Tripura">Tripura</option>
-                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                <option value="Uttarakhand">Uttarakhand</option>
-                <option value="West Bengal">West Bengal</option>
-              </select>
-            </div>
+            <div class="form-field"><label>PIN Code</label><input id="regPin" placeholder="PIN"></div>
           </div>
-          <div class="form-field"><label>PIN Code</label><input id="regPin" placeholder="PIN"></div>
           <button class="account-primary-btn" id="registerBtn">Create Account</button>
           <div style="text-align: center; margin-top: 15px; font-size: 0.82rem;">
             Already have an account? <a href="#" id="gotoLoginLink" style="color: var(--p); font-weight: 700; text-decoration: none;">Please Login</a>
@@ -588,50 +504,8 @@
             <div class="form-field"><label>Address</label><textarea id="editAddress" rows="2" placeholder="Address"></textarea></div>
             <div class="form-row-2">
               <div class="form-field"><label>City</label><input id="editCity" placeholder="City"></div>
-              <div class="form-field">
-                <label>State</label>
-                <select id="editState" class="address-state-select">
-                  <option value="">Select State</option>
-                  <option value="Gujarat">Gujarat</option>
-                  <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                  <option value="Andhra Pradesh">Andhra Pradesh</option>
-                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                  <option value="Assam">Assam</option>
-                  <option value="Bihar">Bihar</option>
-                  <option value="Chandigarh">Chandigarh</option>
-                  <option value="Chhattisgarh">Chhattisgarh</option>
-                  <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Goa">Goa</option>
-                  <option value="Haryana">Haryana</option>
-                  <option value="Himachal Pradesh">Himachal Pradesh</option>
-                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                  <option value="Jharkhand">Jharkhand</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Kerala">Kerala</option>
-                  <option value="Ladakh">Ladakh</option>
-                  <option value="Lakshadweep">Lakshadweep</option>
-                  <option value="Madhya Pradesh">Madhya Pradesh</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Manipur">Manipur</option>
-                  <option value="Meghalaya">Meghalaya</option>
-                  <option value="Mizoram">Mizoram</option>
-                  <option value="Nagaland">Nagaland</option>
-                  <option value="Odisha">Odisha</option>
-                  <option value="Puducherry">Puducherry</option>
-                  <option value="Punjab">Punjab</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                  <option value="Sikkim">Sikkim</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Telangana">Telangana</option>
-                  <option value="Tripura">Tripura</option>
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
-                  <option value="Uttarakhand">Uttarakhand</option>
-                  <option value="West Bengal">West Bengal</option>
-                </select>
-              </div>
+              <div class="form-field"><label>PIN</label><input id="editPin" placeholder="PIN"></div>
             </div>
-            <div class="form-field"><label>PIN</label><input id="editPin" placeholder="PIN"></div>
             <button class="account-primary-btn" id="saveProfileBtn">Save Changes</button>
           </div>
           <div class="account-actions">
@@ -907,30 +781,26 @@
             <div class="admin-form-card">
               <div class="form-row-2">
                 <div class="form-field">
-                  <label>Flat Shipping Rate (₹) [Gujarat]</label>
+                  <label>Flat Shipping Rate (₹)</label>
                   <input class="admin-input" type="number" step="0.01" id="afShippingRate" placeholder="60">
                 </div>
-                <div class="form-field">
-                  <label>Out of Gujarat Shipping Rate (₹)</label>
-                  <input class="admin-input" type="number" step="0.01" id="afOutOfStateShippingRate" placeholder="100">
-                </div>
-              </div>
-              <div class="form-row-2">
                 <div class="form-field">
                   <label>Free Shipping Threshold (₹)</label>
                   <input class="admin-input" type="number" step="0.01" id="afShippingThreshold" placeholder="999">
                 </div>
+              </div>
+              <div class="form-row-2">
                 <div class="form-field">
                   <label>Other Charges Value</label>
                   <input class="admin-input" type="number" step="0.01" id="afOtherCharges" placeholder="0">
                 </div>
-              </div>
-              <div class="form-field">
-                <label>Other Charges Type</label>
-                <select class="admin-input" id="afOtherChargesType" style="height: 40px; padding: 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); box-sizing: border-box;">
-                  <option value="flat">Flat (₹)</option>
-                  <option value="percentage">Percentage (%)</option>
-                </select>
+                <div class="form-field">
+                  <label>Other Charges Type</label>
+                  <select class="admin-input" id="afOtherChargesType" style="height: 40px; padding: 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); box-sizing: border-box;">
+                    <option value="flat">Flat (₹)</option>
+                    <option value="percentage">Percentage (%)</option>
+                  </select>
+                </div>
               </div>
               <button class="admin-save-btn" id="saveBillingSettingsBtn">Save Billing Settings</button>
               <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved!</div>
@@ -1421,51 +1291,9 @@
         <div class="form-field"><label>City</label><input class="admin-input" id="euCity" placeholder="City"></div>
       </div>
       <div class="form-row-2">
-        <div class="form-field">
-          <label>State</label>
-          <select class="admin-input" id="euState" style="height: 40px; background: var(--card); color: var(--ink); border: 1px solid var(--border);">
-            <option value="">Select State</option>
-            <option value="Gujarat">Gujarat</option>
-            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-            <option value="Andhra Pradesh">Andhra Pradesh</option>
-            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-            <option value="Assam">Assam</option>
-            <option value="Bihar">Bihar</option>
-            <option value="Chandigarh">Chandigarh</option>
-            <option value="Chhattisgarh">Chhattisgarh</option>
-            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Goa">Goa</option>
-            <option value="Haryana">Haryana</option>
-            <option value="Himachal Pradesh">Himachal Pradesh</option>
-            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-            <option value="Jharkhand">Jharkhand</option>
-            <option value="Karnataka">Karnataka</option>
-            <option value="Kerala">Kerala</option>
-            <option value="Ladakh">Ladakh</option>
-            <option value="Lakshadweep">Lakshadweep</option>
-            <option value="Madhya Pradesh">Madhya Pradesh</option>
-            <option value="Maharashtra">Maharashtra</option>
-            <option value="Manipur">Manipur</option>
-            <option value="Meghalaya">Meghalaya</option>
-            <option value="Mizoram">Mizoram</option>
-            <option value="Nagaland">Nagaland</option>
-            <option value="Odisha">Odisha</option>
-            <option value="Puducherry">Puducherry</option>
-            <option value="Punjab">Punjab</option>
-            <option value="Rajasthan">Rajasthan</option>
-            <option value="Sikkim">Sikkim</option>
-            <option value="Tamil Nadu">Tamil Nadu</option>
-            <option value="Telangana">Telangana</option>
-            <option value="Tripura">Tripura</option>
-            <option value="Uttar Pradesh">Uttar Pradesh</option>
-            <option value="Uttarakhand">Uttarakhand</option>
-            <option value="West Bengal">West Bengal</option>
-          </select>
-        </div>
+        <div class="form-field"><label>Delivery Address</label><input class="admin-input" id="euAddress" placeholder="Address"></div>
         <div class="form-field"><label>PIN Code</label><input class="admin-input" id="euPin" placeholder="PIN Code"></div>
       </div>
-      <div class="form-field"><label>Delivery Address</label><input class="admin-input" id="euAddress" placeholder="Address"></div>
       <div class="form-field" style="margin-top:10px;">
         <label>Set / Reset Password (Optional)</label>
         <div style="position:relative;">
