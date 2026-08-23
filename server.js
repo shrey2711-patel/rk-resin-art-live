@@ -1383,32 +1383,50 @@ function logSecurityEvent(ip, type, message) {
   writeDB(db);
 }
 
-function autoBlockIp(ip) {
+const LOGIN_MAX_FAILED_ATTEMPTS = 5;
+const LOGIN_LOCKOUT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function getLoginLockoutInfo(ip) {
   if (isWhitelistedIp(ip)) {
-    console.log(`🛡️ Security: Skipping auto-block for whitelisted developer IP ${ip}.`);
-    return;
+    return { locked: false, remainingMinutes: 0, failedCount: 0 };
   }
-  const db = readDB();
-  db.blockedIps = db.blockedIps || [];
-  if (!db.blockedIps.includes(ip)) {
-    db.blockedIps.push(ip);
-    writeDB(db);
-    console.warn(`🚨 Security: Automatically blocked IP ${ip} due to suspicious brute-force activity.`);
+  const now = Date.now();
+  if (!failedLoginTracker[ip] || !Array.isArray(failedLoginTracker[ip])) {
+    return { locked: false, remainingMinutes: 0, failedCount: 0 };
+  }
+  // Auto-refresh: filter out failed attempts older than 15 minutes
+  failedLoginTracker[ip] = failedLoginTracker[ip].filter(timestamp => now - timestamp < LOGIN_LOCKOUT_WINDOW_MS);
+  const failedCount = failedLoginTracker[ip].length;
+  if (failedCount >= LOGIN_MAX_FAILED_ATTEMPTS) {
+    const oldestTimestamp = failedLoginTracker[ip][0] || now;
+    const remainingMs = Math.max(0, LOGIN_LOCKOUT_WINDOW_MS - (now - oldestTimestamp));
+    const remainingMinutes = Math.ceil(remainingMs / (60 * 1000)) || 1;
+    return { locked: true, remainingMinutes, remainingMs, failedCount };
+  }
+  return { locked: false, remainingMinutes: 0, failedCount };
+}
+
+function recordFailedLogin(ip) {
+  if (isWhitelistedIp(ip)) return;
+  const now = Date.now();
+  if (!failedLoginTracker[ip] || !Array.isArray(failedLoginTracker[ip])) {
+    failedLoginTracker[ip] = [];
+  }
+  failedLoginTracker[ip] = failedLoginTracker[ip].filter(timestamp => now - timestamp < LOGIN_LOCKOUT_WINDOW_MS);
+  failedLoginTracker[ip].push(now);
+
+  if (failedLoginTracker[ip].length >= LOGIN_MAX_FAILED_ATTEMPTS) {
+    logSecurityEvent(ip, 'LOGIN_LOCKOUT', `5 invalid login attempts reached. Login access temporarily held for 15 minutes.`);
   }
 }
 
+function resetFailedLogins(ip) {
+  delete failedLoginTracker[ip];
+}
+
+// Backward-compatibility alias
 function trackFailedLogin(ip) {
-  const now = Date.now();
-  if (!failedLoginTracker[ip]) {
-    failedLoginTracker[ip] = [];
-  }
-  failedLoginTracker[ip] = failedLoginTracker[ip].filter(timestamp => now - timestamp < 15 * 60 * 1000);
-  failedLoginTracker[ip].push(now);
-  
-  if (failedLoginTracker[ip].length >= 5) {
-    logSecurityEvent(ip, 'BRUTE_FORCE_DETECTED', `Brute force login attempts detected. Automatically blocking IP.`);
-    autoBlockIp(ip);
-  }
+  recordFailedLogin(ip);
 }
 
 async function sendSecurityAlertEmail(user, geo, ip) {
@@ -1519,8 +1537,8 @@ const globalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { error: 'Too many login or registration attempts. Please try again in 15 minutes.' },
+  max: 60,
+  message: { error: 'Too many requests. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res, next, options) => {
@@ -1682,141 +1700,6 @@ function getImgBbApiKey() {
     process.env.IMG_BB_API_KEY ||
     process.env.IMG_BB_KEY ||
     null;
-}
-
-function hasLiveStoreData(data) {
-  if (!data || typeof data !== 'object') return false;
-  return Boolean(
-    (Array.isArray(data.products) && data.products.length > 0) ||
-    (Array.isArray(data.orders) && data.orders.length > 0) ||
-    (Array.isArray(data.users) && data.users.length > 0) ||
-    (Array.isArray(data.banners) && data.banners.length > 0)
-  );
-}
-
-
-// Manual cookie parser middleware
-app.use((req, res, next) => {
-  req.cookies = {};
-  const rc = req.headers.cookie;
-  if (rc) {
-    rc.split(';').forEach(cookie => {
-      const parts = cookie.split('=');
-      req.cookies[parts.shift().trim()] = decodeURI(parts.join('='));
-    });
-  }
-  next();
-});
-
-// Blocklist enforcement middleware
-app.use((req, res, next) => {
-  const normalizedIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
-  
-  if (isWhitelistedIp(normalizedIp)) {
-    return next();
-  }
-
-  const db = readDB();
-  const blockedIps = db.blockedIps || [];
-
-  if (blockedIps.includes(normalizedIp)) {
-    return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
-  }
-  next();
-});
-
-// Developer request logger & analytics collector middleware
-app.use((req, res, next) => {
-  const startTime = Date.now();
-  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-  
-  let visitorId = req.cookies.visitor_id;
-  let isNewVisitor = false;
-  if (!visitorId) {
-    visitorId = crypto.randomBytes(16).toString('hex');
-    res.cookie('visitor_id', visitorId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true });
-    isNewVisitor = true;
-  }
-
-  const originalEnd = res.end;
-  res.end = function(chunk, encoding) {
-    res.end = originalEnd;
-    res.end(chunk, encoding);
-    
-    const duration = Date.now() - startTime;
-    const statusCode = res.statusCode;
-    
-    const ext = path.extname(req.url);
-    const isAsset = ext && ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'].includes(ext.toLowerCase());
-    
-    if (!isAsset && !req.url.startsWith('/uploads/')) {
-      const geo = getIpLocation(clientIp);
-      
-      // Disabled to prevent automatic visitor analytics updates from triggering database writes on every page load, saving Render bandwidth.
-      /*
-      try {
-        updateAggregatedAnalytics({
-          ip: clientIp,
-          isNew: isNewVisitor,
-          country: geo.country,
-          region: geo.region,
-          city: geo.city,
-          isp: geo.isp
-        });
-      } catch (err) {
-        console.error('Error updating analytics:', err.message);
-      }
-      */
-
-      const logEntry = {
-        timestamp: new Date().toISOString(),
-        ip: clientIp,
-        url: req.originalUrl || req.url,
-        method: req.method,
-        userAgent: req.headers['user-agent'] || 'Unknown',
-        status: statusCode,
-        duration: `${duration}ms`,
-        location: formatLocationLabel(geo)
-      };
-      
-      logVisitorRequest(logEntry);
-    }
-  };
-  
-  next();
-});
-
-// Apply global rate limiting to all APIs
-app.use('/api/', globalLimiter);
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(UPLOAD_DIR));
-
-
-function getFirebaseDbUrl() {
-  return process.env.FIREBASE_DB_URL ||
-    process.env.FIREBASE_DATABASE_URL ||
-    process.env.FIREBASE_RTDB_URL ||
-    process.env.FIREBASE_REALTIME_DATABASE_URL ||
-    null;
-}
-
-function firebaseRestUrl() {
-  const dbUrl = getFirebaseDbUrl();
-  if (!dbUrl) return null;
-  const secret = process.env.FIREBASE_DB_SECRET || process.env.FIREBASE_SECRET;
-  const baseUrl = dbUrl.endsWith('/') ? `${dbUrl}.json` : `${dbUrl}/.json`;
-  return secret ? `${baseUrl}?auth=${secret}` : baseUrl;
-}
-
-function getR2Config() {
-  const accountId  = process.env.R2_ACCOUNT_ID;
-  const accessKey  = process.env.R2_ACCESS_KEY_ID;
-  const secretKey  = process.env.R2_SECRET_ACCESS_KEY;
-  const bucketName = process.env.R2_BUCKET_NAME;
-  const publicUrl  = process.env.R2_PUBLIC_URL;
-  if (!accountId || !accessKey || !secretKey || !bucketName || !publicUrl) return null;
-  return { accountId, accessKey, secretKey, bucketName, publicUrl };
 }
 
 function hasLiveStoreData(data) {
@@ -2302,6 +2185,14 @@ app.post('/api/admin/login', authLimiter, async (req, res) => {
   const { password } = req.body;
   const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
 
+  // Check if temporarily held due to 5 failed attempts in 15 minutes
+  const lockout = getLoginLockoutInfo(clientIp);
+  if (lockout.locked) {
+    return res.status(429).json({
+      error: `Too many invalid login attempts. Please try again in ${lockout.remainingMinutes} minute${lockout.remainingMinutes === 1 ? '' : 's'}.`
+    });
+  }
+
   const envAdminPass = process.env.ADMIN_PASSWORD;
   const storedPass = db.settings.adminPassword;
   const ALLOWED_INITIAL_PASSWORDS = ['rk3495', 'rk2024'];
@@ -2346,13 +2237,22 @@ app.post('/api/admin/login', authLimiter, async (req, res) => {
   }
 
   if (!passwordMatch) {
-    trackFailedLogin(clientIp);
+    recordFailedLogin(clientIp);
     logSecurityEvent(clientIp, 'FAILED_ADMIN_LOGIN', `Failed admin login attempt from ${clientIp}`);
-    return res.status(401).json({ error: 'Incorrect password' });
+    const postLockout = getLoginLockoutInfo(clientIp);
+    if (postLockout.locked) {
+      return res.status(429).json({
+        error: `Too many invalid login attempts. Login access held for 15 minutes. Please try again in ${postLockout.remainingMinutes} minute${postLockout.remainingMinutes === 1 ? '' : 's'}.`
+      });
+    }
+    const remainingAttempts = LOGIN_MAX_FAILED_ATTEMPTS - postLockout.failedCount;
+    return res.status(401).json({
+      error: `Incorrect password. ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining before 15-minute hold.`
+    });
   }
 
   // Clear any failed login tracking on success
-  delete failedLoginTracker[clientIp];
+  resetFailedLogins(clientIp);
 
   // Record login log
   const geo = getIpLocation(clientIp);
@@ -2453,16 +2353,34 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
   const email = (req.body.email || '').trim().toLowerCase();
   const password = req.body.password || '';
   const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+
+  // Check if temporarily held due to 5 failed attempts in 15 minutes
+  const lockout = getLoginLockoutInfo(clientIp);
+  if (lockout.locked) {
+    return res.status(429).json({
+      error: `Too many invalid login attempts. Please try again in ${lockout.remainingMinutes} minute${lockout.remainingMinutes === 1 ? '' : 's'}.`
+    });
+  }
+
   const user = db.users.find(u => u.email === email);
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    trackFailedLogin(clientIp);
+    recordFailedLogin(clientIp);
     logSecurityEvent(clientIp, 'FAILED_LOGIN', `Failed login attempt for email: ${email}`);
-    return res.status(401).json({ error: 'Invalid email or password' });
+    const postLockout = getLoginLockoutInfo(clientIp);
+    if (postLockout.locked) {
+      return res.status(429).json({
+        error: `Too many invalid login attempts. Login access held for 15 minutes. Please try again in ${postLockout.remainingMinutes} minute${postLockout.remainingMinutes === 1 ? '' : 's'}.`
+      });
+    }
+    const remainingAttempts = LOGIN_MAX_FAILED_ATTEMPTS - postLockout.failedCount;
+    return res.status(401).json({
+      error: `Invalid email or password. ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining before 15-minute hold.`
+    });
   }
 
   // Clear failed logins on success
-  delete failedLoginTracker[clientIp];
+  resetFailedLogins(clientIp);
 
   // Geolocation checks for unusual login activity
   const geo = getIpLocation(clientIp);

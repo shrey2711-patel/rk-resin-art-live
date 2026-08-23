@@ -1924,8 +1924,8 @@ document.getElementById('adminLoginBtn').onclick = async () => {
     await API.adminLogin(pass);
     errEl.textContent = '';
     Admin.showDashboard();
-  } catch {
-    errEl.textContent = 'Incorrect password. Please try again.';
+  } catch (err) {
+    errEl.textContent = err.message || 'Incorrect password. Please try again.';
   }
 };
 document.getElementById('adminPassInput').onkeydown = e => {

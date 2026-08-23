@@ -2753,8 +2753,8 @@ const Auth = {
       if (typeof Cart !== 'undefined') {
         Cart.syncWithServer();
       }
-    } catch {
-      this.message('Invalid email or password.', 'error');
+    } catch (e) {
+      this.message(e.message || 'Invalid email or password.', 'error');
     }
   },
 
