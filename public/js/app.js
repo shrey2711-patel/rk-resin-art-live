@@ -199,7 +199,7 @@ const App = {
             discount: result.discount
           };
 
-          msgEl.textContent = `Coupon applied successfully! Saved ₹${result.discount} 🎉`;
+          msgEl.textContent = `Coupon applied successfully! Saved ₹${result.discount}`;
           msgEl.style.display = 'block';
           msgEl.style.color = 'var(--green)';
 
@@ -976,12 +976,41 @@ const App = {
     }
   },
 
+  updatePlaceOrderButton(state = 'default') {
+    const btn = document.getElementById('placeOrderBtn');
+    if (!btn) return;
+    const method = this.state.paymentMethod || 'upi';
+
+    if (state === 'loading') {
+      btn.disabled = true;
+      btn.innerHTML = `<span>Processing Order...</span>`;
+      return;
+    }
+
+    btn.disabled = false;
+    if (method === 'upi') {
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span>Submit Order & Confirm Payment</span>
+      `;
+    } else if (method === 'online') {
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        <span>Pay securely with Razorpay</span>
+      `;
+    } else {
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        <span>Place Order via WhatsApp</span>
+      `;
+    }
+  },
+
   setupPaymentSelector() {
     const upiOpt = document.getElementById('payUpiOpt');
     const codOpt = document.getElementById('payCodOpt');
     const onlineOpt = document.getElementById('payOnlineOpt');
     const upiSection = document.getElementById('upiPaymentSection');
-    const btn = document.getElementById('placeOrderBtn');
 
     if (upiOpt) {
       upiOpt.onclick = () => {
@@ -990,7 +1019,7 @@ const App = {
         if (codOpt) codOpt.classList.remove('active');
         if (onlineOpt) onlineOpt.classList.remove('active');
         if (upiSection) upiSection.style.display = 'block';
-        if (btn) btn.textContent = 'Submit Order & Confirm Payment';
+        App.updatePlaceOrderButton('default');
         App.recalculateCheckout();
       };
     }
@@ -1002,7 +1031,7 @@ const App = {
         if (upiOpt) upiOpt.classList.remove('active');
         if (onlineOpt) onlineOpt.classList.remove('active');
         if (upiSection) upiSection.style.display = 'none';
-        if (btn) btn.textContent = 'Place Order via WhatsApp';
+        App.updatePlaceOrderButton('default');
       };
     }
 
@@ -1014,11 +1043,11 @@ const App = {
         if (upiOpt) upiOpt.classList.remove('active');
         if (codOpt) codOpt.classList.remove('active');
         if (upiSection) upiSection.style.display = 'none';
-        if (btn) btn.textContent = 'Pay securely with Razorpay';
+        App.updatePlaceOrderButton('default');
       };
     }
 
-    // 1-Click Copy UPI ID button
+    // 1-Click Copy UPI ID button with SVG toggle
     const copyUpiBtn = document.getElementById('copyUpiBtn');
     if (copyUpiBtn) {
       copyUpiBtn.onclick = async (e) => {
@@ -1037,12 +1066,16 @@ const App = {
           }
           const textSpan = document.getElementById('copyUpiText');
           const iconSpan = document.getElementById('copyUpiIcon');
-          if (textSpan) textSpan.textContent = 'Copied!';
-          if (iconSpan) iconSpan.textContent = '✅';
-          showToast('UPI ID copied to clipboard: ' + upiId, 'success');
+          if (textSpan) textSpan.textContent = 'Copied';
+          if (iconSpan) {
+            iconSpan.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          }
+          showToast('UPI ID copied to clipboard', 'success');
           setTimeout(() => {
             if (textSpan) textSpan.textContent = 'Copy';
-            if (iconSpan) iconSpan.textContent = '📋';
+            if (iconSpan) {
+              iconSpan.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            }
           }, 2000);
         } catch (err) {
           showToast('UPI ID: ' + upiId, 'info');
@@ -1079,7 +1112,7 @@ const App = {
           if (emptyState) emptyState.style.display = 'none';
           if (filledState) filledState.style.display = 'flex';
           if (proofStatus) {
-            proofStatus.textContent = '✅ Screenshot attached (' + Math.round(file.size / 1024) + ' KB)';
+            proofStatus.textContent = 'Receipt attached (' + Math.round(file.size / 1024) + ' KB)';
             proofStatus.style.color = '#059669';
           }
         };
@@ -1104,7 +1137,6 @@ const App = {
     const codOpt = document.getElementById('payCodOpt');
     const onlineOpt = document.getElementById('payOnlineOpt');
     const upiSection = document.getElementById('upiPaymentSection');
-    const btn = document.getElementById('placeOrderBtn');
     
     const upiEnabled = this.state.upiEnabled !== false && this.state.cartEnabled !== false;
     const razorpayEnabled = this.state.razorpayEnabled !== false && this.state.cartEnabled !== false;
@@ -1123,22 +1155,20 @@ const App = {
       if (codOpt) codOpt.classList.remove('active');
       if (onlineOpt) onlineOpt.classList.remove('active');
       if (upiSection) upiSection.style.display = 'block';
-      if (btn) btn.textContent = 'Submit Order & Confirm Payment';
     } else if (razorpayEnabled) {
       this.state.paymentMethod = 'online';
       if (onlineOpt) onlineOpt.classList.add('active');
       if (upiOpt) upiOpt.classList.remove('active');
       if (codOpt) codOpt.classList.remove('active');
       if (upiSection) upiSection.style.display = 'none';
-      if (btn) btn.textContent = 'Pay securely with Razorpay';
     } else {
       this.state.paymentMethod = 'cod';
       if (codOpt) codOpt.classList.add('active');
       if (upiOpt) upiOpt.classList.remove('active');
       if (onlineOpt) onlineOpt.classList.remove('active');
       if (upiSection) upiSection.style.display = 'none';
-      if (btn) btn.textContent = 'Place Order via WhatsApp';
     }
+    this.updatePlaceOrderButton('default');
   },
 
   // ── Settings / Announce ───────────────────────────────────
@@ -1973,8 +2003,8 @@ const App = {
   // ── Buy Now (direct checkout) ─────────────────────────────
   openBuyNowCheckout(prod, cat = {}) {
     if (!Auth.user) {
-      const actionText = this.state.cartEnabled !== false ? 'buy products' : 'enquire about products';
-      showToast(`🔒 Please login or register to ${actionText}!`, 'error');
+      const actionText = this.state.cartEnabled !== false ? 'purchase products' : 'enquire about products';
+      showToast(`Please login or register to ${actionText}`, 'error');
       Auth.open();
       return;
     }
@@ -1984,8 +2014,8 @@ const App = {
     Auth.fillCheckout();
 
     document.getElementById('checkoutTitle').textContent = this.state.cartEnabled !== false
-      ? 'Buy Now — Quick Checkout'
-      : 'Enquire Now — Quick Inquiry';
+      ? 'Express Checkout'
+      : 'Quick Inquiry';
     document.getElementById('invoiceDownloadBtn').style.display = 'none';
     document.getElementById('checkoutModalOverlay').classList.add('open');
 
@@ -3165,11 +3195,11 @@ document.getElementById('productModalOverlay').onclick = (e) => {
 // ── Checkout Modal ────────────────────────────────────────────
 function openCheckoutModal() {
   if (!Auth.user) {
-    showToast('🔒 Please login or register to proceed to checkout!', 'error');
+    showToast('Please login or register to proceed to checkout', 'error');
     Auth.open();
     return;
   }
-  if (!Cart.items.length) { showToast('Your cart is empty!', 'error'); return; }
+  if (!Cart.items.length) { showToast('Your cart is empty', 'error'); return; }
   Auth.fillCheckout();
 
   document.getElementById('checkoutTitle').textContent = 'Checkout';
@@ -3215,9 +3245,15 @@ App.recalculateCheckout = function() {
     discount = Math.min(discount, subtotal);
 
     promoHTML = `
-      <div class="ck-order-item" style="color: var(--red); font-weight: bold; border-bottom: 1px dashed var(--red);">
-        <span class="ck-order-item-name">Discount (${c.code})</span>
-        <span class="ck-order-item-price">-₹${discount.toLocaleString('en-IN')}</span>
+      <div class="ck-order-item" style="color: #059669; font-weight: 700; background: rgba(16, 185, 129, 0.05); padding: 8px 10px; border-radius: 8px; margin-top: 4px; border: 1px solid rgba(16, 185, 129, 0.2);">
+        <div class="ck-item-left">
+          <div class="ck-item-thumb-fallback" style="background: rgba(16, 185, 129, 0.12); color: #059669; border-color: rgba(16, 185, 129, 0.3);">%</div>
+          <div class="ck-item-details">
+            <span class="ck-order-item-name" style="color: #059669;">Discount (${c.code})</span>
+            <span class="ck-item-qty-tag" style="color: #047857;">Promotion applied</span>
+          </div>
+        </div>
+        <span class="ck-order-item-price" style="color: #059669;">-₹${discount.toLocaleString('en-IN')}</span>
       </div>
     `;
   }
@@ -3230,13 +3266,35 @@ App.recalculateCheckout = function() {
     : otherCharges;
   const grandTotal = taxableAmount + shipping + otherChargesAmount;
 
-  // Draw checkout summary lists
-  document.getElementById('ckOrderItems').innerHTML = items.map(i =>
-    `<div class="ck-order-item">
-      <span class="ck-order-item-name">${i.name} ×${i.qty}</span>
-      <span class="ck-order-item-price">₹${(i.price * i.qty).toLocaleString('en-IN')}</span>
-    </div>`
-  ).join('') + promoHTML;
+  // Draw checkout summary list with image thumbnails
+  const itemsContainer = document.getElementById('ckOrderItems');
+  if (itemsContainer) {
+    itemsContainer.innerHTML = items.map(i => {
+      const img = (i.images && i.images[0]) || i.image || i.imageUrl || '';
+      const thumbHtml = img
+        ? `<img src="${img}" alt="${i.name}" class="ck-item-thumb">`
+        : `<div class="ck-item-thumb-fallback">${(i.name || 'P').charAt(0).toUpperCase()}</div>`;
+      const meta = i.selectedVariant ? i.selectedVariant.name : (i.category || '');
+      return `
+        <div class="ck-order-item">
+          <div class="ck-item-left">
+            ${thumbHtml}
+            <div class="ck-item-details">
+              <span class="ck-order-item-name">${i.name}</span>
+              <span class="ck-item-qty-tag">${meta ? meta + ' · ' : ''}Qty: ${i.qty}</span>
+            </div>
+          </div>
+          <span class="ck-order-item-price">₹${(i.price * i.qty).toLocaleString('en-IN')}</span>
+        </div>
+      `;
+    }).join('') + promoHTML;
+  }
+
+  const itemsBadge = document.getElementById('ckItemsCountBadge');
+  if (itemsBadge) {
+    const totalQty = items.reduce((s, i) => s + (i.qty || 1), 0);
+    itemsBadge.textContent = `${totalQty} ${totalQty === 1 ? 'item' : 'items'}`;
+  }
 
   document.getElementById('ckSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
   document.getElementById('ckShipping').textContent = shipping === 0 ? 'FREE' : `₹${shipping}`;
@@ -3274,7 +3332,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
   const phone = document.getElementById('ckPhone').value.trim();
   const address = document.getElementById('ckAddress').value.trim();
   if (!firstName || !phone || !address) {
-    showToast('Please fill Name, Phone & Address', 'error'); return;
+    showToast('Please fill Name, Phone and Delivery Address', 'error'); return;
   }
 
   const customer = {
@@ -3320,15 +3378,14 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
     // Require either UPI transaction ID / UTR or payment screenshot proof
     if (!upiTxnId && !hasProofFile) {
-      showToast('⚠️ Please enter your UPI Reference / UTR Number or attach payment screenshot', 'error');
+      showToast('Please enter your UPI Reference / UTR Number or attach payment receipt', 'error');
       const txnInput = document.getElementById('ckUpiTxnId');
       if (txnInput) { txnInput.focus(); txnInput.style.borderColor = '#ef4444'; }
       return;
     }
 
     try {
-      btn.textContent = 'Verifying & Submitting Order...';
-      btn.disabled = true;
+      App.updatePlaceOrderButton('loading');
 
       let upiProofUrl = document.getElementById('ckUpiProofUrl').value || '';
       if (hasProofFile && !upiProofUrl) {
@@ -3361,19 +3418,18 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
       if (!isBuyNow) Cart.clear();
 
-      btn.textContent = 'Submit Order & Confirm Payment';
-      btn.disabled = false;
+      App.updatePlaceOrderButton('default');
       btn._isBuyNow = false;
       btn._buyNowItems = null;
 
       // Invoice download button
       const invoiceBtn = document.getElementById('invoiceDownloadBtn');
       if (invoiceBtn) {
-        invoiceBtn.style.display = 'flex';
+        invoiceBtn.style.display = 'inline-flex';
         invoiceBtn.onclick = () => Invoice.generate(res.order);
       }
 
-      showToast(`Order #${res.orderId} placed via UPI! Payment proof recorded 🎉`, 'success');
+      showToast(`Order #${res.orderId} placed via UPI. Payment proof recorded.`, 'success');
 
       // WhatsApp message to admin with UPI details & order info
       const orderLines = cartItems.map((i, index) =>
@@ -3392,39 +3448,37 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       const otherLine = otherChargesAmount > 0 ? `Other Charges${res.order.otherChargesType === 'percentage' ? ' (' + res.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
 
       const msg = encodeURIComponent(
-        `⚡ *New UPI Paid Order from RK Resin Art Website!*\n\n` +
-        `📋 *Order ID:* #${res.orderId}\n` +
-        `🟣 *Payment Method:* Direct UPI QR Scan\n` +
-        `🔢 *UPI UTR / Reference ID:* ${upiTxnId || 'See attached screenshot'}\n` +
-        `${upiProofUrl ? `📸 *Payment Screenshot Link:* ${upiProofUrl}\n` : ''}` +
-        `📅 *Date:* ${new Date().toLocaleDateString('en-IN')}\n\n` +
-        `📦 *ORDER DETAILS*\n${orderLines}\n\n` +
-        `💰 *PAYMENT SUMMARY*\n` +
+        `*New UPI Paid Order - RK Resin Art*\n\n` +
+        `Order ID: #${res.orderId}\n` +
+        `Payment Method: Direct UPI QR Scan\n` +
+        `UPI UTR / Ref ID: ${upiTxnId || 'See attached receipt'}\n` +
+        `${upiProofUrl ? `Payment Receipt: ${upiProofUrl}\n` : ''}` +
+        `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
+        `ORDER DETAILS:\n${orderLines}\n\n` +
+        `PAYMENT SUMMARY:\n` +
         `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
         discountLine +
         `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
         otherLine +
-        `*Amount Paid: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}*\n\n` +
-        `👤 *CUSTOMER DETAILS*\n` +
+        `Total Paid: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}\n\n` +
+        `CUSTOMER DETAILS:\n` +
         `Name: ${fullName}\n` +
         `Phone: ${phone}\n` +
         `Email: ${customer.email || '-'}\n` +
         `Address: ${fullAddress}\n\n` +
-        `*I have completed the payment via UPI. Please confirm my order!* 🙏`
+        `I have completed payment via UPI. Please confirm my order.`
       );
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
 
       App.loadProducts();
       document.getElementById('checkoutModalOverlay').classList.remove('open');
     } catch (e) {
-      btn.textContent = 'Submit Order & Confirm Payment';
-      btn.disabled = false;
+      App.updatePlaceOrderButton('default');
       showToast(e.message || 'Error placing UPI order. Please try again.', 'error');
     }
   } else if (isOnline) {
     try {
-      btn.textContent = 'Preparing Payment...';
-      btn.disabled = true;
+      App.updatePlaceOrderButton('loading');
 
       // 1. Create Razorpay order on the server
       const reqPayload = { items: cartItems };
@@ -3440,17 +3494,17 @@ document.getElementById('placeOrderBtn').onclick = async () => {
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: 'RK Resin Art',
-        description: 'Premium Craft Supplies Order',
+        description: 'Artisanal Studio Order',
         order_id: razorpayOrder.id,
         prefill: {
           name: `${firstName} ${customer.lastName}`.trim(),
           email: customer.email || '',
           contact: phone
         },
-        theme: { color: '#0f766e' },
+        theme: { color: '#7c3aed' },
         handler: async function (response) {
           try {
-            btn.textContent = 'Verifying Payment...';
+            App.updatePlaceOrderButton('loading');
             
             // 3. Cryptographically verify signature & place order
             const verifyPayload = {
@@ -3469,19 +3523,18 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
             if (!isBuyNow) Cart.clear();
 
-            btn.textContent = 'Pay securely with Razorpay';
-            btn.disabled = false;
+            App.updatePlaceOrderButton('default');
             btn._isBuyNow = false;
             btn._buyNowItems = null;
 
             // Invoice download button
             const invoiceBtn = document.getElementById('invoiceDownloadBtn');
             if (invoiceBtn) {
-              invoiceBtn.style.display = 'flex';
+              invoiceBtn.style.display = 'inline-flex';
               invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
             }
 
-            showToast(`Order #${verifyRes.orderId} placed & paid successfully! 🎉`, 'success');
+            showToast(`Order #${verifyRes.orderId} placed and paid successfully.`, 'success');
 
             // WhatsApp message to admin
             const orderLines = cartItems.map((i, index) =>
@@ -3500,19 +3553,19 @@ document.getElementById('placeOrderBtn').onclick = async () => {
             const otherLine = otherChargesAmount > 0 ? `Other Charges${verifyRes.order.otherChargesType === 'percentage' ? ' (' + verifyRes.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
 
             const msg = encodeURIComponent(
-              `🛍 New ONLINE Order from RK Resin Art Website!\n\n` +
+              `*New Online Order - RK Resin Art*\n\n` +
               `Order ID: #${verifyRes.orderId}\n` +
               `Payment Status: Paid online via Razorpay\n` +
               `Payment ID: ${response.razorpay_payment_id}\n` +
               `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
-              `📦 ORDER DETAILS\n${orderLines}\n\n` +
-              `💰 PAYMENT SUMMARY\n` +
+              `ORDER DETAILS:\n${orderLines}\n\n` +
+              `PAYMENT SUMMARY:\n` +
               `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
               discountLine +
               `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
               otherLine +
               `Grand Total: ₹${Number(verifyRes.order.grandTotal).toLocaleString('en-IN')}\n\n` +
-              `👤 CUSTOMER DETAILS\n` +
+              `CUSTOMER DETAILS:\n` +
               `Name: ${fullName}\n` +
               `Phone: ${phone}\n` +
               `Email: ${customer.email || '-'}\n` +
@@ -3522,15 +3575,13 @@ document.getElementById('placeOrderBtn').onclick = async () => {
             App.loadProducts();
             document.getElementById('checkoutModalOverlay').classList.remove('open');
           } catch (e) {
-            btn.textContent = 'Pay securely with Razorpay';
-            btn.disabled = false;
+            App.updatePlaceOrderButton('default');
             showToast(e.message || 'Payment verification failed', 'error');
           }
         },
         modal: {
           ondismiss: function () {
-            btn.textContent = 'Pay securely with Razorpay';
-            btn.disabled = false;
+            App.updatePlaceOrderButton('default');
             showToast('Payment cancelled by user', 'error');
           }
         }
@@ -3539,15 +3590,13 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       const rzp = new Razorpay(options);
       rzp.open();
     } catch (e) {
-      btn.textContent = 'Pay securely with Razorpay';
-      btn.disabled = false;
+      App.updatePlaceOrderButton('default');
       showToast(e.message || 'Failed to initiate payment', 'error');
     }
   } else {
     // WhatsApp Inquiry flow
     try {
-      btn.textContent = 'Sending Inquiry...';
-      btn.disabled = true;
+      App.updatePlaceOrderButton('loading');
 
       const orderPayload = { items: cartItems, customer };
       if (App.state.appliedCoupon) {
@@ -3559,19 +3608,18 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
       if (!isBuyNow) Cart.clear();
 
-      btn.textContent = 'Place Order via WhatsApp';
-      btn.disabled = false;
+      App.updatePlaceOrderButton('default');
       btn._isBuyNow = false;
       btn._buyNowItems = null;
 
       // Invoice download button
       const invoiceBtn = document.getElementById('invoiceDownloadBtn');
       if (invoiceBtn) {
-        invoiceBtn.style.display = 'flex';
+        invoiceBtn.style.display = 'inline-flex';
         invoiceBtn.onclick = () => Invoice.generate(res.order);
       }
 
-      showToast(`Order #${res.orderId} inquiry sent! We'll contact you on WhatsApp 🎉`, 'success');
+      showToast(`Order #${res.orderId} inquiry sent. We will contact you on WhatsApp.`, 'success');
 
       // Build WhatsApp inquiry message to admin
       const orderLines = cartItems.map((i, index) =>
@@ -3590,30 +3638,29 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       const otherLine = otherChargesAmount > 0 ? `Other Charges${res.order.otherChargesType === 'percentage' ? ' (' + res.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
 
       const msg = encodeURIComponent(
-        `🛍️ *New Order Inquiry from RK Resin Art Website!*\n\n` +
-        `📋 *Order ID:* #${res.orderId}\n` +
-        `📅 *Date:* ${new Date().toLocaleDateString('en-IN')}\n\n` +
-        `📦 *ORDER DETAILS*\n${orderLines}\n\n` +
-        `💰 *PAYMENT SUMMARY*\n` +
+        `*New Order Inquiry - RK Resin Art*\n\n` +
+        `Order ID: #${res.orderId}\n` +
+        `Date: ${new Date().toLocaleDateString('en-IN')}\n\n` +
+        `ORDER DETAILS:\n${orderLines}\n\n` +
+        `PAYMENT SUMMARY:\n` +
         `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
         discountLine +
         `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
         otherLine +
-        `*Grand Total: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}*\n\n` +
-        `👤 *CUSTOMER DETAILS*\n` +
+        `Grand Total: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}\n\n` +
+        `CUSTOMER DETAILS:\n` +
         `Name: ${fullName}\n` +
         `Phone: ${phone}\n` +
         `Email: ${customer.email || '-'}\n` +
         `Address: ${fullAddress}\n\n` +
-        `Please confirm this order and arrange delivery. Thank you! 🙏`
+        `Please confirm this order and arrange delivery. Thank you.`
       );
       window.open(`https://wa.me/918141994995?text=${msg}`, '_blank');
 
       App.loadProducts();
       document.getElementById('checkoutModalOverlay').classList.remove('open');
     } catch (e) {
-      btn.textContent = 'Place Order via WhatsApp';
-      btn.disabled = false;
+      App.updatePlaceOrderButton('default');
       showToast(e.message || 'Error placing order. Please try again.', 'error');
     }
   }

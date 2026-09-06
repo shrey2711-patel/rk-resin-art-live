@@ -523,6 +523,18 @@
           "qty": 2
         }
       ]
+    },
+    {
+      "id": 11,
+      "name": "Aarav Sharma",
+      "email": "testcustomer@example.com",
+      "phone": "9876543210",
+      "address": "12 Lotus Boulevard",
+      "city": "Ahmedabad",
+      "pin": "380001",
+      "passwordHash": "$2a$10$EaheWZMKCLcvjgk6ZUiLIe99K4/tI2KeIG7dD2RtZbf29Xf509k5u",
+      "passwordPlain": "Password123!",
+      "createdAt": "2026-09-06T16:39:40.632Z"
     }
   ],
   "reviews": [
@@ -661,6 +673,18 @@
         "region": "MH",
         "city": "Mumbai",
         "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-09-06T16:33:24.946Z",
+      "ip": "::1",
+      "type": "FAILED_LOGIN",
+      "message": "Failed login attempt for email: testcustomer@example.com",
+      "location": {
+        "country": "IN",
+        "region": "GJ",
+        "city": "Ahmedabad",
+        "isp": "Reliance Jio Infocomm"
       }
     }
   ],

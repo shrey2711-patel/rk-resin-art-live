@@ -1,1115 +1,5 @@
 [
   {
-    "timestamp": "2026-07-12T21:35:56.041Z",
-    "ip": "127.0.0.1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
-    "status": 200,
-    "duration": "31ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:30.973Z",
-    "ip": "127.0.0.1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "13ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:31.881Z",
-    "ip": "127.0.0.1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "85ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:31.891Z",
-    "ip": "127.0.0.1",
-    "url": "/api/banners",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "31ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:31.902Z",
-    "ip": "127.0.0.1",
-    "url": "/api/nav",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "38ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:31.936Z",
-    "ip": "127.0.0.1",
-    "url": "/api/categories",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "59ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.361Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Pigments&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "137ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.533Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Resins&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "299ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.611Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Moulds&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "363ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.702Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Dry+Flowers&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "440ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.726Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Glitters&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "414ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.756Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Tools&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "406ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.814Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Jewellery&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "39ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.825Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Candle&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "46ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.849Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Teak+Wood&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "65ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.879Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?category=Stickers&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "87ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.915Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "111ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:32.955Z",
-    "ip": "127.0.0.1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "139ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:33.018Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "31ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:33.113Z",
-    "ip": "127.0.0.1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "54ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:36:34.845Z",
-    "ip": "127.0.0.1",
-    "url": "/sw.js?v=1.1.3",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "226ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-12T21:37:03.877Z",
-    "ip": "127.0.0.1",
-    "url": "/sw.js?v=1.1.3",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 206,
-    "duration": "9ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:39.940Z",
-    "ip": "::1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "24ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.501Z",
-    "ip": "::1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "26ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.506Z",
-    "ip": "::1",
-    "url": "/api/banners",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "17ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.510Z",
-    "ip": "::1",
-    "url": "/api/nav",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "19ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.517Z",
-    "ip": "::1",
-    "url": "/api/categories",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "23ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.525Z",
-    "ip": "::1",
-    "url": "/api/subcategories",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "30ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.709Z",
-    "ip": "::1",
-    "url": "/api/products?category=Pigments&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "18ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.716Z",
-    "ip": "::1",
-    "url": "/api/products?category=Resins&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "21ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.722Z",
-    "ip": "::1",
-    "url": "/api/products?category=Moulds&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "25ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.727Z",
-    "ip": "::1",
-    "url": "/api/products?category=Dry+Flowers&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "28ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.734Z",
-    "ip": "::1",
-    "url": "/api/products?category=Glitters&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "32ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.739Z",
-    "ip": "::1",
-    "url": "/api/products?category=Tools&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "34ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.764Z",
-    "ip": "::1",
-    "url": "/api/products?category=Jewellery&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "17ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.769Z",
-    "ip": "::1",
-    "url": "/api/products?category=Candle&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "20ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.778Z",
-    "ip": "::1",
-    "url": "/api/products?category=Teak+Wood&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "21ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.785Z",
-    "ip": "::1",
-    "url": "/api/products?category=Stickers&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "27ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.791Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "31ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.796Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "35ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.806Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:41.814Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "11ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:57.330Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20&category=Pigments&subcategory=Mica+Colors",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "13ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:56:57.347Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "26ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:57:08.518Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20&category=Resins",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "5ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:57:08.527Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "10ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:57:14.409Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-15T15:57:14.416Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "10ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T14:39:14.323Z",
-    "ip": "::1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
-    "status": 200,
-    "duration": "6ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T14:39:43.015Z",
-    "ip": "::1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
-    "status": 200,
-    "duration": "7ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T14:40:04.374Z",
-    "ip": "::1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
-    "status": 200,
-    "duration": "11ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T14:40:12.229Z",
-    "ip": "::1",
-    "url": "/api/products",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
-    "status": 200,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T14:40:16.806Z",
-    "ip": "::1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
-    "status": 200,
-    "duration": "1ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:21:27.170Z",
-    "ip": "::1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "node",
-    "status": 200,
-    "duration": "51ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:25.539Z",
-    "ip": "::1",
-    "url": "/",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "31ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.465Z",
-    "ip": "::1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "74ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.482Z",
-    "ip": "::1",
-    "url": "/api/banners",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "41ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.495Z",
-    "ip": "::1",
-    "url": "/api/nav",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "49ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.508Z",
-    "ip": "::1",
-    "url": "/api/categories",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "58ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.525Z",
-    "ip": "::1",
-    "url": "/api/subcategories",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "73ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.612Z",
-    "ip": "::1",
-    "url": "/api/products?category=Pigments&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "17ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.628Z",
-    "ip": "::1",
-    "url": "/api/products?category=Resins&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "27ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.651Z",
-    "ip": "::1",
-    "url": "/api/products?category=Moulds&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "51ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.660Z",
-    "ip": "::1",
-    "url": "/api/products?category=Dry+Flowers&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "57ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.671Z",
-    "ip": "::1",
-    "url": "/api/products?category=Glitters&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "65ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.701Z",
-    "ip": "::1",
-    "url": "/api/products?category=Tools&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "79ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.740Z",
-    "ip": "::1",
-    "url": "/api/products?category=Jewellery&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "32ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.754Z",
-    "ip": "::1",
-    "url": "/api/products?category=Candle&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "36ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.769Z",
-    "ip": "::1",
-    "url": "/api/products?category=Teak+Wood&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "49ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.788Z",
-    "ip": "::1",
-    "url": "/api/products?category=Stickers&limit=1&page=1",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "63ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.802Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "67ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.814Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "72ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.855Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "27ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.867Z",
-    "ip": "::1",
-    "url": "/api/products?page=1&limit=20",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "37ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:26.885Z",
-    "ip": "::1",
-    "url": "/api/reviews/summary",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "51ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:28.524Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "13ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:30.601Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:34.607Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:38.604Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:38.897Z",
-    "ip": "::1",
-    "url": "/admin",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "7ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:39.145Z",
-    "ip": "::1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:40.773Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:41.562Z",
-    "ip": "::1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "13ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:42.860Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:46.447Z",
-    "ip": "::1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "9ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:46.847Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:48.329Z",
-    "ip": "::1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "8ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:50.371Z",
-    "ip": "::1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "7ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:50.858Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:28:51.018Z",
-    "ip": "::1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "16ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:30:38.001Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 200,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:30:57.928Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "5ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:31:28.946Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:31:57.933Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:32:28.974Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:32:57.937Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:33:28.958Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:33:57.935Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:34:28.951Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:34:57.929Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:35:28.958Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:35:57.920Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:36:28.947Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "4ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:36:57.957Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "5ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:37:28.976Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T15:37:57.938Z",
-    "ip": "::1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-07-17T16:33:15.854Z",
-    "ip": "::1",
-    "url": "/sw.js?v=1.3.6",
-    "method": "GET",
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-    "status": 304,
-    "duration": "1ms",
-    "location": "Ahmedabad, GJ, IN"
-  },
-  {
-    "timestamp": "2026-08-21T17:55:46.254Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "137ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T17:55:46.256Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "123ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T17:59:46.615Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "191ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T17:59:46.617Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "190ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
     "timestamp": "2026-08-21T19:24:41.955Z",
     "ip": "127.0.0.1",
     "url": "/api/admin/banners",
@@ -7638,5 +6528,3475 @@
     "status": 200,
     "duration": "9ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:26.602Z",
+    "ip": "::1",
+    "url": "/",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "28ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.212Z",
+    "ip": "::1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "23ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.227Z",
+    "ip": "::1",
+    "url": "/api/banners",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "30ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.242Z",
+    "ip": "::1",
+    "url": "/api/nav",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "41ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.257Z",
+    "ip": "::1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "52ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.284Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.294Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "14ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.317Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:31:32.326Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "15ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:33:24.969Z",
+    "ip": "::1",
+    "url": "/api/auth/login",
+    "method": "POST",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 401,
+    "duration": "37ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:39:40.708Z",
+    "ip": "::1",
+    "url": "/api/auth/register",
+    "method": "POST",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "480ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:39:40.764Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:39:44.320Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:39:48.331Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:39:52.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:39:57.066Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "14ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:00.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:04.312Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:08.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:12.461Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:16.337Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "45ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:20.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:24.316Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:28.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:32.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:36.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:40.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:44.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:48.310Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:52.298Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:40:56.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:00.344Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:04.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:08.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:12.298Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:16.307Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:20.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:24.321Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:26.196Z",
+    "ip": "::1",
+    "url": "/api/products/1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:26.304Z",
+    "ip": "::1",
+    "url": "/api/products?category=Resin&limit=8&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:26.377Z",
+    "ip": "::1",
+    "url": "/api/products?limit=8&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:26.541Z",
+    "ip": "::1",
+    "url": "/api/products/1/reviews",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 200,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:28.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:32.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:36.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:40.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:44.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:48.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:52.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:41:56.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:00.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:04.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:08.304Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:12.301Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:17.874Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:20.303Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:24.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:28.298Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:32.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:36.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:40.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:44.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:48.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:52.309Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:42:56.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:00.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:04.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:08.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:12.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:16.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:20.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:24.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:28.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:32.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:36.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:40.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:44.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:48.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:52.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:43:56.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:00.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:04.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:08.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:12.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:16.325Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "39ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:20.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:24.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:28.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:32.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:36.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:40.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:44.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:48.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:52.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:44:56.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:00.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:04.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:08.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:12.329Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "23ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:16.311Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "19ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:20.309Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "21ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:24.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:28.308Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "17ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:32.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "13ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:36.311Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "17ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:40.324Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "25ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:44.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:48.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:52.503Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:45:56.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:00.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:04.343Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:08.328Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:12.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:16.304Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:20.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:24.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:28.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:32.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:36.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:40.356Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:44.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:48.301Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:52.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:46:56.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:00.358Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:04.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:08.303Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:12.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:16.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:20.308Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:24.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:28.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:32.353Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:36.309Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:40.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:44.357Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:48.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:52.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:47:56.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:00.277Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:04.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:08.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:12.316Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:16.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:20.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:24.344Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:28.304Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:32.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:36.349Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:40.322Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:44.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:48.301Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:52.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:48:56.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:00.346Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:04.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:08.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:12.304Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:16.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:20.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:24.613Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:28.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:32.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:36.298Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:40.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:44.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:48.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:52.319Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:49:58.604Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:00.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:04.323Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:08.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:12.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:16.325Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:20.310Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:24.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:28.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:34.164Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:36.303Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:40.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:44.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:48.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:52.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:50:56.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:00.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:04.307Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:10.022Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:12.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:16.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:20.332Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:24.331Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:28.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:32.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:36.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:40.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:44.523Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:48.280Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:52.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:51:56.298Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:00.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:04.303Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:08.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:12.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:16.459Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:20.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:24.327Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:28.301Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:32.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:36.331Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:40.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:44.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:48.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:52.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:52:56.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:00.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:04.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:08.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:12.549Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:16.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:20.322Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:24.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:28.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:32.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:36.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:40.318Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:41.258Z",
+    "ip": "::1",
+    "url": "/api/products?page=1&limit=20",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:41.274Z",
+    "ip": "::1",
+    "url": "/api/reviews/summary",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "20ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:44.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:48.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:52.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:53:56.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:00.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:04.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:08.311Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:12.338Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:16.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:20.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:24.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:28.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:32.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:36.280Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:40.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:44.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:48.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:52.298Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:54:56.304Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:00.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:04.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:08.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:12.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:16.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:20.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:24.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:28.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:32.310Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:36.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:40.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:44.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:48.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:52.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:55:56.323Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:00.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:04.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:08.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:12.400Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:16.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:20.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:24.379Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:28.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:32.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:36.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:42.213Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:44.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:48.303Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:52.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:56:56.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:00.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:04.302Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:08.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:12.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:16.320Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:20.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:24.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:28.336Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:29.925Z",
+    "ip": "::1",
+    "url": "/api/products/1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:30.008Z",
+    "ip": "::1",
+    "url": "/api/products?category=Resin&limit=8&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:30.162Z",
+    "ip": "::1",
+    "url": "/api/products?limit=8&page=1",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:30.356Z",
+    "ip": "::1",
+    "url": "/api/products/1/reviews",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:32.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:36.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:40.331Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "19ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:44.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:48.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:54.763Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "21ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:57:56.399Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:00.309Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:04.333Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:08.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:12.336Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "15ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:16.323Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:20.315Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:24.331Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:28.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:32.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:36.431Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:40.296Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "12ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:44.306Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:48.311Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:52.332Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "14ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:58:56.354Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "15ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:02.787Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:04.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:08.308Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "19ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:12.310Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "16ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:16.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "16ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:20.340Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:24.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "11ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:28.300Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:32.334Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "10ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:36.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:40.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:44.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:48.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:52.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T16:59:56.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:00.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:04.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:08.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:12.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:16.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:20.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:24.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:28.869Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:32.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:36.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:40.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:44.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:48.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:52.299Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:00:56.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:01:00.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:01:04.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:01:08.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:01:12.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:01:16.289Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:01:20.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
   }
 ]

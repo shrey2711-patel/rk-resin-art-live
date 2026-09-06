@@ -343,170 +343,312 @@
   <!-- CHECKOUT MODAL -->
   <div class="modal-overlay" id="checkoutModalOverlay">
     <div class="checkout-modal" id="checkoutModal">
-      <button class="modal-close" id="closeCheckout">&times;</button>
-      <h2 class="modal-title" id="checkoutTitle">Checkout</h2>
-      <div class="checkout-body">
-        <div class="checkout-form-wrap">
-          <h4>Delivery Details</h4>
-          <div class="form-row-2">
-            <div class="form-field">
-              <label>First Name</label>
-              <input type="text" id="ckFirstName" placeholder="Ravi">
-            </div>
-            <div class="form-field">
-              <label>Last Name</label>
-              <input type="text" id="ckLastName" placeholder="Kumar">
-            </div>
+      <!-- Modal Header -->
+      <div class="ck-modal-header">
+        <div class="ck-header-left">
+          <div class="ck-security-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Secure Checkout</span>
           </div>
-          <div class="form-field">
-            <label>Phone Number *</label>
-            <input type="tel" id="ckPhone" placeholder="+91 98765 43210">
-          </div>
-          <div class="form-field">
-            <label>Email (optional)</label>
-            <input type="email" id="ckEmail" placeholder="you@email.com">
-          </div>
-          <div class="form-field">
-            <label>Full Address *</label>
-            <textarea id="ckAddress" rows="3" placeholder="House no, Street, Area..."></textarea>
-          </div>
-          <div class="form-row-2">
-            <div class="form-field">
-              <label>City</label>
-              <input type="text" id="ckCity" placeholder="Ahmedabad">
-            </div>
-            <div class="form-field">
-              <label>PIN Code</label>
-              <input type="text" id="ckPin" placeholder="380001">
-            </div>
-          </div>
-
-        <!-- Promo Code Block -->
-        <div class="form-field promo-field" style="margin-top: 15px;">
-          <label>Promo Code</label>
-          <div class="promo-input-row" style="display: flex; gap: 8px;">
-            <input type="text" id="ckPromoCode" placeholder="E.g. WELCOME10" style="text-transform: uppercase; flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 0.88rem; outline: none; background: var(--white); color: var(--ink);">
-            <button type="button" class="add-to-cart-btn" id="applyPromoBtn" style="padding: 0 16px; height: 38px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s;">Apply</button>
-          </div>
-          <div id="promoMsg" class="promo-msg" style="display: none; font-size: 0.76rem; font-weight: 700; margin-top: 4px;"></div>
+          <h2 class="ck-modal-title" id="checkoutTitle">Checkout</h2>
         </div>
+        <div class="ck-header-right">
+          <div class="ck-ssl-indicator">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>256-Bit SSL Encryption</span>
+          </div>
+          <button class="ck-close-btn" id="closeCheckout" aria-label="Close Checkout">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
 
-          <div class="form-field payment-method-field" style="margin-top:15px">
-            <label>Payment Method</label>
-            <div class="payment-options" id="checkoutPaymentOptions">
-              <div class="payment-option active" id="payUpiOpt" data-method="upi">
-                <div class="payment-option-icon">⚡</div>
-                <div class="payment-option-details">
-                  <strong>Pay through UPI</strong>
-                  <span>Instant QR Code Scan & Pay</span>
-                </div>
+      <div class="checkout-body">
+        <!-- Left: Delivery & Payment Details -->
+        <div class="checkout-form-wrap">
+          <!-- Step 1: Delivery Details -->
+          <div class="ck-section">
+            <div class="ck-section-title">
+              <span class="ck-step-tag">1</span>
+              <div>
+                <h3>Delivery Address</h3>
+                <p>Provide your shipping destination details</p>
               </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-field">
+                <label for="ckFirstName">First Name *</label>
+                <input type="text" id="ckFirstName" placeholder="e.g. Aarav" autocomplete="given-name">
+              </div>
+              <div class="form-field">
+                <label for="ckLastName">Last Name</label>
+                <input type="text" id="ckLastName" placeholder="e.g. Sharma" autocomplete="family-name">
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-field">
+                <label for="ckPhone">Phone Number *</label>
+                <input type="tel" id="ckPhone" placeholder="+91 98765 43210" autocomplete="tel">
+              </div>
+              <div class="form-field">
+                <label for="ckEmail">Email Address (Optional)</label>
+                <input type="email" id="ckEmail" placeholder="name@example.com" autocomplete="email">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="ckAddress">Street Address *</label>
+              <textarea id="ckAddress" rows="2" placeholder="Apartment, building, street, and landmark..." autocomplete="street-address"></textarea>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-field">
+                <label for="ckCity">City *</label>
+                <input type="text" id="ckCity" placeholder="City or Town" autocomplete="address-level2">
+              </div>
+              <div class="form-field">
+                <label for="ckPin">Postal PIN Code *</label>
+                <input type="text" id="ckPin" placeholder="e.g. 380001" autocomplete="postal-code" maxlength="10">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Payment Method -->
+          <div class="ck-section" style="margin-top: 24px;">
+            <div class="ck-section-title">
+              <span class="ck-step-tag">2</span>
+              <div>
+                <h3>Payment Method</h3>
+                <p>Select your preferred mode of payment</p>
+              </div>
+            </div>
+
+            <div class="payment-options" id="checkoutPaymentOptions">
+              <!-- UPI Option -->
+              <div class="payment-option active" id="payUpiOpt" data-method="upi">
+                <div class="payment-option-radio">
+                  <span class="radio-dot"></span>
+                </div>
+                <div class="payment-option-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </div>
+                <div class="payment-option-details">
+                  <strong>Instant UPI QR Scan</strong>
+                  <span>GPay, PhonePe, Paytm, BHIM & Any UPI App</span>
+                </div>
+                <span class="pay-method-badge">Direct Scan</span>
+              </div>
+
+              <!-- WhatsApp Option -->
               <div class="payment-option" id="payCodOpt" data-method="cod">
-                <div class="payment-option-icon">💬</div>
+                <div class="payment-option-radio">
+                  <span class="radio-dot"></span>
+                </div>
+                <div class="payment-option-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                </div>
                 <div class="payment-option-details">
                   <strong>Inquire on WhatsApp</strong>
-                  <span>Send order details via WhatsApp</span>
+                  <span>Send order specification directly to our studio</span>
                 </div>
               </div>
+
+              <!-- Razorpay Online Option -->
               <div class="payment-option" id="payOnlineOpt" data-method="online" style="display:none;">
-                <div class="payment-option-icon">💳</div>
+                <div class="payment-option-radio">
+                  <span class="radio-dot"></span>
+                </div>
+                <div class="payment-option-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
                 <div class="payment-option-details">
-                  <strong>Razorpay Online</strong>
-                  <span>Cards, Netbanking, Wallet</span>
+                  <strong>Cards & Net Banking</strong>
+                  <span>Visa, MasterCard, RuPay, NetBanking & Wallets</span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Interactive UPI QR Code Module -->
-          <div id="upiPaymentSection" class="upi-payment-section" style="margin-top: 16px;">
-            <div class="upi-payment-card">
-              <div class="upi-head-badge">
-                <span>⚡ Instant UPI Payment</span>
-                <span class="upi-verified-pill">GPay · PhonePe · Paytm · BHIM</span>
-              </div>
-
-              <div class="upi-qr-box">
-                <div class="upi-qr-frame">
-                  <img id="upiQrImg" src="" alt="UPI Payment QR Code" class="upi-qr-image">
-                  <div class="upi-qr-scan-line"></div>
-                </div>
-                <div class="upi-pay-info">
-                  <div class="upi-amount-badge">
-                    <span class="upi-amount-label">Pay Exact Amount:</span>
-                    <span class="upi-amount-val" id="upiAmountDisplay">₹0</span>
+            <!-- UPI Payment Card Module -->
+            <div id="upiPaymentSection" class="upi-payment-section">
+              <div class="upi-payment-card">
+                <div class="upi-head-strip">
+                  <div class="upi-strip-title">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Instant UPI Payment</span>
                   </div>
-                  <div class="upi-vpa-row">
-                    <span class="upi-vpa-text" id="upiVpaDisplay">8141994995@upi</span>
-                    <button type="button" class="copy-upi-btn" id="copyUpiBtn" title="Copy UPI ID">
-                      <span id="copyUpiIcon">📋</span> <span id="copyUpiText">Copy</span>
-                    </button>
+                  <div class="upi-supported-apps">
+                    <span>Google Pay</span>
+                    <span>PhonePe</span>
+                    <span>Paytm</span>
+                    <span>BHIM</span>
                   </div>
-                  <a id="mobileUpiPayLink" href="#" class="mobile-upi-app-btn">
-                    📱 Tap to Pay on UPI App
-                  </a>
                 </div>
-              </div>
 
-              <!-- Post-payment verification notice -->
-              <div class="upi-instruction-box">
-                <div class="uib-icon">ℹ️</div>
-                <div class="uib-content">
-                  <strong>After completing payment of <span id="upiPromptAmount">₹0</span>:</strong>
-                  <p>Please enter your <strong>12-digit UPI Reference / UTR Number</strong> or upload the payment screenshot below to confirm your order.</p>
-                </div>
-              </div>
+                <div class="upi-qr-box">
+                  <div class="upi-qr-frame">
+                    <img id="upiQrImg" src="" alt="UPI Payment QR Code" class="upi-qr-image">
+                    <div class="upi-qr-corner top-left"></div>
+                    <div class="upi-qr-corner top-right"></div>
+                    <div class="upi-qr-corner bottom-left"></div>
+                    <div class="upi-qr-corner bottom-right"></div>
+                    <div class="upi-qr-scan-line"></div>
+                  </div>
 
-              <!-- Verification Inputs -->
-              <div class="upi-verify-inputs">
-                <div class="form-field" style="margin-bottom: 12px;">
-                  <label>UPI Transaction ID / UTR Number *</label>
-                  <input type="text" id="ckUpiTxnId" class="admin-input" placeholder="e.g. 423456789012 or UPI Ref number" style="font-family: monospace; font-size: 0.95rem; letter-spacing: 0.5px;">
-                </div>
-                <div class="form-field" style="margin-bottom: 0;">
-                  <label>Upload Payment Screenshot / Receipt (Optional)</label>
-                  <input type="file" id="ckUpiProofFile" accept="image/*" style="display: none;">
-                  <input type="hidden" id="ckUpiProofUrl">
-                  
-                  <div class="upi-proof-upload-box" id="upiProofDropZone">
-                    <div id="upiProofEmptyState" style="display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; padding: 10px;">
-                      <span style="font-size: 1.2rem;">📸</span>
-                      <span style="font-size: 0.82rem; font-weight: 700; color: var(--p);">Click to attach payment screenshot</span>
+                  <div class="upi-pay-info">
+                    <div class="upi-amount-badge">
+                      <span class="upi-amount-label">Payable Amount</span>
+                      <span class="upi-amount-val" id="upiAmountDisplay">₹0</span>
                     </div>
-                    <div id="upiProofFilledState" style="display: none; align-items: center; justify-content: space-between; padding: 6px 12px; background: rgba(16,185,129,0.08); border-radius: 8px;">
-                      <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
-                        <img id="upiProofThumb" src="" alt="Proof" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
-                        <span id="upiProofFileName" style="font-size: 0.78rem; font-weight: 700; color: #065f46; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 180px;">screenshot.png</span>
+
+                    <div class="upi-vpa-row">
+                      <div class="upi-vpa-details">
+                        <span class="upi-vpa-label">Studio UPI ID</span>
+                        <span class="upi-vpa-text" id="upiVpaDisplay">8141994995@upi</span>
                       </div>
-                      <button type="button" id="removeUpiProofBtn" style="background: none; border: none; color: var(--red); font-size: 0.8rem; font-weight: 800; cursor: pointer;">✕ Remove</button>
+                      <button type="button" class="copy-upi-btn" id="copyUpiBtn" title="Copy UPI ID" aria-label="Copy UPI ID">
+                        <span id="copyUpiIcon">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </span>
+                        <span id="copyUpiText">Copy</span>
+                      </button>
                     </div>
+
+                    <a id="mobileUpiPayLink" href="#" class="mobile-upi-app-btn">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                      <span>Open in UPI App</span>
+                    </a>
                   </div>
-                  <div id="upiProofStatus" style="font-size: 0.75rem; margin-top: 4px;"></div>
+                </div>
+
+                <!-- Instruction Box -->
+                <div class="upi-instruction-box">
+                  <div class="uib-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  </div>
+                  <div class="uib-content">
+                    <strong>Payment Verification Notice:</strong>
+                    <p>After transferring <span id="upiPromptAmount">₹0</span>, enter the 12-digit UPI reference number or attach your payment confirmation below to verify your order.</p>
+                  </div>
+                </div>
+
+                <!-- Verification Inputs -->
+                <div class="upi-verify-inputs">
+                  <div class="form-field">
+                    <label for="ckUpiTxnId">UPI Transaction ID / 12-Digit UTR Number *</label>
+                    <input type="text" id="ckUpiTxnId" placeholder="e.g. 423456789012 or UPI Ref Number" style="font-family: 'SFMono-Regular', Consolas, monospace; letter-spacing: 0.5px;">
+                  </div>
+
+                  <div class="form-field" style="margin-bottom: 0;">
+                    <label>Payment Receipt / Screenshot (Optional)</label>
+                    <input type="file" id="ckUpiProofFile" accept="image/*" style="display: none;">
+                    <input type="hidden" id="ckUpiProofUrl">
+
+                    <div class="upi-proof-upload-box" id="upiProofDropZone">
+                      <div id="upiProofEmptyState" class="upi-upload-empty">
+                        <div class="upload-icon-wrap">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <div class="upload-text-wrap">
+                          <span class="upload-primary-text">Click to upload payment receipt</span>
+                          <span class="upload-hint-text">PNG, JPG or WEBP (Max 15MB)</span>
+                        </div>
+                      </div>
+
+                      <div id="upiProofFilledState" class="upi-upload-filled" style="display: none;">
+                        <div class="upload-preview-meta">
+                          <img id="upiProofThumb" src="" alt="Proof Preview" class="upload-thumb">
+                          <span id="upiProofFileName" class="upload-filename">screenshot.png</span>
+                        </div>
+                        <button type="button" id="removeUpiProofBtn" class="upload-remove-btn" title="Remove attachment">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          <span>Remove</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div id="upiProofStatus" class="upi-proof-status"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Right: Sticky Order Summary -->
         <div class="checkout-summary">
-          <h4>Order Summary</h4>
-          <div id="ckOrderItems"></div>
-          <div class="ck-total-row">
-            <span>Subtotal</span><span id="ckSubtotal">₹0</span>
+          <div class="ck-summary-card">
+            <div class="ck-summary-head">
+              <h4>Order Summary</h4>
+              <span class="ck-items-count-badge" id="ckItemsCountBadge">Review Items</span>
+            </div>
+
+            <!-- Items List -->
+            <div id="ckOrderItems" class="ck-items-container"></div>
+
+            <!-- Promo Code Module -->
+            <div class="ck-promo-box">
+              <label for="ckPromoCode">Discount Code</label>
+              <div class="promo-input-row">
+                <div class="promo-input-wrap">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                  <input type="text" id="ckPromoCode" placeholder="Enter coupon code" autocomplete="off" spellcheck="false">
+                </div>
+                <button type="button" class="promo-apply-btn" id="applyPromoBtn">Apply</button>
+              </div>
+              <div id="promoMsg" class="promo-msg" style="display: none;"></div>
+            </div>
+
+            <!-- Financial Calculation Rows -->
+            <div class="ck-cost-breakdown">
+              <div class="ck-total-row">
+                <span>Subtotal</span>
+                <span id="ckSubtotal">₹0</span>
+              </div>
+              <div class="ck-total-row">
+                <span>Estimated Shipping</span>
+                <span id="ckShipping">₹60</span>
+              </div>
+              <div class="ck-total-row" id="ckOtherRow" style="display: none;">
+                <span>Other Charges<span id="ckOtherLabelExtra"></span></span>
+                <span id="ckOther">₹0</span>
+              </div>
+              <div class="ck-total-row total">
+                <div class="total-label-wrap">
+                  <span class="total-title">Total Due</span>
+                  <span class="total-subtitle">Includes all applicable charges</span>
+                </div>
+                <span class="total-amount" id="ckTotal">₹0</span>
+              </div>
+            </div>
+
+            <!-- Primary Actions -->
+            <button class="place-order-btn" id="placeOrderBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Submit Order & Confirm Payment</span>
+            </button>
+
+            <button class="invoice-download-btn" id="invoiceDownloadBtn" style="display:none">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span>Download Invoice (PDF)</span>
+            </button>
+
+            <!-- Reassurance Trust Badges -->
+            <div class="ck-trust-guarantee">
+              <div class="ck-trust-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>SSL Encrypted Checkout</span>
+              </div>
+              <div class="ck-trust-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                <span>Insured Studio Delivery</span>
+              </div>
+              <div class="ck-trust-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span>Handcrafted Guaranteed</span>
+              </div>
+            </div>
           </div>
-          <div class="ck-total-row">
-            <span>Shipping</span><span id="ckShipping">₹60</span>
-          </div>
-          <div class="ck-total-row" id="ckOtherRow" style="display: none;">
-            <span>Other Charges<span id="ckOtherLabelExtra"></span></span><span id="ckOther">₹0</span>
-          </div>
-          <div class="ck-total-row total">
-            <span>Total</span><span id="ckTotal">₹0</span>
-          </div>
-          <button class="place-order-btn" id="placeOrderBtn">Place Order via WhatsApp</button>
-          <button class="invoice-download-btn" id="invoiceDownloadBtn" style="display:none">
-            📄 Download Invoice
-          </button>
-          <p class="ck-note">* Order will be confirmed via WhatsApp</p>
         </div>
       </div>
     </div>
