@@ -1376,21 +1376,46 @@ function logVisitorRequest(logEntry) {
   }
 }
 
-function logSecurityEvent(ip, type, message) {
+function logSecurityEvent(ip, type, message, options = {}) {
   const db = readDB();
   db.securityLogs = db.securityLogs || [];
+  const geo = getIpLocation(ip);
+  const locationLabel = typeof formatLocationLabel === 'function' ? formatLocationLabel(geo) : `${geo.city || ''}, ${geo.country || ''}`;
+
+  const defaultSeverity = {
+    'VULNERABILITY_PROBE': 'CRITICAL',
+    'SQLI_ATTACK': 'CRITICAL',
+    'XSS_ATTACK': 'HIGH',
+    'PATH_TRAVERSAL': 'CRITICAL',
+    'MALICIOUS_SCANNER': 'HIGH',
+    'LOGIN_LOCKOUT': 'HIGH',
+    'FAILED_ADMIN_LOGIN': 'HIGH',
+    'RATE_LIMIT_EXCEEDED': 'MEDIUM',
+    'MANUALLY_BLOCKED': 'INFO',
+    'MANUALLY_UNBLOCKED': 'INFO',
+    'FAILED_LOGIN': 'LOW',
+    'SIMULATED_ATTACK': 'WARNING'
+  };
+
   const logEntry = {
+    id: 'sec_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
     timestamp: new Date().toISOString(),
     ip,
-    type,
-    message,
-    location: getIpLocation(ip)
+    type: type || 'SECURITY_ALERT',
+    severity: options.severity || defaultSeverity[type] || 'MEDIUM',
+    message: message || 'Suspicious security event recorded',
+    target: options.target || '',
+    method: options.method || 'GET',
+    location: locationLabel || 'Unknown',
+    blocked: options.blocked !== false
   };
+
   db.securityLogs.push(logEntry);
   if (db.securityLogs.length > 200) {
-    db.securityLogs.shift();
+    db.securityLogs = db.securityLogs.slice(-200);
   }
   writeDB(db);
+  return logEntry;
 }
 
 const LOGIN_MAX_FAILED_ATTEMPTS = 5;
@@ -1606,6 +1631,81 @@ app.use((req, res, next) => {
   if (blockedIps.includes(normalizedIp)) {
     return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
   }
+  next();
+});
+
+// Real-Time Attack & Intrusion Detection Shield
+app.use((req, res, next) => {
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+  if (isWhitelistedIp(clientIp)) return next();
+
+  let rawUrl = '';
+  try {
+    rawUrl = decodeURIComponent(req.originalUrl || req.url || '');
+  } catch {
+    rawUrl = req.originalUrl || req.url || '';
+  }
+  const userAgent = String(req.headers['user-agent'] || '');
+
+  // 1. Check for malicious vulnerability scanner User-Agents
+  const scannerUaRegex = /\b(sqlmap|nikto|masscan|dirbuster|gobuster|wpscan|zgrab|acunetix|nessus)\b/i;
+  if (scannerUaRegex.test(userAgent)) {
+    logSecurityEvent(clientIp, 'MALICIOUS_SCANNER', `Automated vulnerability scanner bot detected: ${userAgent.substring(0, 60)}`, {
+      severity: 'HIGH',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Malicious vulnerability scanner signature detected.' });
+  }
+
+  // 2. Check for directory / path traversal
+  if (/(\.\.[\/\\]|%2e%2e[\/\\])/i.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'PATH_TRAVERSAL', `Directory traversal exploit attempt: ${rawUrl.substring(0, 80)}`, {
+      severity: 'CRITICAL',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Path traversal pattern detected.' });
+  }
+
+  // 3. Check for sensitive file / admin probe scanning
+  const probeRegex = /(\/\.env|\/\.git|\/\.aws|\/\.config|\/wp-admin|\/wp-login\.php|\/xmlrpc\.php|\/phpmyadmin|\/pma|\/adminer|\/cgi-bin|\/actuator|\/swagger|\/console|\/\.htaccess)/i;
+  if (probeRegex.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'VULNERABILITY_PROBE', `Unauthorized probe for protected resource: ${rawUrl.substring(0, 80)}`, {
+      severity: 'CRITICAL',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Security probe signature detected.' });
+  }
+
+  // 4. Check for SQL Injection patterns in query URL
+  const sqliRegex = /(\bunion\s+(all\s+)?select\b|\bselect\s+.*\s+from\b|\binsert\s+into\b|\bdrop\s+table\b|\bdelete\s+from\b|'\s*or\s*['"]?1['"]?\s*=\s*['"]?1|\bwaitfor\s+delay\b|;\s*drop\b)/i;
+  if (sqliRegex.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'SQLI_ATTACK', `SQL Injection exploit payload in request: ${rawUrl.substring(0, 80)}`, {
+      severity: 'CRITICAL',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Malicious SQL injection signature detected.' });
+  }
+
+  // 5. Check for XSS script tag injection in URL
+  const xssRegex = /(<script|javascript:|onerror\s*=|onload\s*=|onclick\s*=|vbscript:)/i;
+  if (xssRegex.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'XSS_ATTACK', `Cross-Site Scripting (XSS) probe detected in query URL: ${rawUrl.substring(0, 80)}`, {
+      severity: 'HIGH',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Malicious script pattern detected.' });
+  }
+
   next();
 });
 
@@ -1849,6 +1949,15 @@ function readDB() {
     if (!data.coupons) data.coupons = [];
     if (!data.blockedIps) data.blockedIps = [];
     if (!data.securityLogs) data.securityLogs = [];
+    if (!data.settings.upiId || data.settings.upiId === '8141994995@upi') {
+      data.settings.upiId = 'rinkupatel3495@okaxis';
+    }
+    if (!data.settings.upiPayeeName || data.settings.upiPayeeName === 'RK Resin Art') {
+      data.settings.upiPayeeName = 'RINKU PATEL';
+    }
+    if (!data.settings.upiQrImageUrl) {
+      data.settings.upiQrImageUrl = '/upi-rinku-patel.jpeg';
+    }
 
     // Automatically remove whitelisted developer IPs from blocked list if present
     if (Array.isArray(data.blockedIps)) {
@@ -2117,9 +2226,9 @@ app.get('/api/settings', (req, res) => {
     otherChargesType: db.settings.otherChargesType || 'flat',
     razorpayEnabled: db.settings.razorpayEnabled !== false,
     upiEnabled: db.settings.upiEnabled !== false,
-    upiId: db.settings.upiId || '8141994995@upi',
-    upiPayeeName: db.settings.upiPayeeName || 'RK Resin Art',
-    upiQrImageUrl: db.settings.upiQrImageUrl || ''
+    upiId: db.settings.upiId || 'rinkupatel3495@okaxis',
+    upiPayeeName: db.settings.upiPayeeName || 'RINKU PATEL',
+    upiQrImageUrl: db.settings.upiQrImageUrl || '/upi-rinku-patel.jpeg'
   });
 });
 
@@ -3243,9 +3352,38 @@ app.get('/api/admin/analytics', requireAdmin, (req, res) => {
     quantity
   })).sort((a, b) => b.quantity - a.quantity);
 
+  // Calculate threat and security analytics
+  const now = Date.now();
+  const last24h = now - (24 * 60 * 60 * 1000);
+  const recentThreats = securityLogs.filter(l => {
+    const t = new Date(l.timestamp).getTime();
+    return !isNaN(t) && t >= last24h && l.type !== 'MANUALLY_BLOCKED' && l.type !== 'MANUALLY_UNBLOCKED';
+  });
+
+  const criticalCount = recentThreats.filter(l => l.severity === 'CRITICAL').length;
+  const highCount = recentThreats.filter(l => l.severity === 'HIGH').length;
+
+  let threatLevel = 'SECURE';
+  if (criticalCount >= 3 || recentThreats.length >= 8) {
+    threatLevel = 'ATTACK';
+  } else if (recentThreats.length > 0) {
+    threatLevel = 'WARNING';
+  }
+
+  const threatSummary = {
+    threatLevel,
+    totalThreats24h: recentThreats.length,
+    criticalCount,
+    highCount,
+    probesBlocked: securityLogs.filter(l => ['VULNERABILITY_PROBE', 'PATH_TRAVERSAL', 'SQLI_ATTACK', 'XSS_ATTACK', 'MALICIOUS_SCANNER'].includes(l.type)).length,
+    failedLogins: securityLogs.filter(l => ['FAILED_LOGIN', 'FAILED_ADMIN_LOGIN', 'LOGIN_LOCKOUT'].includes(l.type)).length,
+    blockedIpsCount: blockedIps.length
+  };
+
   res.json({
     analytics,
     securityLogs,
+    threatSummary,
     blockedIps,
     loginLogs: db.loginLogs || [],
     orderStats: {
@@ -3256,6 +3394,33 @@ app.get('/api/admin/analytics', requireAdmin, (req, res) => {
       categoryDistribution
     }
   });
+});
+
+// POST clear security alerts
+app.post('/api/admin/security/clear-logs', requireAdmin, (req, res) => {
+  const db = readDB();
+  db.securityLogs = [];
+  writeDB(db);
+  res.json({ success: true, message: 'Security logs cleared successfully' });
+});
+
+// POST simulate test attack event for testing
+app.post('/api/admin/security/test-attack', requireAdmin, (req, res) => {
+  const simulatedIp = '198.51.100.' + Math.floor(Math.random() * 200 + 1);
+  const testTypes = [
+    { type: 'VULNERABILITY_PROBE', msg: 'Simulated probe for sensitive environment file: /.env', target: 'GET /.env', sev: 'CRITICAL' },
+    { type: 'SQLI_ATTACK', msg: 'Simulated SQL Injection exploit probe: " OR 1=1; DROP TABLE products', target: "GET /api/products?cat=' OR 1=1", sev: 'CRITICAL' },
+    { type: 'PATH_TRAVERSAL', msg: 'Simulated directory traversal attack: /../../etc/passwd', target: 'GET /../../etc/passwd', sev: 'CRITICAL' },
+    { type: 'MALICIOUS_SCANNER', msg: 'Simulated automated vulnerability scanner: Nikto/2.1.6', target: 'GET /wp-login.php', sev: 'HIGH' }
+  ];
+  const choice = testTypes[Math.floor(Math.random() * testTypes.length)];
+  const entry = logSecurityEvent(simulatedIp, choice.type, choice.msg, {
+    severity: choice.sev,
+    target: choice.target,
+    method: 'GET',
+    blocked: true
+  });
+  res.json({ success: true, event: entry });
 });
 
 // POST block an IP address
@@ -3335,9 +3500,9 @@ app.get('/api/admin/settings', requireAdmin, (req, res) => {
     otherChargesType: db.settings.otherChargesType || 'flat',
     razorpayEnabled: db.settings.razorpayEnabled !== false,
     upiEnabled: db.settings.upiEnabled !== false,
-    upiId: db.settings.upiId || '8141994995@upi',
-    upiPayeeName: db.settings.upiPayeeName || 'RK Resin Art',
-    upiQrImageUrl: db.settings.upiQrImageUrl || ''
+    upiId: db.settings.upiId || 'rinkupatel3495@okaxis',
+    upiPayeeName: db.settings.upiPayeeName || 'RINKU PATEL',
+    upiQrImageUrl: db.settings.upiQrImageUrl || '/upi-rinku-patel.jpeg'
   });
 });
 

@@ -1232,9 +1232,9 @@ const Admin = {
       const upiEl = document.getElementById('afUpiEnabled');
       if (upiEl) upiEl.checked = s.upiEnabled !== false;
       const upiIdEl = document.getElementById('afUpiId');
-      if (upiIdEl) upiIdEl.value = s.upiId || '8141994995@upi';
+      if (upiIdEl) upiIdEl.value = s.upiId || 'rinkupatel3495@okaxis';
       const upiPayeeEl = document.getElementById('afUpiPayeeName');
-      if (upiPayeeEl) upiPayeeEl.value = s.upiPayeeName || 'RK Resin Art';
+      if (upiPayeeEl) upiPayeeEl.value = s.upiPayeeName || 'RINKU PATEL';
       const upiQrImgUrlEl = document.getElementById('afUpiQrImageUrl');
       if (upiQrImgUrlEl) upiQrImgUrlEl.value = s.upiQrImageUrl || '';
       const upiPreviewBox = document.getElementById('upiQrPreviewBox');
@@ -1249,7 +1249,7 @@ const Admin = {
       } else {
         if (upiPreviewBox) upiPreviewBox.style.display = 'none';
         if (removeUpiQrBtn) removeUpiQrBtn.style.display = 'none';
-        if (upiStatus) upiStatus.textContent = 'Auto dynamic QR enabled';
+        if (upiStatus) upiStatus.textContent = 'Default Rinku Patel QR active';
       }
 
       const rateEl = document.getElementById('afShippingRate');
@@ -2021,8 +2021,8 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
     trackStock: trackStock,
     razorpayEnabled: razorpayEnabled,
     upiEnabled: upiEnabled,
-    upiId: upiId || '8141994995@upi',
-    upiPayeeName: upiPayeeName || 'RK Resin Art',
+    upiId: upiId || 'rinkupatel3495@okaxis',
+    upiPayeeName: upiPayeeName || 'RINKU PATEL',
     upiQrImageUrl: upiQrImageUrl
   });
 
@@ -2033,8 +2033,8 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   Admin.data.settings.trackStock = trackStock;
   Admin.data.settings.razorpayEnabled = razorpayEnabled;
   Admin.data.settings.upiEnabled = upiEnabled;
-  Admin.data.settings.upiId = upiId || '8141994995@upi';
-  Admin.data.settings.upiPayeeName = upiPayeeName || 'RK Resin Art';
+  Admin.data.settings.upiId = upiId || 'rinkupatel3495@okaxis';
+  Admin.data.settings.upiPayeeName = upiPayeeName || 'RINKU PATEL';
   Admin.data.settings.upiQrImageUrl = upiQrImageUrl;
 
   // Instantly toggle the visibility of the stock inputs
@@ -2085,8 +2085,8 @@ if (removeUpiQrBtn) {
     if (previewBox) previewBox.style.display = 'none';
     removeUpiQrBtn.style.display = 'none';
     const status = document.getElementById('upiQrUploadStatus');
-    if (status) status.textContent = 'Auto dynamic QR enabled';
-    showToast('Custom QR removed. Dynamic QR will be generated automatically.', 'info');
+    if (status) status.textContent = 'Default Rinku Patel QR active';
+    showToast('Custom QR removed. Default Rinku Patel scanner will be used.', 'info');
   };
 }
 
@@ -2600,7 +2600,7 @@ if (refreshCouponsBtn) {
   };
 }
 
-// ── Admin Analytics & Developer Logs ────────────────────────────
+// ── Admin Analytics & Threat Monitor ────────────────────────────
 Admin.renderAnalytics = async function() {
   try {
     const data = await API.get('/api/admin/analytics', true);
@@ -2628,54 +2628,8 @@ Admin.renderAnalytics = async function() {
     // Render top selling products progress bars
     Admin.renderTopProductsList(orderStats.topProducts);
 
-    // Render Blocked IPs
-    const blockedList = document.getElementById('blockedIpsList');
-    if (blockedList) {
-      const ips = data.blockedIps || [];
-      if (!ips.length) {
-        blockedList.innerHTML = '<tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked visitors.</td></tr>';
-      } else {
-        blockedList.innerHTML = ips.map(ip => `
-          <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 8px 10px; font-family: monospace; font-weight: 700;">${ip}</td>
-            <td style="padding: 8px 10px; text-align: right;">
-              <button class="unblock-ip-btn" data-ip="${ip}" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; background: #ef4444; color: #fff; border: none; cursor: pointer; font-weight: 700;">Unblock</button>
-            </td>
-          </tr>
-        `).join('');
-
-        blockedList.querySelectorAll('.unblock-ip-btn').forEach(btn => {
-          btn.onclick = async () => {
-            try {
-              await API.post('/api/admin/ip-unblock', { ip: btn.dataset.ip }, true);
-              showToast(`IP ${btn.dataset.ip} unblocked`, 'success');
-              Admin.renderAnalytics();
-            } catch (e) {
-              showToast('Unblock failed: ' + e.message, 'error');
-            }
-          };
-        });
-      }
-    }
-
-    // Render Security Logs
-    const secList = document.getElementById('securityLogsList');
-    if (secList) {
-      const logs = data.securityLogs || [];
-      if (!logs.length) {
-        secList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No risky activity found.</div>';
-      } else {
-        secList.innerHTML = logs.slice(0, 15).map(l => `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--surface); border-radius: 6px; font-size: 0.78rem; border: 1px solid var(--border);">
-            <div>
-              <span style="font-weight: 800; color: #ef4444;">${l.type || 'ALERT'}</span>
-              <span style="color: var(--muted); margin-left: 6px;">${l.details || ''}</span>
-            </div>
-            <div style="font-family: monospace; font-size: 0.72rem; color: var(--muted);">${l.ip || ''} &nbsp;|&nbsp; ${l.timestamp ? new Date(l.timestamp).toLocaleTimeString() : ''}</div>
-          </div>
-        `).join('');
-      }
-    }
+    // Render Cybersecurity Threat Center & Blocked IPs
+    Admin.renderSecurityThreats(data);
 
     // Render Login Activity
     const loginList = document.getElementById('analyticsLoginHistoryList');
@@ -2701,6 +2655,192 @@ Admin.renderAnalytics = async function() {
   }
 };
 
+Admin.renderSecurityThreats = function(data) {
+  const summary = data.threatSummary || {
+    threatLevel: 'SECURE',
+    totalThreats24h: 0,
+    criticalCount: 0,
+    highCount: 0,
+    probesBlocked: 0,
+    blockedIpsCount: 0
+  };
+  const logs = data.securityLogs || [];
+  const blockedIps = data.blockedIps || [];
+
+  // 1. Update KPI stats
+  const levelEl = document.getElementById('statThreatLevel');
+  if (levelEl) {
+    levelEl.textContent = summary.threatLevel;
+    if (summary.threatLevel === 'ATTACK') {
+      levelEl.style.color = '#dc2626';
+    } else if (summary.threatLevel === 'WARNING') {
+      levelEl.style.color = '#d97706';
+    } else {
+      levelEl.style.color = '#10b981';
+    }
+  }
+
+  const threats24hEl = document.getElementById('statThreats24h');
+  if (threats24hEl) threats24hEl.textContent = summary.totalThreats24h;
+
+  const probesBlockedEl = document.getElementById('statProbesBlocked');
+  if (probesBlockedEl) probesBlockedEl.textContent = summary.probesBlocked;
+
+  const blockedCountEl = document.getElementById('statBlockedIpsCount');
+  if (blockedCountEl) blockedCountEl.textContent = summary.blockedIpsCount;
+
+  // 2. Update Live Threat Status Banner
+  const banner = document.getElementById('threatStatusBanner');
+  const dot = document.getElementById('threatPulseIndicator');
+  const statusText = document.getElementById('threatStatusText');
+  const statusSub = document.getElementById('threatStatusSub');
+
+  if (banner && dot && statusText && statusSub) {
+    banner.className = 'threat-status-banner';
+    dot.className = 'threat-pulse-dot';
+
+    if (summary.threatLevel === 'ATTACK') {
+      banner.classList.add('attack');
+      dot.classList.add('pulse');
+      dot.style.background = '#ef4444';
+      dot.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.25)';
+      statusText.style.color = '#991b1b';
+      statusText.textContent = 'WARNING: ACTIVE EXPLOIT ATTACK DETECTED';
+      statusSub.style.color = '#b91c1c';
+      statusSub.textContent = `Multiple critical threat probes detected (${summary.criticalCount} critical). Automated 403 blocking is active.`;
+    } else if (summary.threatLevel === 'WARNING') {
+      banner.classList.add('warning');
+      dot.style.background = '#f59e0b';
+      dot.style.boxShadow = '0 0 0 4px rgba(245, 158, 11, 0.25)';
+      statusText.style.color = '#92400e';
+      statusText.textContent = 'ELEVATED SECURITY: RECENT SUSPICIOUS ACTIVITY';
+      statusSub.style.color = '#b45309';
+      statusSub.textContent = `${summary.totalThreats24h} suspicious probe attempts intercepted in the last 24h.`;
+    } else {
+      banner.classList.add('secure');
+      dot.style.background = '#10b981';
+      dot.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.25)';
+      statusText.style.color = '#065f46';
+      statusText.textContent = 'SYSTEM DEFENSE SHIELD: ALL SECURE';
+      statusSub.style.color = '#047857';
+      statusSub.textContent = 'No active attacks detected in the last 24 hours. Automated 403 mitigation active.';
+    }
+  }
+
+  // 3. Render Live Attack Feed Table
+  const secList = document.getElementById('securityLogsList');
+  if (secList) {
+    if (!logs.length) {
+      secList.innerHTML = '<tr><td colspan="5" style="padding: 24px; text-align: center; color: var(--muted);">No attack activity detected. All systems clear.</td></tr>';
+    } else {
+      const sortedLogs = [...logs].reverse();
+      secList.innerHTML = sortedLogs.slice(0, 30).map(l => {
+        const isBanned = blockedIps.includes(l.ip);
+        const sev = (l.severity || 'MEDIUM').toUpperCase();
+        let sevClass = 'threat-sev-medium';
+        if (sev === 'CRITICAL') sevClass = 'threat-sev-critical';
+        else if (sev === 'HIGH') sevClass = 'threat-sev-high';
+        else if (sev === 'INFO') sevClass = 'threat-sev-info';
+
+        const timeStr = l.timestamp ? new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—';
+        const dateStr = l.timestamp ? new Date(l.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+
+        let locationDisplay = 'Unknown';
+        if (typeof l.location === 'string' && l.location.trim()) {
+          locationDisplay = l.location;
+        } else if (l.location && typeof l.location === 'object') {
+          const parts = [l.location.city, l.location.region || l.location.state, l.location.country].filter(Boolean);
+          locationDisplay = parts.length > 0 ? parts.join(', ') : 'Local / Unknown';
+        }
+
+        return `
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 8px 10px;">
+              <span class="threat-sev-pill ${sevClass}">${sev}</span>
+            </td>
+            <td style="padding: 8px 10px; font-weight: 700; color: var(--ink); font-size: 0.76rem;">
+              ${l.type || 'PROBE'}
+            </td>
+            <td style="padding: 8px 10px;">
+              <div style="font-weight: 600; color: var(--ink); font-family: monospace; font-size: 0.74rem;">${l.target || l.message || '—'}</div>
+              <div style="color: var(--muted); font-size: 0.7rem; margin-top: 1px;">${l.message || ''}</div>
+            </td>
+            <td style="padding: 8px 10px;">
+              <div style="font-family: monospace; font-weight: 700; color: var(--ink);">${l.ip || '—'}</div>
+              <div style="color: var(--muted); font-size: 0.7rem;">${locationDisplay} · ${dateStr} ${timeStr}</div>
+            </td>
+            <td style="padding: 8px 10px; text-align: right;">
+              ${isBanned
+                ? `<button class="threat-unban-btn unblock-ip-btn" data-ip="${l.ip}">Unban</button>`
+                : `<button class="threat-ban-btn ban-row-btn" data-ip="${l.ip}">Ban IP</button>`}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Wire up 1-click ban buttons on attack rows
+      secList.querySelectorAll('.ban-row-btn').forEach(btn => {
+        btn.onclick = async () => {
+          const ip = btn.dataset.ip;
+          if (!ip || ip === '127.0.0.1') {
+            showToast('Cannot block local host IP', 'error');
+            return;
+          }
+          try {
+            await API.post('/api/admin/ip-block', { ip }, true);
+            showToast(`Attacker IP ${ip} permanently blocked`, 'success');
+            Admin.renderAnalytics();
+          } catch (e) {
+            showToast('Ban failed: ' + e.message, 'error');
+          }
+        };
+      });
+
+      // Wire up unban buttons
+      secList.querySelectorAll('.unblock-ip-btn').forEach(btn => {
+        btn.onclick = async () => {
+          try {
+            await API.post('/api/admin/ip-unblock', { ip: btn.dataset.ip }, true);
+            showToast(`IP ${btn.dataset.ip} unbanned`, 'success');
+            Admin.renderAnalytics();
+          } catch (e) {
+            showToast('Unblock failed: ' + e.message, 'error');
+          }
+        };
+      });
+    }
+  }
+
+  // 4. Render Banned IPs Table
+  const blockedList = document.getElementById('blockedIpsList');
+  if (blockedList) {
+    if (!blockedIps.length) {
+      blockedList.innerHTML = '<tr><td colspan="2" style="padding: 20px; text-align: center; color: var(--muted);">No blocked IPs.</td></tr>';
+    } else {
+      blockedList.innerHTML = blockedIps.map(ip => `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 8px 10px; font-family: monospace; font-weight: 700; color: #dc2626;">${ip}</td>
+          <td style="padding: 8px 10px; text-align: right;">
+            <button class="threat-unban-btn unblock-ip-btn" data-ip="${ip}">Unban</button>
+          </td>
+        </tr>
+      `).join('');
+
+      blockedList.querySelectorAll('.unblock-ip-btn').forEach(btn => {
+        btn.onclick = async () => {
+          try {
+            await API.post('/api/admin/ip-unblock', { ip: btn.dataset.ip }, true);
+            showToast(`IP ${btn.dataset.ip} unblocked`, 'success');
+            Admin.renderAnalytics();
+          } catch (e) {
+            showToast('Unblock failed: ' + e.message, 'error');
+          }
+        };
+      });
+    }
+  }
+};
+
 // Bind Block IP Button
 const blockIpBtn = document.getElementById('blockIpBtn');
 if (blockIpBtn) {
@@ -2720,69 +2860,39 @@ if (blockIpBtn) {
       showToast('Block failed: ' + e.message, 'error');
     }
   };
-};
+}
 
-Admin.formatReadableLocation = function(location) {
-  if (!location) return 'Location not available';
-  if (typeof location === 'string') {
-    const parts = location.split(',').map(part => part.trim()).filter(part => part && !/^unknown/i.test(part));
-    return parts.length ? parts.join(', ') : 'Location not available';
-  }
-  const parts = [location.city, location.region, location.country]
-    .map(part => String(part || '').trim())
-    .filter(part => part && !/^unknown/i.test(part));
-  return parts.length ? parts.join(', ') : 'Location not available';
-};
+// Test Attack Simulation button
+const testAttackBtn = document.getElementById('testAttackBtn');
+if (testAttackBtn) {
+  testAttackBtn.onclick = async () => {
+    try {
+      testAttackBtn.disabled = true;
+      await API.post('/api/admin/security/test-attack', {}, true);
+      showToast('Simulated attack signature triggered and logged', 'success');
+      Admin.renderAnalytics();
+    } catch (e) {
+      showToast('Test failed: ' + e.message, 'error');
+    } finally {
+      testAttackBtn.disabled = false;
+    }
+  };
+}
 
-Admin.readableStatus = function(status) {
-  const code = Number(status);
-  if (code >= 200 && code < 300) return 'Opened';
-  if (code === 304) return 'Already loaded';
-  if (code >= 400 && code < 500) return 'Not allowed';
-  if (code >= 500) return 'Server issue';
-  return status || 'Checked';
-};
-
-Admin.readableAction = function(method) {
-  const m = String(method || '').toUpperCase();
-  if (m === 'GET') return 'Viewed';
-  if (m === 'POST') return 'Saved';
-  if (m === 'PUT' || m === 'PATCH') return 'Updated';
-  if (m === 'DELETE') return 'Deleted';
-  return m || 'Opened';
-};
-
-Admin.renderAnalytics = async function() {
-  try {
-    const data = await API.get('/api/admin/analytics', true);
-    
-    // Render financial statistics and charts
-    const orderStats = data.orderStats || {
-      totalRevenue: 0,
-      orderCount: 0,
-      salesHistory: [],
-      topProducts: [],
-      categoryDistribution: []
-    };
-
-    document.getElementById('statTotalRevenue').textContent = `₹${orderStats.totalRevenue.toLocaleString('en-IN')}`;
-    document.getElementById('statTotalOrders').textContent = orderStats.orderCount;
-
-    // Render sales trend line chart
-    Admin.renderSalesTrendChart(orderStats.salesHistory);
-
-    // Render category donut chart
-    Admin.renderCategoryDonutChart(orderStats.categoryDistribution);
-
-    // Render top selling products progress bars
-    Admin.renderTopProductsList(orderStats.topProducts);
-    
-
-
-  } catch (err) {
-    showToast('Failed to load analytics: ' + err.message, 'error');
-  }
-};
+// Clear Security Logs button
+const clearSecLogsBtn = document.getElementById('clearSecurityLogsBtn');
+if (clearSecLogsBtn) {
+  clearSecLogsBtn.onclick = async () => {
+    if (!confirm('Are you sure you want to clear all security and attack logs?')) return;
+    try {
+      await API.post('/api/admin/security/clear-logs', {}, true);
+      showToast('Security logs cleared', 'success');
+      Admin.renderAnalytics();
+    } catch (e) {
+      showToast('Clear failed: ' + e.message, 'error');
+    }
+  };
+}
 
 // Auto-load analytics when Analytics tab is clicked
 document.querySelectorAll('.atab[data-tab]').forEach(btn => {
@@ -3529,4 +3639,3 @@ if (changeAdminPwBtn) {
     changeAdminPwBtn.textContent = '🔒 Update Admin Password';
   });
 }
-

@@ -1,6 +1,10 @@
 {
   "settings": {
-    "adminPassword": "$2a$10$/zKd4EE/5RDFB6xCf0oCTOpErvyjiRz3UbX./OMzDT0UWYQ2UMgje"
+    "adminPassword": "$2a$10$HRWq6qnYm/9Bg4BM1S4vK.QNWFZC7nv3H4M3qy3dg.A.U0VlX39ma",
+    "upiEnabled": true,
+    "upiId": "rinkupatel3495@okaxis",
+    "upiPayeeName": "RINKU PATEL",
+    "upiQrImageUrl": "/upi-rinku-patel.jpeg"
   },
   "banners": [],
   "navLinks": [],
@@ -686,6 +690,42 @@
         "city": "Ahmedabad",
         "isp": "Reliance Jio Infocomm"
       }
+    },
+    {
+      "id": "sec_1788716786414_3zkt3",
+      "timestamp": "2026-09-06T17:46:26.414Z",
+      "ip": "198.51.100.161",
+      "type": "MALICIOUS_SCANNER",
+      "severity": "HIGH",
+      "message": "Simulated automated vulnerability scanner: Nikto/2.1.6",
+      "target": "GET /wp-login.php",
+      "method": "GET",
+      "location": "Location not available",
+      "blocked": true
+    },
+    {
+      "id": "sec_1788716829854_3mzft",
+      "timestamp": "2026-09-06T17:47:09.854Z",
+      "ip": "198.51.100.161",
+      "type": "MANUALLY_BLOCKED",
+      "severity": "INFO",
+      "message": "IP address manually blocked by administrator",
+      "target": "",
+      "method": "GET",
+      "location": "Location not available",
+      "blocked": true
+    },
+    {
+      "id": "sec_1788717157360_6vxe1",
+      "timestamp": "2026-09-06T17:52:37.360Z",
+      "ip": "198.51.100.161",
+      "type": "MANUALLY_UNBLOCKED",
+      "severity": "INFO",
+      "message": "IP address manually unblocked by administrator",
+      "target": "",
+      "method": "GET",
+      "location": "Location not available",
+      "blocked": true
     }
   ],
   "loginLogs": [
@@ -812,6 +852,30 @@
         "city": "Mumbai",
         "isp": "Tata Communications"
       }
+    },
+    {
+      "timestamp": "2026-09-06T17:42:54.475Z",
+      "email": "Admin",
+      "role": "Admin",
+      "ip": "::1",
+      "location": "Ahmedabad, GJ, IN",
+      "status": "Success"
+    },
+    {
+      "timestamp": "2026-09-06T17:50:49.605Z",
+      "email": "Admin",
+      "role": "Admin",
+      "ip": "::1",
+      "location": "Ahmedabad, GJ, IN",
+      "status": "Success"
+    },
+    {
+      "timestamp": "2026-09-06T18:09:27.253Z",
+      "email": "Admin",
+      "role": "Admin",
+      "ip": "::1",
+      "location": "Ahmedabad, GJ, IN",
+      "status": "Success"
     }
   ]
 }

@@ -128,6 +128,10 @@ const App = {
     razorpayEnabled: true,
     cartEnabled: true,
     trackStock: true,
+    upiEnabled: true,
+    upiId: 'rinkupatel3495@okaxis',
+    upiPayeeName: 'RINKU PATEL',
+    upiQrImageUrl: '/upi-rinku-patel.jpeg',
   },
 
   // ── Boot ──────────────────────────────────────────────────
@@ -945,9 +949,9 @@ const App = {
   },
 
   updateUpiQrCode(grandTotal = 0) {
-    const upiId = this.state.upiId || '8141994995@upi';
-    const payeeName = this.state.upiPayeeName || 'RK Resin Art';
-    const customQrUrl = this.state.upiQrImageUrl || '';
+    const upiId = this.state.upiId || 'rinkupatel3495@okaxis';
+    const payeeName = this.state.upiPayeeName || 'RINKU PATEL';
+    const customQrUrl = this.state.upiQrImageUrl || '/upi-rinku-patel.jpeg';
 
     const vpaDisplay = document.getElementById('upiVpaDisplay');
     if (vpaDisplay) vpaDisplay.textContent = upiId;
@@ -960,18 +964,24 @@ const App = {
 
     const upiQrImg = document.getElementById('upiQrImg');
     const mobileLink = document.getElementById('mobileUpiPayLink');
+    const gpayLink = document.getElementById('gpayUpiPayLink');
+    const qrFrame = document.querySelector('.upi-qr-frame');
 
     // Build standard UPI Payment URI
     const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${Math.max(0, grandTotal)}&cu=INR&tn=${encodeURIComponent('RK Resin Art Order')}`;
+    const gpayUri = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${Math.max(0, grandTotal)}&cu=INR&tn=${encodeURIComponent('RK Resin Art Order')}`;
 
     if (mobileLink) mobileLink.href = upiUri;
+    if (gpayLink) gpayLink.href = gpayUri;
 
     if (upiQrImg) {
       if (customQrUrl) {
         upiQrImg.src = customQrUrl;
+        if (qrFrame) qrFrame.classList.add('upi-qr-frame--scanner');
       } else {
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(upiUri)}`;
         upiQrImg.src = qrApiUrl;
+        if (qrFrame) qrFrame.classList.remove('upi-qr-frame--scanner');
       }
     }
   },
@@ -1052,7 +1062,7 @@ const App = {
     if (copyUpiBtn) {
       copyUpiBtn.onclick = async (e) => {
         e.preventDefault();
-        const upiId = App.state.upiId || '8141994995@upi';
+        const upiId = App.state.upiId || 'rinkupatel3495@okaxis';
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(upiId);
@@ -1095,7 +1105,7 @@ const App = {
 
     if (dropZone && proofFileInput) {
       dropZone.onclick = (e) => {
-        if (e.target !== removeProofBtn && !removeProofBtn.contains(e.target)) {
+        if (!removeProofBtn || (e.target !== removeProofBtn && !removeProofBtn.contains(e.target))) {
           proofFileInput.click();
         }
       };
@@ -1191,9 +1201,9 @@ const App = {
       this.state.trackStock = s.trackStock !== false;
 
       this.state.upiEnabled = s.upiEnabled !== false;
-      this.state.upiId = s.upiId || '8141994995@upi';
-      this.state.upiPayeeName = s.upiPayeeName || 'RK Resin Art';
-      this.state.upiQrImageUrl = s.upiQrImageUrl || '';
+      this.state.upiId = s.upiId || 'rinkupatel3495@okaxis';
+      this.state.upiPayeeName = s.upiPayeeName || 'RINKU PATEL';
+      this.state.upiQrImageUrl = s.upiQrImageUrl || '/upi-rinku-patel.jpeg';
 
       this.resetPaymentSelector();
     } catch {}

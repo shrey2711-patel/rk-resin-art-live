@@ -436,7 +436,7 @@
                 </div>
                 <div class="payment-option-details">
                   <strong>Instant UPI QR Scan</strong>
-                  <span>GPay, PhonePe, Paytm, BHIM & Any UPI App</span>
+                  <span>Scan QR or open Google Pay directly</span>
                 </div>
                 <span class="pay-method-badge">Direct Scan</span>
               </div>
@@ -476,7 +476,7 @@
                 <div class="upi-head-strip">
                   <div class="upi-strip-title">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    <span>Instant UPI Payment</span>
+                    <span>Pay Rinku Patel via UPI</span>
                   </div>
                   <div class="upi-supported-apps">
                     <span>Google Pay</span>
@@ -504,8 +504,8 @@
 
                     <div class="upi-vpa-row">
                       <div class="upi-vpa-details">
-                        <span class="upi-vpa-label">Studio UPI ID</span>
-                        <span class="upi-vpa-text" id="upiVpaDisplay">8141994995@upi</span>
+                        <span class="upi-vpa-label">UPI ID</span>
+                        <span class="upi-vpa-text" id="upiVpaDisplay">rinkupatel3495@okaxis</span>
                       </div>
                       <button type="button" class="copy-upi-btn" id="copyUpiBtn" title="Copy UPI ID" aria-label="Copy UPI ID">
                         <span id="copyUpiIcon">
@@ -515,10 +515,16 @@
                       </button>
                     </div>
 
-                    <a id="mobileUpiPayLink" href="#" class="mobile-upi-app-btn">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                      <span>Open in UPI App</span>
-                    </a>
+                    <div class="upi-action-row">
+                      <a id="gpayUpiPayLink" href="#" class="mobile-upi-app-btn gpay-upi-app-btn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 11-12h-8l1-8z"></path></svg>
+                        <span>Open Google Pay</span>
+                      </a>
+                      <a id="mobileUpiPayLink" href="#" class="mobile-upi-app-btn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        <span>Open any UPI app</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -528,21 +534,21 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                   </div>
                   <div class="uib-content">
-                    <strong>Payment Verification Notice:</strong>
-                    <p>After transferring <span id="upiPromptAmount">₹0</span>, enter the 12-digit UPI reference number or attach your payment confirmation below to verify your order.</p>
+                    <strong>After payment</strong>
+                    <p>Pay <span id="upiPromptAmount">₹0</span>, then enter the UTR/reference number or attach the payment screenshot so we can verify your order quickly.</p>
                   </div>
                 </div>
 
                 <!-- Verification Inputs -->
                 <div class="upi-verify-inputs">
                   <div class="form-field">
-                    <label for="ckUpiTxnId">UPI Transaction ID / 12-Digit UTR Number *</label>
+                    <label for="ckUpiTxnId">UPI Transaction ID / UTR Number *</label>
                     <input type="text" id="ckUpiTxnId" placeholder="e.g. 423456789012 or UPI Ref Number" style="font-family: 'SFMono-Regular', Consolas, monospace; letter-spacing: 0.5px;">
                   </div>
 
                   <div class="form-field" style="margin-bottom: 0;">
                     <label>Payment Receipt / Screenshot (Optional)</label>
-                    <input type="file" id="ckUpiProofFile" accept="image/*" style="display: none;">
+                    <input type="file" id="ckUpiProofFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display: none;">
                     <input type="hidden" id="ckUpiProofUrl">
 
                     <div class="upi-proof-upload-box" id="upiProofDropZone">
@@ -552,7 +558,7 @@
                         </div>
                         <div class="upload-text-wrap">
                           <span class="upload-primary-text">Click to upload payment receipt</span>
-                          <span class="upload-hint-text">PNG, JPG or WEBP (Max 15MB)</span>
+                          <span class="upload-hint-text">PNG, JPG, WEBP or HEIC (Max 15MB)</span>
                         </div>
                       </div>
 
@@ -965,20 +971,20 @@
                 <div class="form-row-2">
                   <div class="form-field">
                     <label>Store UPI ID (VPA) *</label>
-                    <input class="admin-input" id="afUpiId" placeholder="e.g. 8141994995@upi" value="8141994995@upi">
+                    <input class="admin-input" id="afUpiId" placeholder="e.g. rinkupatel3495@okaxis" value="rinkupatel3495@okaxis">
                   </div>
                   <div class="form-field">
                     <label>UPI Payee / Business Name</label>
-                    <input class="admin-input" id="afUpiPayeeName" placeholder="e.g. RK Resin Art" value="RK Resin Art">
+                    <input class="admin-input" id="afUpiPayeeName" placeholder="e.g. RINKU PATEL" value="RINKU PATEL">
                   </div>
                 </div>
                 <div class="form-field" style="margin-top: 8px;">
-                  <label>Custom UPI QR Code Image (Optional - If empty, dynamic QR code is auto-generated)</label>
+                  <label>Custom UPI QR Code Image</label>
                   <input type="hidden" id="afUpiQrImageUrl">
-                  <input class="product-file-input" type="file" id="afUpiQrFile" accept="image/jpeg,image/png,image/webp" style="display:none;">
+                  <input class="product-file-input" type="file" id="afUpiQrFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display:none;">
                   <div style="display: flex; gap: 10px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
                     <button type="button" class="admin-save-btn" id="uploadUpiQrBtn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #7c3aed;">Choose QR Image</button>
-                    <span id="upiQrUploadStatus" style="font-size: 0.78rem; color: var(--muted);">Auto dynamic QR enabled</span>
+                    <span id="upiQrUploadStatus" style="font-size: 0.78rem; color: var(--muted);">Default Rinku Patel QR active</span>
                     <button type="button" id="removeUpiQrBtn" style="display:none; background:none; border:none; color:var(--red); font-size:0.78rem; font-weight:700; cursor:pointer;">Remove Custom QR</button>
                   </div>
                   <div id="upiQrPreviewBox" style="display:none; margin-top: 10px;">
@@ -988,7 +994,7 @@
               </div>
 
               <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--border); padding: 10px 15px; font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; border-radius: 4px;">
-                💡 When <strong>Pay via UPI QR Code</strong> is enabled (checked), checkout displays the dynamic UPI QR code with payment screenshot upload alongside <strong>WhatsApp Inquiry</strong>.
+                💡 When <strong>Pay via UPI QR Code</strong> is enabled, checkout displays the Rinku Patel scanner, Google Pay button, and payment screenshot upload alongside <strong>WhatsApp Inquiry</strong>.
               </div>
 
               <button class="admin-save-btn" id="saveSettingsBtn">Save Settings</button>
@@ -1428,37 +1434,107 @@
               </div>
             </div>
 
-            <!-- Blocklist management and Security warning logs -->
-            <div class="form-row-2" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px;">
-              <!-- Blocklist Manager -->
-              <div class="admin-form-card" style="margin: 0;">
-                <div class="afc-title">Blocked Visitor List</div>
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                  <input type="text" class="admin-input" id="blockIpInput" placeholder="Visitor IP address" style="flex: 1; min-height: 38px;">
-                  <button class="admin-save-btn" id="blockIpBtn" style="padding: 0 16px; min-height: 38px; border-radius: 8px; font-weight: 800;">Block</button>
+            <!-- CYBERSECURITY THREAT & ATTACK DETECTION CENTER -->
+            <div class="admin-form-card" id="threatMonitorCard" style="margin: 0; margin-bottom: 24px; padding: 22px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                <div>
+                  <div style="font-size: 1.05rem; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Website Attack & Intrusion Detection Monitor</span>
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--muted); margin-top: 2px;">Real-time automated bot, vulnerability scan, SQLi, and brute-force intrusion defense</div>
                 </div>
-                <div style="overflow-y: auto; max-height: 180px;">
-                  <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <button type="button" class="admin-save-btn" id="testAttackBtn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--border); padding: 7px 13px; font-size: 0.78rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Test Attack Detection</span>
+                  </button>
+                  <button type="button" class="admin-save-btn" id="clearSecurityLogsBtn" style="background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 7px 13px; font-size: 0.78rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                    Clear Logs
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Threat Status Banner -->
+              <div id="threatStatusBanner" class="threat-status-banner secure" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div id="threatPulseIndicator" class="threat-pulse-dot" style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);"></div>
+                  <div>
+                    <div id="threatStatusText" style="font-size: 0.88rem; font-weight: 800; color: #065f46; letter-spacing: 0.02em;">SYSTEM DEFENSE SHIELD: ALL SECURE</div>
+                    <div id="threatStatusSub" style="font-size: 0.74rem; color: #047857; margin-top: 1px;">No active attacks detected in the last 24 hours. Automated 403 mitigation active.</div>
+                  </div>
+                </div>
+                <span class="threat-shield-pill" style="font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; background: rgba(255,255,255,0.7); color: #065f46; border: 1px solid rgba(16,185,129,0.3);">Shield Active</span>
+              </div>
+
+              <!-- Threat KPI Metric Cards -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px;">
+                <div class="admin-form-card" style="margin: 0; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;">
+                  <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 4px;">Threat Status</div>
+                  <div id="statThreatLevel" style="font-size: 1.35rem; font-weight: 900; color: #10b981;">SECURE</div>
+                </div>
+                <div class="admin-form-card" style="margin: 0; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;">
+                  <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 4px;">Attacks Detected (24h)</div>
+                  <div id="statThreats24h" style="font-size: 1.35rem; font-weight: 900; color: var(--ink);">0</div>
+                </div>
+                <div class="admin-form-card" style="margin: 0; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;">
+                  <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 4px;">Exploit Probes Blocked</div>
+                  <div id="statProbesBlocked" style="font-size: 1.35rem; font-weight: 900; color: #7c3aed;">0</div>
+                </div>
+                <div class="admin-form-card" style="margin: 0; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;">
+                  <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 4px;">Blocked Attacker IPs</div>
+                  <div id="statBlockedIpsCount" style="font-size: 1.35rem; font-weight: 900; color: #ef4444;">0</div>
+                </div>
+              </div>
+
+              <!-- Live Attack Feed (Full Width) -->
+              <div style="margin-top: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <div style="font-size: 0.86rem; font-weight: 800; color: var(--ink);">Recent Attack & Probe Logs</div>
+                  <span style="font-size: 0.72rem; color: var(--muted);">Auto-logged by Security Shield</span>
+                </div>
+                <div style="overflow-y: auto; max-height: 280px; border: 1px solid var(--border); border-radius: 10px; background: var(--card);">
+                  <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.78rem;">
                     <thead>
-                      <tr style="border-bottom: 1.5px solid var(--border); text-align: left; font-weight: 800; color: var(--muted);">
-                        <th style="padding: 8px 10px;">Blocked Visitor</th>
-                        <th style="padding: 8px 10px; text-align: right; width: 80px;">Action</th>
+                      <tr style="border-bottom: 1.5px solid var(--border); background: var(--bg); text-align: left; font-weight: 800; color: var(--muted);">
+                        <th style="padding: 8px 12px; width: 85px;">Severity</th>
+                        <th style="padding: 8px 12px; width: 140px;">Threat Type</th>
+                        <th style="padding: 8px 12px;">Target & Message</th>
+                        <th style="padding: 8px 12px; width: 160px;">Attacker IP & Location</th>
+                        <th style="padding: 8px 12px; width: 90px; text-align: right;">Action</th>
                       </tr>
                     </thead>
-                    <tbody id="blockedIpsList">
-                      <tr><td colspan="2" style="padding: 12px; text-align: center; color: var(--muted);">No blocked visitors.</td></tr>
+                    <tbody id="securityLogsList">
+                      <tr><td colspan="5" style="padding: 24px; text-align: center; color: var(--muted);">No attack activity detected. All systems clear.</td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <!-- Security Logs -->
-              <div class="admin-form-card" style="margin: 0;">
-                <div class="afc-title">Security Alerts</div>
-                <div style="overflow-y: auto; max-height: 240px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.01);">
-                  <div id="securityLogsList" style="padding: 4px; display: flex; flex-direction: column; gap: 8px;">
-                    <div style="padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem;">No risky activity found.</div>
+              <!-- Blocked IPs Manager (Dedicated Section) -->
+              <div style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <div style="font-size: 0.86rem; font-weight: 800; color: var(--ink);">Banned Attacker IP Addresses</div>
+                    <div style="font-size: 0.72rem; color: var(--muted); margin-top: 2px;">IPs listed here are permanently dropped with HTTP 403 before reaching your application</div>
                   </div>
+                  <div style="display: flex; gap: 8px; align-items: center; width: 100%; max-width: 380px;">
+                    <input type="text" id="blockIpInput" placeholder="Enter IP to ban (e.g. 185.220.101.5)" style="flex: 1; min-width: 0; height: 36px; font-size: 0.82rem; padding: 0 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--ink); box-sizing: border-box;">
+                    <button type="button" id="blockIpBtn" style="height: 36px; padding: 0 18px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; white-space: nowrap; background: #0f766e; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: opacity 0.2s;">Ban IP</button>
+                  </div>
+                </div>
+                <div style="overflow-y: auto; max-height: 180px; border: 1px solid var(--border); border-radius: 10px; background: var(--card);">
+                  <table class="admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.78rem;">
+                    <thead>
+                      <tr style="border-bottom: 1.5px solid var(--border); background: var(--bg); text-align: left; font-weight: 800; color: var(--muted);">
+                        <th style="padding: 8px 12px;">Banned IP Address</th>
+                        <th style="padding: 8px 12px; text-align: right; width: 100px;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="blockedIpsList">
+                      <tr><td colspan="2" style="padding: 16px; text-align: center; color: var(--muted);">No blocked IPs.</td></tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
