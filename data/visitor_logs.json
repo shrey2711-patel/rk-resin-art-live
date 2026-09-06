@@ -1,485 +1,5 @@
 [
   {
-    "timestamp": "2026-08-21T21:26:14.503Z",
-    "ip": "127.0.0.1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "19ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.508Z",
-    "ip": "127.0.0.1",
-    "url": "/api/settings",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "15ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.521Z",
-    "ip": "127.0.0.1",
-    "url": "/api/categories",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.525Z",
-    "ip": "127.0.0.1",
-    "url": "/api/categories",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.535Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.539Z",
-    "ip": "127.0.0.1",
-    "url": "/api/products",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.549Z",
-    "ip": "127.0.0.1",
-    "url": "/api/banners",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.552Z",
-    "ip": "127.0.0.1",
-    "url": "/api/banners",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "5ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.563Z",
-    "ip": "127.0.0.1",
-    "url": "/api/nav",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "5ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.566Z",
-    "ip": "127.0.0.1",
-    "url": "/api/nav",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "5ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.578Z",
-    "ip": "127.0.0.1",
-    "url": "/api/non-existent-route-xyz",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 404,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.582Z",
-    "ip": "127.0.0.1",
-    "url": "/api/non-existent-route-xyz",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 404,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.627Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/orders",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "3ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.630Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/orders",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.644Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/orders",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "5ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.649Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/orders",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "8ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.660Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/me",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.664Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/me",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.840Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/register",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "167ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.845Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/register",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "170ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.861Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/me",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "8ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.865Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/me",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "10ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.883Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/profile",
-    "method": "PUT",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "8ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.887Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/profile",
-    "method": "PUT",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "11ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.899Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/register",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 409,
-    "duration": "3ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:14.903Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/register",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 409,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.080Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "170ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.084Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "173ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.267Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "173ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.272Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/login",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 401,
-    "duration": "175ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.291Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/cart",
-    "method": "PUT",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "9ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.296Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/cart",
-    "method": "PUT",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "13ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.309Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "5ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.313Z",
-    "ip": "127.0.0.1",
-    "url": "/api/auth/cart",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "7ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.332Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/coupons",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 201,
-    "duration": "10ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.336Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/coupons",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 201,
-    "duration": "12ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.349Z",
-    "ip": "127.0.0.1",
-    "url": "/api/payment/validate-coupon",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.353Z",
-    "ip": "127.0.0.1",
-    "url": "/api/payment/validate-coupon",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.364Z",
-    "ip": "127.0.0.1",
-    "url": "/api/payment/validate-coupon",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 400,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.368Z",
-    "ip": "127.0.0.1",
-    "url": "/api/payment/validate-coupon",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 400,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.389Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/products",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 500,
-    "duration": "12ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.394Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/products",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 500,
-    "duration": "16ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.406Z",
-    "ip": "127.0.0.1",
-    "url": "/api/orders",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 400,
-    "duration": "4ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.409Z",
-    "ip": "127.0.0.1",
-    "url": "/api/orders",
-    "method": "POST",
-    "userAgent": "Unknown",
-    "status": 400,
-    "duration": "6ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.422Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/users",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "5ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.427Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/users",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "8ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.443Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/users/7",
-    "method": "PUT",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "8ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
-    "timestamp": "2026-08-21T21:26:15.447Z",
-    "ip": "127.0.0.1",
-    "url": "/api/admin/users/7",
-    "method": "PUT",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "11ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
     "timestamp": "2026-08-21T21:26:15.464Z",
     "ip": "127.0.0.1",
     "url": "/api/admin/categories",
@@ -9997,6 +9517,486 @@
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
     "status": 304,
     "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:26:44.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:26:48.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:26:52.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:26:56.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:00.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:04.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:08.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:12.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:16.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:20.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:24.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:28.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:32.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:36.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:40.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:44.297Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:48.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:52.291Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:27:56.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:00.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:04.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:08.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:12.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:16.294Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:20.308Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "8ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:24.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:28.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:32.280Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:36.305Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "9ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:40.295Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:44.288Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:48.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:52.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:28:56.292Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:00.287Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:04.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:08.276Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:12.278Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:16.284Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:20.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:24.283Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:28.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:32.282Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:36.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:40.281Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "2ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:44.285Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "3ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:48.286Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "5ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:29:52.293Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "6ms",
     "location": "Ahmedabad, GJ, IN"
   }
 ]
