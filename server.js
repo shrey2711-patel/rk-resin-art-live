@@ -1354,22 +1354,25 @@ function getIpLocation(ip) {
 }
 
 function logVisitorRequest(logEntry) {
-  try {
-    let logs = [];
-    if (fs.existsSync(VISITOR_LOGS_PATH)) {
-      try {
-        logs = JSON.parse(fs.readFileSync(VISITOR_LOGS_PATH, 'utf8'));
-      } catch (e) {
-        logs = [];
+  // File-based visitor logging disabled to stop continuous writes to visitor_logs.json
+  if (process.env.ENABLE_FILE_LOGGING === 'true') {
+    try {
+      let logs = [];
+      if (fs.existsSync(VISITOR_LOGS_PATH)) {
+        try {
+          logs = JSON.parse(fs.readFileSync(VISITOR_LOGS_PATH, 'utf8'));
+        } catch (e) {
+          logs = [];
+        }
       }
+      logs.push(logEntry);
+      if (logs.length > 1000) {
+        logs = logs.slice(logs.length - 1000);
+      }
+      fs.writeFileSync(VISITOR_LOGS_PATH, JSON.stringify(logs, null, 2));
+    } catch (err) {
+      console.error('Error writing to visitor logs:', err.message);
     }
-    logs.push(logEntry);
-    if (logs.length > 1000) {
-      logs = logs.slice(logs.length - 1000);
-    }
-    fs.writeFileSync(VISITOR_LOGS_PATH, JSON.stringify(logs, null, 2));
-  } catch (err) {
-    console.error('Error writing to visitor logs:', err.message);
   }
 }
 
