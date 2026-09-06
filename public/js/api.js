@@ -174,6 +174,15 @@ const API = {
   placeOrder: (data) => API.userPost('/api/orders', data),
   createPaymentOrder: (data) => API.userPost('/api/payment/create-order', data),
   verifyPayment: (data) => API.userPost('/api/payment/verify', data),
+  uploadPaymentProof: async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await fetch(BASE + '/api/upload/payment-proof', {
+      method: 'POST',
+      body: formData
+    });
+    return API.handleResponse(res, false);
+  },
 
   // ── Customer auth ─────────────────────────────────────────
   register: async (data) => {

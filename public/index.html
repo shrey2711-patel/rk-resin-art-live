@@ -393,12 +393,12 @@
 
           <div class="form-field payment-method-field" style="margin-top:15px">
             <label>Payment Method</label>
-            <div class="payment-options">
-              <div class="payment-option active" id="payOnlineOpt" data-method="online">
-                <div class="payment-option-icon">💳</div>
+            <div class="payment-options" id="checkoutPaymentOptions">
+              <div class="payment-option active" id="payUpiOpt" data-method="upi">
+                <div class="payment-option-icon">⚡</div>
                 <div class="payment-option-details">
-                  <strong>Pay Online</strong>
-                  <span>UPI, Cards, Netbanking</span>
+                  <strong>Pay through UPI</strong>
+                  <span>Instant QR Code Scan & Pay</span>
                 </div>
               </div>
               <div class="payment-option" id="payCodOpt" data-method="cod">
@@ -406,6 +406,82 @@
                 <div class="payment-option-details">
                   <strong>Inquire on WhatsApp</strong>
                   <span>Send order details via WhatsApp</span>
+                </div>
+              </div>
+              <div class="payment-option" id="payOnlineOpt" data-method="online" style="display:none;">
+                <div class="payment-option-icon">💳</div>
+                <div class="payment-option-details">
+                  <strong>Razorpay Online</strong>
+                  <span>Cards, Netbanking, Wallet</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive UPI QR Code Module -->
+          <div id="upiPaymentSection" class="upi-payment-section" style="margin-top: 16px;">
+            <div class="upi-payment-card">
+              <div class="upi-head-badge">
+                <span>⚡ Instant UPI Payment</span>
+                <span class="upi-verified-pill">GPay · PhonePe · Paytm · BHIM</span>
+              </div>
+
+              <div class="upi-qr-box">
+                <div class="upi-qr-frame">
+                  <img id="upiQrImg" src="" alt="UPI Payment QR Code" class="upi-qr-image">
+                  <div class="upi-qr-scan-line"></div>
+                </div>
+                <div class="upi-pay-info">
+                  <div class="upi-amount-badge">
+                    <span class="upi-amount-label">Pay Exact Amount:</span>
+                    <span class="upi-amount-val" id="upiAmountDisplay">₹0</span>
+                  </div>
+                  <div class="upi-vpa-row">
+                    <span class="upi-vpa-text" id="upiVpaDisplay">8141994995@upi</span>
+                    <button type="button" class="copy-upi-btn" id="copyUpiBtn" title="Copy UPI ID">
+                      <span id="copyUpiIcon">📋</span> <span id="copyUpiText">Copy</span>
+                    </button>
+                  </div>
+                  <a id="mobileUpiPayLink" href="#" class="mobile-upi-app-btn">
+                    📱 Tap to Pay on UPI App
+                  </a>
+                </div>
+              </div>
+
+              <!-- Post-payment verification notice -->
+              <div class="upi-instruction-box">
+                <div class="uib-icon">ℹ️</div>
+                <div class="uib-content">
+                  <strong>After completing payment of <span id="upiPromptAmount">₹0</span>:</strong>
+                  <p>Please enter your <strong>12-digit UPI Reference / UTR Number</strong> or upload the payment screenshot below to confirm your order.</p>
+                </div>
+              </div>
+
+              <!-- Verification Inputs -->
+              <div class="upi-verify-inputs">
+                <div class="form-field" style="margin-bottom: 12px;">
+                  <label>UPI Transaction ID / UTR Number *</label>
+                  <input type="text" id="ckUpiTxnId" class="admin-input" placeholder="e.g. 423456789012 or UPI Ref number" style="font-family: monospace; font-size: 0.95rem; letter-spacing: 0.5px;">
+                </div>
+                <div class="form-field" style="margin-bottom: 0;">
+                  <label>Upload Payment Screenshot / Receipt (Optional)</label>
+                  <input type="file" id="ckUpiProofFile" accept="image/*" style="display: none;">
+                  <input type="hidden" id="ckUpiProofUrl">
+                  
+                  <div class="upi-proof-upload-box" id="upiProofDropZone">
+                    <div id="upiProofEmptyState" style="display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; padding: 10px;">
+                      <span style="font-size: 1.2rem;">📸</span>
+                      <span style="font-size: 0.82rem; font-weight: 700; color: var(--p);">Click to attach payment screenshot</span>
+                    </div>
+                    <div id="upiProofFilledState" style="display: none; align-items: center; justify-content: space-between; padding: 6px 12px; background: rgba(16,185,129,0.08); border-radius: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+                        <img id="upiProofThumb" src="" alt="Proof" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;">
+                        <span id="upiProofFileName" style="font-size: 0.78rem; font-weight: 700; color: #065f46; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 180px;">screenshot.png</span>
+                      </div>
+                      <button type="button" id="removeUpiProofBtn" style="background: none; border: none; color: var(--red); font-size: 0.8rem; font-weight: 800; cursor: pointer;">✕ Remove</button>
+                    </div>
+                  </div>
+                  <div id="upiProofStatus" style="font-size: 0.75rem; margin-top: 4px;"></div>
                 </div>
               </div>
             </div>
@@ -714,6 +790,12 @@
               
               <!-- Settings Checklist -->
               <div class="admin-settings-checklist" style="margin-top: 15px; margin-bottom: 15px;">
+                <!-- UPI Direct QR Payment Switch (Default: Checked) -->
+                <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                  <input type="checkbox" id="afUpiEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;" checked>
+                  <label for="afUpiEnabled" style="font-weight: 700; cursor: pointer; margin: 0; user-select: none;">Enable Pay via UPI QR Code (Direct scan & pay at checkout)</label>
+                </div>
+
                 <!-- Cart Toggle Switch -->
                 <div class="form-field" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                   <input type="checkbox" id="afCartEnabled" style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
@@ -733,8 +815,38 @@
                 </div>
               </div>
 
+              <!-- UPI Merchant Configuration -->
+              <div id="adminUpiConfigSection" style="margin-top: 15px; padding: 14px; background: rgba(124, 58, 237, 0.04); border: 1.5px solid rgba(124, 58, 237, 0.2); border-radius: 10px; margin-bottom: 20px;">
+                <div style="font-weight: 800; font-size: 0.88rem; color: #6d28d9; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                  <span>⚡ Direct UPI QR Code Settings</span>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-field">
+                    <label>Store UPI ID (VPA) *</label>
+                    <input class="admin-input" id="afUpiId" placeholder="e.g. 8141994995@upi" value="8141994995@upi">
+                  </div>
+                  <div class="form-field">
+                    <label>UPI Payee / Business Name</label>
+                    <input class="admin-input" id="afUpiPayeeName" placeholder="e.g. RK Resin Art" value="RK Resin Art">
+                  </div>
+                </div>
+                <div class="form-field" style="margin-top: 8px;">
+                  <label>Custom UPI QR Code Image (Optional - If empty, dynamic QR code is auto-generated)</label>
+                  <input type="hidden" id="afUpiQrImageUrl">
+                  <input class="product-file-input" type="file" id="afUpiQrFile" accept="image/jpeg,image/png,image/webp" style="display:none;">
+                  <div style="display: flex; gap: 10px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
+                    <button type="button" class="admin-save-btn" id="uploadUpiQrBtn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #7c3aed;">Choose QR Image</button>
+                    <span id="upiQrUploadStatus" style="font-size: 0.78rem; color: var(--muted);">Auto dynamic QR enabled</span>
+                    <button type="button" id="removeUpiQrBtn" style="display:none; background:none; border:none; color:var(--red); font-size:0.78rem; font-weight:700; cursor:pointer;">Remove Custom QR</button>
+                  </div>
+                  <div id="upiQrPreviewBox" style="display:none; margin-top: 10px;">
+                    <img id="adminUpiQrPreview" src="" alt="Custom QR Preview" style="width: 100px; height: 100px; object-fit: contain; border-radius: 6px; border: 1.5px solid var(--border);">
+                  </div>
+                </div>
+              </div>
+
               <div class="admin-info-note" style="background: rgba(0,0,0,0.02); border-left: 3px solid var(--border); padding: 10px 15px; font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; border-radius: 4px;">
-                💡 If Razorpay is disabled (unchecked), checkout will automatically default to <strong>WhatsApp COD</strong> payments only and hide the online payment selection.
+                💡 When <strong>Pay via UPI QR Code</strong> is enabled (checked), checkout displays the dynamic UPI QR code with payment screenshot upload alongside <strong>WhatsApp Inquiry</strong>.
               </div>
 
               <button class="admin-save-btn" id="saveSettingsBtn">Save Settings</button>

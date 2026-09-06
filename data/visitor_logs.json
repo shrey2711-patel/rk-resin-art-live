@@ -7228,5 +7228,415 @@
     "status": 200,
     "duration": "4ms",
     "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.680Z",
+    "ip": "127.0.0.1",
+    "url": "/",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "37ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.769Z",
+    "ip": "127.0.0.1",
+    "url": "/sitemap.xml",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "17ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.794Z",
+    "ip": "127.0.0.1",
+    "url": "/robots.txt",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "5ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.830Z",
+    "ip": "127.0.0.1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "17ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.859Z",
+    "ip": "127.0.0.1",
+    "url": "/api/categories",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.892Z",
+    "ip": "127.0.0.1",
+    "url": "/api/products",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "12ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.911Z",
+    "ip": "127.0.0.1",
+    "url": "/api/banners",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "5ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.941Z",
+    "ip": "127.0.0.1",
+    "url": "/api/nav",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.966Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/orders",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 401,
+    "duration": "5ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:14.989Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/me",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 401,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:15.012Z",
+    "ip": "127.0.0.1",
+    "url": "/api/non-existent-endpoint",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 404,
+    "duration": "6ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:15.562Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/register",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "437ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:15.589Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/register",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 409,
+    "duration": "4ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:15.981Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/login",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "372ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.017Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/me",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.037Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/cart",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.065Z",
+    "ip": "127.0.0.1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.094Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/coupons",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 201,
+    "duration": "11ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.120Z",
+    "ip": "127.0.0.1",
+    "url": "/api/payment/validate-coupon",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "4ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.146Z",
+    "ip": "127.0.0.1",
+    "url": "/api/payment/validate-coupon",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 400,
+    "duration": "3ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.175Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.205Z",
+    "ip": "127.0.0.1",
+    "url": "/api/orders",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "15ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.230Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/orders",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.258Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/orders/7",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.277Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/users",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.303Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/users/10",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "11ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.324Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "10ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.353Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories/reorder",
+    "method": "PUT",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "13ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.383Z",
+    "ip": "127.0.0.1",
+    "url": "/api/products/2/reviews",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 201,
+    "duration": "11ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.410Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products/2",
+    "method": "DELETE",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.430Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/categories/1",
+    "method": "DELETE",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "7ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:16.453Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/coupons/2",
+    "method": "DELETE",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "6ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:27.585Z",
+    "ip": "127.0.0.1",
+    "url": "/api/settings",
+    "method": "GET",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "15ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:27.627Z",
+    "ip": "127.0.0.1",
+    "url": "/api/orders",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 400,
+    "duration": "5ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:42.249Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 401,
+    "duration": "14ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:42.268Z",
+    "ip": "127.0.0.1",
+    "url": "/api/orders",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 400,
+    "duration": "5ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:51.189Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 401,
+    "duration": "16ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:37:51.210Z",
+    "ip": "127.0.0.1",
+    "url": "/api/orders",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 400,
+    "duration": "5ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:38:00.399Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "20ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:38:00.464Z",
+    "ip": "127.0.0.1",
+    "url": "/api/orders",
+    "method": "POST",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "53ms",
+    "location": "Mumbai, MH, IN"
+  },
+  {
+    "timestamp": "2026-09-05T12:38:00.499Z",
+    "ip": "127.0.0.1",
+    "url": "/api/admin/products/2",
+    "method": "DELETE",
+    "userAgent": "Unknown",
+    "status": 200,
+    "duration": "9ms",
+    "location": "Mumbai, MH, IN"
   }
 ]

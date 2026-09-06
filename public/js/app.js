@@ -944,53 +944,200 @@ const App = {
     });
   },
 
+  updateUpiQrCode(grandTotal = 0) {
+    const upiId = this.state.upiId || '8141994995@upi';
+    const payeeName = this.state.upiPayeeName || 'RK Resin Art';
+    const customQrUrl = this.state.upiQrImageUrl || '';
+
+    const vpaDisplay = document.getElementById('upiVpaDisplay');
+    if (vpaDisplay) vpaDisplay.textContent = upiId;
+
+    const amountDisplay = document.getElementById('upiAmountDisplay');
+    if (amountDisplay) amountDisplay.textContent = `₹${Math.max(0, grandTotal).toLocaleString('en-IN')}`;
+
+    const promptAmount = document.getElementById('upiPromptAmount');
+    if (promptAmount) promptAmount.textContent = `₹${Math.max(0, grandTotal).toLocaleString('en-IN')}`;
+
+    const upiQrImg = document.getElementById('upiQrImg');
+    const mobileLink = document.getElementById('mobileUpiPayLink');
+
+    // Build standard UPI Payment URI
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${Math.max(0, grandTotal)}&cu=INR&tn=${encodeURIComponent('RK Resin Art Order')}`;
+
+    if (mobileLink) mobileLink.href = upiUri;
+
+    if (upiQrImg) {
+      if (customQrUrl) {
+        upiQrImg.src = customQrUrl;
+      } else {
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(upiUri)}`;
+        upiQrImg.src = qrApiUrl;
+      }
+    }
+  },
+
   setupPaymentSelector() {
-    const onlineOpt = document.getElementById('payOnlineOpt');
+    const upiOpt = document.getElementById('payUpiOpt');
     const codOpt = document.getElementById('payCodOpt');
-    if (!onlineOpt || !codOpt) return;
+    const onlineOpt = document.getElementById('payOnlineOpt');
+    const upiSection = document.getElementById('upiPaymentSection');
+    const btn = document.getElementById('placeOrderBtn');
 
-    onlineOpt.onclick = () => {
-      if (App.state.razorpayEnabled === false) return;
-      onlineOpt.classList.add('active');
-      codOpt.classList.remove('active');
-      App.state.paymentMethod = 'online';
-      document.getElementById('placeOrderBtn').textContent = 'Pay securely with Razorpay';
-    };
+    if (upiOpt) {
+      upiOpt.onclick = () => {
+        App.state.paymentMethod = 'upi';
+        upiOpt.classList.add('active');
+        if (codOpt) codOpt.classList.remove('active');
+        if (onlineOpt) onlineOpt.classList.remove('active');
+        if (upiSection) upiSection.style.display = 'block';
+        if (btn) btn.textContent = 'Submit Order & Confirm Payment';
+        App.recalculateCheckout();
+      };
+    }
 
-    codOpt.onclick = () => {
-      codOpt.classList.add('active');
-      onlineOpt.classList.remove('active');
-      App.state.paymentMethod = 'cod';
-      document.getElementById('placeOrderBtn').textContent = 'Send Inquiry on WhatsApp';
-    };
+    if (codOpt) {
+      codOpt.onclick = () => {
+        App.state.paymentMethod = 'cod';
+        codOpt.classList.add('active');
+        if (upiOpt) upiOpt.classList.remove('active');
+        if (onlineOpt) onlineOpt.classList.remove('active');
+        if (upiSection) upiSection.style.display = 'none';
+        if (btn) btn.textContent = 'Place Order via WhatsApp';
+      };
+    }
+
+    if (onlineOpt) {
+      onlineOpt.onclick = () => {
+        if (App.state.razorpayEnabled === false) return;
+        App.state.paymentMethod = 'online';
+        onlineOpt.classList.add('active');
+        if (upiOpt) upiOpt.classList.remove('active');
+        if (codOpt) codOpt.classList.remove('active');
+        if (upiSection) upiSection.style.display = 'none';
+        if (btn) btn.textContent = 'Pay securely with Razorpay';
+      };
+    }
+
+    // 1-Click Copy UPI ID button
+    const copyUpiBtn = document.getElementById('copyUpiBtn');
+    if (copyUpiBtn) {
+      copyUpiBtn.onclick = async (e) => {
+        e.preventDefault();
+        const upiId = App.state.upiId || '8141994995@upi';
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(upiId);
+          } else {
+            const tempInput = document.createElement('input');
+            tempInput.value = upiId;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+          }
+          const textSpan = document.getElementById('copyUpiText');
+          const iconSpan = document.getElementById('copyUpiIcon');
+          if (textSpan) textSpan.textContent = 'Copied!';
+          if (iconSpan) iconSpan.textContent = '✅';
+          showToast('UPI ID copied to clipboard: ' + upiId, 'success');
+          setTimeout(() => {
+            if (textSpan) textSpan.textContent = 'Copy';
+            if (iconSpan) iconSpan.textContent = '📋';
+          }, 2000);
+        } catch (err) {
+          showToast('UPI ID: ' + upiId, 'info');
+        }
+      };
+    }
+
+    // Payment Screenshot Proof Upload & Drop Zone
+    const dropZone = document.getElementById('upiProofDropZone');
+    const proofFileInput = document.getElementById('ckUpiProofFile');
+    const emptyState = document.getElementById('upiProofEmptyState');
+    const filledState = document.getElementById('upiProofFilledState');
+    const proofThumb = document.getElementById('upiProofThumb');
+    const proofFileName = document.getElementById('upiProofFileName');
+    const removeProofBtn = document.getElementById('removeUpiProofBtn');
+    const proofStatus = document.getElementById('upiProofStatus');
+
+    if (dropZone && proofFileInput) {
+      dropZone.onclick = (e) => {
+        if (e.target !== removeProofBtn && !removeProofBtn.contains(e.target)) {
+          proofFileInput.click();
+        }
+      };
+
+      proofFileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Show local preview immediately
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          if (proofThumb) proofThumb.src = re.target.result;
+          if (proofFileName) proofFileName.textContent = file.name;
+          if (emptyState) emptyState.style.display = 'none';
+          if (filledState) filledState.style.display = 'flex';
+          if (proofStatus) {
+            proofStatus.textContent = '✅ Screenshot attached (' + Math.round(file.size / 1024) + ' KB)';
+            proofStatus.style.color = '#059669';
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+    }
+
+    if (removeProofBtn && proofFileInput) {
+      removeProofBtn.onclick = (e) => {
+        e.stopPropagation();
+        proofFileInput.value = '';
+        document.getElementById('ckUpiProofUrl').value = '';
+        if (emptyState) emptyState.style.display = 'flex';
+        if (filledState) filledState.style.display = 'none';
+        if (proofStatus) proofStatus.textContent = '';
+      };
+    }
   },
 
   resetPaymentSelector() {
-    const onlineOpt = document.getElementById('payOnlineOpt');
+    const upiOpt = document.getElementById('payUpiOpt');
     const codOpt = document.getElementById('payCodOpt');
+    const onlineOpt = document.getElementById('payOnlineOpt');
+    const upiSection = document.getElementById('upiPaymentSection');
     const btn = document.getElementById('placeOrderBtn');
-    const paymentField = document.querySelector('.payment-method-field');
     
+    const upiEnabled = this.state.upiEnabled !== false && this.state.cartEnabled !== false;
     const razorpayEnabled = this.state.razorpayEnabled !== false && this.state.cartEnabled !== false;
-    
-    if (paymentField) {
-      paymentField.style.display = razorpayEnabled ? '' : 'none';
+
+    if (onlineOpt) {
+      onlineOpt.style.display = razorpayEnabled ? 'flex' : 'none';
     }
-    
-    if (!razorpayEnabled) {
-      this.state.paymentMethod = 'cod';
-      if (onlineOpt && codOpt) {
-        onlineOpt.classList.remove('active');
-        codOpt.classList.add('active');
-      }
-      if (btn) btn.textContent = 'Send Inquiry on WhatsApp';
-    } else {
+    if (upiOpt) {
+      upiOpt.style.display = upiEnabled ? 'flex' : 'none';
+    }
+
+    // Default selection: UPI (if enabled), else Razorpay (if enabled), else WhatsApp COD
+    if (upiEnabled) {
+      this.state.paymentMethod = 'upi';
+      if (upiOpt) upiOpt.classList.add('active');
+      if (codOpt) codOpt.classList.remove('active');
+      if (onlineOpt) onlineOpt.classList.remove('active');
+      if (upiSection) upiSection.style.display = 'block';
+      if (btn) btn.textContent = 'Submit Order & Confirm Payment';
+    } else if (razorpayEnabled) {
       this.state.paymentMethod = 'online';
-      if (onlineOpt && codOpt) {
-        onlineOpt.classList.add('active');
-        codOpt.classList.remove('active');
-      }
+      if (onlineOpt) onlineOpt.classList.add('active');
+      if (upiOpt) upiOpt.classList.remove('active');
+      if (codOpt) codOpt.classList.remove('active');
+      if (upiSection) upiSection.style.display = 'none';
       if (btn) btn.textContent = 'Pay securely with Razorpay';
+    } else {
+      this.state.paymentMethod = 'cod';
+      if (codOpt) codOpt.classList.add('active');
+      if (upiOpt) upiOpt.classList.remove('active');
+      if (onlineOpt) onlineOpt.classList.remove('active');
+      if (upiSection) upiSection.style.display = 'none';
+      if (btn) btn.textContent = 'Place Order via WhatsApp';
     }
   },
 
@@ -1012,6 +1159,12 @@ const App = {
       
       this.state.razorpayEnabled = s.razorpayEnabled !== false;
       this.state.trackStock = s.trackStock !== false;
+
+      this.state.upiEnabled = s.upiEnabled !== false;
+      this.state.upiId = s.upiId || '8141994995@upi';
+      this.state.upiPayeeName = s.upiPayeeName || 'RK Resin Art';
+      this.state.upiQrImageUrl = s.upiQrImageUrl || '';
+
       this.resetPaymentSelector();
     } catch {}
   },
@@ -3101,6 +3254,9 @@ App.recalculateCheckout = function() {
   }
 
   document.getElementById('ckTotal').textContent = `₹${Math.max(0, grandTotal).toLocaleString('en-IN')}`;
+  
+  // Update live UPI QR code and amount display
+  App.updateUpiQrCode(grandTotal);
 };
 
 document.getElementById('closeCheckout').onclick = () => {
@@ -3151,10 +3307,121 @@ document.getElementById('placeOrderBtn').onclick = async () => {
     : (App.state.otherCharges || 0);
   const grandTotal = taxableSubtotal + shipping + otherChargesAmount;
 
-  const isOnline = App.state.paymentMethod === 'online';
+  const paymentMethod = App.state.paymentMethod || 'upi';
+  const isUpi = paymentMethod === 'upi';
+  const isOnline = paymentMethod === 'online';
   const WHATSAPP_NUMBER = '918141994995';
 
-  if (isOnline) {
+  if (isUpi) {
+    // ── UPI QR Code Payment Flow ─────────────────────────────
+    const upiTxnId = (document.getElementById('ckUpiTxnId').value || '').trim();
+    const proofFileInput = document.getElementById('ckUpiProofFile');
+    const hasProofFile = proofFileInput && proofFileInput.files && proofFileInput.files[0];
+
+    // Require either UPI transaction ID / UTR or payment screenshot proof
+    if (!upiTxnId && !hasProofFile) {
+      showToast('⚠️ Please enter your UPI Reference / UTR Number or attach payment screenshot', 'error');
+      const txnInput = document.getElementById('ckUpiTxnId');
+      if (txnInput) { txnInput.focus(); txnInput.style.borderColor = '#ef4444'; }
+      return;
+    }
+
+    try {
+      btn.textContent = 'Verifying & Submitting Order...';
+      btn.disabled = true;
+
+      let upiProofUrl = document.getElementById('ckUpiProofUrl').value || '';
+      if (hasProofFile && !upiProofUrl) {
+        const proofStatus = document.getElementById('upiProofStatus');
+        if (proofStatus) proofStatus.textContent = 'Uploading payment screenshot...';
+        try {
+          const uploadRes = await API.uploadPaymentProof(proofFileInput.files[0]);
+          if (uploadRes && uploadRes.url) {
+            upiProofUrl = uploadRes.url;
+            document.getElementById('ckUpiProofUrl').value = upiProofUrl;
+          }
+        } catch (uploadErr) {
+          console.warn('Screenshot upload warning:', uploadErr.message);
+        }
+      }
+
+      const orderPayload = {
+        items: cartItems,
+        customer,
+        paymentMethod: 'upi',
+        upiTransactionId: upiTxnId,
+        upiProofUrl: upiProofUrl
+      };
+      if (App.state.appliedCoupon) {
+        orderPayload.couponCode = App.state.appliedCoupon.code;
+      }
+
+      const res = await API.placeOrder(orderPayload);
+      App.state.lastOrderData = res.order;
+
+      if (!isBuyNow) Cart.clear();
+
+      btn.textContent = 'Submit Order & Confirm Payment';
+      btn.disabled = false;
+      btn._isBuyNow = false;
+      btn._buyNowItems = null;
+
+      // Invoice download button
+      const invoiceBtn = document.getElementById('invoiceDownloadBtn');
+      if (invoiceBtn) {
+        invoiceBtn.style.display = 'flex';
+        invoiceBtn.onclick = () => Invoice.generate(res.order);
+      }
+
+      showToast(`Order #${res.orderId} placed via UPI! Payment proof recorded 🎉`, 'success');
+
+      // WhatsApp message to admin with UPI details & order info
+      const orderLines = cartItems.map((i, index) =>
+        `${index + 1}. ${i.name}\n` +
+        `   Category: ${i.category || 'Product'}\n` +
+        `   Qty: ${i.qty}\n` +
+        `   Rate: ₹${Number(i.price).toLocaleString('en-IN')}\n` +
+        `   Amount: ₹${(i.price * i.qty).toLocaleString('en-IN')}`
+      ).join('\n\n');
+      const fullName = `${firstName} ${customer.lastName}`.trim();
+      const fullAddress = [address, customer.city, customer.pin].filter(Boolean).join(', ');
+      
+      const discountAmount = res.order.discount || 0;
+      const discountLine = discountAmount > 0 ? `Discount (${res.order.couponCode}): -₹${discountAmount.toLocaleString('en-IN')}\n` : '';
+      const otherChargesAmount = res.order.otherChargesAmount || 0;
+      const otherLine = otherChargesAmount > 0 ? `Other Charges${res.order.otherChargesType === 'percentage' ? ' (' + res.order.otherCharges + '%)' : ''}: ₹${otherChargesAmount.toLocaleString('en-IN')}\n` : '';
+
+      const msg = encodeURIComponent(
+        `⚡ *New UPI Paid Order from RK Resin Art Website!*\n\n` +
+        `📋 *Order ID:* #${res.orderId}\n` +
+        `🟣 *Payment Method:* Direct UPI QR Scan\n` +
+        `🔢 *UPI UTR / Reference ID:* ${upiTxnId || 'See attached screenshot'}\n` +
+        `${upiProofUrl ? `📸 *Payment Screenshot Link:* ${upiProofUrl}\n` : ''}` +
+        `📅 *Date:* ${new Date().toLocaleDateString('en-IN')}\n\n` +
+        `📦 *ORDER DETAILS*\n${orderLines}\n\n` +
+        `💰 *PAYMENT SUMMARY*\n` +
+        `Subtotal: ₹${cartSubtotal.toLocaleString('en-IN')}\n` +
+        discountLine +
+        `Shipping: ${shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}\n` +
+        otherLine +
+        `*Amount Paid: ₹${Number(res.order.grandTotal).toLocaleString('en-IN')}*\n\n` +
+        `👤 *CUSTOMER DETAILS*\n` +
+        `Name: ${fullName}\n` +
+        `Phone: ${phone}\n` +
+        `Email: ${customer.email || '-'}\n` +
+        `Address: ${fullAddress}\n\n` +
+        `*I have completed the payment via UPI. Please confirm my order!* 🙏`
+      );
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+
+      App.loadProducts();
+      document.getElementById('checkoutModalOverlay').classList.remove('open');
+    } catch (e) {
+      btn.textContent = 'Submit Order & Confirm Payment';
+      btn.disabled = false;
+      showToast(e.message || 'Error placing UPI order. Please try again.', 'error');
+    }
+  } else if (isOnline) {
     try {
       btn.textContent = 'Preparing Payment...';
       btn.disabled = true;
@@ -3209,8 +3476,10 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
             // Invoice download button
             const invoiceBtn = document.getElementById('invoiceDownloadBtn');
-            invoiceBtn.style.display = 'flex';
-            invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
+            if (invoiceBtn) {
+              invoiceBtn.style.display = 'flex';
+              invoiceBtn.onclick = () => Invoice.generate(verifyRes.order);
+            }
 
             showToast(`Order #${verifyRes.orderId} placed & paid successfully! 🎉`, 'success');
 
@@ -3290,15 +3559,17 @@ document.getElementById('placeOrderBtn').onclick = async () => {
 
       if (!isBuyNow) Cart.clear();
 
-      btn.textContent = 'Send Inquiry on WhatsApp';
+      btn.textContent = 'Place Order via WhatsApp';
       btn.disabled = false;
       btn._isBuyNow = false;
       btn._buyNowItems = null;
 
       // Invoice download button
       const invoiceBtn = document.getElementById('invoiceDownloadBtn');
-      invoiceBtn.style.display = 'flex';
-      invoiceBtn.onclick = () => Invoice.generate(res.order);
+      if (invoiceBtn) {
+        invoiceBtn.style.display = 'flex';
+        invoiceBtn.onclick = () => Invoice.generate(res.order);
+      }
 
       showToast(`Order #${res.orderId} inquiry sent! We'll contact you on WhatsApp 🎉`, 'success');
 
@@ -3341,7 +3612,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       App.loadProducts();
       document.getElementById('checkoutModalOverlay').classList.remove('open');
     } catch (e) {
-      btn.textContent = 'Send Inquiry on WhatsApp';
+      btn.textContent = 'Place Order via WhatsApp';
       btn.disabled = false;
       showToast(e.message || 'Error placing order. Please try again.', 'error');
     }

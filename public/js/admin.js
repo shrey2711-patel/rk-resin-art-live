@@ -1228,6 +1228,30 @@ const Admin = {
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
 
+      // UPI settings
+      const upiEl = document.getElementById('afUpiEnabled');
+      if (upiEl) upiEl.checked = s.upiEnabled !== false;
+      const upiIdEl = document.getElementById('afUpiId');
+      if (upiIdEl) upiIdEl.value = s.upiId || '8141994995@upi';
+      const upiPayeeEl = document.getElementById('afUpiPayeeName');
+      if (upiPayeeEl) upiPayeeEl.value = s.upiPayeeName || 'RK Resin Art';
+      const upiQrImgUrlEl = document.getElementById('afUpiQrImageUrl');
+      if (upiQrImgUrlEl) upiQrImgUrlEl.value = s.upiQrImageUrl || '';
+      const upiPreviewBox = document.getElementById('upiQrPreviewBox');
+      const upiPreviewImg = document.getElementById('adminUpiQrPreview');
+      const removeUpiQrBtn = document.getElementById('removeUpiQrBtn');
+      const upiStatus = document.getElementById('upiQrUploadStatus');
+      if (s.upiQrImageUrl && upiPreviewBox && upiPreviewImg) {
+        upiPreviewImg.src = s.upiQrImageUrl;
+        upiPreviewBox.style.display = 'block';
+        if (removeUpiQrBtn) removeUpiQrBtn.style.display = 'inline-block';
+        if (upiStatus) upiStatus.textContent = 'Custom QR image active';
+      } else {
+        if (upiPreviewBox) upiPreviewBox.style.display = 'none';
+        if (removeUpiQrBtn) removeUpiQrBtn.style.display = 'none';
+        if (upiStatus) upiStatus.textContent = 'Auto dynamic QR enabled';
+      }
+
       const rateEl = document.getElementById('afShippingRate');
       if (rateEl) rateEl.value = s.shippingRate !== undefined ? s.shippingRate : 60;
       const threshEl = document.getElementById('afShippingThreshold');
@@ -1732,17 +1756,41 @@ const Admin = {
       const cleanPhone = hasPhone ? c.phone.replace(/[^0-9]/g, '') : '';
       const waLink = hasPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${waMsg}` : '#';
 
+      const isUpiOrder = o.paymentMethod === 'upi';
+      const isOnlineOrder = o.paymentMethod === 'online' || !!o.paymentId;
+
+      let paymentBadgeHtml = `<span class="order-status-badge" style="background:#fef3c7;color:#92400e;margin-left:6px;font-size:0.7rem;">💬 WhatsApp</span>`;
+      if (isOnlineOrder) {
+        paymentBadgeHtml = `<span class="order-status-badge" style="background:#d1fae5;color:#065f46;margin-left:6px;font-size:0.7rem;">💳 Razorpay Paid</span>`;
+      } else if (isUpiOrder) {
+        paymentBadgeHtml = `<span class="order-status-badge" style="background:#ede9fe;color:#6d28d9;margin-left:6px;font-size:0.7rem;font-weight:800;">⚡ Pay via UPI</span>`;
+      }
+
       return `
       <div class="order-card" data-oid="${o.id}">
         <div class="order-head">
           <div>
             <span class="order-id">Order #${o.id}</span>
             <span class="order-status-badge ${statusClass(o.status)}" style="margin-left:8px">${(o.status || 'Pending').charAt(0).toUpperCase() + (o.status || 'pending').slice(1)}</span>
+            ${paymentBadgeHtml}
             <div class="order-date">${date}</div>
           </div>
         </div>
         <div class="order-customer">👤 <strong>${fullName}</strong> | 📞 ${c.phone || '—'} | ${c.city || ''}</div>
         ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.pin].filter(Boolean).join(', ')}</div>` : ''}
+        ${isUpiOrder ? `
+          <div style="margin: 8px 0; padding: 8px 12px; background: rgba(124, 58, 237, 0.05); border: 1px dashed rgba(124, 58, 237, 0.3); border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <strong>⚡ UPI Transaction ID / UTR:</strong> 
+              <code style="font-family: monospace; font-weight: 800; color: #6d28d9; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(124,58,237,0.2);">${escapeHtml(o.upiTransactionId || 'None provided')}</code>
+            </div>
+            ${o.upiProofUrl ? `
+              <a href="${escapeHtml(o.upiProofUrl)}" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; background: #7c3aed; color: #ffffff; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; text-decoration: none;">
+                📸 View Payment Screenshot
+              </a>
+            ` : '<span style="font-size:0.75rem;color:var(--muted)">No screenshot attached</span>'}
+          </div>
+        ` : ''}
         <div class="order-items-list">${itemsSummary}</div>
 
         <!-- Courier & Tracking Info Panel -->
@@ -1956,18 +2004,26 @@ document.getElementById('cancelBannerBtn').onclick = () => {
 };
 
 // Save Announce & Settings
-// Save General Settings (Announcement, Cart, Stock tracking, Razorpay)
+// Save General Settings (Announcement, Cart, Stock tracking, Razorpay, UPI)
 document.getElementById('saveSettingsBtn').onclick = async () => {
   const text = document.getElementById('afAnnounce').value.trim();
   const cartEnabled = document.getElementById('afCartEnabled').checked;
   const trackStock = document.getElementById('afTrackStock').checked;
   const razorpayEnabled = document.getElementById('afRazorpayEnabled').checked;
+  const upiEnabled = document.getElementById('afUpiEnabled').checked;
+  const upiId = (document.getElementById('afUpiId').value || '').trim();
+  const upiPayeeName = (document.getElementById('afUpiPayeeName').value || '').trim();
+  const upiQrImageUrl = (document.getElementById('afUpiQrImageUrl').value || '').trim();
 
   await API.updateSettings({ 
     announce: text, 
     cartEnabled: cartEnabled,
     trackStock: trackStock,
-    razorpayEnabled: razorpayEnabled
+    razorpayEnabled: razorpayEnabled,
+    upiEnabled: upiEnabled,
+    upiId: upiId || '8141994995@upi',
+    upiPayeeName: upiPayeeName || 'RK Resin Art',
+    upiQrImageUrl: upiQrImageUrl
   });
 
   // Update local settings cache
@@ -1976,6 +2032,10 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   Admin.data.settings.cartEnabled = cartEnabled;
   Admin.data.settings.trackStock = trackStock;
   Admin.data.settings.razorpayEnabled = razorpayEnabled;
+  Admin.data.settings.upiEnabled = upiEnabled;
+  Admin.data.settings.upiId = upiId || '8141994995@upi';
+  Admin.data.settings.upiPayeeName = upiPayeeName || 'RK Resin Art';
+  Admin.data.settings.upiQrImageUrl = upiQrImageUrl;
 
   // Instantly toggle the visibility of the stock inputs
   Admin.updateStockFieldsVisibility();
@@ -1988,6 +2048,47 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
     await App.loadSettings();
   }
 };
+
+// UPI Custom QR Image Upload Trigger
+const uploadUpiQrBtn = document.getElementById('uploadUpiQrBtn');
+const afUpiQrFile = document.getElementById('afUpiQrFile');
+const removeUpiQrBtn = document.getElementById('removeUpiQrBtn');
+if (uploadUpiQrBtn && afUpiQrFile) {
+  uploadUpiQrBtn.onclick = () => afUpiQrFile.click();
+  afUpiQrFile.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = document.getElementById('upiQrUploadStatus');
+    if (status) status.textContent = 'Uploading QR image...';
+    try {
+      const res = await API.uploadImage(file);
+      if (res && res.url) {
+        document.getElementById('afUpiQrImageUrl').value = res.url;
+        const previewBox = document.getElementById('upiQrPreviewBox');
+        const previewImg = document.getElementById('adminUpiQrPreview');
+        if (previewImg) previewImg.src = res.url;
+        if (previewBox) previewBox.style.display = 'block';
+        if (removeUpiQrBtn) removeUpiQrBtn.style.display = 'inline-block';
+        if (status) status.textContent = 'Custom QR uploaded successfully!';
+        showToast('Custom UPI QR uploaded! Remember to click Save Settings.', 'success');
+      }
+    } catch (err) {
+      if (status) status.textContent = 'Upload failed: ' + err.message;
+      showToast('QR Upload failed: ' + err.message, 'error');
+    }
+  };
+}
+if (removeUpiQrBtn) {
+  removeUpiQrBtn.onclick = () => {
+    document.getElementById('afUpiQrImageUrl').value = '';
+    const previewBox = document.getElementById('upiQrPreviewBox');
+    if (previewBox) previewBox.style.display = 'none';
+    removeUpiQrBtn.style.display = 'none';
+    const status = document.getElementById('upiQrUploadStatus');
+    if (status) status.textContent = 'Auto dynamic QR enabled';
+    showToast('Custom QR removed. Dynamic QR will be generated automatically.', 'info');
+  };
+}
 
 // Save Billing & Charges Settings
 document.getElementById('saveBillingSettingsBtn').onclick = async () => {

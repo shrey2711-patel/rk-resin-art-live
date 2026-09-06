@@ -233,6 +233,74 @@
       "createdAt": "2026-08-21T21:32:31.012Z",
       "courierName": "Delhivery Express",
       "trackingId": "DEL9988776655IN"
+    },
+    {
+      "id": 7,
+      "userId": 10,
+      "items": [
+        {
+          "id": 2,
+          "name": "Verified Epoxy Starter Kit",
+          "selectedVariant": "300ml",
+          "price": 450,
+          "qty": 2
+        }
+      ],
+      "customer": {
+        "name": "Shrey Verification User",
+        "email": "final_verified_1788611835122@example.com",
+        "phone": "9876543210",
+        "address": "Surendranagar Main Rd",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 900,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 960,
+      "paymentMethod": "whatsapp",
+      "paymentStatus": "Pending (WhatsApp Inquiry)",
+      "upiTransactionId": null,
+      "upiProofUrl": null,
+      "status": "shipped",
+      "createdAt": "2026-09-05T12:37:16.196Z",
+      "courierName": "Delhivery Express",
+      "trackingId": "DEL9988776655IN"
+    },
+    {
+      "id": 8,
+      "userId": null,
+      "items": [
+        {
+          "id": 2,
+          "name": "Test Resin Resin P",
+          "price": 100,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "firstName": "Ravi",
+        "phone": "9876543210",
+        "address": "Surendranagar Main Rd"
+      },
+      "total": 100,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 160,
+      "paymentMethod": "upi",
+      "paymentStatus": "Pending Verification (UPI)",
+      "upiTransactionId": "UTR456789123456",
+      "upiProofUrl": "https://i.ibb.co/uploads/proof.jpg",
+      "status": "pending",
+      "createdAt": "2026-09-05T12:38:00.414Z"
     }
   ],
   "cart": [],
@@ -431,6 +499,30 @@
           "qty": 2
         }
       ]
+    },
+    {
+      "id": 10,
+      "name": "Shrey Verified Updated",
+      "email": "final_verified_1788611835122@example.com",
+      "phone": "9876543210",
+      "address": "Surendranagar Main Rd",
+      "city": "Surendranagar",
+      "pin": "363020",
+      "passwordHash": "$2a$10$xf/.yq.84bUNzZhZ265VCuoIVtW9e4dr7TTrYdbyHyXbXF7w2eq1i",
+      "passwordPlain": "SecurePassword123!",
+      "createdAt": "2026-09-05T12:37:15.534Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 101,
+          "name": "Crystal UV Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
     }
   ],
   "reviews": [
@@ -442,6 +534,15 @@
       "rating": 5,
       "comment": "Exceptional resin clarity and bubble release! 5/5 stars.",
       "createdAt": "2026-08-21T21:32:31.251Z"
+    },
+    {
+      "id": 2,
+      "productId": 2,
+      "userId": 10,
+      "userName": "Shrey Verified Updated",
+      "rating": 5,
+      "comment": "Exceptional resin clarity and bubble release! 5/5 stars.",
+      "createdAt": "2026-09-05T12:37:16.376Z"
     }
   ],
   "wishlistSubscriptions": [],
@@ -667,6 +768,18 @@
     {
       "timestamp": "2026-08-21T21:32:30.850Z",
       "email": "final_verified_1787347950454@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-09-05T12:37:15.971Z",
+      "email": "final_verified_1788611835122@example.com",
       "role": "User",
       "ip": "127.0.0.1",
       "location": {

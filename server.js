@@ -278,8 +278,6 @@ async function sendAdminEmailNotification(order) {
     const db = readDB();
     // Force admin notification to go to rinkupatel3495@gmail.com as requested
     const adminEmail = 'rinkupatel3495@gmail.com';
-    const isOnline = order.paymentStatus === 'Paid (Razorpay)';
-
     const customer = order.customer || {};
     const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
     const fullAddress = [customer.address, customer.city, customer.pin].filter(Boolean).join(', ') || 'No Address Provided';
@@ -303,15 +301,24 @@ async function sendAdminEmailNotification(order) {
       `;
     });
 
-    const paymentBadge = isOnline 
-      ? `<span style="background-color: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">💳 PAID (Razorpay)</span>`
-      : `<span style="background-color: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">💵 COD (WhatsApp)</span>`;
+    const isUpi = order.paymentMethod === 'upi';
+    const isOnline = order.paymentMethod === 'online' || !!order.paymentId;
 
-    const paymentIdRow = isOnline
-      ? `<p style="margin: 4px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #64748b;"><strong>Razorpay Payment ID:</strong> ${order.paymentId}</p>`
-      : '';
+    let paymentBadge = `<span style="background-color: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">💬 WhatsApp Inquiry</span>`;
+    let paymentIdRow = '';
 
-    const emailSubject = `🛒 New Order #${order.id} Placed - ${isOnline ? 'PAID' : 'COD'} [RK Resin Art]`;
+    if (isOnline) {
+      paymentBadge = `<span style="background-color: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">💳 PAID (Razorpay)</span>`;
+      paymentIdRow = `<p style="margin: 4px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #64748b;"><strong>Razorpay Payment ID:</strong> ${order.paymentId}</p>`;
+    } else if (isUpi) {
+      paymentBadge = `<span style="background-color: #ede9fe; color: #5b21b6; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">🟣 UPI PAYMENT</span>`;
+      paymentIdRow = `
+        <p style="margin: 4px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #1e293b;"><strong>UPI Transaction ID / UTR:</strong> ${order.upiTransactionId || 'Not provided'}</p>
+        ${order.upiProofUrl ? `<p style="margin: 6px 0 0 0;"><a href="${order.upiProofUrl}" target="_blank" style="background:#7c3aed;color:#ffffff;padding:6px 12px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:bold;display:inline-block;">📸 View Payment Screenshot Proof</a></p>` : ''}
+      `;
+    }
+
+    const emailSubject = `🛒 New Order #${order.id} Placed - ${isOnline ? 'PAID' : (isUpi ? 'UPI PAYMENT' : 'INQUIRY')} [RK Resin Art]`;
 
     const emailHTML = `
       <!DOCTYPE html>
@@ -2105,7 +2112,11 @@ app.get('/api/settings', (req, res) => {
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
     otherChargesType: db.settings.otherChargesType || 'flat',
-    razorpayEnabled: db.settings.razorpayEnabled !== false
+    razorpayEnabled: db.settings.razorpayEnabled !== false,
+    upiEnabled: db.settings.upiEnabled !== false,
+    upiId: db.settings.upiId || '8141994995@upi',
+    upiPayeeName: db.settings.upiPayeeName || 'RK Resin Art',
+    upiQrImageUrl: db.settings.upiQrImageUrl || ''
   });
 });
 
@@ -3017,6 +3028,12 @@ app.post('/api/orders', checkoutLimiter, (req, res) => {
     : otherCharges;
   const grandTotal = taxableAmount + shipping + otherChargesAmount;
 
+  const isUpi = req.body.paymentMethod === 'upi';
+  const paymentMethod = isUpi ? 'upi' : (req.body.paymentMethod || 'cod');
+  const paymentStatus = isUpi ? 'Pending Verification (UPI)' : 'Pending (WhatsApp Inquiry)';
+  const upiTransactionId = (req.body.upiTransactionId || '').trim();
+  const upiProofUrl = (req.body.upiProofUrl || '').trim();
+
   const order = {
     id: nextId(db.orders),
     userId: loggedInUser ? loggedInUser.userId : null,
@@ -3030,13 +3047,17 @@ app.post('/api/orders', checkoutLimiter, (req, res) => {
     otherChargesType,
     otherChargesAmount,
     grandTotal,
+    paymentMethod,
+    paymentStatus,
+    upiTransactionId: upiTransactionId || null,
+    upiProofUrl: upiProofUrl || null,
     status: 'pending',
     createdAt: new Date().toISOString()
   };
   db.orders.push(order);
   writeDB(db);
 
-  // Trigger admin email alert (COD order)
+  // Trigger admin email alert
   sendAdminEmailNotification(order);
 
   // Trigger customer confirmation email (COD order)
@@ -3309,7 +3330,11 @@ app.get('/api/admin/settings', requireAdmin, (req, res) => {
     shippingThreshold: db.settings.shippingThreshold !== undefined ? Number(db.settings.shippingThreshold) : 999,
     otherCharges: db.settings.otherCharges !== undefined ? Number(db.settings.otherCharges) : 0,
     otherChargesType: db.settings.otherChargesType || 'flat',
-    razorpayEnabled: db.settings.razorpayEnabled !== false
+    razorpayEnabled: db.settings.razorpayEnabled !== false,
+    upiEnabled: db.settings.upiEnabled !== false,
+    upiId: db.settings.upiId || '8141994995@upi',
+    upiPayeeName: db.settings.upiPayeeName || 'RK Resin Art',
+    upiQrImageUrl: db.settings.upiQrImageUrl || ''
   });
 });
 
@@ -3324,6 +3349,10 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   if (req.body.otherCharges !== undefined) db.settings.otherCharges = Number(req.body.otherCharges);
   if (req.body.otherChargesType !== undefined) db.settings.otherChargesType = req.body.otherChargesType;
   if (req.body.razorpayEnabled !== undefined) db.settings.razorpayEnabled = !!req.body.razorpayEnabled;
+  if (req.body.upiEnabled !== undefined) db.settings.upiEnabled = !!req.body.upiEnabled;
+  if (req.body.upiId !== undefined) db.settings.upiId = String(req.body.upiId).trim();
+  if (req.body.upiPayeeName !== undefined) db.settings.upiPayeeName = String(req.body.upiPayeeName).trim();
+  if (req.body.upiQrImageUrl !== undefined) db.settings.upiQrImageUrl = String(req.body.upiQrImageUrl).trim();
   writeDB(db);
   res.json({ success: true });
 });
@@ -3338,8 +3367,7 @@ app.get('/api/admin/imgbb-key', requireAdmin, (req, res) => {
   res.json({ key: getImgBbApiKey() });
 });
 
-// PRODUCT IMAGE UPLOAD
-app.post('/api/admin/upload', requireAdmin, (req, res) => {
+async function processUploadedImage(req, res) {
   uploadProductImage.single('image')(req, res, async (err) => {
     if (err) {
       const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
@@ -3378,7 +3406,6 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
     }
 
     // ── Compress ALL images to ≤ 1 MB using sharp ──────────────
-    // Handles HEIC (already converted above), JPG, PNG, WebP from any device/OS.
     if (sharp) {
       try {
         const filePath  = req.file.path;
@@ -3392,7 +3419,6 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
             .rotate() // honour EXIF orientation
             .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true });
 
-          // PNG stays PNG only if still small; everything else → JPEG
           if (fileExt === '.png' && quality > 50) {
             outputBuf = await inst.png({ compressionLevel: 9, quality }).toBuffer();
           } else {
@@ -3400,19 +3426,16 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
           }
 
           if (outputBuf.length <= TARGET) break;
-          quality -= 12; // step down ~12 points each pass
+          quality -= 12;
         } while (quality >= 20);
 
         fs.writeFileSync(filePath, outputBuf);
         const finalKB = Math.round(outputBuf.length / 1024);
         console.log(`🗜️ Image compressed to ${finalKB} KB (q${quality + 12}) → ${req.file.filename}`);
       } catch (compErr) {
-        // Non-fatal: log and continue with original file
         console.error('⚠️ Image compression step failed:', compErr.message);
       }
     }
-    // ────────────────────────────────────────────────────────────
-
 
     // ── Upload to Cloudflare R2 ───────────────────────────────
     const r2cfg = getR2Config();
@@ -3424,7 +3447,6 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
         const mimeMap    = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
         const contentType = mimeMap[fileExt] || 'image/jpeg';
 
-        // Build a clean R2 object key: images/filename
         const r2Key = `images/${req.file.filename}`;
 
         const client = new S3Client({
@@ -3443,7 +3465,6 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
           ContentType: contentType
         }));
 
-        // Delete local temp file after successful R2 upload
         try { fs.unlinkSync(filePath); } catch (_) {}
 
         const publicUrl = `${r2cfg.publicUrl.replace(/\/$/, '')}/${r2Key}`;
@@ -3461,7 +3482,7 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
       }
     }
 
-    // ── Legacy ImgBB fallback (if R2 not configured but ImgBB key exists) ────
+    // ── Legacy ImgBB fallback ────
     const imgbbApiKey = getImgBbApiKey();
     if (imgbbApiKey) {
       try {
@@ -3501,13 +3522,23 @@ app.post('/api/admin/upload', requireAdmin, (req, res) => {
       }
     }
 
-    // ── Local storage (no cloud configured) ──────────────────────
+    // ── Local storage ──────────────────────
     res.json({
       success: true,
       url: `/uploads/${req.file.filename}`,
       filename: req.file.filename
     });
   });
+}
+
+// PRODUCT IMAGE UPLOAD (Admin only)
+app.post('/api/admin/upload', requireAdmin, (req, res) => {
+  processUploadedImage(req, res);
+});
+
+// PAYMENT PROOF / SCREENSHOT UPLOAD (Public during checkout with rate limit)
+app.post('/api/upload/payment-proof', checkoutLimiter, (req, res) => {
+  processUploadedImage(req, res);
 });
 
 // BANNERS CRUD
