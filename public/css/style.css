@@ -2034,24 +2034,28 @@ input, select, textarea { font-family: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   background: var(--ink);
   color: #ffffff !important;
   text-decoration: none;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  flex: 1;
+  min-width: 0;
 }
 .mobile-upi-app-btn:hover {
-  opacity: 0.9;
+  opacity: 0.88;
   transform: translateY(-1px);
 }
 .upi-action-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  margin-top: 2px;
 }
 .gpay-upi-app-btn {
   background: #1a73e8;
@@ -2093,10 +2097,10 @@ input, select, textarea { font-family: inherit; }
 
 /* Proof Upload Dropzone */
 .upi-proof-upload-box {
-  border: 1.5px dashed var(--border);
+  border: 1.5px dashed #a78bfa;
   border-radius: 10px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  background: var(--bg);
+  background: rgba(124, 58, 237, 0.02);
   cursor: pointer;
 }
 .upi-proof-upload-box:hover {

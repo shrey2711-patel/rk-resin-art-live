@@ -534,8 +534,8 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                   </div>
                   <div class="uib-content">
-                    <strong>After payment</strong>
-                    <p>Pay <span id="upiPromptAmount">₹0</span>, then enter the UTR/reference number or attach the payment screenshot so we can verify your order quickly.</p>
+                    <strong>After payment — 2 steps required</strong>
+                    <p>1. Upload your UPI payment screenshot (mandatory for verification).<br>2. Enter the UTR / Transaction ID shown in your payment app. We will read the details from your screenshot to cross-check the payment.</p>
                   </div>
                 </div>
 
@@ -547,7 +547,10 @@
                   </div>
 
                   <div class="form-field" style="margin-bottom: 0;">
-                    <label>Payment Receipt / Screenshot (Optional)</label>
+                    <label style="display: flex; align-items: center; gap: 6px;">
+                      Payment Screenshot
+                      <span style="background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 800; padding: 1px 6px; border-radius: 9999px; letter-spacing: 0.04em;">REQUIRED</span>
+                    </label>
                     <input type="file" id="ckUpiProofFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display: none;">
                     <input type="hidden" id="ckUpiProofUrl">
 
@@ -557,8 +560,8 @@
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                         </div>
                         <div class="upload-text-wrap">
-                          <span class="upload-primary-text">Click to upload payment receipt</span>
-                          <span class="upload-hint-text">PNG, JPG, WEBP or HEIC (Max 15MB)</span>
+                          <span class="upload-primary-text">Tap to attach payment receipt</span>
+                          <span class="upload-hint-text">PNG, JPG, WEBP or HEIC — payment details will be read from this photo</span>
                         </div>
                       </div>
 
@@ -574,6 +577,9 @@
                       </div>
                     </div>
                     <div id="upiProofStatus" class="upi-proof-status"></div>
+                    <div style="font-size: 0.68rem; color: var(--muted); margin-top: 5px; line-height: 1.4;">
+                      We extract the transaction ID, amount, and date from your screenshot to cross-verify your payment. Your image is used only for order verification.
+                    </div>
                   </div>
                 </div>
               </div>

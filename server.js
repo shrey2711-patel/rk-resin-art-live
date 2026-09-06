@@ -311,10 +311,36 @@ async function sendAdminEmailNotification(order) {
       paymentBadge = `<span style="background-color: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">💳 PAID (Razorpay)</span>`;
       paymentIdRow = `<p style="margin: 4px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #64748b;"><strong>Razorpay Payment ID:</strong> ${order.paymentId}</p>`;
     } else if (isUpi) {
-      paymentBadge = `<span style="background-color: #ede9fe; color: #5b21b6; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">🟣 UPI PAYMENT</span>`;
+      paymentBadge = `<span style="background-color: #ede9fe; color: #5b21b6; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: bold;">UPI PAYMENT - VERIFY REQUIRED</span>`;
       paymentIdRow = `
-        <p style="margin: 4px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #1e293b;"><strong>UPI Transaction ID / UTR:</strong> ${order.upiTransactionId || 'Not provided'}</p>
-        ${order.upiProofUrl ? `<p style="margin: 6px 0 0 0;"><a href="${order.upiProofUrl}" target="_blank" style="background:#7c3aed;color:#ffffff;padding:6px 12px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:bold;display:inline-block;">📸 View Payment Screenshot Proof</a></p>` : ''}
+        <div style="background: #fefce8; border: 1.5px solid #fde047; border-radius: 8px; padding: 12px 14px; margin-top: 10px;">
+          <p style="margin: 0 0 6px 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #713f12; font-weight: bold;">PAYMENT CROSS-CHECK REQUIRED</p>
+          <table style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #1e293b; width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 3px 0; font-weight: bold; width: 40%;">UPI Transaction ID / UTR:</td>
+              <td style="padding: 3px 0; font-family: monospace; letter-spacing: 0.5px; color: ${order.upiTransactionId ? '#0f766e' : '#dc2626'}; font-weight: bold;">${order.upiTransactionId || 'NOT PROVIDED - check screenshot'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0; font-weight: bold;">Amount to verify:</td>
+              <td style="padding: 3px 0; font-weight: bold; color: #0f766e;">&#8377;${Number(order.grandTotal).toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+              <td style="padding: 3px 0; font-weight: bold;">Screenshot uploaded:</td>
+              <td style="padding: 3px 0; color: ${order.upiProofUrl ? '#065f46' : '#dc2626'}; font-weight: bold;">${order.upiProofUrl ? 'YES - attached below' : 'NOT UPLOADED'}</td>
+            </tr>
+          </table>
+          ${order.upiProofUrl ? `
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #fde047;">
+              <p style="margin: 0 0 8px 0; font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #713f12; font-weight: bold;">Payment Screenshot (verify UTR & amount match):</p>
+              <a href="${order.upiProofUrl}" target="_blank" style="display: inline-block;">
+                <img src="${order.upiProofUrl}" alt="Payment Screenshot" style="max-width: 280px; max-height: 180px; border-radius: 6px; border: 1.5px solid #e2e8f0; object-fit: contain; display: block;">
+              </a>
+              <p style="margin: 6px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #64748b;">
+                <a href="${order.upiProofUrl}" target="_blank" style="color: #7c3aed; text-decoration: underline;">Open full screenshot</a>
+              </p>
+            </div>
+          ` : '<p style="margin: 8px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #dc2626;">No screenshot was uploaded. Contact customer to send proof before shipping.</p>'}
+        </div>
       `;
     }
 
