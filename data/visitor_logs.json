@@ -1,15 +1,5 @@
 [
   {
-    "timestamp": "2026-08-21T21:26:14.471Z",
-    "ip": "127.0.0.1",
-    "url": "/robots.txt",
-    "method": "GET",
-    "userAgent": "Unknown",
-    "status": 200,
-    "duration": "3ms",
-    "location": "Mumbai, MH, IN"
-  },
-  {
     "timestamp": "2026-08-21T21:26:14.503Z",
     "ip": "127.0.0.1",
     "url": "/api/settings",
@@ -9997,6 +9987,16 @@
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
     "status": 304,
     "duration": "7ms",
+    "location": "Ahmedabad, GJ, IN"
+  },
+  {
+    "timestamp": "2026-09-06T17:26:40.290Z",
+    "ip": "::1",
+    "url": "/api/auth/cart",
+    "method": "GET",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "status": 304,
+    "duration": "4ms",
     "location": "Ahmedabad, GJ, IN"
   }
 ]
