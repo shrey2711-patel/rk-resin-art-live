@@ -342,6 +342,42 @@
       "createdAt": "2026-09-12T13:29:47.845Z",
       "courierName": "Delhivery Express",
       "trackingId": "DEL9988776655IN"
+    },
+    {
+      "id": 10,
+      "userId": 13,
+      "items": [
+        {
+          "id": 2,
+          "name": "QA In-Stock Resin",
+          "selectedVariant": "50g",
+          "price": 350,
+          "qty": 1
+        }
+      ],
+      "customer": {
+        "name": "QA Orderer",
+        "email": "qa_test_1789220286526@example.com",
+        "phone": "8141994995",
+        "address": "Test Street",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 350,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 410,
+      "paymentMethod": "whatsapp",
+      "paymentStatus": "Pending (WhatsApp Inquiry)",
+      "upiTransactionId": null,
+      "upiProofUrl": null,
+      "status": "confirmed",
+      "createdAt": "2026-09-12T13:38:07.287Z",
+      "trackingNumber": "DEL12345678IN"
     }
   ],
   "cart": [],
@@ -600,6 +636,30 @@
           "qty": 2
         }
       ]
+    },
+    {
+      "id": 13,
+      "name": "QA Customer Admin-Modified",
+      "email": "qa_test_1789220286526@example.com",
+      "phone": "9998887776",
+      "address": "456 Palette Ave",
+      "city": "Surat",
+      "pin": "395007",
+      "passwordHash": "$2a$10$3yjlQXkt1P5BOJ6idyzfe.WCri47X23JO15qWtcPMO12kCsa78qLC",
+      "passwordPlain": "SecurePassword123!",
+      "createdAt": "2026-09-12T13:38:06.846Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 9999,
+          "name": "Test Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
     }
   ],
   "reviews": [
@@ -796,6 +856,18 @@
       "method": "GET",
       "location": "Location not available",
       "blocked": true
+    },
+    {
+      "id": "sec_1789220287234_xffbu",
+      "timestamp": "2026-09-12T13:38:07.234Z",
+      "ip": "127.0.0.1",
+      "type": "FAILED_LOGIN",
+      "severity": "LOW",
+      "message": "Failed login attempt for email: qa_test_1789220286526@example.com",
+      "target": "",
+      "method": "GET",
+      "location": "Mumbai, MH, IN",
+      "blocked": true
     }
   ],
   "loginLogs": [
@@ -950,6 +1022,18 @@
     {
       "timestamp": "2026-09-12T13:29:47.770Z",
       "email": "final_verified_1789219787405@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
+    },
+    {
+      "timestamp": "2026-09-12T13:38:07.070Z",
+      "email": "qa_test_1789220286526@example.com",
       "role": "User",
       "ip": "127.0.0.1",
       "location": {

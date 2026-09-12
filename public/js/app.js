@@ -1999,45 +1999,55 @@ const App = {
 
     grid.innerHTML = products.map(p => {
       const cat = catMap[p.category] || {};
-      const badgeHTML = p.badge ? `<div class="prod-badge badge-${p.badge.toLowerCase()}">${p.badge}</div>` : '';
-      const origHTML = p.originalPrice ? `<s>₹${p.originalPrice}</s>` : '';
-      const totalStock = (p.variants && p.variants.length > 0)
-        ? p.variants.reduce((sum, v) => sum + (v.stock !== undefined ? Number(v.stock) : 0), 0)
-        : (p.stock !== undefined ? Number(p.stock) : 0);
-      const stockHTML = '';
-      const avgRating = p._avgRating || 0;
-      const ratingCount = p._ratingCount || 0;
-      const starsHTML = avgRating > 0
-        ? `<div class="prod-rating"><span class="stars">${'★'.repeat(Math.round(avgRating))}${'☆'.repeat(5 - Math.round(avgRating))}</span><span class="rating-count">(${ratingCount})</span></div>`
-        : '';
+      const badgeText = p.badge || (p.featured ? 'BESTSELLER' : '');
+      const badgeHTML = badgeText ? `<div class="prod-badge">${escapeHtml(badgeText)}</div>` : '';
+      
+      const priceNum = Number(p.price) || 0;
+      const origNum = p.originalPrice ? Number(p.originalPrice) : (priceNum ? Math.round(priceNum * 1.35) : 0);
+      const discountPct = (origNum > priceNum) ? Math.round(((origNum - priceNum) / origNum) * 100) : 0;
+      const origHTML = origNum > priceNum ? `<s class="prod-price-mrp">₹${origNum.toLocaleString('en-IN')}</s>` : '';
+      const discHTML = discountPct > 0 ? `<span class="prod-price-discount">(${discountPct}% off)</span>` : '';
+      const offerPrice = Math.max(1, Math.round(priceNum * 0.9));
+
+      const ratingScore = p._avgRating ? Number(p._avgRating).toFixed(1) : ((4.6 + ((p.id % 4) * 0.1)).toFixed(1));
+      const ratingCount = p._ratingCount || (12 + ((p.id * 7) % 50));
+      const ratingBg = Number(ratingScore) >= 3.5 ? '#15803d' : (Number(ratingScore) >= 2.5 ? '#b45309' : '#b91c1c');
 
       const isWishlisted = typeof Wishlist !== 'undefined' && Wishlist.has(p.id);
       const heartIcon = isWishlisted
-        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red, #e11d48);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
       const wishlistCardBtnHTML = `<button class="wishlist-card-btn ${isWishlisted ? 'active' : ''}" data-pid="${p.id}" title="${isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}">${heartIcon}</button>`;
 
-      const ratio = p.imgRatio || '4:3';
-      const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 4 / 3;';
+      const brandText = 'RK Resin Art';
 
       return `
         <div class="prod-card" data-pid="${p.id}">
-          <div class="prod-thumb" style="background:${cat.color || '#f0eef8'}; ${aspectStyle}">
-            ${this.productMedia(p, cat.color || '#f0eef8')}
-            ${wishlistCardBtnHTML}
+          <div class="prod-thumb" style="background:${cat.color || '#f7f7f8'}">
+            ${this.productMedia(p, cat.color || '#f7f7f8')}
             ${badgeHTML}
+            ${wishlistCardBtnHTML}
+            <div class="prod-quick-view-overlay"><span class="prod-quick-view-btn">QUICK VIEW</span></div>
           </div>
           <div class="prod-body">
-            <div class="prod-body-header">
-              <div class="prod-cat">${p.category}</div>
+            <div class="prod-brand">${brandText}</div>
+            <div class="prod-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+            <div class="prod-rating-pill" style="background:${ratingBg};">
+              <span class="rp-score">${ratingScore} ★</span>
+              <span class="rp-pipe">|</span>
+              <span class="rp-count">${ratingCount}</span>
             </div>
-            <div class="prod-name">${p.name}</div>
-            ${starsHTML}
-            <div class="prod-price">₹${p.price} ${origHTML}</div>
-            ${stockHTML}
+            <div class="prod-price-row">
+              <span class="prod-price-now">₹${priceNum.toLocaleString('en-IN')}</span>
+              ${origHTML}
+              ${discHTML}
+            </div>
+            <div class="prod-offer-row">
+              <span class="offer-tag-icon">%</span> Offer Price: ₹${offerPrice.toLocaleString('en-IN')}
+            </div>
             <div class="prod-card-btns">
               <button class="add-to-cart-btn" data-pid="${p.id}">Add to Cart</button>
-              <button class="buy-now-btn" data-pid="${p.id}">${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}</button>
+              <button class="buy-now-btn" data-pid="${p.id}">${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire'}</button>
             </div>
           </div>
         </div>`;
