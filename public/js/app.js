@@ -239,10 +239,78 @@ const App = {
       };
     }
 
+    this.bindLogo();
     this.bindFooter();
     this.bindMobileNav();
     this.setupPaymentSelector();
     this.initRouter();
+  },
+
+  // ── Brand Logo & Home Navigation ─────────────────────────
+  bindLogo() {
+    const handleHomeClick = (e) => {
+      if (e) e.preventDefault();
+
+      // 1. Close open drawers and modals
+      const overlayIds = [
+        'cartDrawer', 'wishlistDrawer', 'mobileNavDrawer', 'drawerOverlay',
+        'quickViewOverlay', 'checkoutModalOverlay', 'authModalOverlay',
+        'policyModalOverlay', 'orderDetailModalOverlay', 'imageLightbox'
+      ];
+      overlayIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.remove('open');
+          el.classList.remove('active');
+          if (el.style.display && el.style.display !== 'none' && (id === 'imageLightbox' || id.includes('Modal') || id.includes('Overlay'))) {
+            el.style.display = 'none';
+          }
+        }
+      });
+      document.body.style.overflow = '';
+
+      // 2. Clear stored navigation state to ensure clean Home view
+      sessionStorage.removeItem('rk_nav_state');
+
+      // 3. Clear search inputs and filters
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.value = '';
+      this.state.searchQuery = '';
+      this.state.activeCategory = 'All';
+      this.state.page = 1;
+      this.state.sortBy = '';
+      const sortSelect = document.getElementById('sortSelect');
+      if (sortSelect) sortSelect.value = '';
+
+      const heading = document.getElementById('shopHeading');
+      if (heading) heading.textContent = 'All Products';
+
+      // 4. Reset hash without triggering unwanted hashchange loop
+      if (window.location.hash !== '') {
+        history.pushState('', document.title, window.location.pathname + window.location.search);
+      }
+
+      // 5. If on admin page route, navigate back to home
+      if (window.location.pathname.toLowerCase().replace(/\/$/, '') === '/admin' || document.body.classList.contains('admin-page-active')) {
+        window.location.href = '/';
+        return;
+      }
+
+      // 6. Reset views to home
+      this.showHomePage(true);
+      this.renderCatFilters(this.state.categories);
+      this.syncNavbarActiveState();
+      this.loadProducts();
+
+      // 7. Smoothly scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const logos = document.querySelectorAll('.logo, #siteLogo, #footerBrandLogo');
+    logos.forEach(logo => {
+      logo.style.cursor = 'pointer';
+      logo.onclick = handleHomeClick;
+    });
   },
 
   // ── Footer Interactions ──────────────────────────────────
@@ -493,7 +561,7 @@ const App = {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
-  async showHomePage() {
+  async showHomePage(forceFresh = false) {
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
@@ -511,8 +579,10 @@ const App = {
     if (announceBar) announceBar.style.display = '';
 
     // Check if we can restore state
-    const restored = await this.restoreNavigationState();
-    if (restored) return;
+    if (!forceFresh) {
+      const restored = await this.restoreNavigationState();
+      if (restored) return;
+    }
 
     const shopHeading = document.getElementById('shopHeading');
     if (shopHeading) shopHeading.textContent = 'All Products';
