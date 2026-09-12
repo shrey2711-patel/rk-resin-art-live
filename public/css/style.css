@@ -5921,106 +5921,174 @@ body {
 /* ─── Legal & Policy Documentation Modal ────────────────── */
 .policy-modal {
   background: var(--card);
-  border-radius: 16px;
-  max-width: 860px;
-  width: 95%;
-  max-height: 90vh;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 94%;
+  max-height: 88vh;
+  height: 780px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
   animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   border: 1px solid var(--border);
 }
+
 .policy-modal-head {
-  padding: 20px 24px 14px;
-  border-bottom: 1.5px solid var(--border);
+  padding: 20px 24px 18px;
+  border-bottom: 1px solid var(--border);
   background: var(--surface);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
 }
+
+.policy-head-content {
+  flex: 1;
+  min-width: 0;
+}
+
 .policy-header-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 10px;
+  margin-bottom: 6px;
 }
+
 .pm-title-badge {
   font-size: 0.76rem;
   font-weight: 800;
   color: var(--p);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
+
 .policy-status-pill {
   font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 999px;
   background: rgba(34, 197, 94, 0.12);
   color: #16a34a;
   border: 1px solid rgba(34, 197, 94, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 [data-theme="dark"] .policy-status-pill {
   background: rgba(34, 197, 94, 0.2);
   color: #4ade80;
 }
+
 .policy-modal-head h2 {
   font-size: 1.35rem;
   font-weight: 900;
   color: var(--ink);
-  margin: 0 0 3px;
+  margin: 0 0 4px;
+  line-height: 1.25;
 }
+
 .policy-modal-head p {
   font-size: 0.82rem;
   color: var(--muted);
   margin: 0;
+  line-height: 1.4;
+}
+
+.policy-modal-close-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 2px;
+}
+
+.policy-modal-close-btn:hover {
+  background: var(--red);
+  color: #ffffff;
+  border-color: var(--red);
+  transform: rotate(90deg) scale(1.05);
+}
+
+.policy-tabs-nav-wrap {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: relative;
 }
 
 .policy-tabs-nav {
   display: flex;
-  gap: 6px;
-  padding: 10px 20px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  gap: 8px;
+  padding: 12px 24px;
   overflow-x: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
   -webkit-overflow-scrolling: touch;
 }
+.policy-tabs-nav::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge - hides ugly scrollbar */
+}
+
 .policy-tab {
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.82rem;
   font-weight: 700;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--card);
   color: var(--muted);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  flex-shrink: 0;
 }
+
 .policy-tab:hover {
   border-color: var(--p);
   color: var(--ink);
+  background: var(--surface);
 }
+
 .policy-tab.active {
   background: var(--p);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--p);
-  box-shadow: 0 2px 8px rgba(20, 90, 70, 0.28);
+  box-shadow: 0 4px 12px rgba(20, 90, 70, 0.28);
 }
 
 .policy-modal-body {
-  padding: 20px 24px;
+  padding: 24px 28px 36px;
   overflow-y: auto;
+  flex: 1;
   font-size: 0.88rem;
-  line-height: 1.7;
+  line-height: 1.72;
   color: var(--ink);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
+.policy-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.policy-modal-body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
 .policy-pane {
   display: none;
 }
@@ -6032,53 +6100,62 @@ body {
 .policy-meta-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
-  padding: 8px 12px;
+  padding: 10px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.78rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--muted);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .policy-card-block {
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 14px;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+.policy-card-block:hover {
+  border-color: rgba(20, 90, 70, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
 .policy-card-block h3 {
-  font-size: 0.98rem;
+  font-size: 1.02rem;
   font-weight: 800;
   color: var(--ink);
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
+
 .policy-card-block p {
   color: var(--muted);
   margin: 0 0 8px;
-  font-size: 0.86rem;
+  font-size: 0.88rem;
 }
 .policy-card-block p:last-child {
   margin-bottom: 0;
 }
+
 .policy-card-block ul {
-  margin: 0 0 8px 18px;
+  margin: 6px 0 10px 20px;
+  padding: 0;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.88rem;
 }
 .policy-card-block li {
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .policy-alert-box {
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 18px;
+  border-radius: 10px;
   margin: 14px 0;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   line-height: 1.6;
 }
 .policy-alert-box.warning {
@@ -6108,23 +6185,30 @@ body {
 
 .policy-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.85rem;
-  margin: 8px 0;
+  margin: 10px 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
 }
 .policy-table th,
 .policy-table td {
-  padding: 9px 12px;
+  padding: 10px 14px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
+.policy-table tr:last-child td {
+  border-bottom: none;
+}
 .policy-table th {
-  background: var(--surface);
+  background: var(--card);
   font-weight: 800;
   color: var(--ink);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
 }
 .policy-table td {
   color: var(--muted);
@@ -6134,38 +6218,38 @@ body {
 }
 
 .policy-dev-card {
-  background: var(--surface);
+  background: var(--card);
   border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 14px;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 16px;
 }
 .policy-dev-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 .policy-dev-role {
   font-weight: 800;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   color: var(--ink);
 }
 .policy-dev-pill {
-  font-size: 0.72rem;
-  background: rgba(20, 90, 70, 0.1);
+  font-size: 0.74rem;
+  background: rgba(20, 90, 70, 0.12);
   color: var(--p);
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
   font-weight: 700;
 }
 .policy-dev-desc {
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   color: var(--muted);
-  line-height: 1.6;
-  margin: 0 0 12px;
+  line-height: 1.65;
+  margin: 0 0 14px;
 }
 .policy-dev-actions {
   display: flex;
@@ -6176,29 +6260,22 @@ body {
 .policy-dev-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: var(--card);
+  gap: 8px;
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--ink);
   text-decoration: none;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 8px;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   transition: all 0.2s ease;
 }
 .policy-dev-btn:hover {
   border-color: var(--p);
   color: var(--p);
-}
-.policy-dev-btn.github {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
-}
-.policy-dev-btn.github:hover {
-  opacity: 0.9;
-  color: var(--bg);
+  background: var(--card);
+  transform: translateY(-1px);
 }
 
 @keyframes modalPop {

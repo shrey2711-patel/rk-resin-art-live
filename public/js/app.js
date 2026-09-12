@@ -4093,13 +4093,23 @@ function openPolicyModal(policyTab = 'terms') {
 
   // Set active tab
   document.querySelectorAll('.policy-tab').forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.ptab === policyTab);
+    const isActive = tab.dataset.ptab === policyTab;
+    tab.classList.toggle('active', isActive);
+    if (isActive) {
+      setTimeout(() => {
+        tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }, 50);
+    }
   });
 
   // Set active pane
   document.querySelectorAll('.policy-pane').forEach(pane => {
     pane.classList.toggle('active', pane.id === `pane-${policyTab}`);
   });
+
+  // Reset scroll of modal body
+  const modalBody = overlay.querySelector('.policy-modal-body');
+  if (modalBody) modalBody.scrollTop = 0;
 
   // Update modal heading
   const headingEl = document.getElementById('policyModalHeading');
