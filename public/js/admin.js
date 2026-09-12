@@ -567,7 +567,7 @@ const Admin = {
 
 
   resetProductForm() {
-    ['pfName', 'pfPrice', 'pfOrig', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfImageUrl2', 'pfImageUrl3', 'pfUnit'].forEach(id => {
+    ['pfName', 'pfPrice', 'pfOrig', 'pfOfferPrice', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfImageUrl2', 'pfImageUrl3', 'pfUnit'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -666,6 +666,8 @@ const Admin = {
 
       document.getElementById('pfPrice').value = product.price || '';
       document.getElementById('pfOrig').value = product.originalPrice || '';
+      const offerEl = document.getElementById('pfOfferPrice');
+      if (offerEl) offerEl.value = product.offerPrice || '';
       document.getElementById('pfStock').value = product.stock !== undefined ? product.stock : '';
       const isOut = Number(product.stock) === 0;
       this.setStockStatusButtonState(isOut ? '0' : '1');
@@ -759,6 +761,7 @@ const Admin = {
 
     let price = 0;
     let originalPrice = null;
+    let offerPrice = null;
     let stock = 0;
     let imageUrl = mainImageUrl;
     let images = mainImages;
@@ -775,6 +778,7 @@ const Admin = {
       }
       price = prcVal;
       originalPrice = parseFloat(document.getElementById('pfOrig').value) || null;
+      offerPrice = parseFloat(document.getElementById('pfOfferPrice')?.value) || null;
       if (isTracking) {
         stock = parseInt(document.getElementById('pfStock').value) || 0;
       } else {
@@ -879,6 +883,7 @@ const Admin = {
       name,
       price,
       originalPrice,
+      offerPrice,
       category: document.getElementById('pfCat').value,
       stock,
       emoji: document.getElementById('pfEmoji').value.trim() || '📦',

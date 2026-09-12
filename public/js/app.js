@@ -931,9 +931,9 @@ const App = {
     }
   },
 
-  productMedia(product, fallbackBg = '#f0eef8', size = 'card') {
-    const ratio = (size === 'modal' || size === 'product') ? '1:1' : (product.imgRatio || '4:3');
-    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : (ratio === '1:1' ? 'aspect-ratio: 1 / 1;' : 'aspect-ratio: 4 / 3;');
+  productMedia(product, fallbackBg = '#f7f7f8', size = 'card') {
+    const ratio = (size === 'modal' || size === 'product' || size === 'card') ? '1:1' : (product.imgRatio || '1:1');
+    const aspectStyle = ratio === '16:9' ? 'aspect-ratio: 16 / 9;' : 'aspect-ratio: 1 / 1;';
     
     // Fallback image resolution (images array or variant images)
     let displayImageUrl = product.imageUrl;
@@ -950,7 +950,7 @@ const App = {
       return `
         <div class="prod-image-wrap ${size}" style="background:${fallbackBg}; ${aspectStyle}">
           <img class="prod-image" src="${displayImageUrl}" alt="${product.name}" loading="lazy"
-            onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'prod-emoji-fallback ${size}\' style=\'background:${fallbackBg}; ${aspectStyle}\'>${emojiHtml}</div>';">
+            onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\\'prod-emoji-fallback ${size}\\' style=\\'background:${fallbackBg}; ${aspectStyle}\\'>${emojiHtml}</div>';">
         </div>`;
     }
     return `<div class="prod-emoji-fallback ${size}" style="background:${fallbackBg}; ${aspectStyle}">${product.emoji || '📦'}</div>`;
@@ -1999,55 +1999,78 @@ const App = {
 
     grid.innerHTML = products.map(p => {
       const cat = catMap[p.category] || {};
-      const badgeText = p.badge || (p.featured ? 'BESTSELLER' : '');
-      const badgeHTML = badgeText ? `<div class="prod-badge">${escapeHtml(badgeText)}</div>` : '';
       
-      const priceNum = Number(p.price) || 0;
-      const origNum = p.originalPrice ? Number(p.originalPrice) : (priceNum ? Math.round(priceNum * 1.35) : 0);
-      const discountPct = (origNum > priceNum) ? Math.round(((origNum - priceNum) / origNum) * 100) : 0;
-      const origHTML = origNum > priceNum ? `<s class="prod-price-mrp">₹${origNum.toLocaleString('en-IN')}</s>` : '';
-      const discHTML = discountPct > 0 ? `<span class="prod-price-discount">(${discountPct}% off)</span>` : '';
-      const offerPrice = Math.max(1, Math.round(priceNum * 0.9));
+      // Badge (only if explicitly set by admin)
+      const badgeText = p.badge ? p.badge.trim().toUpperCase() : '';
+      const badgeHTML = badgeText ? `<div class="prod-tag-badge">${escapeHtml(badgeText)}</div>` : '';
 
-      const ratingScore = p._avgRating ? Number(p._avgRating).toFixed(1) : ((4.6 + ((p.id % 4) * 0.1)).toFixed(1));
-      const ratingCount = p._ratingCount || (12 + ((p.id * 7) % 50));
-      const ratingBg = Number(ratingScore) >= 3.5 ? '#15803d' : (Number(ratingScore) >= 2.5 ? '#b45309' : '#b91c1c');
+      // Review Rating (ONLY shown if real customer reviews exist)
+      const avgRating = (p._avgRating !== undefined && p._avgRating !== null && Number(p._avgRating) > 0)
+        ? Number(p._avgRating)
+        : null;
+      const ratingCount = p._ratingCount || 0;
+      let ratingHTML = '';
+      if (avgRating && ratingCount > 0) {
+        const ratingVal = avgRating.toFixed(1);
+        const pillColorClass = avgRating >= 3.5 ? 'pill-green' : (avgRating >= 2.8 ? 'pill-amber' : 'pill-red');
+        ratingHTML = `<div class="prod-rating-row"><span class="prod-rating-pill ${pillColorClass}"><strong>${ratingVal} ★</strong><span class="rating-pipe">|</span><span>${ratingCount}</span></span></div>`;
+      }
 
+      // Real Price
+      const currentPrice = Number(p.price || (p.variants && p.variants[0] ? p.variants[0].price : 0) || 0);
+
+      // Discount & Original Price (ONLY shown if admin configured originalPrice > currentPrice)
+      const origPrice = (p.originalPrice && Number(p.originalPrice) > currentPrice)
+        ? Number(p.originalPrice)
+        : ((p.variants && p.variants[0] && p.variants[0].originalPrice && Number(p.variants[0].originalPrice) > currentPrice) ? Number(p.variants[0].originalPrice) : null);
+      
+      let origHTML = '';
+      let discountHTML = '';
+      if (origPrice && origPrice > currentPrice) {
+        const discountPct = Math.round(((origPrice - currentPrice) / origPrice) * 100);
+        origHTML = `<s class="prod-price-orig">₹${origPrice.toLocaleString('en-IN')}</s>`;
+        if (discountPct > 0) {
+          discountHTML = `<span class="prod-discount-pct">(${discountPct}% off)</span>`;
+        }
+      }
+
+      // Offer Price (ONLY shown if admin configured a special offerPrice < currentPrice)
+      const offerPrice = (p.offerPrice && Number(p.offerPrice) > 0 && Number(p.offerPrice) < currentPrice) ? Number(p.offerPrice) : null;
+      const offerHTML = offerPrice
+        ? `<div class="prod-offer-row"><span class="prod-offer-icon">%</span><span class="prod-offer-text">Offer Price: <strong>₹${offerPrice.toLocaleString('en-IN')}</strong></span></div>`
+        : '';
+
+      // Wishlist Heart Button
       const isWishlisted = typeof Wishlist !== 'undefined' && Wishlist.has(p.id);
       const heartIcon = isWishlisted
-        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red, #e11d48);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" style="color: var(--red);"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
         : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
-      const wishlistCardBtnHTML = `<button class="wishlist-card-btn ${isWishlisted ? 'active' : ''}" data-pid="${p.id}" title="${isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}">${heartIcon}</button>`;
+      const wishlistCardBtnHTML = `<button class="wishlist-card-btn ${isWishlisted ? 'active' : ''}" data-pid="${p.id}" type="button" aria-label="Wishlist" title="${isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}">${heartIcon}</button>`;
 
-      const brandText = 'RK Resin Art';
+      // Brand / Category in golden serif typography
+      const brandName = p.brand || p.category || 'RK Resin Art';
 
       return `
-        <div class="prod-card" data-pid="${p.id}">
-          <div class="prod-thumb" style="background:${cat.color || '#f7f7f8'}">
+        <div class="prod-card frameless-card" data-pid="${p.id}">
+          <div class="prod-thumb" style="background:${cat.color || '#f7f7f8'};">
             ${this.productMedia(p, cat.color || '#f7f7f8')}
             ${badgeHTML}
             ${wishlistCardBtnHTML}
-            <div class="prod-quick-view-overlay"><span class="prod-quick-view-btn">QUICK VIEW</span></div>
+            <div class="prod-quickview-overlay">QUICK VIEW</div>
           </div>
           <div class="prod-body">
-            <div class="prod-brand">${brandText}</div>
-            <div class="prod-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
-            <div class="prod-rating-pill" style="background:${ratingBg};">
-              <span class="rp-score">${ratingScore} ★</span>
-              <span class="rp-pipe">|</span>
-              <span class="rp-count">${ratingCount}</span>
-            </div>
+            <div class="prod-brand">${escapeHtml(brandName)}</div>
+            <h3 class="prod-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</h3>
+            ${ratingHTML}
             <div class="prod-price-row">
-              <span class="prod-price-now">₹${priceNum.toLocaleString('en-IN')}</span>
+              <span class="prod-price-current">₹${currentPrice.toLocaleString('en-IN')}</span>
               ${origHTML}
-              ${discHTML}
+              ${discountHTML}
             </div>
-            <div class="prod-offer-row">
-              <span class="offer-tag-icon">%</span> Offer Price: ₹${offerPrice.toLocaleString('en-IN')}
-            </div>
+            ${offerHTML}
             <div class="prod-card-btns">
-              <button class="add-to-cart-btn" data-pid="${p.id}">Add to Cart</button>
-              <button class="buy-now-btn" data-pid="${p.id}">${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire'}</button>
+              <button class="add-to-cart-btn" data-pid="${p.id}" type="button">Add to Cart</button>
+              <button class="buy-now-btn" data-pid="${p.id}" type="button">${this.state.cartEnabled !== false ? 'Buy Now' : 'Enquire Now'}</button>
             </div>
           </div>
         </div>`;
@@ -3948,14 +3971,15 @@ function openPolicyModal(policyTab = 'terms') {
   // Update modal heading
   const headingEl = document.getElementById('policyModalHeading');
   const headings = {
-    terms: 'Terms & Conditions',
-    privacy: 'Privacy Policy',
-    cookies: 'Cookie Policy',
-    shipping: 'Shipping & Delivery Policy',
-    refund: 'Returns & Refund Policy',
-    operator: 'Business & Developer Information'
+    terms: 'Terms & Conditions of Service',
+    privacy: 'Privacy Policy & Data Protection',
+    shipping: 'Shipping, Logistics & Delivery Policy',
+    refund: 'Returns, Replacement & Refund Policy',
+    cancellation: 'Order Cancellation & Custom Commissions Policy',
+    payment: 'Payment Processing & Security Standards',
+    operator: 'Commercial Merchant & Developer Information'
   };
-  if (headingEl) headingEl.textContent = headings[policyTab] || 'Terms & Conditions';
+  if (headingEl) headingEl.textContent = headings[policyTab] || 'Terms & Conditions of Service';
 
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';

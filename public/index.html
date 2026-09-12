@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=20260912_final">
   <!-- jsPDF for invoice generation -->
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- Razorpay for secure checkout -->
@@ -196,8 +196,8 @@
     <div class="footer-grid">
       <!-- Col 1: Brand & Business Entity -->
       <div class="footer-col-about">
-        <div class="footer-brand" style="display:flex; align-items:center; gap:10px;">
-          <img src="/footer_logo.png" alt="RK Resin Art" style="width:46px; height:46px; object-fit:contain; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3));" onerror="this.src='/logo.png'">
+        <div class="footer-brand" style="display:flex; align-items:center; gap:8px;">
+          <img src="/logo.png" alt="RK Resin Art" style="width:32px; height:32px; border-radius:6px; object-fit:contain;" onerror="this.style.display='none'">
           <span>RK Resin Art</span>
         </div>
         <p class="footer-tagline">Premium epoxy resin, mica pigments, silicone moulds, dry flowers, clock essentials and craft supplies made for creative makers.</p>
@@ -264,30 +264,31 @@
       </div>
     </div>
 
-    <!-- Bottom Bar: Slim Copyright & Web Developer Credit -->
+    <!-- Bottom Bar: Copyright & Web Developer Credit with Email & Phone -->
     <div class="footer-bottom-bar">
       <div class="footer-copyright">
         © 2026 <strong>RK Resin Art</strong>. All Rights Reserved. Operated by <strong>RK Creation</strong>.
       </div>
       
-      <div class="footer-dev-slim">
-        <span class="dev-tag-compact">💻 Web Dev:</span>
-        <strong class="dev-name-compact">Shrey Patel</strong>
-        <span class="dev-sep">•</span>
-        <a href="mailto:shreypatel00557@gmail.com" class="dev-link-compact" title="Email Shrey Patel">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <span>shreypatel00557@gmail.com</span>
-        </a>
-        <span class="dev-sep">•</span>
-        <a href="tel:+919824500557" class="dev-link-compact" title="Call Shrey Patel">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          <span>+91 98245 00557</span>
-        </a>
-        <span class="dev-sep">•</span>
-        <a href="https://github.com/shrey2711-patel" target="_blank" rel="noopener noreferrer" class="dev-link-compact" title="Visit GitHub Profile">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          <span>GitHub</span>
-        </a>
+      <div class="footer-dev-card">
+        <div class="dev-header">
+          <span class="dev-tag">💻 Web Developer</span>
+          <strong class="dev-name">Shrey Patel</strong>
+        </div>
+        <div class="dev-contact-row">
+          <a href="mailto:shreypatel00557@gmail.com" class="dev-contact-badge email" title="Email Shrey Patel">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>shreypatel00557@gmail.com</span>
+          </a>
+          <a href="tel:+919824500557" class="dev-contact-badge phone" title="Call Shrey Patel">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>+91 98245 00557</span>
+          </a>
+          <a href="https://github.com/shrey2711-patel" target="_blank" rel="noopener noreferrer" class="dev-contact-badge github" title="Visit GitHub Profile">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
       </div>
     </div>
   </footer>
@@ -1157,7 +1158,8 @@
               </div>
               <div class="form-row-3" id="pfBasePriceStockContainer">
                 <div class="form-field"><label>Price (₹) *</label><input class="admin-input" type="number" id="pfPrice" placeholder="199"></div>
-                <div class="form-field"><label>Original Price (₹)</label><input class="admin-input" type="number" id="pfOrig" placeholder="Optional"></div>
+                <div class="form-field"><label>Original Price (₹)</label><input class="admin-input" type="number" id="pfOrig" placeholder="Optional MRP"></div>
+                <div class="form-field"><label>Offered Price (₹)</label><input class="admin-input" type="number" id="pfOfferPrice" placeholder="Optional Offer"></div>
                 <div class="form-field">
                   <label id="pfStockLabel">Stock</label>
                   <input class="admin-input" type="number" id="pfStock" placeholder="50">
@@ -1681,159 +1683,284 @@
   <div class="modal-overlay" id="policyModalOverlay" style="display:none;">
     <div class="policy-modal">
       <button class="modal-close" id="closePolicyModal" aria-label="Close legal modal">&times;</button>
+      
       <div class="policy-modal-head">
-        <div class="pm-title-badge">⚖️ Official Documentation & Legal Center</div>
+        <div class="policy-header-top">
+          <div class="pm-title-badge">⚖️ Compliance & Legal Documentation Center</div>
+          <span class="policy-status-pill">● Live & Enforceable 2026</span>
+        </div>
         <h2 id="policyModalHeading">Terms & Conditions of Service</h2>
         <p id="policyModalSub">Official commercial terms, compliance disclosures, and operational policies for RK Resin Art.</p>
       </div>
 
       <div class="policy-tabs-nav">
-        <button class="policy-tab active" data-ptab="terms">Terms & Conditions</button>
-        <button class="policy-tab" data-ptab="privacy">Privacy Policy</button>
-        <button class="policy-tab" data-ptab="cookies">Cookie Policy</button>
-        <button class="policy-tab" data-ptab="shipping">Shipping & Logistics</button>
-        <button class="policy-tab" data-ptab="refund">Refund & Replacement</button>
-        <button class="policy-tab" data-ptab="operator">Corporate & Developer Info</button>
+        <button class="policy-tab active" data-ptab="terms">📜 Terms of Service</button>
+        <button class="policy-tab" data-ptab="privacy">🔒 Privacy & DPDP</button>
+        <button class="policy-tab" data-ptab="shipping">🚚 Shipping & Delivery</button>
+        <button class="policy-tab" data-ptab="refund">↩️ Returns & Refund</button>
+        <button class="policy-tab" data-ptab="cancellation">❌ Cancellation Policy</button>
+        <button class="policy-tab" data-ptab="payment">💳 Payment & Security</button>
+        <button class="policy-tab" data-ptab="operator">🏢 Merchant & Developer</button>
       </div>
 
       <div class="policy-modal-body">
         <!-- 1. Terms & Conditions -->
         <div class="policy-pane active" id="pane-terms">
-          <div class="policy-badge-legal">Effective Date: January 1, 2026 | Governing Entity: RK Creation / RK Resin Art</div>
+          <div class="policy-meta-bar">
+            <span>📅 Effective: January 1, 2026</span>
+            <span>🏛️ Governing Entity: RK Creation</span>
+            <span>📍 Jurisdiction: Surendranagar, Gujarat</span>
+          </div>
 
-          <h3>1. Legal Framework & Acceptance</h3>
-          <p>These Terms and Conditions ("Agreement") govern the access to and commercial purchase of goods from <strong>RK Resin Art</strong>, an enterprise legally owned and operated by <strong>RK Creation</strong> ("Company", "We", "Us", or "Our"), headquartered in Surendranagar, Gujarat, India. By accessing our web application, placing an order, or utilizing our services, you ("Customer", "Buyer", or "User") agree to be legally bound by these terms.</p>
+          <div class="policy-card-block">
+            <h3>1. Legal Framework & Binding Acceptance</h3>
+            <p>These Terms and Conditions ("Agreement") govern your access to, use of, and commercial purchases made through <strong>RK Resin Art</strong>, an enterprise legally registered and operated by <strong>RK Creation</strong> ("Company", "We", "Us", or "Our"), headquartered in Surendranagar, Gujarat, India. By accessing our website, placing an order, or utilizing our services, you ("Customer", "Buyer", or "User") agree to be bound by these legal terms.</p>
+          </div>
 
-          <h3>2. Product Catalog & Handmade Artistry Disclosures</h3>
-          <p>We take rigorous care to ensure our craft materials, epoxy resins, silicone moulds, mica pigments, and naturally preserved dry flora are accurately depicted. Due to the artisanal, handmade nature of customized resin articles and organic variations in botanical specimens, slight natural variations in color tonality, crystalline dispersion, and floral geometries are intrinsic characteristics of authentic craft work.</p>
+          <div class="policy-card-block">
+            <h3>2. Product Catalog & Artisanal Craft Disclosures</h3>
+            <p>We take rigorous care to ensure our craft supplies, epoxy resin products, silicone moulds, mica pigments, and naturally preserved dry flora are accurately depicted. Due to the handcrafted, artisanal nature of customized resin artwork and organic variations in botanicals:</p>
+            <ul>
+              <li>Slight natural variations in floral geometries, crystalline dispersion, and micro-shimmer tonalities are intrinsic hallmarks of authentic handmade resin crafts.</li>
+              <li>Hand-poured resin may feature minor microscopic air bubbles naturally occurring during the chemical exothermic curing process.</li>
+              <li>Product colors may vary slightly depending on monitor color calibrations and lighting conditions.</li>
+            </ul>
+          </div>
 
-          <h3>3. Pricing, Invoicing & Commercial Currency</h3>
-          <p>All commercial transactions are denominated in <strong>Indian National Rupees (INR ₹)</strong> inclusive of applicable statutory taxes. We reserve the prerogative to adjust inventory availability and rectify pricing discrepancies without prior notice. In the improbable event of an order processed under an inventory or typographical pricing anomaly, we retain the right to cancel the order with an immediate 100% full refund.</p>
+          <div class="policy-card-block">
+            <h3>3. Pricing, Commercial Invoicing & Currency</h3>
+            <p>All commercial transactions are denominated in <strong>Indian National Rupees (INR ₹)</strong> inclusive of applicable statutory Goods and Services Tax (GST). We reserve the prerogative to adjust inventory availability and correct typographical discrepancies. In the improbable event of an order processed under an erroneous pricing discrepancy, we retain the right to cancel the order with an immediate 100% full monetary refund.</p>
+          </div>
 
-          <h3>4. Payment Processing & Gateway Compliance</h3>
-          <p>Digital payments are securely routed through PCI-DSS Level 1 compliant payment aggregators (Razorpay) supporting Unified Payments Interface (UPI), Net Banking, and Major Credit/Debit Cards, or facilitated through official WhatsApp merchant billing. All sensitive payload transmissions are protected with 256-bit TLS/SSL cryptographic encryption.</p>
+          <div class="policy-card-block">
+            <h3>4. Custom Orders, Commissioned Artwork & Curing Timeline</h3>
+            <p>Custom resin artifacts (including Personalized Name Plates, Mantra Frames, Photo Clocks, and Preservation Blocks) require a standard chemical curing window of <strong>4 to 7 business days</strong> prior to dispatch to achieve optimal crystalline hardness and heat resistance.</p>
+          </div>
 
-          <h3>5. Intellectual Property Rights</h3>
-          <p>All trademarks, brand names, product photographic assets, visual graphics, custom UI stylesheets, and digital catalog content are the proprietary intellectual property of <strong>RK Creation</strong>. Unauthorized reproduction, web scraping, or commercial duplication is strictly prohibited under the Copyright Act, 1957.</p>
+          <div class="policy-card-block">
+            <h3>5. Intellectual Property Rights</h3>
+            <p>All trademarks, catalog designs, photographic brand assets, UI software stylesheets, and handcrafted designs are the proprietary intellectual property of <strong>RK Creation</strong>. Unauthorized reproduction, web scraping, or commercial duplication is strictly actionable under the Copyright Act, 1957.</p>
+          </div>
 
-          <h3>6. Limitation of Liability & Dispute Jurisdiction</h3>
-          <p>To the fullest extent permissible under Indian Law, RK Creation shall not be liable for indirect, incidental, or consequential damages arising from the misuse or mishandling of chemical resin compounds. Any commercial dispute shall be exclusively subject to the judicial courts of <strong>Surendranagar, Gujarat, India</strong>.</p>
+          <div class="policy-card-block">
+            <h3>6. Limitation of Liability & Dispute Jurisdiction</h3>
+            <p>To the fullest extent permissible under Indian Law, RK Creation shall not be held liable for indirect, incidental, or consequential damages resulting from the improper storage or handling of epoxy compounds. All legal disputes shall fall under the exclusive jurisdiction of the competent civil courts of <strong>Surendranagar, Gujarat, India</strong>.</p>
+          </div>
         </div>
 
         <!-- 2. Privacy Policy -->
         <div class="policy-pane" id="pane-privacy">
-          <div class="policy-badge-legal">Compliant with Information Technology Act, 2000 & DPDP Framework</div>
-
-          <h3>1. Data Collection Architecture</h3>
-          <p>We process only requisite Personally Identifiable Information (PII) indispensable for verifying identity, facilitating order fulfillment, and complying with statutory tax obligations:</p>
-          <ul>
-            <li><strong>Identity & Communication Data:</strong> Full customer name, verified email address, and mobile phone number.</li>
-            <li><strong>Logistics & Consignment Data:</strong> Complete delivery address, landmark, PIN code, and recipient designation.</li>
-            <li><strong>Transaction Identifiers:</strong> Razorpay Payment ID, Order ID, and cryptographic authentication tokens.</li>
-            <li><strong>Security & Network Telemetry:</strong> Anonymized IP addresses, browser client metadata, and timestamped security audit logs.</li>
-          </ul>
-
-          <h3>2. Purpose & Principles of Data Utilization</h3>
-          <p>Collected customer records are deployed solely for order processing, logistics consignment booking, real-time shipment dispatch notification (via WhatsApp/Email), and account management. <strong>We do not sell, lease, trade, or monetize customer data with third-party advertising brokers under any circumstances.</strong></p>
-
-          <h3>3. Banking & Payment Token Security</h3>
-          <p>Our infrastructure does not store complete credit/debit card credentials, CVV numbers, or banking PINs. All financial settlement operations are handled directly through Reserve Bank of India (RBI) authorized payment gateways.</p>
-
-          <h3>4. Customer Security & Password Encryption</h3>
-          <p>Customer account credentials are safeguarded using one-way adaptive cryptographic hashing (bcrypt with multi-round salt). Customers maintain full autonomy to request profile rectification or permanent data deletion by contacting support.</p>
-        </div>
-
-        <!-- 3. Cookie Policy -->
-        <div class="policy-pane" id="pane-cookies">
-          <div class="policy-badge-legal">Transparency in Storage & Tracking Technologies</div>
-
-          <h3>1. Function and Scope of Cookies</h3>
-          <p>Cookies and browser local storage technologies are compact data tokens placed on your device to maintain session integrity, optimize website speed, and deliver a coherent user experience.</p>
-
-          <h3>2. Categorization of Utilized Cookies</h3>
-          <ul>
-            <li><strong>Strictly Essential Functional Storage:</strong> Manages persistent shopping cart items, maintains secure customer login tokens (JSON Web Tokens), and preserves checkout state during navigation.</li>
-            <li><strong>Preference Tokens:</strong> Retains user visual themes (Dark Mode / Light Mode) and preferred sorting criteria.</li>
-            <li><strong>Infrastructure & Rate-Limiting Protection:</strong> Monitors client request frequencies to protect the web server against automated DDoS attacks, brute-force vulnerabilities, and bot crawling.</li>
-          </ul>
-
-          <h3>3. User Consent & Management</h3>
-          <p>Users may configure browser settings to decline or clear cookies at will. Note that disabling essential session storage may impair shopping cart retention and account authentication.</p>
-        </div>
-
-        <!-- 4. Shipping & Logistics -->
-        <div class="policy-pane" id="pane-shipping">
-          <div class="policy-badge-legal">Pan-India Express Logistics & Delivery Standards</div>
-
-          <h3>1. Packaging Integrity & Dispatch Schedule</h3>
-          <p>Art supplies, liquid resins, pigments, and botanical specimens undergo meticulous quality inspection and shock-resistant multi-layered bubble packaging to ensure safe transit. All verified orders are dispatched within <strong>24 to 48 business hours</strong> from our Surendranagar studio.</p>
-
-          <h3>2. Estimated Transit Timelines across India</h3>
-          <ul>
-            <li><strong>Gujarat & Western Region:</strong> 2 to 4 Business Days.</li>
-            <li><strong>Metro Cities & Major Urban Hubs:</strong> 3 to 6 Business Days.</li>
-            <li><strong>Tier 2 / Tier 3 Cities & Regional Centers:</strong> 4 to 7 Business Days.</li>
-            <li><strong>Special Transit Zones (Northeast / Remote Locations):</strong> 6 to 9 Business Days.</li>
-          </ul>
-
-          <h3>3. Courier Consignment Tracking</h3>
-          <p>Upon consignment generation, an automated electronic dispatch notification containing the assigned Air Waybill (AWB) number and direct live tracking hyperlink is transmitted via WhatsApp and Email.</p>
-
-          <h3>4. Shipping Tariffs & Free Delivery Thresholds</h3>
-          <p>Standard flat-rate shipping is computed based on gross volumetric package weight and destination pincode. RK Resin Art periodically sponsors <strong>Free Shipping</strong> on qualifying orders exceeding established purchase thresholds.</p>
-        </div>
-
-        <!-- 5. Refund & Replacement -->
-        <div class="policy-pane" id="pane-refund">
-          <div class="policy-badge-legal">Customer Protection, Transit Guarantee & Replacement Protocol</div>
-
-          <h3>1. Transit Damage Guarantee</h3>
-          <p>We take complete responsibility for consignments during transit. If an item arrives physically damaged, leaking, or defective, RK Resin Art guarantees an <strong>expedited free replacement or full monetary refund</strong>.</p>
-
-          <div style="background:#fef2f2; border:1.5px solid #fecaca; border-left:5px solid #ef4444; padding:12px 16px; border-radius:8px; margin:14px 0; color:#991b1b; font-size:0.86rem; line-height:1.6;">
-            <strong>Mandatory Claim Requirement:</strong> To prevent fraudulent claims and initiate immediate courier insurance compensation, a <strong>continuous, uncut 360° unboxing video</strong> showing the outer shipping label and intact parcel seal opening is mandatory for all transit damage, leakage, or missing item claims.
+          <div class="policy-meta-bar">
+            <span>🛡️ Information Technology Act, 2000 Compliant</span>
+            <span>🔒 DPDP Act (Digital Personal Data Protection) 2023 Aligned</span>
           </div>
 
-          <h3>2. Incident Notification Window</h3>
-          <p>Transit discrepancies or product defects must be formally reported within <strong>48 hours</strong> of courier delivered timestamp via WhatsApp at <a href="https://wa.me/918141994995" target="_blank" style="color:var(--p);font-weight:700;">+91 81419 94995</a> or email at <a href="mailto:rinkupatel3495@gmail.com" style="color:var(--p);font-weight:700;">rinkupatel3495@gmail.com</a> accompanied by your Order ID and unboxing footage.</p>
+          <div class="policy-card-block">
+            <h3>1. Data Collection Architecture</h3>
+            <p>We collect and process only essential Personally Identifiable Information (PII) required to verify identity, process commercial orders, and ensure seamless logistics delivery:</p>
+            <ul>
+              <li><strong>Contact Information:</strong> Customer Full Name, verified Email Address, and Mobile Phone Number.</li>
+              <li><strong>Shipping & Consignment Data:</strong> Complete delivery address, landmark, PIN code, and recipient instructions.</li>
+              <li><strong>Transactional Data:</strong> Payment ID, Order ID, and cryptographic webhook settlement verification tokens.</li>
+              <li><strong>Telemetry & Security Logs:</strong> Anonymized IP addresses, session identifiers, and firewall security logs to prevent DDoS attempts.</li>
+            </ul>
+          </div>
 
-          <h3>3. Settlement & Refund Disbursement Timeline</h3>
-          <p>Upon verification by our support team, replacement articles are dispatched within 24 hours. Approved monetary refunds are processed directly to the customer's original payment source / UPI account within <strong>3 to 5 business days</strong>.</p>
+          <div class="policy-card-block">
+            <h3>2. Strict Non-Monetization Pledge</h3>
+            <div class="policy-alert-box success">
+              <strong>🔒 Zero Data Sharing Guarantee:</strong> We do not sell, rent, trade, monetize, or lease your personal information or contact details to third-party advertising brokers or data brokers under any circumstances.
+            </div>
+            <p>Your records are exclusively accessed by authorized fulfillment staff and courier partners solely to execute dispatch and deliver shipment notifications via SMS, WhatsApp, and Email.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>3. Password Protection & Cryptographic Security</h3>
+            <p>Customer account passwords are encrypted using adaptive cryptographic salted hashing (bcrypt). Customer passwords are never stored in plaintext and cannot be retrieved or viewed by system administrators.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>4. Customer Rights & Data Erasure</h3>
+            <p>Under the DPDP framework, you maintain the right to inspect, rectify, or request permanent deletion of your customer account profile and purchase telemetry by contacting our Data Protection Officer at <a href="mailto:rinkupatel3495@gmail.com" style="color:var(--p);font-weight:700;">rinkupatel3495@gmail.com</a>.</p>
+          </div>
         </div>
 
-        <!-- 6. Corporate & Developer Info -->
+        <!-- 3. Shipping & Delivery -->
+        <div class="policy-pane" id="pane-shipping">
+          <div class="policy-meta-bar">
+            <span>📦 Pan-India Express Logistics</span>
+            <span>⚡ 24–48h Dispatch Window</span>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>1. Packaging Integrity & Transit Protection</h3>
+            <p>Epoxy resin products, delicate silicone moulds, and botanical specimens undergo multi-stage quality checks. Every consignment is fortified with shock-resistant multi-layered bubble packaging, corner protectors, and heavy-duty tamper-proof courier cartons.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>2. Estimated Transit Timelines Across India</h3>
+            <table class="policy-table">
+              <thead>
+                <tr>
+                  <th>Destination Region</th>
+                  <th>Estimated Transit Time</th>
+                  <th>Courier Logistics Partners</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Gujarat & Western Region</strong></td>
+                  <td>2 – 4 Business Days</td>
+                  <td>BlueDart, DTDC, Delhivery</td>
+                </tr>
+                <tr>
+                  <td><strong>Tier 1 Metros (Mumbai, Delhi, Bengaluru, etc.)</strong></td>
+                  <td>3 – 5 Business Days</td>
+                  <td>Delhivery Express, BlueDart Air</td>
+                </tr>
+                <tr>
+                  <td><strong>Tier 2 / Tier 3 Regional Centers</strong></td>
+                  <td>4 – 7 Business Days</td>
+                  <td>DTDC, India Post Speed Post, Xpressbees</td>
+                </tr>
+                <tr>
+                  <td><strong>Special Transit Zones (Northeast / J&K / Remote)</strong></td>
+                  <td>6 – 9 Business Days</td>
+                  <td>India Post Speed Post, Delhivery Surface</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>3. Live Courier Tracking (Air Waybill / AWB)</h3>
+            <p>Upon parcel dispatch, automated dispatch notifications containing your courier Air Waybill (AWB) number and direct live tracking hyperlinks are transmitted via WhatsApp and Email.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>4. Shipping Tariffs & Free Delivery</h3>
+            <p>Standard flat-rate shipping is computed based on gross volumetric package weight. RK Resin Art periodically provides <strong>Free Express Shipping</strong> on promotional orders exceeding qualifying cart thresholds.</p>
+          </div>
+        </div>
+
+        <!-- 4. Refund & Replacement -->
+        <div class="policy-pane" id="pane-refund">
+          <div class="policy-meta-bar">
+            <span>🛡️ 100% Transit Guarantee</span>
+            <span>⚡ Fast Replacement & Refund</span>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>1. 100% Transit Damage & Leakage Guarantee</h3>
+            <p>We take complete responsibility for consignments during transit. If an item arrives physically damaged, leaking, broken, or defective, RK Resin Art guarantees an <strong>immediate free replacement or 100% monetary refund</strong>.</p>
+          </div>
+
+          <div class="policy-alert-box warning">
+            <strong>📹 Mandatory Claim Requirement:</strong>
+            <p style="margin:4px 0 0;">To process damage or missing item claims and initiate courier insurance settlement, a <strong>continuous, uncut 360° unboxing video</strong> recorded from before opening the courier parcel seal with the shipping label clearly visible is mandatory.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>2. Incident Notification Window (48 Hours)</h3>
+            <p>Any transit discrepancies, bottle leakages, or product defects must be formally reported within <strong>48 hours of courier delivery</strong> via:</p>
+            <ul>
+              <li><strong>WhatsApp Support:</strong> <a href="https://wa.me/918141994995" target="_blank" style="color:var(--p);font-weight:700;">+91 81419 94995</a></li>
+              <li><strong>Email Support:</strong> <a href="mailto:rinkupatel3495@gmail.com" style="color:var(--p);font-weight:700;">rinkupatel3495@gmail.com</a></li>
+            </ul>
+            <p>Please share your <strong>Order ID</strong>, brief description, and the uncut unboxing video footage.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>3. Settlement & Refund Disbursement Timeline</h3>
+            <p>Approved replacement articles are dispatched within <strong>24 business hours</strong>. Monetary refunds are processed directly to the customer's original payment source (UPI / Bank Account) within <strong>3 to 5 business days</strong>.</p>
+          </div>
+        </div>
+
+        <!-- 5. Cancellation Policy -->
+        <div class="policy-pane" id="pane-cancellation">
+          <div class="policy-meta-bar">
+            <span>⏱️ Transparent Cancellation Protocol</span>
+            <span>⚡ Full Refund on Unfulfilled Orders</span>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>1. Standard Catalog Orders Cancellation</h3>
+            <p>Customers may cancel standard catalog orders (mica powders, resin kits, silicone moulds, glitter supplies) at any time <strong>prior to shipment dispatch</strong> for an immediate 100% full refund with zero cancellation deductions.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>2. Custom / Personalized Artwork Orders</h3>
+            <p>Customized artwork (e.g. customized name plates, preservation blocks, personalized clocks) may be cancelled within <strong>12 hours</strong> of order placement. Once chemical epoxy pouring and customized graphic preparation has commenced, customized commissions cannot be cancelled.</p>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>3. How to Request Cancellation</h3>
+            <p>To request a cancellation, message customer care directly on WhatsApp at <a href="https://wa.me/918141994995" target="_blank" style="color:var(--p);font-weight:700;">+91 81419 94995</a> with your Order ID.</p>
+          </div>
+        </div>
+
+        <!-- 6. Payment & Security Terms -->
+        <div class="policy-pane" id="pane-payment">
+          <div class="policy-meta-bar">
+            <span>💳 PCI-DSS Level 1 Encrypted</span>
+            <span>🔒 256-Bit SSL Secured</span>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>1. Supported Payment Methods</h3>
+            <p>RK Resin Art accepts seamless digital payments through secure channels:</p>
+            <ul>
+              <li><strong>Direct UPI Payments:</strong> Google Pay, PhonePe, Paytm, BHIM, Cred, and all major bank UPI applications.</li>
+              <li><strong>Card Payments & Net Banking:</strong> Visa, MasterCard, RuPay, and leading Indian Net Banking networks.</li>
+              <li><strong>Official WhatsApp Merchant Billing:</strong> Direct verified order invoicing and payment reconciliation.</li>
+            </ul>
+          </div>
+
+          <div class="policy-card-block">
+            <h3>2. Bank Grade Gateway Compliance</h3>
+            <p>All online financial transactions are routed through Reserve Bank of India (RBI) approved payment gateways. Our servers never receive, process, or store sensitive credit card numbers or CVVs.</p>
+          </div>
+        </div>
+
+        <!-- 7. Corporate & Developer Info -->
         <div class="policy-pane" id="pane-operator">
-          <div class="policy-badge-legal">Enterprise Identification & Architectural Credits</div>
+          <div class="policy-meta-bar">
+            <span>🏢 Commercial Identity & Architect Profile</span>
+          </div>
 
-          <h3>🏢 Commercial Merchant Information</h3>
-          <table style="width:100%; border-collapse:collapse; font-size:0.86rem; margin:12px 0;">
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; width:180px; color:var(--ink);">Trading / Brand Name:</td><td style="padding:10px 0; color:var(--muted);">RK Resin Art</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; color:var(--ink);">Parent Operating Entity:</td><td style="padding:10px 0; color:var(--muted);">RK Creation</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; color:var(--ink);">Proprietor / Representative:</td><td style="padding:10px 0; color:var(--muted);">Rinku Patel</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; color:var(--ink);">Studio & Operational Office:</td><td style="padding:10px 0; color:var(--muted);">Umiyanagar, Nr. Old Darshan School, Ratanpar, Surendranagar, Gujarat — 363020, India</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; color:var(--ink);">Customer Support Line:</td><td style="padding:10px 0; color:var(--muted);"><a href="tel:+918141994995" style="color:var(--p);font-weight:700;">+91 81419 94995</a></td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; color:var(--ink);">Official Inquiries Email:</td><td style="padding:10px 0; color:var(--muted);"><a href="mailto:rinkupatel3495@gmail.com" style="color:var(--p);font-weight:700;">rinkupatel3495@gmail.com</a></td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:10px 0; font-weight:700; color:var(--ink);">Instagram Community:</td><td style="padding:10px 0; color:var(--muted);"><a href="https://instagram.com/rk_creation2208" target="_blank" rel="noopener" style="color:var(--p);font-weight:700;">@rk_creation2208</a></td></tr>
-          </table>
+          <div class="policy-card-block">
+            <h3>🏢 Commercial Operating Entity</h3>
+            <table class="policy-table">
+              <tbody>
+                <tr><td><strong>Trading / Brand Name:</strong></td><td>RK Resin Art</td></tr>
+                <tr><td><strong>Parent Commercial Firm:</strong></td><td>RK Creation</td></tr>
+                <tr><td><strong>Proprietor & Representative:</strong></td><td>Rinku Patel</td></tr>
+                <tr><td><strong>Operational Studio & Office:</strong></td><td>Umiyanagar, Nr. Old Darshan School, Ratanpar, Surendranagar, Gujarat — 363020, India</td></tr>
+                <tr><td><strong>Direct Telephone Support:</strong></td><td><a href="tel:+918141994995" style="color:var(--p);font-weight:700;">+91 81419 94995</a></td></tr>
+                <tr><td><strong>Commercial Email:</strong></td><td><a href="mailto:rinkupatel3495@gmail.com" style="color:var(--p);font-weight:700;">rinkupatel3495@gmail.com</a></td></tr>
+                <tr><td><strong>Instagram Community:</strong></td><td><a href="https://instagram.com/rk_creation2208" target="_blank" rel="noopener" style="color:var(--p);font-weight:700;">@rk_creation2208</a></td></tr>
+              </tbody>
+            </table>
+          </div>
 
-          <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px; margin-top:20px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
-              <span style="font-weight:800; font-size:0.92rem; color:var(--ink);">💻 Web Development & Systems Engineering</span>
-              <span style="font-size:0.72rem; background:rgba(124, 58, 237, 0.1); color:var(--p); padding:2px 8px; border-radius:4px; font-weight:700;">Full-Stack Architecture</span>
+          <div class="policy-dev-card">
+            <div class="policy-dev-header">
+              <span class="policy-dev-role">💻 Web Developer & Systems Engineer</span>
+              <span class="policy-dev-pill">Full-Stack Architecture</span>
             </div>
-            <div style="font-size:0.84rem; color:var(--muted); line-height:1.6;">
-              Engineered, designed, and deployed by <strong>Shrey Patel</strong>. Features real-time state management, secure authenticated REST APIs, automated invoice generation, and full responsive framing.
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px;">
-              <a href="mailto:shreypatel00557@gmail.com" style="display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); color:var(--ink); text-decoration:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:700;">
+            <p class="policy-dev-desc">
+              Designed, architected, and engineered by <strong>Shrey Patel</strong>. Built with high-performance responsive interfaces, real-time database state synchronization, secure authentication, automated UPI invoice generation, and frameless catalog framing.
+            </p>
+            <div class="policy-dev-actions">
+              <a href="mailto:shreypatel00557@gmail.com" class="policy-dev-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 shreypatel00557@gmail.com
               </a>
-              <a href="tel:+919824500557" style="display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); color:var(--ink); text-decoration:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:700;">
+              <a href="tel:+919824500557" class="policy-dev-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 +91 98245 00557
               </a>
-              <a href="https://github.com/shrey2711-patel" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:6px; background:var(--ink); color:#fff; text-decoration:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:700;">
+              <a href="https://github.com/shrey2711-patel" target="_blank" rel="noopener noreferrer" class="policy-dev-btn github">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
                 GitHub (@shrey2711-patel)
               </a>
@@ -1881,10 +2008,10 @@
     <span class="cart-badge" id="cartBadge">0</span>
   </button>
 
-  <script src="/js/api.js"></script>
-  <script src="/js/cart.js"></script>
-  <script src="/js/wishlist.js"></script>
-  <script src="/js/admin.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="/js/api.js?v=20260912_final"></script>
+  <script src="/js/cart.js?v=20260912_final"></script>
+  <script src="/js/wishlist.js?v=20260912_final"></script>
+  <script src="/js/admin.js?v=20260912_final"></script>
+  <script src="/js/app.js?v=20260912_final"></script>
 </body>
 </html>

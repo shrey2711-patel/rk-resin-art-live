@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Under Scheduled Maintenance | RK Resin Art</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="/tab_logo.png" type="image/png">
+  <style>
+    :root {
+      --bg: #0d1411;
+      --card: #15221c;
+      --surface: #1b2d25;
+      --p: #145a46;
+      --gold: #d4af37;
+      --gold-light: #f5e7a9;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: rgba(212, 175, 55, 0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+      text-align: center;
+    }
+    
+    body::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(20, 90, 70, 0.35) 0%, rgba(212, 175, 55, 0.08) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .m-container {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(20, 90, 70, 0.15);
+      backdrop-filter: blur(12px);
+      animation: floatIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .brand-logo-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+    }
+    .brand-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: 0.5px;
+      text-align: left;
+      line-height: 1.15;
+    }
+    .brand-sub {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid var(--border);
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #eab308;
+      box-shadow: 0 0 10px #eab308;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+    .m-desc {
+      font-size: 0.96rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .contact-box h3 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .contact-box p {
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-wa {
+      background: #25d366;
+      color: #0b2214;
+    }
+    .btn-wa:hover {
+      background: #22bf5b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+    }
+    .btn-mail {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-mail:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--gold);
+    }
+
+    .dev-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 16px;
+      margin-top: 20px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .dev-footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .dev-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .m-container { padding: 28px 20px; }
+      h1 { font-size: 1.7rem; }
+      .brand-title { font-size: 1.4rem; }
+      .contact-links { flex-direction: column; }
+      .btn-action { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="m-container">
+    <div class="brand-logo-wrap">
+      <img src="/logo.png" alt="RK Resin Art Logo" class="brand-logo-img" onerror="this.src='/tab_logo.png'">
+      <div>
+        <div class="brand-title">RK Resin Art</div>
+        <div class="brand-sub">Handcrafted Art & Supplies</div>
+      </div>
+    </div>
+
+    <div class="status-badge">
+      <span class="pulse-dot"></span>
+      Scheduled Upgrades & Maintenance
+    </div>
+
+    <h1>We’ll Be Right Back! ✨</h1>
+    
+    <p class="m-desc">
+      Our website is temporarily offline for scheduled system upgrades, inventory restocks, and security enhancements. We are polishing our catalog to deliver a superior shopping experience.
+    </p>
+
+    <div class="contact-box">
+      <h3>💬 Need Immediate Help or Custom Inquiries?</h3>
+      <p>Our studio remains active! For urgent custom orders, Name Plates, Resin Clocks, or inquiry status, reach out to us directly:</p>
+      
+      <div class="contact-links">
+        <a href="https://wa.me/918141994995?text=Hello%20RK%20Resin%20Art,%20I%20have%20an%20inquiry" target="_blank" class="btn-action btn-wa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.969.586 1.761.888 2.796.888 3.182 0 5.769-2.587 5.77-5.768.001-3.18-2.586-5.772-5.77-5.772zm3.374 8.211c-.144.405-.837.774-1.17.824-.312.045-.698.072-2.146-.527-1.745-.722-2.868-2.518-2.955-2.634-.087-.116-.708-.941-.708-1.796 0-.855.449-1.277.609-1.451.16-.174.348-.217.464-.217.116 0 .232.001.333.006.106.005.249-.04.39.298.144.347.491 1.2.535 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.044.101-.116.434-.506.549-.68.116-.174.232-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824z"/></svg>
+          WhatsApp Support (+91 81419 94995)
+        </a>
+        <a href="mailto:rinkupatel3495@gmail.com" class="btn-action btn-mail">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          rinkupatel3495@gmail.com
+        </a>
+      </div>
+    </div>
+
+    <div class="dev-footer">
+      <div>Operating Firm: <strong>RK Creation / RK Resin Art</strong> | Surendranagar, Gujarat</div>
+      <div>Systems & Infrastructure: <a href="mailto:shreypatel00557@gmail.com">Shrey Patel</a> (+91 98245 00557)</div>
+    </div>
+  </div>
+
+</body>
+</html>
