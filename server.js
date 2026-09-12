@@ -2254,13 +2254,10 @@ app.get('/api/settings', (req, res) => {
     upiEnabled: db.settings.upiEnabled !== false,
     upiId: db.settings.upiId || 'rinkupatel3495@okaxis',
     upiPayeeName: db.settings.upiPayeeName || 'RINKU PATEL',
-    upiQrImageUrl: db.settings.upiQrImageUrl || '/upi-rinku-patel.jpeg'
+    upiQrImageUrl: db.settings.upiQrImageUrl || '/upi-rinku-patel.jpeg',
+    termsCriteria: db.settings.termsCriteria || {},
+    customTermsNotes: db.settings.customTermsNotes || ''
   });
-});
-
-// GET banners
-app.get('/api/banners', (req, res) => {
-  res.json(readDB().banners);
 });
 
 // GET nav links
@@ -3528,7 +3525,9 @@ app.get('/api/admin/settings', requireAdmin, (req, res) => {
     upiEnabled: db.settings.upiEnabled !== false,
     upiId: db.settings.upiId || 'rinkupatel3495@okaxis',
     upiPayeeName: db.settings.upiPayeeName || 'RINKU PATEL',
-    upiQrImageUrl: db.settings.upiQrImageUrl || '/upi-rinku-patel.jpeg'
+    upiQrImageUrl: db.settings.upiQrImageUrl || '/upi-rinku-patel.jpeg',
+    termsCriteria: db.settings.termsCriteria || {},
+    customTermsNotes: db.settings.customTermsNotes || ''
   });
 });
 
@@ -3547,6 +3546,8 @@ app.put('/api/admin/settings', requireAdmin, (req, res) => {
   if (req.body.upiId !== undefined) db.settings.upiId = String(req.body.upiId).trim();
   if (req.body.upiPayeeName !== undefined) db.settings.upiPayeeName = String(req.body.upiPayeeName).trim();
   if (req.body.upiQrImageUrl !== undefined) db.settings.upiQrImageUrl = String(req.body.upiQrImageUrl).trim();
+  if (req.body.termsCriteria !== undefined) db.settings.termsCriteria = req.body.termsCriteria;
+  if (req.body.customTermsNotes !== undefined) db.settings.customTermsNotes = String(req.body.customTermsNotes).trim();
   writeDB(db);
   res.json({ success: true });
 });

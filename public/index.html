@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20260912_legal_modal">
+  <link rel="stylesheet" href="/css/style.css?v=20260913_50terms_search">
   <!-- jsPDF for invoice generation -->
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- heic-to for modern iPhone HEIC image conversion -->
@@ -194,8 +194,8 @@
     <div class="footer-grid">
       <!-- Col 1: Brand & Business Entity -->
       <div class="footer-col-about">
-        <a href="/" class="footer-brand" id="footerBrandLogo" style="display:flex; align-items:center; gap:8px; cursor:pointer; text-decoration:none; color:inherit;" title="RK Resin Art — Home">
-          <img src="/logo.png" alt="RK Resin Art" style="width:32px; height:32px; border-radius:6px; object-fit:contain;" onerror="this.style.display='none'">
+        <a href="/" class="footer-brand" id="footerBrandLogo" style="display:flex; align-items:center; gap:10px; cursor:pointer; text-decoration:none; color:inherit;" title="RK Resin Art — Home">
+          <img src="/footer_logo.png" alt="RK Resin Art" style="width:42px; height:42px; border-radius:50%; object-fit:contain; border:1.5px solid rgba(255,255,255,0.25); background:#fff; padding:1px; transition:transform 0.2s ease;" onerror="this.src='/logo.png'">
           <span>RK Resin Art</span>
         </a>
         <p class="footer-tagline">Premium epoxy resin, mica pigments, silicone moulds, dry flowers, clock essentials and craft supplies made for creative makers.</p>
@@ -262,28 +262,25 @@
       </div>
     </div>
 
-    <!-- Bottom Bar: Copyright & Web Developer Credit with Email & Phone -->
+    <!-- Bottom Bar: Copyright & Compact Web Developer Credit -->
     <div class="footer-bottom-bar">
       <div class="footer-copyright">
         © 2026 <strong>RK Resin Art</strong>. All Rights Reserved. Operated by <strong>RK Creation</strong>.
       </div>
       
-      <div class="footer-dev-card">
-        <div class="dev-header">
-          <span class="dev-tag">💻 Web Developer</span>
-          <strong class="dev-name">Shrey Patel</strong>
-        </div>
-        <div class="dev-contact-row">
-          <a href="mailto:shreypatel00557@gmail.com" class="dev-contact-badge email" title="Email Shrey Patel">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <div class="footer-dev-compact">
+        <span class="dev-lead">Web Developer: <strong>Shrey Patel</strong></span>
+        <div class="dev-links-wrap">
+          <a href="mailto:shreypatel00557@gmail.com" class="dev-link-pill" title="Email Shrey Patel">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             <span>shreypatel00557@gmail.com</span>
           </a>
-          <a href="tel:+919824500557" class="dev-contact-badge phone" title="Call Shrey Patel">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <a href="tel:+919824500557" class="dev-link-pill" title="Call Shrey Patel">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             <span>+91 98245 00557</span>
           </a>
-          <a href="https://github.com/shrey2711-patel" target="_blank" rel="noopener noreferrer" class="dev-contact-badge github" title="Visit GitHub Profile">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <a href="https://github.com/shrey2711-patel" target="_blank" rel="noopener noreferrer" class="dev-link-pill github" title="GitHub">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
             <span>GitHub</span>
           </a>
         </div>
@@ -1020,6 +1017,73 @@
               <div class="admin-ok" id="settingsOk">✅ Settings saved!</div>
             </div>
 
+            <!-- TERMS & CONDITIONS CRITERIA MANAGER -->
+            <div class="admin-form-card" style="margin-top: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <div>
+                  <div class="afc-title" style="margin-bottom: 3px; display: flex; align-items: center; gap: 8px;">
+                    <span>📜</span>
+                    <span>Store Terms &amp; Conditions Criteria Checklist</span>
+                    <span style="font-size: 0.74rem; font-weight: 800; background: var(--pl); color: var(--p); padding: 2px 8px; border-radius: 999px;">50 World Criteria</span>
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--muted);">Select from 50 comprehensive real-world commercial clauses, buyer mandates, DPDP compliance, and return terms. Live customer policies sync instantly.</div>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                  <button type="button" class="btn-sm" id="btnSelectAllTerms" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--text);" title="Select all currently visible or all criteria">✓ Select All</button>
+                  <button type="button" class="btn-sm" id="btnDeselectAllTerms" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--text);" title="Deselect all currently visible or all criteria">✕ Deselect All</button>
+                  <button type="button" class="btn-sm" id="btnResetTermsDefault" style="background: var(--bg); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; color: var(--text);" title="Reset to standard defaults">🔄 Reset Defaults</button>
+                </div>
+              </div>
+
+              <!-- Search & Category Filters Bar -->
+              <div class="terms-search-filter-bar" style="margin-bottom: 14px;">
+                <div style="position: relative; margin-bottom: 10px;">
+                  <input type="text" id="adminTermsSearch" class="admin-input" placeholder="🔍 Search criteria by keyword, title, category, or badge (e.g. unboxing, curing, transit, refund, DPDP, yellowing, safety)..." style="padding-left: 36px; padding-right: 34px; font-size: 0.85rem; border-radius: 8px;">
+                  <span style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 0.95rem; opacity: 0.6; pointer-events: none;">🔍</span>
+                  <button type="button" id="adminTermsSearchClear" style="display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--muted); padding: 0 4px;" title="Clear Search">✕</button>
+                </div>
+
+                <!-- Category Filters Scrollable Pills -->
+                <div class="terms-category-pills-wrap" id="adminTermsCategoryFilters">
+                  <button type="button" class="terms-cat-pill active" data-cat="all">All (50)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Custom Art & Claims">🎨 Custom Art (8)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Orders & Cancellations">⏱️ Orders (6)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Shipping & Logistics">🚚 Shipping (7)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Returns & Refunds">↩️ Returns (6)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Payments & Billing">💳 Payments (6)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Safety & Product Care">⚠️ Safety (6)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Privacy & Accounts">🔒 Privacy (5)</button>
+                  <button type="button" class="terms-cat-pill" data-cat="Legal & Jurisdiction">🏛️ Legal (6)</button>
+                </div>
+
+                <!-- Live Counter & Active Status Bar -->
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--muted); margin-top: 8px; padding: 0 2px;">
+                  <span id="adminTermsCountStatus">Showing 50 of 50 criteria</span>
+                  <span id="adminTermsActiveStatus" style="color: #10b981; font-weight: 700;">50 Active / Enforced</span>
+                </div>
+              </div>
+
+              <!-- Real-world Terms Criteria Grid -->
+              <div id="adminTermsCriteriaGrid" class="admin-terms-grid" style="max-height: 520px; overflow-y: auto; padding-right: 4px;">
+                <!-- Injected dynamically by Admin.renderTermsCriteria() -->
+              </div>
+
+              <!-- Custom Store Notice / Special Terms Announcement -->
+              <div class="form-field" style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border);">
+                <label style="font-weight: 700; font-size: 0.84rem; display: flex; align-items: center; gap: 6px;">
+                  <span>📢</span>
+                  <span>Custom Store Notice &amp; Special Terms Announcement (Optional)</span>
+                </label>
+                <textarea class="admin-input" id="afCustomTermsNotes" rows="3" placeholder="e.g. Festival Season Advisory: Due to peak festive demand, custom floral preservation orders require 7 to 10 business days for complete curing and dispatch." style="resize: vertical; font-size: 0.84rem; line-height: 1.5; margin-top: 6px;"></textarea>
+                <div style="font-size: 0.76rem; color: var(--muted); margin-top: 4px;">This message appears as a highlighted banner at the top of the customer-facing Terms &amp; Conditions policy modal.</div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
+                <button type="button" class="admin-save-btn" id="saveTermsBtn" style="background: #10b981; padding: 9px 22px;">Save Terms &amp; Conditions Criteria</button>
+                <div class="admin-ok" id="termsOk" style="margin: 0;">✅ Terms &amp; Conditions criteria updated!</div>
+              </div>
+            </div>
+
             <!-- Admin Password Security Card -->
             <div class="admin-form-card" style="margin-top: 24px;">
               <div class="afc-title">🔒 Change Admin Master Password</div>
@@ -1715,8 +1779,14 @@
             <span>📍 Jurisdiction: Surendranagar, Gujarat</span>
           </div>
 
+          <!-- Dynamic Admin Store Notice Container -->
+          <div id="termsCustomNoticeContainer" style="display: none;"></div>
+
+          <!-- Dynamic Admin Verified Criteria Container -->
+          <div id="termsDynamicCriteriaContainer"></div>
+
           <div class="policy-card-block">
-            <h3>1. Legal Framework & Binding Acceptance</h3>
+            <h3>1. Legal Framework &amp; Binding Acceptance</h3>
             <p>These Terms and Conditions ("Agreement") govern your access to, use of, and commercial purchases made through <strong>RK Resin Art</strong>, an enterprise legally registered and operated by <strong>RK Creation</strong> ("Company", "We", "Us", or "Our"), headquartered in Surendranagar, Gujarat, India. By accessing our website, placing an order, or utilizing our services, you ("Customer", "Buyer", or "User") agree to be bound by these legal terms.</p>
           </div>
 
@@ -2011,10 +2081,10 @@
     <span class="cart-badge" id="cartBadge">0</span>
   </button>
 
-  <script src="/js/api.js?v=20260912_legal_modal"></script>
-  <script src="/js/cart.js?v=20260912_legal_modal"></script>
-  <script src="/js/wishlist.js?v=20260912_legal_modal"></script>
-  <script src="/js/admin.js?v=20260912_legal_modal"></script>
-  <script src="/js/app.js?v=20260912_legal_modal"></script>
+  <script src="/js/api.js?v=20260913_50terms_search"></script>
+  <script src="/js/cart.js?v=20260913_50terms_search"></script>
+  <script src="/js/wishlist.js?v=20260913_50terms_search"></script>
+  <script src="/js/admin.js?v=20260913_50terms_search"></script>
+  <script src="/js/app.js?v=20260913_50terms_search"></script>
 </body>
 </html>

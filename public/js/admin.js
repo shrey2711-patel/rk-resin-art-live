@@ -53,6 +53,149 @@ const Admin = {
     }
   },
 
+  termsSearchQuery: '',
+  termsCategoryFilter: 'all',
+  termsStateCache: {},
+
+  renderTermsCriteria(savedCriteria = null) {
+    const container = document.getElementById('adminTermsCriteriaGrid');
+    if (!container) return;
+
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+
+    // Initialize or update termsStateCache
+    if (savedCriteria && typeof savedCriteria === 'object') {
+      catalog.forEach(c => {
+        if (savedCriteria[c.id] !== undefined) {
+          this.termsStateCache[c.id] = !!savedCriteria[c.id];
+        } else if (this.termsStateCache[c.id] === undefined) {
+          this.termsStateCache[c.id] = c.defaultChecked;
+        }
+      });
+    } else {
+      catalog.forEach(c => {
+        if (this.termsStateCache[c.id] === undefined) {
+          this.termsStateCache[c.id] = c.defaultChecked;
+        }
+      });
+    }
+
+    const q = (this.termsSearchQuery || '').trim().toLowerCase();
+    const cat = this.termsCategoryFilter || 'all';
+
+    // Filter criteria
+    const filtered = catalog.filter(c => {
+      // Category filter
+      if (cat !== 'all' && c.category !== cat) return false;
+      // Search query filter (matches title, desc, category, badge)
+      if (q) {
+        const matchTitle = (c.title || '').toLowerCase().includes(q);
+        const matchDesc = (c.desc || '').toLowerCase().includes(q);
+        const matchCat = (c.category || '').toLowerCase().includes(q);
+        const matchBadge = (c.badge || '').toLowerCase().includes(q);
+        return matchTitle || matchDesc || matchCat || matchBadge;
+      }
+      return true;
+    });
+
+    // Count active items
+    let activeTotal = 0;
+    catalog.forEach(c => {
+      if (this.termsStateCache[c.id]) activeTotal++;
+    });
+
+    // Update counter labels
+    const countStatusEl = document.getElementById('adminTermsCountStatus');
+    if (countStatusEl) {
+      if (q || cat !== 'all') {
+        countStatusEl.textContent = `Showing ${filtered.length} of ${catalog.length} criteria (Filtered)`;
+      } else {
+        countStatusEl.textContent = `Showing ${catalog.length} of ${catalog.length} criteria`;
+      }
+    }
+
+    const activeStatusEl = document.getElementById('adminTermsActiveStatus');
+    if (activeStatusEl) {
+      activeStatusEl.textContent = `${activeTotal} of ${catalog.length} Active / Enforced`;
+      activeStatusEl.style.color = activeTotal > 0 ? '#10b981' : '#ef4444';
+    }
+
+    // Render HTML
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="terms-empty-search">
+          <div class="tes-title">🔍 No matching terms or criteria found</div>
+          <div>No results matching "${escapeHtml(this.termsSearchQuery)}". Try searching for <em>unboxing, refund, shipping, curing, DPDP, safety,</em> or select another category.</div>
+          <button type="button" class="btn-sm" style="margin-top: 10px; background: var(--p); color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer;" onclick="document.getElementById('adminTermsSearchClear').click();">Reset Search</button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(c => {
+      const isChecked = !!this.termsStateCache[c.id];
+      return `
+        <div class="admin-term-card ${isChecked ? 'is-active' : ''}" data-term-id="${c.id}" onclick="Admin.toggleTermCard(event, '${c.id}')">
+          <div class="term-card-header">
+            <input type="checkbox" id="term_chk_${c.id}" class="term-checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); Admin.onTermCheckboxChange('${c.id}', this.checked);">
+            <div class="term-title-wrap">
+              <div class="term-title-row">
+                <span class="term-card-title">${c.title}</span>
+                <span class="term-badge" style="background:${c.badgeBg}; color:${c.badgeColor};">${c.badge}</span>
+              </div>
+              <div style="font-size: 0.72rem; color: var(--p); font-weight: 700; margin-bottom: 3px;">📁 ${c.category}</div>
+              <p class="term-card-desc">${c.desc}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  toggleTermCard(event, termId) {
+    const currentState = !!this.termsStateCache[termId];
+    const newState = !currentState;
+    this.termsStateCache[termId] = newState;
+    
+    const chk = document.getElementById(`term_chk_${termId}`);
+    if (chk) chk.checked = newState;
+    
+    const card = document.querySelector(`.admin-term-card[data-term-id="${termId}"]`);
+    if (card) card.classList.toggle('is-active', newState);
+
+    this.updateTermsActiveCounter();
+  },
+
+  onTermCheckboxChange(termId, isChecked) {
+    this.termsStateCache[termId] = isChecked;
+    const card = document.querySelector(`.admin-term-card[data-term-id="${termId}"]`);
+    if (card) card.classList.toggle('is-active', isChecked);
+    this.updateTermsActiveCounter();
+  },
+
+  updateTermsActiveCounter() {
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+    let activeTotal = 0;
+    catalog.forEach(c => {
+      if (this.termsStateCache[c.id]) activeTotal++;
+    });
+
+    const activeStatusEl = document.getElementById('adminTermsActiveStatus');
+    if (activeStatusEl) {
+      activeStatusEl.textContent = `${activeTotal} of ${catalog.length} Active / Enforced`;
+      activeStatusEl.style.color = activeTotal > 0 ? '#10b981' : '#ef4444';
+    }
+  },
+
+  getSelectedTermsCriteria() {
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+    const result = {};
+    catalog.forEach(c => {
+      result[c.id] = this.termsStateCache[c.id] !== undefined ? !!this.termsStateCache[c.id] : c.defaultChecked;
+    });
+    return result;
+  },
+
   setStockStatusButtonState(val) {
     const btn = document.getElementById('pfStockStatusBtn');
     const input = document.getElementById('pfStockStatus');
@@ -1265,6 +1408,11 @@ const Admin = {
       if (otherEl) otherEl.value = s.otherCharges !== undefined ? s.otherCharges : 0;
       const typeEl = document.getElementById('afOtherChargesType');
       if (typeEl) typeEl.value = s.otherChargesType || 'flat';
+
+      // Populate Terms & Conditions criteria
+      this.renderTermsCriteria(s.termsCriteria || {});
+      const customTermsEl = document.getElementById('afCustomTermsNotes');
+      if (customTermsEl) customTermsEl.value = s.customTermsNotes || '';
     } catch {}
 
     if (API.isAdminLoggedIn()) {
@@ -1317,6 +1465,11 @@ const Admin = {
       // Populate Payments settings
       const rzEl = document.getElementById('afRazorpayEnabled');
       if (rzEl) rzEl.checked = s.razorpayEnabled !== false;
+
+      // Populate Terms & Conditions criteria
+      this.renderTermsCriteria(s.termsCriteria || {});
+      const customTermsEl = document.getElementById('afCustomTermsNotes');
+      if (customTermsEl) customTermsEl.value = s.customTermsNotes || '';
     }
 
     this.initVariantBuilder();
@@ -2019,6 +2172,8 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   const upiId = (document.getElementById('afUpiId').value || '').trim();
   const upiPayeeName = (document.getElementById('afUpiPayeeName').value || '').trim();
   const upiQrImageUrl = (document.getElementById('afUpiQrImageUrl').value || '').trim();
+  const termsCriteria = Admin.getSelectedTermsCriteria();
+  const customTermsNotes = (document.getElementById('afCustomTermsNotes')?.value || '').trim();
 
   await API.updateSettings({ 
     announce: text, 
@@ -2028,7 +2183,9 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
     upiEnabled: upiEnabled,
     upiId: upiId || 'rinkupatel3495@okaxis',
     upiPayeeName: upiPayeeName || 'RINKU PATEL',
-    upiQrImageUrl: upiQrImageUrl
+    upiQrImageUrl: upiQrImageUrl,
+    termsCriteria: termsCriteria,
+    customTermsNotes: customTermsNotes
   });
 
   // Update local settings cache
@@ -2041,6 +2198,8 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   Admin.data.settings.upiId = upiId || 'rinkupatel3495@okaxis';
   Admin.data.settings.upiPayeeName = upiPayeeName || 'RINKU PATEL';
   Admin.data.settings.upiQrImageUrl = upiQrImageUrl;
+  Admin.data.settings.termsCriteria = termsCriteria;
+  Admin.data.settings.customTermsNotes = customTermsNotes;
 
   // Instantly toggle the visibility of the stock inputs
   Admin.updateStockFieldsVisibility();
@@ -2049,10 +2208,127 @@ document.getElementById('saveSettingsBtn').onclick = async () => {
   if (announceTextEl) announceTextEl.textContent = text;
 
   showOk('settingsOk');
+  showToast('Settings saved successfully!', 'success');
   if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
     await App.loadSettings();
   }
 };
+
+// Terms & Conditions Criteria Checklist Save, Search & Filter Controls
+const saveTermsBtn = document.getElementById('saveTermsBtn');
+if (saveTermsBtn) {
+  saveTermsBtn.onclick = async () => {
+    const termsCriteria = Admin.getSelectedTermsCriteria();
+    const customTermsNotes = (document.getElementById('afCustomTermsNotes')?.value || '').trim();
+
+    await API.updateSettings({
+      termsCriteria: termsCriteria,
+      customTermsNotes: customTermsNotes
+    });
+
+    if (!Admin.data.settings) Admin.data.settings = {};
+    Admin.data.settings.termsCriteria = termsCriteria;
+    Admin.data.settings.customTermsNotes = customTermsNotes;
+
+    showOk('termsOk');
+    showToast('Terms & Conditions criteria saved successfully!', 'success');
+    if (typeof App !== 'undefined' && typeof App.loadSettings === 'function') {
+      await App.loadSettings();
+    }
+  };
+}
+
+// Select All Button
+const btnSelectAllTerms = document.getElementById('btnSelectAllTerms');
+if (btnSelectAllTerms) {
+  btnSelectAllTerms.onclick = () => {
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+    const q = (Admin.termsSearchQuery || '').trim().toLowerCase();
+    const cat = Admin.termsCategoryFilter || 'all';
+
+    catalog.forEach(c => {
+      // If filters are active, only toggle items matching the filter
+      const matchesCat = cat === 'all' || c.category === cat;
+      const matchesQ = !q || (c.title || '').toLowerCase().includes(q) || (c.desc || '').toLowerCase().includes(q) || (c.category || '').toLowerCase().includes(q) || (c.badge || '').toLowerCase().includes(q);
+      
+      if (matchesCat && matchesQ) {
+        Admin.termsStateCache[c.id] = true;
+      }
+    });
+
+    Admin.renderTermsCriteria();
+    showToast('Selected all matching criteria', 'info');
+  };
+}
+
+// Deselect All Button
+const btnDeselectAllTerms = document.getElementById('btnDeselectAllTerms');
+if (btnDeselectAllTerms) {
+  btnDeselectAllTerms.onclick = () => {
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+    const q = (Admin.termsSearchQuery || '').trim().toLowerCase();
+    const cat = Admin.termsCategoryFilter || 'all';
+
+    catalog.forEach(c => {
+      const matchesCat = cat === 'all' || c.category === cat;
+      const matchesQ = !q || (c.title || '').toLowerCase().includes(q) || (c.desc || '').toLowerCase().includes(q) || (c.category || '').toLowerCase().includes(q) || (c.badge || '').toLowerCase().includes(q);
+      
+      if (matchesCat && matchesQ) {
+        Admin.termsStateCache[c.id] = false;
+      }
+    });
+
+    Admin.renderTermsCriteria();
+    showToast('Deselected all matching criteria', 'info');
+  };
+}
+
+// Reset to Defaults Button
+const btnResetTermsDefault = document.getElementById('btnResetTermsDefault');
+if (btnResetTermsDefault) {
+  btnResetTermsDefault.onclick = () => {
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+    catalog.forEach(c => {
+      Admin.termsStateCache[c.id] = c.defaultChecked;
+    });
+    Admin.renderTermsCriteria();
+    showToast('Reset all 50 criteria to standard defaults', 'info');
+  };
+}
+
+// Live Search Input Box
+const adminTermsSearch = document.getElementById('adminTermsSearch');
+const adminTermsSearchClear = document.getElementById('adminTermsSearchClear');
+
+if (adminTermsSearch) {
+  adminTermsSearch.oninput = (e) => {
+    Admin.termsSearchQuery = e.target.value;
+    if (adminTermsSearchClear) {
+      adminTermsSearchClear.style.display = e.target.value ? 'block' : 'none';
+    }
+    Admin.renderTermsCriteria();
+  };
+}
+
+if (adminTermsSearchClear) {
+  adminTermsSearchClear.onclick = () => {
+    if (adminTermsSearch) adminTermsSearch.value = '';
+    Admin.termsSearchQuery = '';
+    adminTermsSearchClear.style.display = 'none';
+    Admin.renderTermsCriteria();
+    if (adminTermsSearch) adminTermsSearch.focus();
+  };
+}
+
+// Category Filter Pills
+document.querySelectorAll('.terms-cat-pill').forEach(pill => {
+  pill.onclick = function () {
+    document.querySelectorAll('.terms-cat-pill').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    Admin.termsCategoryFilter = this.dataset.cat || 'all';
+    Admin.renderTermsCriteria();
+  };
+});
 
 // UPI Custom QR Image Upload Trigger
 const uploadUpiQrBtn = document.getElementById('uploadUpiQrBtn');

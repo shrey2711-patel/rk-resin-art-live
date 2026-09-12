@@ -1414,6 +1414,12 @@ const App = {
       this.state.upiId = s.upiId || 'rinkupatel3495@okaxis';
       this.state.upiPayeeName = s.upiPayeeName || 'RINKU PATEL';
       this.state.upiQrImageUrl = s.upiQrImageUrl || '/upi-rinku-patel.jpeg';
+      this.state.termsCriteria = s.termsCriteria || {};
+      this.state.customTermsNotes = s.customTermsNotes || '';
+
+      if (typeof renderDynamicTerms === 'function') {
+        renderDynamicTerms(s);
+      }
 
       this.resetPaymentSelector();
     } catch {}
@@ -4086,10 +4092,99 @@ function showOk(id) {
 }
 
 
+// ── Dynamic Terms & Conditions Renderer ─────────────────────
+function renderDynamicTerms(settings = {}) {
+  const noticeContainer = document.getElementById('termsCustomNoticeContainer');
+  const criteriaContainer = document.getElementById('termsDynamicCriteriaContainer');
+
+  if (noticeContainer) {
+    const note = (settings.customTermsNotes || (App.state && App.state.customTermsNotes) || '').trim();
+    if (note) {
+      noticeContainer.innerHTML = `
+        <div class="policy-custom-announcement">
+          <div class="pca-icon">📢</div>
+          <div class="pca-content">
+            <div class="pca-title">Official Store Policy Notice &amp; Operational Advisory</div>
+            <div class="pca-body">${escapeHtml(note).replace(/\n/g, '<br>')}</div>
+          </div>
+        </div>
+      `;
+      noticeContainer.style.display = 'block';
+    } else {
+      noticeContainer.style.display = 'none';
+      noticeContainer.innerHTML = '';
+    }
+  }
+
+  if (criteriaContainer) {
+    const activeCriteria = settings.termsCriteria || (App.state && App.state.termsCriteria) || {};
+    const catalog = window.DEFAULT_TERMS_CRITERIA || [];
+    const enabledList = catalog.filter(c => {
+      return activeCriteria[c.id] !== undefined ? !!activeCriteria[c.id] : c.defaultChecked;
+    });
+
+    if (enabledList.length > 0) {
+      // Group by category
+      const grouped = {};
+      enabledList.forEach(c => {
+        const cat = c.category || 'General Policies';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(c);
+      });
+
+      const categoriesHtml = Object.keys(grouped).map(catName => {
+        const items = grouped[catName];
+        return `
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: var(--p); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>📁</span>
+              <span>${catName} (${items.length})</span>
+            </div>
+            <div class="pac-grid">
+              ${items.map(c => `
+                <div class="pac-item">
+                  <span class="pac-check-icon">✓</span>
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 2px;">
+                      <span class="pac-item-title">${c.title}</span>
+                      <span class="term-badge" style="background:${c.badgeBg}; color:${c.badgeColor}; font-size: 0.65rem;">${c.badge}</span>
+                    </div>
+                    <div class="pac-item-desc">${c.desc}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      criteriaContainer.innerHTML = `
+        <div class="policy-active-criteria-box">
+          <div class="pac-header">
+            <div class="pac-title">
+              <span>🛡️</span>
+              <span>Active Commercial Criteria &amp; Store Standards</span>
+            </div>
+            <span class="pac-count-badge">✓ ${enabledList.length} Criteria Enforced</span>
+          </div>
+          ${categoriesHtml}
+        </div>
+      `;
+    } else {
+      criteriaContainer.innerHTML = '';
+    }
+  }
+}
+window.renderDynamicTerms = renderDynamicTerms;
+
 // ── Legal & Policy Modal Handlers ───────────────────────────
 function openPolicyModal(policyTab = 'terms') {
   const overlay = document.getElementById('policyModalOverlay');
   if (!overlay) return;
+
+  if (policyTab === 'terms') {
+    renderDynamicTerms(App.state);
+  }
 
   // Set active tab
   document.querySelectorAll('.policy-tab').forEach(tab => {
