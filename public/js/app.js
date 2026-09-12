@@ -1,3 +1,21 @@
+function loadRazorpaySDK() {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== 'undefined' && window.Razorpay) return resolve(window.Razorpay);
+    const existing = document.getElementById('razorpay-sdk');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.Razorpay));
+      existing.addEventListener('error', () => reject(new Error('Failed to load Razorpay SDK')));
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'razorpay-sdk';
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(window.Razorpay);
+    script.onerror = () => reject(new Error('Failed to load Razorpay SDK. Please check your connection.'));
+    document.body.appendChild(script);
+  });
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -1010,16 +1028,42 @@ const App = {
         <div class="modal-related-grid">
           ${relatedProducts.map(item => {
             const cat = catMap[item.category] || {};
-            const price = item.price !== undefined ? item.price : (item.variants && item.variants[0] ? item.variants[0].price : 0);
+            const price = Number(item.price !== undefined ? item.price : (item.variants && item.variants[0] ? item.variants[0].price : 0) || 0);
+            const brandName = item.brand || item.category || 'RK Resin Art';
+            
+            const origPrice = (item.originalPrice && Number(item.originalPrice) > price) ? Number(item.originalPrice) : null;
+            let origHTML = '';
+            let discountHTML = '';
+            if (origPrice && origPrice > price) {
+              const discountPct = Math.round(((origPrice - price) / origPrice) * 100);
+              origHTML = `<s class="prod-price-orig">₹${origPrice.toLocaleString('en-IN')}</s>`;
+              if (discountPct > 0) discountHTML = `<span class="prod-discount-pct">(${discountPct}% off)</span>`;
+            }
+
+            const avgRating = (item._avgRating !== undefined && item._avgRating !== null && Number(item._avgRating) > 0) ? Number(item._avgRating) : null;
+            const ratingCount = item._ratingCount || 0;
+            let ratingHTML = '';
+            if (avgRating && ratingCount > 0) {
+              const ratingVal = avgRating.toFixed(1);
+              const pillColorClass = avgRating >= 3.5 ? 'pill-green' : (avgRating >= 2.8 ? 'pill-amber' : 'pill-red');
+              ratingHTML = `<div class="prod-rating-row"><span class="prod-rating-pill ${pillColorClass}"><strong>${ratingVal} ★</strong><span class="rating-pipe">|</span><span>${ratingCount}</span></span></div>`;
+            }
+
             return `
-              <button class="modal-related-card" type="button" data-related-pid="${item.id}" data-related-context="${context}">
-                <div class="modal-related-media" style="background:${cat.color || '#f0eef8'}">
-                  ${this.productMedia(item, cat.color || '#f0eef8', 'related')}
+              <button class="modal-related-card frameless-card" type="button" data-related-pid="${item.id}" data-related-context="${context}">
+                <div class="modal-related-media" style="background:${cat.color || '#f7f7f8'}">
+                  ${this.productMedia(item, cat.color || '#f7f7f8', 'related')}
+                  <div class="prod-quickview-overlay">VIEW PRODUCT</div>
                 </div>
                 <div class="modal-related-info">
-                  <span>${item.category || 'Product'}</span>
-                  <strong>${item.name}</strong>
-                  <em>&#8377;${price}</em>
+                  <div class="prod-brand">${escapeHtml(brandName)}</div>
+                  <strong class="prod-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</strong>
+                  ${ratingHTML}
+                  <div class="prod-price-row">
+                    <span class="prod-price-current">₹${price.toLocaleString('en-IN')}</span>
+                    ${origHTML}
+                    ${discountHTML}
+                  </div>
                 </div>
               </button>`;
           }).join('')}
@@ -2301,15 +2345,31 @@ const App = {
         <div class="pdp-similar-carousel">
           ${relatedProducts.map(item => {
             const itemCat = catMap[item.category] || {};
-            const itemPrice = item.price !== undefined ? item.price : (item.variants && item.variants[0] ? item.variants[0].price : 0);
+            const itemPrice = Number(item.price !== undefined ? item.price : (item.variants && item.variants[0] ? item.variants[0].price : 0) || 0);
+            const brandName = item.brand || item.category || 'RK Resin Art';
+            const origPrice = (item.originalPrice && Number(item.originalPrice) > itemPrice) ? Number(item.originalPrice) : null;
+            let origHTML = '';
+            let discountHTML = '';
+            if (origPrice && origPrice > itemPrice) {
+              const discountPct = Math.round(((origPrice - itemPrice) / origPrice) * 100);
+              origHTML = `<s class="prod-price-orig">₹${origPrice.toLocaleString('en-IN')}</s>`;
+              if (discountPct > 0) discountHTML = `<span class="prod-discount-pct">(${discountPct}% off)</span>`;
+            }
+
             return `
-              <button class="pdp-similar-card" type="button" data-related-pid="${item.id}" data-related-context="modal">
-                <div class="pdp-similar-img" style="background:${itemCat.color || '#f0eef8'}">
-                  ${this.productMedia(item, itemCat.color || '#f0eef8', 'related')}
+              <button class="pdp-similar-card frameless-card" type="button" data-related-pid="${item.id}" data-related-context="modal">
+                <div class="pdp-similar-img" style="background:${itemCat.color || '#f7f7f8'}">
+                  ${this.productMedia(item, itemCat.color || '#f7f7f8', 'related')}
+                  <div class="prod-quickview-overlay">VIEW</div>
                 </div>
                 <div class="pdp-similar-info">
-                  <div class="pdp-similar-name">${item.name}</div>
-                  <div class="pdp-similar-price">₹${itemPrice}</div>
+                  <div class="prod-brand">${escapeHtml(brandName)}</div>
+                  <div class="pdp-similar-name">${escapeHtml(item.name)}</div>
+                  <div class="prod-price-row">
+                    <span class="prod-price-current">₹${itemPrice.toLocaleString('en-IN')}</span>
+                    ${origHTML}
+                    ${discountHTML}
+                  </div>
                 </div>
               </button>`;
           }).join('')}
@@ -3691,7 +3751,10 @@ document.getElementById('placeOrderBtn').onclick = async () => {
     try {
       App.updatePlaceOrderButton('loading');
 
-      // 1. Create Razorpay order on the server
+      // 1. Ensure Razorpay SDK is loaded on demand
+      await loadRazorpaySDK();
+
+      // 2. Create Razorpay order on the server
       const reqPayload = { items: cartItems };
       if (App.state.appliedCoupon) {
         reqPayload.couponCode = App.state.appliedCoupon.code;
@@ -3699,7 +3762,7 @@ document.getElementById('placeOrderBtn').onclick = async () => {
       const resOrder = await API.createPaymentOrder(reqPayload);
       const { keyId, order: razorpayOrder } = resOrder;
 
-      // 2. Open Razorpay checkout modal
+      // 3. Open Razorpay checkout modal
       const options = {
         key: keyId,
         amount: razorpayOrder.amount,

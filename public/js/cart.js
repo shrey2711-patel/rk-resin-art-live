@@ -161,9 +161,7 @@ const Cart = {
           }
         }
       } catch (err) {
-        if (typeof API !== 'undefined' && !API.isUserLoggedIn()) return;
-        if (err && err.message && err.message.toLowerCase().includes('login')) return;
-        console.warn('Cart sync paused:', err.message || err);
+        // Silently ignore transient sync interruptions
       }
     }
   }

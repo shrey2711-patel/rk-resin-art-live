@@ -4136,30 +4136,52 @@ body.admin-page-active .admin-panel {
 .modal-related-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 18px 14px;
 }
 
-.modal-related-card {
-  display: block;
+.modal-related-card,
+.modal-related-card.frameless-card {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  overflow: hidden;
-  text-align: left;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--white);
-  box-shadow: 0 8px 24px rgba(17, 17, 17, 0.04);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible !important;
+  text-align: center;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  position: relative;
 }
 
 .modal-related-card:hover {
-  border-color: rgba(17, 17, 17, 0.28);
-  box-shadow: 0 12px 30px rgba(17, 17, 17, 0.08);
+  transform: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .modal-related-media {
+  width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  background: #f4f4f1;
+  background: #f7f7f8;
+  border-radius: 4px;
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+.modal-related-card:hover .modal-related-media {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .modal-related-media {
+  background: #171d1a;
+}
+
+[data-theme="dark"] .modal-related-card:hover .modal-related-media {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 .modal-related-media .prod-image-wrap,
@@ -4167,46 +4189,101 @@ body.admin-page-active .admin-panel {
   width: 100%;
   height: 100%;
   border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-related-media .prod-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
 }
 
 .modal-related-card:hover .prod-image {
-  transform: scale(1.03);
+  transform: scale(1.045);
+}
+
+.modal-related-card .prod-quickview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px);
+  color: #111827;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 6px 4px;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .modal-related-card .prod-quickview-overlay {
+  background: rgba(22, 27, 24, 0.88);
+  color: #f3f4f6;
+}
+
+.modal-related-card:hover .prod-quickview-overlay {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .modal-related-info {
-  display: grid;
-  gap: 4px;
-  padding: 12px;
+  padding: 8px 2px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  width: 100%;
 }
 
-.modal-related-info span {
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.modal-related-info .prod-brand {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #a3753b;
+  text-align: center;
+  margin-bottom: 2px;
 }
 
-.modal-related-info strong {
-  min-height: 38px;
+[data-theme="dark"] .modal-related-info .prod-brand {
+  color: #e0b468;
+}
+
+.modal-related-info .prod-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.88rem;
+  font-weight: 500;
   color: var(--ink);
-  font-size: 0.94rem;
-  line-height: 1.25;
-  text-transform: capitalize;
+  text-align: center;
+  margin: 0 0 4px;
+  line-height: 1.35;
+  min-height: 2.5em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.modal-related-info em {
-  color: var(--ink);
-  font-style: normal;
-  font-size: 1rem;
-  font-weight: 900;
+[data-theme="dark"] .modal-related-info .prod-name {
+  color: #f3f4f6;
+}
+
+.modal-related-info .prod-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 2px;
 }
 
 [data-theme="dark"] .modal-grid-left {
@@ -4216,12 +4293,12 @@ body.admin-page-active .admin-panel {
 }
 
 [data-theme="dark"] .modal-related-section {
-  background: linear-gradient(180deg, var(--white), var(--card));
+  background: transparent;
 }
 
-[data-theme="dark"] .modal-prod-thumb,
 [data-theme="dark"] .modal-related-card {
-  border-color: var(--border);
+  background: transparent !important;
+  border: none !important;
 }
 
 @media (max-width: 900px) {
@@ -5361,29 +5438,122 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #E5E7EB transparent;
 }
-.pdp-similar-card {
+.pdp-similar-card,
+.pdp-similar-card.frameless-card {
   flex-shrink: 0;
   width: 160px;
-  background: #fff;
-  border-radius: 16px;
-  border: 1px solid #E5E7EB;
-  overflow: hidden;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
   cursor: pointer;
-  text-align: left;
-  padding: 0;
-  transition: all 0.2s ease;
+  text-align: center;
+  padding: 0 !important;
+  transition: transform 0.2s ease;
   scroll-snap-align: start;
+  position: relative;
 }
 .pdp-similar-card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  transform: translateY(-3px);
+  box-shadow: none !important;
+  transform: none !important;
 }
-.pdp-similar-img { aspect-ratio: 1 / 1; overflow: hidden; }
+.pdp-similar-img {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f7f7f8;
+  border-radius: 4px;
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+.pdp-similar-card:hover .pdp-similar-img {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+[data-theme="dark"] .pdp-similar-img {
+  background: #171d1a;
+}
 .pdp-similar-img .prod-image-wrap,
-.pdp-similar-img .prod-emoji-fallback { width: 100%; height: 100%; border-radius: 0; }
-.pdp-similar-info { padding: 10px 12px; }
-.pdp-similar-name { font-size: 0.75rem; font-weight: 600; color: #2D2D2D; margin-bottom: 4px; line-height: 1.3; }
-.pdp-similar-price { font-size: 0.82rem; font-weight: 800; color: #111111; }
+.pdp-similar-img .prod-emoji-fallback { width: 100%; height: 100%; border-radius: 0; display: flex; align-items: center; justify-content: center; }
+.pdp-similar-img .prod-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+}
+.pdp-similar-card:hover .prod-image {
+  transform: scale(1.045);
+}
+.pdp-similar-card .prod-quickview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px);
+  color: #111827;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 5px 4px;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  pointer-events: none;
+}
+[data-theme="dark"] .pdp-similar-card .prod-quickview-overlay {
+  background: rgba(22, 27, 24, 0.88);
+  color: #f3f4f6;
+}
+.pdp-similar-card:hover .prod-quickview-overlay {
+  transform: translateY(0);
+  opacity: 1;
+}
+.pdp-similar-info {
+  padding: 8px 2px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+.pdp-similar-info .prod-brand {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #a3753b;
+  text-align: center;
+  margin-bottom: 2px;
+}
+[data-theme="dark"] .pdp-similar-info .prod-brand {
+  color: #e0b468;
+}
+.pdp-similar-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--ink, #1f2937);
+  margin-bottom: 3px;
+  line-height: 1.35;
+  text-align: center;
+  min-height: 2.3em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+[data-theme="dark"] .pdp-similar-name {
+  color: #f3f4f6;
+}
+.pdp-similar-info .prod-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 2px;
+}
 
 /* ── Override product-modal for PDP ── */
 .product-modal:has(.pdp-container) {
