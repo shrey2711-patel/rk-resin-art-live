@@ -221,8 +221,104 @@ const App = {
       };
     }
 
+    this.bindFooter();
+    this.bindMobileNav();
     this.setupPaymentSelector();
     this.initRouter();
+  },
+
+  // ── Footer Interactions ──────────────────────────────────
+  bindFooter() {
+    // 1. Footer Category / Collection Click Handlers
+    document.querySelectorAll('[data-footer-cat]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const cat = btn.dataset.footerCat;
+        if (cat) {
+          window.location.hash = `#collection/${encodeURIComponent(cat)}`;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      };
+    });
+
+    // 2. Footer Policy Buttons
+    document.querySelectorAll('.footer-link.policy-btn, .policy-link').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const policy = btn.dataset.policy || 'terms';
+        if (typeof openPolicyModal === 'function') {
+          openPolicyModal(policy);
+        }
+      };
+    });
+  },
+
+  // ── Mobile Navigation Drawer ─────────────────────────────
+  bindMobileNav() {
+    const mobileBtn = document.getElementById('mobileNavBtn');
+    const drawer = document.getElementById('mobileNavDrawer');
+    const closeBtn = document.getElementById('closeMobileNav');
+    const overlay = document.getElementById('drawerOverlay');
+
+    const openDrawer = () => {
+      if (drawer) drawer.classList.add('open');
+      if (overlay) overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      this.renderMobileNav();
+    };
+
+    const closeDrawer = () => {
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    };
+
+    if (mobileBtn) mobileBtn.onclick = openDrawer;
+    if (closeBtn) closeBtn.onclick = closeDrawer;
+  },
+
+  renderMobileNav() {
+    const container = document.getElementById('mobileNavItems');
+    if (!container) return;
+
+    const cats = this.state.categories || [];
+    let html = '<div style="padding: 10px 0;">';
+    
+    html += '<div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:var(--muted); padding:8px 16px; letter-spacing:0.5px;">Collections</div>';
+    
+    html += `
+      <button class="mobile-nav-link" type="button" onclick="window.location.hash=''; const cb = document.getElementById('closeMobileNav'); if (cb) cb.click();" style="display:flex; align-items:center; gap:10px; width:100%; padding:12px 16px; background:none; border:none; text-align:left; font-size:0.95rem; font-weight:700; color:var(--ink); cursor:pointer;">
+        <span>🏠</span> All Products
+      </button>
+    `;
+
+    cats.forEach(c => {
+      html += `
+        <button class="mobile-nav-link" type="button" onclick="window.location.hash='#collection/${encodeURIComponent(c.name)}'; const cb = document.getElementById('closeMobileNav'); if (cb) cb.click();" style="display:flex; align-items:center; gap:10px; width:100%; padding:12px 16px; background:none; border:none; text-align:left; font-size:0.95rem; font-weight:700; color:var(--ink); cursor:pointer;">
+          <span>${c.emoji || '✨'}</span> ${escapeHtml(c.name)}
+        </button>
+      `;
+    });
+
+    html += '<div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:var(--muted); padding:16px 16px 8px; letter-spacing:0.5px; border-top:1px solid var(--border); margin-top:10px;">Customer Service & Info</div>';
+
+    html += `
+      <button class="mobile-nav-link" type="button" onclick="if (typeof openPolicyModal === 'function') openPolicyModal('terms'); const cb = document.getElementById('closeMobileNav'); if (cb) cb.click();" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 16px; background:none; border:none; text-align:left; font-size:0.88rem; color:var(--muted); cursor:pointer;">
+        <span>📜</span> Terms & Conditions
+      </button>
+      <button class="mobile-nav-link" type="button" onclick="if (typeof openPolicyModal === 'function') openPolicyModal('shipping'); const cb = document.getElementById('closeMobileNav'); if (cb) cb.click();" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 16px; background:none; border:none; text-align:left; font-size:0.88rem; color:var(--muted); cursor:pointer;">
+        <span>🚚</span> Shipping & Delivery
+      </button>
+      <button class="mobile-nav-link" type="button" onclick="if (typeof openPolicyModal === 'function') openPolicyModal('refund'); const cb = document.getElementById('closeMobileNav'); if (cb) cb.click();" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 16px; background:none; border:none; text-align:left; font-size:0.88rem; color:var(--muted); cursor:pointer;">
+        <span>🔄</span> Return & Refund
+      </button>
+      <button class="mobile-nav-link" type="button" onclick="if (typeof openPolicyModal === 'function') openPolicyModal('operator'); const cb = document.getElementById('closeMobileNav'); if (cb) cb.click();" style="display:flex; align-items:center; gap:10px; width:100%; padding:10px 16px; background:none; border:none; text-align:left; font-size:0.88rem; color:var(--muted); cursor:pointer;">
+        <span>🏢</span> Business & Developer Info
+      </button>
+    `;
+
+    html += '</div>';
+    container.innerHTML = html;
   },
 
   // ── Hash Router ───────────────────────────────────────────

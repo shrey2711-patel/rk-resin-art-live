@@ -305,6 +305,43 @@
       "upiProofUrl": "https://i.ibb.co/uploads/proof.jpg",
       "status": "pending",
       "createdAt": "2026-09-05T12:38:00.414Z"
+    },
+    {
+      "id": 9,
+      "userId": 12,
+      "items": [
+        {
+          "id": 2,
+          "name": "Verified Epoxy Starter Kit",
+          "selectedVariant": "300ml",
+          "price": 450,
+          "qty": 2
+        }
+      ],
+      "customer": {
+        "name": "Shrey Verification User",
+        "email": "final_verified_1789219787405@example.com",
+        "phone": "9876543210",
+        "address": "Surendranagar Main Rd",
+        "city": "Surendranagar",
+        "pin": "363020"
+      },
+      "total": 900,
+      "discount": 0,
+      "couponCode": null,
+      "shipping": 60,
+      "otherCharges": 0,
+      "otherChargesType": "flat",
+      "otherChargesAmount": 0,
+      "grandTotal": 960,
+      "paymentMethod": "whatsapp",
+      "paymentStatus": "Pending (WhatsApp Inquiry)",
+      "upiTransactionId": null,
+      "upiProofUrl": null,
+      "status": "shipped",
+      "createdAt": "2026-09-12T13:29:47.845Z",
+      "courierName": "Delhivery Express",
+      "trackingId": "DEL9988776655IN"
     }
   ],
   "cart": [],
@@ -539,6 +576,30 @@
       "passwordHash": "$2a$10$EaheWZMKCLcvjgk6ZUiLIe99K4/tI2KeIG7dD2RtZbf29Xf509k5u",
       "passwordPlain": "Password123!",
       "createdAt": "2026-09-06T16:39:40.632Z"
+    },
+    {
+      "id": 12,
+      "name": "Shrey Verified Updated",
+      "email": "final_verified_1789219787405@example.com",
+      "phone": "9876543210",
+      "address": "Surendranagar Main Rd",
+      "city": "Surendranagar",
+      "pin": "363020",
+      "passwordHash": "$2a$10$ZDKznvye.JGxBaMSLVE8uuZ9bA8BUUAJD.xIjeEH5Qwwy19yy.OI.",
+      "passwordPlain": "SecurePassword123!",
+      "createdAt": "2026-09-12T13:29:47.577Z",
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginCountry": "IN",
+      "lastLoginRegion": "MH",
+      "lastLoginCity": "Mumbai",
+      "cart": [
+        {
+          "id": 101,
+          "name": "Crystal UV Resin",
+          "price": 299,
+          "qty": 2
+        }
+      ]
     }
   ],
   "reviews": [
@@ -559,6 +620,15 @@
       "rating": 5,
       "comment": "Exceptional resin clarity and bubble release! 5/5 stars.",
       "createdAt": "2026-09-05T12:37:16.376Z"
+    },
+    {
+      "id": 3,
+      "productId": 2,
+      "userId": 12,
+      "userName": "Shrey Verified Updated",
+      "rating": 5,
+      "comment": "Exceptional resin clarity and bubble release! 5/5 stars.",
+      "createdAt": "2026-09-12T13:29:48.051Z"
     }
   ],
   "wishlistSubscriptions": [],
@@ -876,6 +946,18 @@
       "ip": "::1",
       "location": "Ahmedabad, GJ, IN",
       "status": "Success"
+    },
+    {
+      "timestamp": "2026-09-12T13:29:47.770Z",
+      "email": "final_verified_1789219787405@example.com",
+      "role": "User",
+      "ip": "127.0.0.1",
+      "location": {
+        "country": "IN",
+        "region": "MH",
+        "city": "Mumbai",
+        "isp": "Tata Communications"
+      }
     }
   ]
 }
