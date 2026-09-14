@@ -206,16 +206,16 @@ const Admin = {
     const text = btn.querySelector('.toggle-text');
     
     if (val === '1' || val === 1) {
-      btn.style.background = '#25D366'; // Green for active In Stock
-      btn.style.color = '#ffffff';
-      btn.style.borderColor = '#25D366';
-      if (dot) dot.style.background = '#ffffff';
+      btn.style.background = 'rgba(16, 185, 129, 0.12)';
+      btn.style.color = '#047857';
+      btn.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+      if (dot) dot.style.background = '#10b981';
       if (text) text.textContent = 'In Stock';
     } else {
-      btn.style.background = '#e5e7eb'; // Grey for Out of Stock
-      btn.style.color = '#555555';
-      btn.style.borderColor = '#e5e7eb';
-      if (dot) dot.style.background = '#888888';
+      btn.style.background = 'rgba(239, 68, 68, 0.1)';
+      btn.style.color = '#b91c1c';
+      btn.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+      if (dot) dot.style.background = '#ef4444';
       if (text) text.textContent = 'Out of Stock';
     }
   },

@@ -1142,6 +1142,9 @@
           <div class="tab-pane" id="atab-billing-settings">
             <div class="admin-section-head">Billing &amp; Charges Settings</div>
             <div class="admin-form-card">
+              <div class="afc-title">
+                <span>💰 Shipping &amp; Extra Charges</span>
+              </div>
               <div class="form-row-2">
                 <div class="form-field">
                   <label>Flat Shipping Rate (₹)</label>
@@ -1159,33 +1162,35 @@
                 </div>
                 <div class="form-field">
                   <label>Other Charges Type</label>
-                  <select class="admin-input" id="afOtherChargesType" style="height: 40px; padding: 5px; background: var(--white); color: var(--ink); border: 1px solid var(--border); box-sizing: border-box;">
+                  <select class="admin-input" id="afOtherChargesType">
                     <option value="flat">Flat (₹)</option>
                     <option value="percentage">Percentage (%)</option>
                   </select>
                 </div>
               </div>
-              <button class="admin-save-btn" id="saveBillingSettingsBtn">Save Billing Settings</button>
+              <div class="admin-form-actions">
+                <button class="admin-save-btn" id="saveBillingSettingsBtn">Save Billing Settings</button>
+              </div>
               <div class="admin-ok" id="billingSettingsOk">✅ Billing settings saved!</div>
             </div>
           </div>
-
-
 
           <!-- NAV -->
           <div class="tab-pane" id="atab-nav">
             <div class="admin-section-head">Navigation Links</div>
             <div id="adminNavList" class="admin-list"></div>
             <div class="admin-form-card">
-              <div class="afc-title">Add Nav Link</div>
+              <div class="afc-title">
+                <span>🔗 Add / Edit Nav Link</span>
+              </div>
               <div class="form-row-3">
-                <div class="form-field"><label>Label *</label><input class="admin-input" id="nfLabel" placeholder="e.g. Resin"></div>
+                <div class="form-field"><label>Label <span class="req">*</span></label><input class="admin-input" id="nfLabel" placeholder="e.g. Resin"></div>
                 <div class="form-field"><label>Row</label><select class="admin-input" id="nfRow"><option value="1">Row 1</option><option value="2">Row 2</option><option value="3">Row 3</option></select></div>
                 <div class="form-field"><label>Style</label><select class="admin-input" id="nfFeat"><option value="false">Normal</option><option value="true">Featured (Red)</option></select></div>
               </div>
               <div class="admin-form-actions">
-                <button class="admin-save-btn" id="addNavBtn">+ Add Link</button>
                 <button class="admin-cancel-btn" id="cancelNavBtn" style="display:none">Cancel Edit</button>
+                <button class="admin-save-btn" id="addNavBtn">+ Add Link</button>
               </div>
               <div class="admin-ok" id="navOk">✅ Link saved!</div>
             </div>
@@ -1196,30 +1201,32 @@
             <div class="admin-section-head">Product Categories</div>
             <div id="adminCatList" class="admin-list"></div>
             <div class="admin-form-card">
-              <div class="afc-title">Add Category</div>
+              <div class="afc-title">
+                <span>🏷️ Add / Edit Category</span>
+              </div>
               <div class="form-row-3">
-                <div class="form-field"><label>Name *</label><input class="admin-input" id="cfName" placeholder="e.g. Pigments"></div>
+                <div class="form-field"><label>Name <span class="req">*</span></label><input class="admin-input" id="cfName" placeholder="e.g. Pigments"></div>
                 <div class="form-field"><label>Emoji</label><input class="admin-input" id="cfEmoji" placeholder="✨"></div>
                 <div class="form-field"><label>BG Color</label><input class="admin-input" type="color" id="cfColor" value="#EDE8FF"></div>
               </div>
-              <div class="form-field" style="margin-top:10px">
+              <div class="form-field" style="margin-top:6px">
                 <label>Category Poster Image (Optional)</label>
                 <input type="hidden" id="cfImageUrl">
                 <input class="product-file-input" type="file" id="cfImageFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream">
-                <label class="product-upload-box" id="categoryUploadBox" for="cfImageFile">
+                <label class="product-upload-box" id="categoryUploadBox" for="cfImageFile" style="min-height:90px; padding:10px;">
                   <span class="upload-icon">+</span>
-                  <span class="upload-title">Drop category poster here or choose file</span>
-                  <span class="upload-sub">JPG, PNG, WEBP or HEIC up to 15MB. Image is uploaded automatically.</span>
+                  <span class="upload-title" style="font-size:0.82rem;">Drop category poster here or choose file</span>
+                  <span class="upload-sub" style="font-size:0.7rem;">JPG, PNG, WEBP or HEIC up to 15MB</span>
                 </label>
-                <div class="product-image-preview" id="categoryImagePreview" style="display:none">
-                  <img id="cfImagePreviewImg" alt="Category preview">
+                <div class="product-image-preview" id="categoryImagePreview" style="display:none; margin-top:6px;">
+                  <img id="cfImagePreviewImg" alt="Category preview" style="max-height:100px; object-fit:cover; border-radius:6px;">
                   <button type="button" class="image-remove-btn" id="removeCategoryImageBtn">Remove Image</button>
                 </div>
                 <div class="upload-status" id="categoryUploadStatus"></div>
               </div>
               <div class="admin-form-actions">
-                <button class="admin-save-btn" id="addCatBtn">+ Add Category</button>
                 <button class="admin-cancel-btn" id="cancelCatBtn" style="display:none">Cancel Edit</button>
+                <button class="admin-save-btn" id="addCatBtn">+ Add Category</button>
               </div>
               <div class="admin-ok" id="catOk">✅ Category saved!</div>
             </div>
@@ -1233,35 +1240,82 @@
             </div>
             <div id="adminProdList" class="admin-list"></div>
             <div class="admin-form-card">
-              <div class="afc-title">Add Product</div>
-              <div class="form-row-3">
-                <div class="form-field"><label>Product Name *</label><input class="admin-input" id="pfName" placeholder="e.g. Rose Gold Mica 10g"></div>
-                <div class="form-field"><label>Category *</label><select class="admin-input" id="pfCat"></select></div>
+              <div class="afc-title">
+                <span>📦 Add / Edit Product</span>
+                <span style="font-size:0.75rem;font-weight:600;color:var(--muted)">Fields marked <span class="req">*</span> are required</span>
               </div>
-              <div class="form-row-3" id="pfBasePriceStockContainer">
-                <div class="form-field"><label>Price (₹) *</label><input class="admin-input" type="number" id="pfPrice" placeholder="199"></div>
-                <div class="form-field"><label>Original Price (₹)</label><input class="admin-input" type="number" id="pfOrig" placeholder="Optional MRP"></div>
-                <div class="form-field"><label>Offered Price (₹)</label><input class="admin-input" type="number" id="pfOfferPrice" placeholder="Optional Offer"></div>
+
+              <!-- Row 1: Product Name & Category -->
+              <div class="form-row-2-1">
+                <div class="form-field">
+                  <label>Product Name <span class="req">*</span></label>
+                  <input class="admin-input" id="pfName" placeholder="e.g. Rose Gold Mica Powder 10g">
+                </div>
+                <div class="form-field">
+                  <label>Category <span class="req">*</span></label>
+                  <select class="admin-input" id="pfCat"></select>
+                </div>
+              </div>
+
+              <!-- Row 2: Pricing & Stock (4-col grid) -->
+              <div class="form-row-4" id="pfBasePriceStockContainer">
+                <div class="form-field">
+                  <label>Price (₹) <span class="req">*</span></label>
+                  <input class="admin-input" type="number" id="pfPrice" placeholder="199">
+                </div>
+                <div class="form-field">
+                  <label>Original MRP (₹)</label>
+                  <input class="admin-input" type="number" id="pfOrig" placeholder="Optional MRP">
+                </div>
+                <div class="form-field">
+                  <label>Offer Price (₹)</label>
+                  <input class="admin-input" type="number" id="pfOfferPrice" placeholder="Optional Offer">
+                </div>
                 <div class="form-field">
                   <label id="pfStockLabel">Stock</label>
                   <input class="admin-input" type="number" id="pfStock" placeholder="50">
-                  <div id="pfStockStatusToggleContainer" style="display:none; margin-top: 4px;">
-                    <button type="button" id="pfStockStatusBtn" style="min-height: 40px; width: 100%; border: 1.5px solid var(--border); border-radius: 8px; font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 0.88rem; outline: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                      <span class="toggle-dot" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block;"></span>
+                  <div id="pfStockStatusToggleContainer" style="display:none;">
+                    <button type="button" id="pfStockStatusBtn">
+                      <span class="toggle-dot" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:#10b981;"></span>
                       <span class="toggle-text">In Stock</span>
                     </button>
                     <input type="hidden" id="pfStockStatus" value="1">
                   </div>
                 </div>
               </div>
-              <div class="form-row-3">
-                <div class="form-field"><label>Badge</label><select class="admin-input" id="pfBadge"><option value="">None</option><option>New</option><option>Sale</option><option>Hot</option></select></div>
-                <div class="form-field"><label>Emoji</label><input class="admin-input" id="pfEmoji" placeholder="✨"></div>
-                <div class="form-field"><label>Image Ratio</label><select class="admin-input" id="pfImgRatio"><option value="4:3">4:3 (Standard)</option><option value="16:9">16:9 (Wide)</option></select></div>
+
+              <!-- Row 3: Badge, Emoji, Image Ratio, Unit/Size -->
+              <div class="form-row-4">
+                <div class="form-field">
+                  <label>Badge</label>
+                  <select class="admin-input" id="pfBadge">
+                    <option value="">None</option>
+                    <option>New</option>
+                    <option>Sale</option>
+                    <option>Hot</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Emoji</label>
+                  <input class="admin-input" id="pfEmoji" placeholder="✨">
+                </div>
+                <div class="form-field">
+                  <label>Aspect Ratio</label>
+                  <select class="admin-input" id="pfImgRatio">
+                    <option value="4:3">4:3 (Standard)</option>
+                    <option value="16:9">16:9 (Wide)</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Unit / Factor</label>
+                  <input class="admin-input" id="pfUnit" placeholder="e.g. 20g, 1L, Gold">
+                </div>
               </div>
-              <div class="form-field" id="pfBaseImageContainer">
-                <label style="display:flex;align-items:center;justify-content:space-between">
-                  <span>Product Photos <span style="font-weight:400;color:var(--muted);font-size:0.8rem">(Up to 3 Angle Photos)</span></span>
+
+              <!-- Row 4: Photos -->
+              <div class="form-field" id="pfBaseImageContainer" style="margin-top:2px;">
+                <label>
+                  <span>Product Photos <span style="font-weight:400;color:var(--muted);font-size:0.75rem">(3 Angles)</span></span>
                 </label>
 
                 <!-- Hidden inputs for 3 image URLs -->
@@ -1270,45 +1324,45 @@
                 <input type="hidden" id="pfImageUrl3">
 
                 <!-- 3 Photo Upload Grid -->
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-top:6px;">
+                <div class="pf-img-slot-row">
                   <!-- Slot 1 (Main) -->
-                  <div class="pf-img-slot" data-slot="1" style="border:2px dashed var(--border); border-radius:10px; padding:10px; text-align:center; background:var(--bg); position:relative;">
-                    <div style="font-size:0.72rem; font-weight:700; color:var(--p); margin-bottom:4px;">Main Photo</div>
-                    <div class="slot-preview-box" id="pfSlotPreview1" style="display:none; margin-bottom:6px;">
-                      <img id="pfSlotImg1" style="width:100%; height:90px; object-fit:cover; border-radius:6px;">
-                      <button type="button" class="slot-remove-btn" id="pfSlotRemove1" style="background:var(--red); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; margin-top:4px; cursor:pointer;">Remove</button>
+                  <div class="pf-img-slot" data-slot="1">
+                    <div class="slot-title" style="color:var(--p);">Main Photo</div>
+                    <div class="slot-preview-box" id="pfSlotPreview1" style="display:none;">
+                      <img id="pfSlotImg1">
+                      <button type="button" class="slot-remove-btn" id="pfSlotRemove1">✕</button>
                     </div>
-                    <label class="slot-upload-label" id="pfSlotBox1" for="pfFile1" style="cursor:pointer; display:block;">
-                      <span style="font-size:1.4rem;">📷</span>
-                      <div style="font-size:0.75rem; font-weight:600; color:var(--muted); margin-top:2px;">Upload Photo 1</div>
+                    <label class="slot-upload-label" id="pfSlotBox1" for="pfFile1">
+                      <span style="font-size:1.1rem;">📷</span>
+                      <div style="font-size:0.72rem;font-weight:600;color:var(--muted);margin-top:2px;">Upload Main</div>
                     </label>
                     <input type="file" id="pfFile1" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display:none">
                   </div>
 
                   <!-- Slot 2 (Angle 2) -->
-                  <div class="pf-img-slot" data-slot="2" style="border:2px dashed var(--border); border-radius:10px; padding:10px; text-align:center; background:var(--bg); position:relative;">
-                    <div style="font-size:0.72rem; font-weight:700; color:var(--muted); margin-bottom:4px;">Angle 2</div>
-                    <div class="slot-preview-box" id="pfSlotPreview2" style="display:none; margin-bottom:6px;">
-                      <img id="pfSlotImg2" style="width:100%; height:90px; object-fit:cover; border-radius:6px;">
-                      <button type="button" class="slot-remove-btn" id="pfSlotRemove2" style="background:var(--red); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; margin-top:4px; cursor:pointer;">Remove</button>
+                  <div class="pf-img-slot" data-slot="2">
+                    <div class="slot-title">Angle 2</div>
+                    <div class="slot-preview-box" id="pfSlotPreview2" style="display:none;">
+                      <img id="pfSlotImg2">
+                      <button type="button" class="slot-remove-btn" id="pfSlotRemove2">✕</button>
                     </div>
-                    <label class="slot-upload-label" id="pfSlotBox2" for="pfFile2" style="cursor:pointer; display:block;">
-                      <span style="font-size:1.4rem;">📷</span>
-                      <div style="font-size:0.75rem; font-weight:600; color:var(--muted); margin-top:2px;">Upload Photo 2</div>
+                    <label class="slot-upload-label" id="pfSlotBox2" for="pfFile2">
+                      <span style="font-size:1.1rem;">📷</span>
+                      <div style="font-size:0.72rem;font-weight:600;color:var(--muted);margin-top:2px;">Upload Angle 2</div>
                     </label>
                     <input type="file" id="pfFile2" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display:none">
                   </div>
 
                   <!-- Slot 3 (Angle 3) -->
-                  <div class="pf-img-slot" data-slot="3" style="border:2px dashed var(--border); border-radius:10px; padding:10px; text-align:center; background:var(--bg); position:relative;">
-                    <div style="font-size:0.72rem; font-weight:700; color:var(--muted); margin-bottom:4px;">Angle 3</div>
-                    <div class="slot-preview-box" id="pfSlotPreview3" style="display:none; margin-bottom:6px;">
-                      <img id="pfSlotImg3" style="width:100%; height:90px; object-fit:cover; border-radius:6px;">
-                      <button type="button" class="slot-remove-btn" id="pfSlotRemove3" style="background:var(--red); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:0.7rem; margin-top:4px; cursor:pointer;">Remove</button>
+                  <div class="pf-img-slot" data-slot="3">
+                    <div class="slot-title">Angle 3</div>
+                    <div class="slot-preview-box" id="pfSlotPreview3" style="display:none;">
+                      <img id="pfSlotImg3">
+                      <button type="button" class="slot-remove-btn" id="pfSlotRemove3">✕</button>
                     </div>
-                    <label class="slot-upload-label" id="pfSlotBox3" for="pfFile3" style="cursor:pointer; display:block;">
-                      <span style="font-size:1.4rem;">📷</span>
-                      <div style="font-size:0.75rem; font-weight:600; color:var(--muted); margin-top:2px;">Upload Photo 3</div>
+                    <label class="slot-upload-label" id="pfSlotBox3" for="pfFile3">
+                      <span style="font-size:1.1rem;">📷</span>
+                      <div style="font-size:0.72rem;font-weight:600;color:var(--muted);margin-top:2px;">Upload Angle 3</div>
                     </label>
                     <input type="file" id="pfFile3" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/octet-stream" style="display:none">
                   </div>
@@ -1316,34 +1370,39 @@
 
                 <div class="upload-status" id="productUploadStatus"></div>
               </div>
-              <div class="form-field"><label>Description</label><textarea class="admin-input" id="pfDesc" rows="2" placeholder="Product description..."></textarea></div>
-              <div class="form-field"><label>Unit/Size Factor (e.g. 20g, 1 Litre, Gold Color, Pack of 5)</label><input class="admin-input" id="pfUnit" placeholder="e.g. 20g, 1 Litre, Gold, Pack of 5"></div>
 
-              <div class="form-field" style="margin: 15px 0 10px 0;">
-                <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; cursor: pointer; color: var(--ink);">
-                  <input type="checkbox" id="pfMultiVariant" style="width: 16px; height: 16px; accent-color: var(--p);">
-                  Multi Variant Product
+              <!-- Row 5: Description -->
+              <div class="form-field" style="margin-top:2px;">
+                <label>Description</label>
+                <textarea class="admin-input" id="pfDesc" rows="2" placeholder="Product description or key highlights..."></textarea>
+              </div>
+
+              <!-- Row 6: Multi Variant Toggle -->
+              <div class="form-field" style="margin: 6px 0 4px 0;">
+                <label style="display:inline-flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;color:var(--ink);text-transform:none;letter-spacing:normal;">
+                  <input type="checkbox" id="pfMultiVariant" style="width:16px;height:16px;accent-color:var(--p);cursor:pointer;">
+                  <span>Multi Variant Product (Sizes, Colors, etc.)</span>
                 </label>
               </div>
 
               <!-- VARIANTS SECTION -->
               <div class="admin-variants-section" id="adminVariantsSection" style="display:none;">
                 <!-- Common Image Checkbox -->
-                <div class="form-field" style="margin: 0 0 14px 0; padding: 10px 14px; background: rgba(124, 58, 237, 0.06); border: 1.5px dashed var(--p); border-radius: 8px;">
-                  <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 800; cursor: pointer; color: var(--ink); font-size: 0.9rem;">
-                    <input type="checkbox" id="pfCommonImages" style="width: 17px; height: 17px; accent-color: var(--p);">
+                <div class="form-field" style="margin: 0 0 10px 0; padding: 8px 12px; background: rgba(124, 58, 237, 0.05); border: 1px dashed var(--p); border-radius: 8px;">
+                  <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 800; cursor: pointer; color: var(--ink); font-size: 0.84rem; text-transform:none; letter-spacing:normal;">
+                    <input type="checkbox" id="pfCommonImages" style="width: 16px; height: 16px; accent-color: var(--p);">
                     🖼️ Common Image for All Variants
                   </label>
-                  <div style="font-size: 0.78rem; color: var(--muted); margin-top: 4px; margin-left: 25px; line-height: 1.4;">
-                    <strong style="color:var(--p);">Checked:</strong> 1 common photo is used above — sizes/prices will share this same image.<br>
+                  <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px; margin-left: 24px; line-height: 1.35;">
+                    <strong style="color:var(--p);">Checked:</strong> 1 common photo is used above — sizes/prices share this photo.<br>
                     <strong>Unchecked:</strong> Upload separate individual photos for each variant option below.
                   </div>
                 </div>
 
                 <div class="admin-variants-header">
-                  <label class="admin-variants-label">Product Variants <span style="font-weight:400;color:var(--muted);font-size:0.78rem">(optional — e.g. Size: 6, 8 inch / Grams: 100g, 250g)</span></label>
-                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px">
-                    <select class="admin-input" id="pfVariantLabel" style="max-width:160px">
+                  <label class="admin-variants-label" style="font-size:0.75rem;">Product Variants <span style="font-weight:400;color:var(--muted);font-size:0.72rem">(e.g. Size: 6, 8 inch / Grams: 100g, 250g)</span></label>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
+                    <select class="admin-input" id="pfVariantLabel" style="max-width:150px">
                       <option value="">No Variants</option>
                       <option value="Size">Size</option>
                       <option value="Weight">Weight</option>
@@ -1357,13 +1416,13 @@
                     <input class="admin-input" id="pfVariantLabelCustom" placeholder="Type label…" style="max-width:130px;display:none">
                   </div>
                 </div>
-                <div id="pfVariantRows" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
-                <button type="button" class="admin-add-variant-btn" id="addVariantRowBtn" style="display:none">+ Add Option</button>
+                <div id="pfVariantRows" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>
+                <button type="button" class="admin-add-variant-btn" id="addVariantRowBtn" style="display:none;margin-top:6px;">+ Add Option</button>
               </div>
 
               <div class="admin-form-actions">
-                <button class="admin-save-btn" id="addProdBtn">+ Add Product</button>
                 <button class="admin-cancel-btn" id="cancelProdBtn" style="display:none">Cancel Edit</button>
+                <button class="admin-save-btn" id="addProdBtn">+ Add Product</button>
               </div>
               <div class="admin-ok" id="prodOk">✅ Product saved!</div>
             </div>
