@@ -39,16 +39,19 @@ const Admin = {
   updateStockFieldsVisibility() {
     const isTracking = this.data.settings && this.data.settings.trackStock !== false;
     const pfStock = document.getElementById('pfStock');
+    const pfStockSegmented = document.getElementById('pfStockSegmented');
     const pfStockToggleContainer = document.getElementById('pfStockStatusToggleContainer');
     const pfStockLabel = document.getElementById('pfStockLabel');
     
     if (isTracking) {
       if (pfStock) pfStock.style.display = '';
+      if (pfStockSegmented) pfStockSegmented.style.display = 'none';
       if (pfStockToggleContainer) pfStockToggleContainer.style.display = 'none';
-      if (pfStockLabel) pfStockLabel.textContent = 'Stock';
+      if (pfStockLabel) pfStockLabel.textContent = 'Stock Quantity';
     } else {
       if (pfStock) pfStock.style.display = 'none';
-      if (pfStockToggleContainer) pfStockToggleContainer.style.display = '';
+      if (pfStockSegmented) pfStockSegmented.style.display = 'flex';
+      if (pfStockToggleContainer) pfStockToggleContainer.style.display = 'none';
       if (pfStockLabel) pfStockLabel.textContent = 'Stock Status';
     }
   },
@@ -197,27 +200,273 @@ const Admin = {
   },
 
   setStockStatusButtonState(val) {
-    const btn = document.getElementById('pfStockStatusBtn');
     const input = document.getElementById('pfStockStatus');
-    if (!btn || !input) return;
+    if (input) input.value = val;
     
-    input.value = val;
-    const dot = btn.querySelector('.toggle-dot');
-    const text = btn.querySelector('.toggle-text');
-    
-    if (val === '1' || val === 1) {
-      btn.style.background = 'rgba(16, 185, 129, 0.12)';
-      btn.style.color = '#047857';
-      btn.style.borderColor = 'rgba(16, 185, 129, 0.35)';
-      if (dot) dot.style.background = '#10b981';
-      if (text) text.textContent = 'In Stock';
-    } else {
-      btn.style.background = 'rgba(239, 68, 68, 0.1)';
-      btn.style.color = '#b91c1c';
-      btn.style.borderColor = 'rgba(239, 68, 68, 0.35)';
-      if (dot) dot.style.background = '#ef4444';
-      if (text) text.textContent = 'Out of Stock';
+    // Legacy button styling
+    const btn = document.getElementById('pfStockStatusBtn');
+    if (btn) {
+      const dot = btn.querySelector('.toggle-dot');
+      const text = btn.querySelector('.toggle-text');
+      if (val === '1' || val === 1 || val === true) {
+        btn.style.background = '#25D366';
+        btn.style.color = '#ffffff';
+        btn.style.borderColor = '#25D366';
+        if (dot) dot.style.background = '#ffffff';
+        if (text) text.textContent = 'In Stock';
+      } else {
+        btn.style.background = '#e5e7eb';
+        btn.style.color = '#555555';
+        btn.style.borderColor = '#e5e7eb';
+        if (dot) dot.style.background = '#888888';
+        if (text) text.textContent = 'Out of Stock';
+      }
     }
+
+    // New segmented control styling
+    const inStockBtn = document.getElementById('segBtnInStock');
+    const outStockBtn = document.getElementById('segBtnOutStock');
+    if (inStockBtn && outStockBtn) {
+      if (val === '1' || val === 1 || val === true) {
+        inStockBtn.classList.add('active');
+        outStockBtn.classList.remove('active');
+      } else {
+        outStockBtn.classList.add('active');
+        inStockBtn.classList.remove('active');
+      }
+    }
+  },
+
+  setBadgeChips(badgeVal = '') {
+    const sel = document.getElementById('pfBadge');
+    if (sel) sel.value = badgeVal || '';
+    const container = document.getElementById('pfBadgeChips');
+    if (container) {
+      container.querySelectorAll('.badge-chip').forEach(chip => {
+        if ((chip.dataset.badge || '') === (badgeVal || '')) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+  },
+
+  setProductEmoji(emojiVal = '✨') {
+    const val = (emojiVal || '✨').trim() || '✨';
+    const hidden = document.getElementById('pfEmoji');
+    const display = document.getElementById('pfEmojiDisplay');
+    const customInp = document.getElementById('pfEmojiCustomInput');
+    if (hidden) hidden.value = val;
+    if (display) display.textContent = val;
+    if (customInp) customInp.value = val;
+  },
+
+  updateCategoryComboboxUI(val, emoji = '✨', label = '') {
+    const display = document.getElementById('pfCatDisplay');
+    const sel = document.getElementById('pfCat');
+    if (sel && val !== undefined) sel.value = val;
+    if (display) {
+      display.innerHTML = `
+        <span class="cat-pill-icon">${emoji || '✨'}</span>
+        <span class="cat-pill-text">${escapeHtml(label || val || 'Select Category')}</span>
+      `;
+    }
+    const list = document.getElementById('pfCatOptionsList');
+    if (list) {
+      list.querySelectorAll('.combobox-opt').forEach(opt => {
+        if (opt.dataset.val === val) {
+          opt.classList.add('active');
+        } else {
+          opt.classList.remove('active');
+        }
+      });
+    }
+  },
+
+  renderCategoryComboboxOptions(filterText = '') {
+    const list = document.getElementById('pfCatOptionsList');
+    if (!list) return;
+    const cats = this.data.categories || [];
+    const q = (filterText || '').toLowerCase().trim();
+    const sel = document.getElementById('pfCat');
+    const currentVal = sel ? sel.value : '';
+
+    const filtered = cats.filter(c => !q || (c.name || '').toLowerCase().includes(q) || (c.emoji || '').includes(q));
+
+    if (!filtered.length) {
+      list.innerHTML = `<div style="padding:8px 10px;font-size:0.78rem;color:var(--muted);text-align:center;">No matching categories</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(c => `
+      <div class="combobox-opt ${c.name === currentVal ? 'active' : ''}" data-val="${escapeHtml(c.name)}" data-emoji="${c.emoji || '✨'}">
+        <span class="cat-pill-icon">${c.emoji || '✨'}</span>
+        <span>${escapeHtml(c.name)}</span>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.combobox-opt').forEach(opt => {
+      opt.onclick = () => {
+        const val = opt.dataset.val;
+        const emoji = opt.dataset.emoji;
+        this.updateCategoryComboboxUI(val, emoji, val);
+        const dropdown = document.getElementById('pfCatDropdown');
+        const trigger = document.getElementById('pfCatTrigger');
+        if (dropdown) dropdown.style.display = 'none';
+        if (trigger) trigger.classList.remove('active');
+      };
+    });
+  },
+
+  initProductFormControls() {
+    if (this._productFormControlsInitialized) return;
+    this._productFormControlsInitialized = true;
+
+    // 1. Category Combobox
+    const pfCatTrigger = document.getElementById('pfCatTrigger');
+    const pfCatDropdown = document.getElementById('pfCatDropdown');
+    const pfCatSearch = document.getElementById('pfCatSearch');
+
+    if (pfCatTrigger && pfCatDropdown) {
+      pfCatTrigger.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = pfCatDropdown.style.display !== 'none';
+        if (isOpen) {
+          pfCatDropdown.style.display = 'none';
+          pfCatTrigger.classList.remove('active');
+        } else {
+          const emojiPop = document.getElementById('pfEmojiPopover');
+          if (emojiPop) emojiPop.style.display = 'none';
+
+          pfCatDropdown.style.display = 'block';
+          pfCatTrigger.classList.add('active');
+          this.renderCategoryComboboxOptions(pfCatSearch ? pfCatSearch.value : '');
+          if (pfCatSearch) {
+            setTimeout(() => pfCatSearch.focus(), 50);
+          }
+        }
+      };
+    }
+
+    if (pfCatSearch) {
+      pfCatSearch.oninput = (e) => {
+        this.renderCategoryComboboxOptions(e.target.value);
+      };
+      pfCatSearch.onclick = (e) => e.stopPropagation();
+    }
+
+    // 2. Segmented Stock Status Controls
+    const segBtnInStock = document.getElementById('segBtnInStock');
+    const segBtnOutStock = document.getElementById('segBtnOutStock');
+    if (segBtnInStock) {
+      segBtnInStock.onclick = () => {
+        this.setStockStatusButtonState('1');
+      };
+    }
+    if (segBtnOutStock) {
+      segBtnOutStock.onclick = () => {
+        this.setStockStatusButtonState('0');
+      };
+    }
+
+    // 3. Badge Chips
+    const badgeChips = document.getElementById('pfBadgeChips');
+    if (badgeChips) {
+      badgeChips.querySelectorAll('.badge-chip').forEach(chip => {
+        chip.onclick = () => {
+          const badgeVal = chip.dataset.badge || '';
+          this.setBadgeChips(badgeVal);
+        };
+      });
+    }
+
+    // 4. Emoji Picker Popover
+    const emojiPickerBtn = document.getElementById('pfEmojiPickerBtn');
+    const emojiPopover = document.getElementById('pfEmojiPopover');
+    const emojiCloseBtn = document.getElementById('pfEmojiCloseBtn');
+    const emojiCustomInput = document.getElementById('pfEmojiCustomInput');
+    const emojiApplyBtn = document.getElementById('pfEmojiApplyBtn');
+
+    if (emojiPickerBtn && emojiPopover) {
+      emojiPickerBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isOpen = emojiPopover.style.display !== 'none';
+        if (isOpen) {
+          emojiPopover.style.display = 'none';
+        } else {
+          if (pfCatDropdown) {
+            pfCatDropdown.style.display = 'none';
+            if (pfCatTrigger) pfCatTrigger.classList.remove('active');
+          }
+          emojiPopover.style.display = 'block';
+        }
+      };
+    }
+
+    if (emojiCloseBtn && emojiPopover) {
+      emojiCloseBtn.onclick = (e) => {
+        e.stopPropagation();
+        emojiPopover.style.display = 'none';
+      };
+    }
+
+    if (emojiPopover) {
+      emojiPopover.onclick = (e) => e.stopPropagation();
+
+      emojiPopover.querySelectorAll('.emoji-opt').forEach(opt => {
+        opt.onclick = () => {
+          const emoji = opt.textContent.trim();
+          this.setProductEmoji(emoji);
+          emojiPopover.style.display = 'none';
+        };
+      });
+    }
+
+    if (emojiApplyBtn && emojiCustomInput) {
+      emojiApplyBtn.onclick = () => {
+        const val = emojiCustomInput.value.trim();
+        if (val) {
+          this.setProductEmoji(val);
+          if (emojiPopover) emojiPopover.style.display = 'none';
+        }
+      };
+    }
+
+    if (emojiCustomInput) {
+      emojiCustomInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (emojiApplyBtn) emojiApplyBtn.click();
+        }
+      };
+    }
+
+    // 5. Reset / Clear Form Top Button
+    const resetTopBtn = document.getElementById('resetProdFormTopBtn');
+    if (resetTopBtn) {
+      resetTopBtn.onclick = () => {
+        this.resetProductForm();
+        showToast('Product form cleared', 'info');
+      };
+    }
+
+    // 6. Global click outside listener for dropdowns
+    document.addEventListener('click', (e) => {
+      const combobox = document.getElementById('pfCatCombobox');
+      if (combobox && !combobox.contains(e.target)) {
+        const dd = document.getElementById('pfCatDropdown');
+        const trg = document.getElementById('pfCatTrigger');
+        if (dd) dd.style.display = 'none';
+        if (trg) trg.classList.remove('active');
+      }
+
+      const emojiContainer = document.getElementById('pfEmojiPickerContainer');
+      if (emojiContainer && !emojiContainer.contains(e.target)) {
+        const ep = document.getElementById('pfEmojiPopover');
+        if (ep) ep.style.display = 'none';
+      }
+    });
   },
 
   setBannerUploadStatus(message, type = '', target = 'desktop') {
@@ -741,17 +990,24 @@ const Admin = {
 
 
   resetProductForm() {
-    ['pfName', 'pfPrice', 'pfOrig', 'pfOfferPrice', 'pfStock', 'pfEmoji', 'pfBadge', 'pfDesc', 'pfImageUrl', 'pfImageUrl2', 'pfImageUrl3', 'pfUnit'].forEach(id => {
+    ['pfName', 'pfPrice', 'pfOrig', 'pfOfferPrice', 'pfStock', 'pfDesc', 'pfImageUrl', 'pfImageUrl2', 'pfImageUrl3', 'pfUnit'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
     [1, 2, 3].forEach(idx => this.updateProductSlotPreview(idx, ''));
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = '4:3';
-    document.getElementById('pfCat').value = this.data.categories[0]?.name || '';
+    
+    // Reset custom controls
+    this.setBadgeChips('');
+    this.setProductEmoji('✨');
+    this.populateProdCatSelect();
+    
     this.setUploadStatus('');
     const btn = document.getElementById('addProdBtn');
     const cancel = document.getElementById('cancelProdBtn');
+    const titleEl = document.getElementById('prodFormTitle');
+    if (titleEl) titleEl.textContent = 'Add Product';
     if (btn) btn.textContent = '+ Add Product';
     if (cancel) cancel.style.display = 'none';
     this.editState = { section: null, id: null };
@@ -787,7 +1043,7 @@ const Admin = {
   setProductEdit(product) {
     document.getElementById('pfName').value = product.name || '';
     
-    // Ensure category dropdown is populated and selected
+    // Ensure category dropdown & combobox is populated and selected
     this.populateProdCatSelect();
     const pfCat = document.getElementById('pfCat');
     if (pfCat) {
@@ -799,6 +1055,8 @@ const Admin = {
         );
         if (match) {
           pfCat.value = match.value;
+          const foundCat = this.data.categories?.find(c => c.name === match.value);
+          this.updateCategoryComboboxUI(match.value, foundCat?.emoji || '✨', match.value);
         } else {
           const opt = document.createElement('option');
           opt.value = targetCat;
@@ -806,21 +1064,27 @@ const Admin = {
           opt.selected = true;
           pfCat.appendChild(opt);
           pfCat.value = targetCat;
+          this.updateCategoryComboboxUI(targetCat, '✨', targetCat);
         }
       } else if (this.data.categories && this.data.categories.length > 0) {
         pfCat.value = this.data.categories[0].name;
+        this.updateCategoryComboboxUI(this.data.categories[0].name, this.data.categories[0].emoji || '✨', this.data.categories[0].name);
       }
     }
     const ratioEl = document.getElementById('pfImgRatio');
     if (ratioEl) ratioEl.value = product.imgRatio || '4:3';
-    document.getElementById('pfEmoji').value = product.emoji || '';
-    document.getElementById('pfBadge').value = product.badge || '';
+    
+    this.setProductEmoji(product.emoji || '✨');
+    this.setBadgeChips(product.badge || '');
+    
     document.getElementById('pfDesc').value = product.description || '';
     const unitEl = document.getElementById('pfUnit');
     if (unitEl) unitEl.value = product.unit || '';
 
     const btn = document.getElementById('addProdBtn');
     const cancel = document.getElementById('cancelProdBtn');
+    const titleEl = document.getElementById('prodFormTitle');
+    if (titleEl) titleEl.textContent = `Edit Product #${product.id}`;
     if (btn) btn.textContent = 'Update Product';
     if (cancel) cancel.style.display = '';
     this.editState = { section: 'product', id: product.id };
@@ -1504,6 +1768,7 @@ const Admin = {
     }
 
     this.initVariantBuilder();
+    this.initProductFormControls();
     this.updateStockFieldsVisibility();
     this.resetProductForm();
   },
@@ -3962,4 +4227,11 @@ if (changeAdminPwBtn) {
     changeAdminPwBtn.disabled = false;
     changeAdminPwBtn.textContent = '🔒 Update Admin Password';
   });
+}
+
+// Initialize product form controls on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => Admin.initProductFormControls());
+} else {
+  Admin.initProductFormControls();
 }
