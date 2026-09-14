@@ -1773,6 +1773,201 @@ app.use((req, res, next) => {
           city: geo.city,
           isp: geo.isp
         });
+    stats.regions[cleanRegion] = (stats.regions[cleanRegion] || 0) + 1;
+    stats.cities[cleanCity] = (stats.cities[cleanCity] || 0) + 1;
+    stats.isps[cleanIsp] = (stats.isps[cleanIsp] || 0) + 1;
+    
+    writeDB(db);
+  }
+}
+
+// ── Rate Limiters & Middlewares ─────────────────────────────────
+
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 150,
+  message: { error: 'Too many requests. Please try again in a minute.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: { error: 'Too many requests. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res, next, options) => {
+    const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+    logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Auth rate limit exceeded on ${req.originalUrl || req.url}`);
+    res.status(options.statusCode).send(options.message);
+  }
+});
+
+const checkoutLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many checkout attempts. Please wait 10 minutes before trying again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res, next, options) => {
+    const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+    logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Checkout rate limit exceeded on ${req.originalUrl || req.url}`);
+    res.status(options.statusCode).send(options.message);
+  }
+});
+
+const wishlistLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many subscription attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Manual cookie parser middleware
+app.use((req, res, next) => {
+  req.cookies = {};
+  const rc = req.headers.cookie;
+  if (rc) {
+    rc.split(';').forEach(cookie => {
+      const parts = cookie.split('=');
+      req.cookies[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+  }
+  next();
+});
+
+// Blocklist enforcement middleware
+app.use((req, res, next) => {
+  const normalizedIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
+  
+  if (isWhitelistedIp(normalizedIp)) {
+    return next();
+  }
+
+  const db = readDB();
+  const blockedIps = db.blockedIps || [];
+
+  if (blockedIps.includes(normalizedIp)) {
+    return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
+  }
+  next();
+});
+
+// Real-Time Attack & Intrusion Detection Shield
+app.use((req, res, next) => {
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+  if (isWhitelistedIp(clientIp)) return next();
+
+  let rawUrl = '';
+  try {
+    rawUrl = decodeURIComponent(req.originalUrl || req.url || '');
+  } catch {
+    rawUrl = req.originalUrl || req.url || '';
+  }
+  const userAgent = String(req.headers['user-agent'] || '');
+
+  // 1. Check for malicious vulnerability scanner User-Agents
+  const scannerUaRegex = /\b(sqlmap|nikto|masscan|dirbuster|gobuster|wpscan|zgrab|acunetix|nessus)\b/i;
+  if (scannerUaRegex.test(userAgent)) {
+    logSecurityEvent(clientIp, 'MALICIOUS_SCANNER', `Automated vulnerability scanner bot detected: ${userAgent.substring(0, 60)}`, {
+      severity: 'HIGH',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Malicious vulnerability scanner signature detected.' });
+  }
+
+  // 2. Check for directory / path traversal
+  if (/(\.\.[\/\\]|%2e%2e[\/\\])/i.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'PATH_TRAVERSAL', `Directory traversal exploit attempt: ${rawUrl.substring(0, 80)}`, {
+      severity: 'CRITICAL',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Path traversal pattern detected.' });
+  }
+
+  // 3. Check for sensitive file / admin probe scanning
+  const probeRegex = /(\/\.env|\/\.git|\/\.aws|\/\.config|\/wp-admin|\/wp-login\.php|\/xmlrpc\.php|\/phpmyadmin|\/pma|\/adminer|\/cgi-bin|\/actuator|\/swagger|\/console|\/\.htaccess)/i;
+  if (probeRegex.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'VULNERABILITY_PROBE', `Unauthorized probe for protected resource: ${rawUrl.substring(0, 80)}`, {
+      severity: 'CRITICAL',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Security probe signature detected.' });
+  }
+
+  // 4. Check for SQL Injection patterns in query URL
+  const sqliRegex = /(\bunion\s+(all\s+)?select\b|\bselect\s+.*\s+from\b|\binsert\s+into\b|\bdrop\s+table\b|\bdelete\s+from\b|'\s*or\s*['"]?1['"]?\s*=\s*['"]?1|\bwaitfor\s+delay\b|;\s*drop\b)/i;
+  if (sqliRegex.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'SQLI_ATTACK', `SQL Injection exploit payload in request: ${rawUrl.substring(0, 80)}`, {
+      severity: 'CRITICAL',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Malicious SQL injection signature detected.' });
+  }
+
+  // 5. Check for XSS script tag injection in URL
+  const xssRegex = /(<script|javascript:|onerror\s*=|onload\s*=|onclick\s*=|vbscript:)/i;
+  if (xssRegex.test(rawUrl)) {
+    logSecurityEvent(clientIp, 'XSS_ATTACK', `Cross-Site Scripting (XSS) probe detected in query URL: ${rawUrl.substring(0, 80)}`, {
+      severity: 'HIGH',
+      target: `${req.method} ${rawUrl}`,
+      method: req.method,
+      blocked: true
+    });
+    return res.status(403).json({ error: 'Access denied: Malicious script pattern detected.' });
+  }
+
+  next();
+});
+
+// Developer request logger & analytics collector middleware
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
+  
+  let visitorId = req.cookies.visitor_id;
+  let isNewVisitor = false;
+  if (!visitorId) {
+    visitorId = crypto.randomBytes(16).toString('hex');
+    res.cookie('visitor_id', visitorId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true });
+    isNewVisitor = true;
+  }
+
+  const originalEnd = res.end;
+  res.end = function(chunk, encoding) {
+    res.end = originalEnd;
+    res.end(chunk, encoding);
+    
+    const duration = Date.now() - startTime;
+    const statusCode = res.statusCode;
+    
+    const ext = path.extname(req.url);
+    const isAsset = ext && ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'].includes(ext.toLowerCase());
+    
+    if (!isAsset && !req.url.startsWith('/uploads/')) {
+      const geo = getIpLocation(clientIp);
+      
+      // Disabled to prevent automatic visitor analytics updates from triggering database writes on every page load, saving Render bandwidth.
+      /*
+      try {
+        updateAggregatedAnalytics({
+          ip: clientIp,
+          isNew: isNewVisitor,
+          country: geo.country,
+          region: geo.region,
+          city: geo.city,
+          isp: geo.isp
+        });
       } catch (err) {
         console.error('Error updating analytics:', err.message);
       }
@@ -1824,12 +2019,11 @@ function getR2Config() {
   const accessKey  = process.env.R2_ACCESS_KEY_ID;
   const secretKey  = process.env.R2_SECRET_ACCESS_KEY;
   const bucketName = process.env.R2_BUCKET_NAME;
-  const publicUrl  = process.env.R2_PUBLIC_URL; // e.g. https://pub-xxxx.r2.dev  or your custom domain
+  const publicUrl  = process.env.R2_PUBLIC_URL;
   if (!accountId || !accessKey || !secretKey || !bucketName || !publicUrl) return null;
   return { accountId, accessKey, secretKey, bucketName, publicUrl };
 }
 
-// Keep legacy ImgBB helper so existing stored URLs still display correctly
 function getImgBbApiKey() {
   return process.env.IMGBB_API_KEY ||
     process.env.IMGBB_KEY ||
@@ -1855,7 +2049,6 @@ function backupDatabaseSnapshot(data, reason = 'write') {
     const backupPath = path.join(DB_BACKUP_DIR, `db-${safeReason}-${timestamp}.json`);
     fs.writeFileSync(backupPath, JSON.stringify(data, null, 2));
 
-    // Keep only the 5 most recent backup files to prevent disk clutter
     const files = fs.readdirSync(DB_BACKUP_DIR)
       .filter(f => f.startsWith('db-') && f.endsWith('.json'))
       .map(f => ({ name: f, time: fs.statSync(path.join(DB_BACKUP_DIR, f)).mtime.getTime() }))
@@ -1883,7 +2076,11 @@ async function initPersistentDatabase() {
 
   try {
     console.log('Loading database from Firebase...');
-    const res = await fetch(firebaseUrl);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(firebaseUrl, { signal: controller.signal });
+    clearTimeout(timeout);
+
     if (!res.ok) {
       throw new Error(`Firebase load failed with status ${res.status}`);
     }
@@ -1913,31 +2110,30 @@ async function initPersistentDatabase() {
     if (syncRes.ok) {
       console.log('Successfully seeded Firebase database from local db.json.');
     } else {
-      throw new Error(`Firebase seed failed with status ${syncRes.status}`);
+      console.warn(`Firebase seed returned status ${syncRes.status}. Continuing with local db.`);
     }
   } catch (e) {
-    console.error('💥 Failed to load/sync database from Firebase:', e.message);
-    throw e; // Crash server startup to prevent running with blank local data
+    console.warn('⚠️ Could not connect to Firebase database (' + e.message + '). Falling back to persistent local storage.');
+    if (!fs.existsSync(DB_PATH)) {
+      console.warn('⚠️ Local db.json not found, initializing blank schema.');
+      const initialSchema = {
+        settings: {},
+        banners: [],
+        navLinks: [],
+        categories: [],
+        products: [],
+        orders: [],
+        cart: [],
+        users: [],
+        reviews: [],
+        wishlistSubscriptions: [],
+        coupons: [],
+        blockedIps: [],
+        securityLogs: []
+      };
+      fs.writeFileSync(DB_PATH, JSON.stringify(initialSchema, null, 2), 'utf8');
+    }
   }
-}
-
-// Keep legacy ImgBB helper so existing stored URLs still display correctly
-function getImgBbApiKey() {
-  return process.env.IMGBB_API_KEY ||
-    process.env.IMGBB_KEY ||
-    process.env.IMG_BB_API_KEY ||
-    process.env.IMG_BB_KEY ||
-    null;
-}
-
-function hasLiveStoreData(data) {
-  if (!data || typeof data !== 'object') return false;
-  return Boolean(
-    (Array.isArray(data.products) && data.products.length > 0) ||
-    (Array.isArray(data.orders) && data.orders.length > 0) ||
-    (Array.isArray(data.users) && data.users.length > 0) ||
-    (Array.isArray(data.banners) && data.banners.length > 0)
-  );
 }
 
 function readDB() {
@@ -3616,6 +3812,8 @@ async function processUploadedImage(req, res) {
 
           if (fileExt === '.png' && quality > 50) {
             outputBuf = await inst.png({ compressionLevel: 9, quality }).toBuffer();
+          } else if (fileExt === '.webp') {
+            outputBuf = await inst.webp({ quality }).toBuffer();
           } else {
             outputBuf = await inst.jpeg({ quality, mozjpeg: true }).toBuffer();
           }
@@ -3750,15 +3948,17 @@ app.post('/api/admin/banners', requireAdmin, (req, res) => {
 });
 app.put('/api/admin/banners/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  const idx = db.banners.findIndex(b => b.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const bannerId = req.params.id;
+  const idx = db.banners.findIndex(b => String(b.id) === String(bannerId) || Number(b.id) === Number(bannerId));
+  if (idx === -1) return res.status(404).json({ error: 'Banner not found' });
   db.banners[idx] = { ...db.banners[idx], ...req.body };
   writeDB(db);
   res.json(db.banners[idx]);
 });
 app.delete('/api/admin/banners/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  db.banners = db.banners.filter(b => b.id !== Number(req.params.id));
+  const bannerId = req.params.id;
+  db.banners = (db.banners || []).filter(b => String(b.id) !== String(bannerId) && Number(b.id) !== Number(bannerId));
   writeDB(db);
   res.json({ success: true });
 });
@@ -3769,12 +3969,12 @@ app.put('/api/admin/nav/reorder', requireAdmin, (req, res) => {
   const { orderedIds } = req.body;
   if (!Array.isArray(orderedIds)) return res.status(400).json({ error: 'orderedIds must be an array' });
   
-  const navMap = new Map((db.navLinks || []).map(n => [n.id, n]));
+  const navMap = new Map((db.navLinks || []).map(n => [String(n.id), n]));
   const newOrder = [];
   orderedIds.forEach(id => {
-    if (navMap.has(Number(id))) {
-      newOrder.push(navMap.get(Number(id)));
-      navMap.delete(Number(id));
+    if (navMap.has(String(id))) {
+      newOrder.push(navMap.get(String(id)));
+      navMap.delete(String(id));
     }
   });
   for (const remaining of navMap.values()) {
@@ -3793,15 +3993,17 @@ app.post('/api/admin/nav', requireAdmin, (req, res) => {
 });
 app.put('/api/admin/nav/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  const idx = db.navLinks.findIndex(n => n.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const navId = req.params.id;
+  const idx = db.navLinks.findIndex(n => String(n.id) === String(navId) || Number(n.id) === Number(navId));
+  if (idx === -1) return res.status(404).json({ error: 'Navigation link not found' });
   db.navLinks[idx] = { ...db.navLinks[idx], ...req.body };
   writeDB(db);
   res.json(db.navLinks[idx]);
 });
 app.delete('/api/admin/nav/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  db.navLinks = db.navLinks.filter(n => n.id !== Number(req.params.id));
+  const navId = req.params.id;
+  db.navLinks = (db.navLinks || []).filter(n => String(n.id) !== String(navId) && Number(n.id) !== Number(navId));
   writeDB(db);
   res.json({ success: true });
 });
@@ -3812,12 +4014,12 @@ app.put('/api/admin/categories/reorder', requireAdmin, (req, res) => {
   const { orderedIds } = req.body;
   if (!Array.isArray(orderedIds)) return res.status(400).json({ error: 'orderedIds must be an array' });
   
-  const catMap = new Map((db.categories || []).map(c => [c.id, c]));
+  const catMap = new Map((db.categories || []).map(c => [String(c.id), c]));
   const newOrder = [];
   orderedIds.forEach(id => {
-    if (catMap.has(Number(id))) {
-      newOrder.push(catMap.get(Number(id)));
-      catMap.delete(Number(id));
+    if (catMap.has(String(id))) {
+      newOrder.push(catMap.get(String(id)));
+      catMap.delete(String(id));
     }
   });
   for (const remaining of catMap.values()) {
@@ -3836,15 +4038,17 @@ app.post('/api/admin/categories', requireAdmin, (req, res) => {
 });
 app.put('/api/admin/categories/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  const idx = db.categories.findIndex(c => c.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const catId = req.params.id;
+  const idx = db.categories.findIndex(c => String(c.id) === String(catId) || Number(c.id) === Number(catId));
+  if (idx === -1) return res.status(404).json({ error: 'Category not found' });
   db.categories[idx] = { ...db.categories[idx], ...req.body };
   writeDB(db);
   res.json(db.categories[idx]);
 });
 app.delete('/api/admin/categories/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  db.categories = db.categories.filter(c => c.id !== Number(req.params.id));
+  const catId = req.params.id;
+  db.categories = (db.categories || []).filter(c => String(c.id) !== String(catId) && Number(c.id) !== Number(catId));
   writeDB(db);
   res.json({ success: true });
 });
@@ -3888,12 +4092,12 @@ app.post('/api/admin/coupons', requireAdmin, (req, res) => {
 app.delete('/api/admin/coupons/:id', requireAdmin, (req, res) => {
   const db = readDB();
   db.coupons = db.coupons || [];
-  const id = Number(req.params.id);
+  const couponId = req.params.id;
 
-  const exists = db.coupons.some(c => c.id === id);
+  const exists = db.coupons.some(c => String(c.id) === String(couponId) || Number(c.id) === Number(couponId));
   if (!exists) return res.status(404).json({ error: 'Coupon not found' });
 
-  db.coupons = db.coupons.filter(c => c.id !== id);
+  db.coupons = db.coupons.filter(c => String(c.id) !== String(couponId) && Number(c.id) !== Number(couponId));
   writeDB(db);
   res.json({ success: true });
 });
@@ -3908,9 +4112,9 @@ app.post('/api/admin/products', requireAdmin, (req, res) => {
 });
 app.put('/api/admin/products/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  const productId = Number(req.params.id);
-  const idx = db.products.findIndex(p => p.id === productId);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const productId = req.params.id;
+  const idx = db.products.findIndex(p => String(p.id) === String(productId) || Number(p.id) === Number(productId));
+  if (idx === -1) return res.status(404).json({ error: 'Product not found' });
 
   const oldStock = Number(db.products[idx].stock) || 0;
   const newStock = Number(req.body.stock) || 0;
@@ -3927,7 +4131,8 @@ app.put('/api/admin/products/:id', requireAdmin, (req, res) => {
 });
 app.delete('/api/admin/products/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  db.products = db.products.filter(p => p.id !== Number(req.params.id));
+  const productId = req.params.id;
+  db.products = db.products.filter(p => String(p.id) !== String(productId) && Number(p.id) !== Number(productId));
   writeDB(db);
   res.json({ success: true });
 });
@@ -3942,8 +4147,9 @@ app.get('/api/admin/orders', requireAdmin, (req, res) => {
 // UPDATE order status/notes (admin) — also triggers stock restore if cancelled
 app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
   const db = readDB();
-  const idx = db.orders.findIndex(o => o.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const orderId = req.params.id;
+  const idx = db.orders.findIndex(o => String(o.id) === String(orderId) || Number(o.id) === Number(orderId));
+  if (idx === -1) return res.status(404).json({ error: 'Order not found' });
 
   const oldStatus = db.orders[idx].status;
   const newStatus = req.body.status;
@@ -3952,7 +4158,7 @@ app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
   if (newStatus === 'cancelled' && oldStatus !== 'cancelled') {
     const items = db.orders[idx].items || [];
     for (const item of items) {
-      const prodIdx = db.products.findIndex(p => p.id === item.id);
+      const prodIdx = db.products.findIndex(p => String(p.id) === String(item.id) || Number(p.id) === Number(item.id) || (p.name && p.name.trim().toLowerCase() === String(item.name || '').trim().toLowerCase()));
       if (prodIdx !== -1) {
         const prod = db.products[prodIdx];
         if (db.settings.trackStock !== false) {
@@ -3987,7 +4193,8 @@ app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
 // POST send shipping email notification to customer (admin)
 app.post('/api/admin/orders/:id/notify-shipping', requireAdmin, async (req, res) => {
   const db = readDB();
-  const order = db.orders.find(o => o.id === Number(req.params.id));
+  const orderId = req.params.id;
+  const order = db.orders.find(o => String(o.id) === String(orderId) || Number(o.id) === Number(orderId));
   if (!order) return res.status(404).json({ error: 'Order not found' });
 
   try {
@@ -3998,7 +4205,6 @@ app.post('/api/admin/orders/:id/notify-shipping', requireAdmin, async (req, res)
     res.status(500).json({ error: 'Failed to send email: ' + err.message });
   }
 });
-
 
 // GET sitemap.xml dynamically generated for search crawlers (SEO)
 app.get('/sitemap.xml', (req, res) => {

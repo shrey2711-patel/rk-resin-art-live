@@ -2,12 +2,13 @@
 const BASE = '';  // same origin; change to http://localhost:3000 if separate
 
 const API = {
-  token: null, // Admin token is in-memory only so page refresh automatically logs out for security
+  token: sessionStorage.getItem('rk_admin_token') || null,
   userToken: localStorage.getItem('rk_user_token') || null,
 
   headers(auth = false) {
     const h = { 'Content-Type': 'application/json' };
-    if (auth && this.token) h['Authorization'] = `Bearer ${this.token}`;
+    const token = this.token || sessionStorage.getItem('rk_admin_token');
+    if (auth && token) h['Authorization'] = `Bearer ${token}`;
     return h;
   },
 
@@ -90,7 +91,7 @@ const API = {
       headers: this.headers(auth),
       body: JSON.stringify(data)
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, auth);
   },
 
   async delete(path, auth = false) {
@@ -98,58 +99,62 @@ const API = {
       method: 'DELETE',
       headers: this.headers(auth)
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, auth);
   },
 
   async uploadImage(file) {
+    if (!file) throw new Error('No image file provided for upload');
+    const token = this.token || sessionStorage.getItem('rk_admin_token');
     const headers = {};
-    if (this.token) headers.Authorization = `Bearer ${this.token}`;
+    if (token) headers.Authorization = `Bearer ${token}`;
     const ext = (file.name || '').split('.').pop().toLowerCase();
     const isHeic = ['heic', 'heif'].includes(ext) || ['image/heic', 'image/heif'].includes((file.type || '').toLowerCase());
 
     try {
-      // 1. Fetch ImgBB key securely from the server
-      const keyData = await API.get('/api/admin/imgbb-key', true);
-      
-      if (!isHeic && keyData && keyData.key) {
-        // Convert optimized file to base64 for direct ImgBB POST request
-        const reader = new FileReader();
-        const base64Promise = new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-        });
-        reader.readAsDataURL(file);
-        const base64Image = await base64Promise;
+      // 1. Fetch ImgBB key securely from the server if admin is logged in
+      if (token) {
+        const keyData = await API.get('/api/admin/imgbb-key', true).catch(() => null);
+        
+        if (!isHeic && keyData && keyData.key) {
+          // Convert optimized file to base64 for direct ImgBB POST request
+          const reader = new FileReader();
+          const base64Promise = new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+          });
+          reader.readAsDataURL(file);
+          const base64Image = await base64Promise;
 
-        const imgbbFormData = new URLSearchParams();
-        imgbbFormData.append('image', base64Image);
+          const imgbbFormData = new URLSearchParams();
+          imgbbFormData.append('image', base64Image);
 
-        // 2. Direct upload using the admin's residential IP (bypasses Render cloud server IP ban!)
-        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${keyData.key}`, {
-          method: 'POST',
-          body: imgbbFormData,
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+          // 2. Direct upload using the admin's residential IP (bypasses Render cloud server IP ban!)
+          const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${keyData.key}`, {
+            method: 'POST',
+            body: imgbbFormData,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          });
+
+          if (imgbbRes.ok) {
+            const imgbbData = await imgbbRes.json();
+            if (imgbbData && imgbbData.data && imgbbData.data.url) {
+              return {
+                success: true,
+                url: imgbbData.data.url,
+                filename: file.name
+              };
+            }
           }
-        });
-
-        if (imgbbRes.ok) {
-          const imgbbData = await imgbbRes.json();
-          if (imgbbData && imgbbData.data && imgbbData.data.url) {
-            return {
-              success: true,
-              url: imgbbData.data.url,
-              filename: file.name
-            };
-          }
+          console.warn('Direct client-side ImgBB upload failed, falling back to server-side upload.');
         }
-        console.warn('Direct client-side ImgBB upload failed, falling back to server-side upload.');
       }
     } catch (err) {
       console.warn('Direct upload setup failed, falling back to server-side upload:', err);
     }
 
-    // 3. Fallback: Upload through the server (saves locally if server fails to connect to ImgBB)
+    // 3. Fallback: Upload through the server (saves locally if server fails to connect to ImgBB/R2)
     const formData = new FormData();
     formData.append('image', file);
 
@@ -158,7 +163,7 @@ const API = {
       headers,
       body: formData
     });
-    return API.handleResponse(res);
+    return API.handleResponse(res, true);
   },
 
   // ── Public endpoints ──────────────────────────────────────
@@ -216,12 +221,14 @@ const API = {
   adminLogin: async (password) => {
     const res = await API.post('/api/admin/login', { password });
     API.token = res.token;
+    sessionStorage.setItem('rk_admin_token', res.token);
     return res;
   },
   adminLogout: () => {
     API.token = null;
+    sessionStorage.removeItem('rk_admin_token');
   },
-  isAdminLoggedIn: () => !!API.token,
+  isAdminLoggedIn: () => !!(API.token || sessionStorage.getItem('rk_admin_token')),
 
   // ── Admin settings ────────────────────────────────────────
   getAdminSettings: () => API.get('/api/admin/settings', true),

@@ -362,6 +362,8 @@ const Admin = {
   },
 
   async resizeImageForUpload(file) {
+    if (!file) return file;
+
     // ── HEIC/HEIF: send raw to server — sharp converts it reliably on all platforms ──
     if (this.isHeicImage(file)) {
       this.updateConversionStatus('📷 HEIC detected — sending to server for conversion & compression...');
@@ -369,56 +371,85 @@ const Admin = {
     }
 
     // ── Standard images: resize + progressive compress to ≤1MB in browser ──
+    let imageUrl = null;
     try {
-      const imageUrl = URL.createObjectURL(file);
+      imageUrl = URL.createObjectURL(file);
       const img = new Image();
 
       await new Promise((resolve, reject) => {
-        img.onload = resolve;
+        img.onload = () => resolve();
         img.onerror = () => reject(new Error('Failed to load image for resize'));
         img.src = imageUrl;
       });
 
-      // Max 1920px wide — keeps quality high while limiting raw pixel count
+      // Max 1920px wide — keeps quality crisp while limiting raw pixel count
       const maxW = 1920;
-      const scale = Math.min(1, maxW / img.width);
+      const origW = img.width || 1200;
+      const origH = img.height || 900;
+      const scale = Math.min(1, maxW / origW);
 
       const canvas = document.createElement('canvas');
-      canvas.width  = Math.round(img.width  * scale);
-      canvas.height = Math.round(img.height * scale);
+      canvas.width  = Math.max(1, Math.round(origW * scale));
+      canvas.height = Math.max(1, Math.round(origH * scale));
 
       const ctx = canvas.getContext('2d');
-      if (!ctx) { URL.revokeObjectURL(imageUrl); return file; }
+      if (!ctx) {
+        if (imageUrl) URL.revokeObjectURL(imageUrl);
+        return file;
+      }
 
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(imageUrl);
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+        imageUrl = null;
+      }
 
       // Progressive quality loop — keep reducing until ≤ 1 MB or quality floor
       const TARGET_BYTES = 1 * 1024 * 1024; // 1 MB
-      const MIN_QUALITY  = 0.15;
+      const MIN_QUALITY  = 0.20;
       let quality = 0.85;
       let blob    = null;
 
       this.updateConversionStatus('🗜️ Compressing image...');
 
       do {
-        blob = await new Promise(resolve =>
-          canvas.toBlob(resolve, 'image/webp', quality)
-        );
+        blob = await new Promise(resolve => {
+          try {
+            canvas.toBlob(resolve, 'image/webp', quality);
+          } catch {
+            resolve(null);
+          }
+        });
         if (!blob || blob.size <= TARGET_BYTES) break;
-        quality = Math.max(MIN_QUALITY, quality - 0.07);
+        quality = Math.max(MIN_QUALITY, quality - 0.08);
       } while (quality >= MIN_QUALITY);
+
+      // If browser doesn't support canvas.toBlob with webp, fallback to JPEG
+      if (!blob) {
+        blob = await new Promise(resolve => {
+          try {
+            canvas.toBlob(resolve, 'image/jpeg', 0.82);
+          } catch {
+            resolve(null);
+          }
+        });
+      }
 
       if (!blob) return file;
 
       const finalKB = Math.round(blob.size / 1024);
-      const usedQ   = Math.round((quality + 0.07) * 100); // quality before last decrement
-      this.updateConversionStatus(`✅ Compressed to ${finalKB} KB (quality ${Math.min(85, usedQ)}%)`);
+      const usedQ   = Math.round(Math.min(85, quality * 100));
+      this.updateConversionStatus(`✅ Compressed to ${finalKB} KB (${usedQ}% quality)`);
 
       const baseName = (file.name || 'image').replace(/\.[^/.]+$/, '');
-      return new File([blob], `${baseName}.webp`, { type: 'image/webp', lastModified: Date.now() });
+      const mimeType = blob.type || 'image/webp';
+      const ext = (mimeType.includes('jpeg') || mimeType.includes('jpg')) ? 'jpg' : 'webp';
+      return new File([blob], `${baseName}.${ext}`, { type: mimeType, lastModified: Date.now() });
     } catch (e) {
-      console.error('Image compression failed, using original file:', e);
+      if (imageUrl) {
+        try { URL.revokeObjectURL(imageUrl); } catch {}
+      }
+      console.warn('Image compression fallback to original file:', e);
       return file;
     }
   },
@@ -1481,23 +1512,23 @@ const Admin = {
   async loadAll() {
     try {
       const [banners, nav, cats, prodRes, orders, coupons, settings] = await Promise.all([
-        API.getBanners(),
-        API.getNav(),
-        API.getCategories(),
-        API.getProducts({ limit: 200 }),
-        API.getOrders(),
+        API.getBanners().catch(() => this.data.banners || []),
+        API.getNav().catch(() => this.data.nav || []),
+        API.getCategories().catch(() => this.data.categories || []),
+        API.getProducts({ limit: 200 }).catch(() => ({ products: this.data.products || [] })),
+        API.getOrders().catch(() => this.data.orders || []),
         API.getCoupons().catch(() => []),
         API.getAdminSettings().catch(() => null)
       ]);
-      this.data.banners = banners;
-      this.data.nav = nav;
-      this.data.categories = cats;
-      this.data.products = prodRes.products;
-      this.data.orders = orders;
-      this.data.coupons = coupons;
-      this.data.settings = settings;
+      this.data.banners = Array.isArray(banners) ? banners : (this.data.banners || []);
+      this.data.nav = Array.isArray(nav) ? nav : (this.data.nav || []);
+      this.data.categories = Array.isArray(cats) ? cats : (this.data.categories || []);
+      this.data.products = (prodRes && Array.isArray(prodRes.products)) ? prodRes.products : (this.data.products || []);
+      this.data.orders = Array.isArray(orders) ? orders : (this.data.orders || []);
+      this.data.coupons = Array.isArray(coupons) ? coupons : (this.data.coupons || []);
+      if (settings) this.data.settings = settings;
     } catch (e) {
-      showToast('Error loading admin data', 'error');
+      console.warn('Error loading some admin data:', e);
     }
   },
 
@@ -1553,7 +1584,8 @@ const Admin = {
 
     list.querySelectorAll('[data-edit-bid]').forEach(btn => {
       btn.onclick = () => {
-        const banner = this.data.banners.find(item => item.id === Number(btn.dataset.editBid));
+        const bid = btn.dataset.editBid;
+        const banner = this.data.banners.find(item => String(item.id) === String(bid) || Number(item.id) === Number(bid));
         if (banner) this.setBannerEdit(banner);
       };
     });
@@ -1561,7 +1593,8 @@ const Admin = {
     list.querySelectorAll('[data-bid]').forEach(btn => {
       btn.onclick = async () => {
         if (!confirm('Are you sure you want to delete this banner?')) return;
-        await API.deleteBanner(Number(btn.dataset.bid));
+        const bid = btn.dataset.bid;
+        await API.deleteBanner(bid);
         showOk('bannerOk');
         await this.loadAll();
         this.renderBanners();
@@ -1599,7 +1632,8 @@ const Admin = {
     // Edit and Delete
     list.querySelectorAll('[data-edit-nid]').forEach(btn => {
       btn.onclick = () => {
-        const item = this.data.nav.find(row => row.id === Number(btn.dataset.editNid));
+        const nid = btn.dataset.editNid;
+        const item = this.data.nav.find(row => String(row.id) === String(nid) || Number(row.id) === Number(nid));
         if (item) this.setNavEdit(item);
       };
     });
@@ -1607,7 +1641,8 @@ const Admin = {
     list.querySelectorAll('.ali-del[data-nid]').forEach(btn => {
       btn.onclick = async () => {
         if (!confirm('Delete this navigation link?')) return;
-        await API.deleteNav(Number(btn.dataset.nid));
+        const nid = btn.dataset.nid;
+        await API.deleteNav(nid);
         await this.loadAll();
         this.renderNav();
         App.loadNav();
@@ -1617,8 +1652,8 @@ const Admin = {
     // Move Up / Move Down buttons
     list.querySelectorAll('[data-nav-up]').forEach(btn => {
       btn.onclick = async () => {
-        const id = Number(btn.dataset.navUp);
-        const idx = this.data.nav.findIndex(n => n.id === id);
+        const id = btn.dataset.navUp;
+        const idx = this.data.nav.findIndex(n => String(n.id) === String(id) || Number(n.id) === Number(id));
         if (idx > 0) {
           const item = this.data.nav.splice(idx, 1)[0];
           this.data.nav.splice(idx - 1, 0, item);
@@ -1633,8 +1668,8 @@ const Admin = {
 
     list.querySelectorAll('[data-nav-down]').forEach(btn => {
       btn.onclick = async () => {
-        const id = Number(btn.dataset.navDown);
-        const idx = this.data.nav.findIndex(n => n.id === id);
+        const id = btn.dataset.navDown;
+        const idx = this.data.nav.findIndex(n => String(n.id) === String(id) || Number(n.id) === Number(id));
         if (idx !== -1 && idx < this.data.nav.length - 1) {
           const item = this.data.nav.splice(idx, 1)[0];
           this.data.nav.splice(idx + 1, 0, item);
@@ -1680,7 +1715,8 @@ const Admin = {
     // Edit and Delete
     list.querySelectorAll('[data-edit-cid]').forEach(btn => {
       btn.onclick = () => {
-        const category = this.data.categories.find(item => item.id === Number(btn.dataset.editCid));
+        const cid = btn.dataset.editCid;
+        const category = this.data.categories.find(item => String(item.id) === String(cid) || Number(item.id) === Number(cid));
         if (category) this.setCategoryEdit(category);
       };
     });
@@ -1688,7 +1724,8 @@ const Admin = {
     list.querySelectorAll('.ali-del[data-cid]').forEach(btn => {
       btn.onclick = async () => {
         if (!confirm('Delete this category?')) return;
-        await API.deleteCategory(Number(btn.dataset.cid));
+        const cid = btn.dataset.cid;
+        await API.deleteCategory(cid);
         await this.loadAll();
         this.renderCategories();
         App.loadCategories();
@@ -1698,8 +1735,8 @@ const Admin = {
     // Move Up / Move Down buttons
     list.querySelectorAll('[data-cat-up]').forEach(btn => {
       btn.onclick = async () => {
-        const id = Number(btn.dataset.catUp);
-        const idx = this.data.categories.findIndex(c => c.id === id);
+        const id = btn.dataset.catUp;
+        const idx = this.data.categories.findIndex(c => String(c.id) === String(id) || Number(c.id) === Number(id));
         if (idx > 0) {
           const item = this.data.categories.splice(idx, 1)[0];
           this.data.categories.splice(idx - 1, 0, item);
@@ -1714,8 +1751,8 @@ const Admin = {
 
     list.querySelectorAll('[data-cat-down]').forEach(btn => {
       btn.onclick = async () => {
-        const id = Number(btn.dataset.catDown);
-        const idx = this.data.categories.findIndex(c => c.id === id);
+        const id = btn.dataset.catDown;
+        const idx = this.data.categories.findIndex(c => String(c.id) === String(id) || Number(c.id) === Number(id));
         if (idx !== -1 && idx < this.data.categories.length - 1) {
           const item = this.data.categories.splice(idx, 1)[0];
           this.data.categories.splice(idx + 1, 0, item);
@@ -1745,7 +1782,7 @@ const Admin = {
     items.forEach(item => {
       item.addEventListener('dragstart', (e) => {
         draggedItem = item;
-        draggedId = Number(item.dataset.catId || item.dataset.nid);
+        draggedId = item.dataset.catId || item.dataset.nid;
         item.classList.add('is-dragging');
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', String(draggedId));
@@ -1783,9 +1820,9 @@ const Admin = {
         items.forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom'));
         if (!draggedItem || draggedItem === item) return;
 
-        const targetId = Number(item.dataset.catId || item.dataset.nid);
-        const fromIdx = dataArray.findIndex(x => x.id === draggedId);
-        let toIdx = dataArray.findIndex(x => x.id === targetId);
+        const targetId = item.dataset.catId || item.dataset.nid;
+        const fromIdx = dataArray.findIndex(x => String(x.id) === String(draggedId) || Number(x.id) === Number(draggedId));
+        let toIdx = dataArray.findIndex(x => String(x.id) === String(targetId) || Number(x.id) === Number(targetId));
 
         if (fromIdx === -1 || toIdx === -1) return;
 
@@ -1795,7 +1832,7 @@ const Admin = {
 
         // Move element in data array
         const [moved] = dataArray.splice(fromIdx, 1);
-        toIdx = dataArray.findIndex(x => x.id === targetId);
+        toIdx = dataArray.findIndex(x => String(x.id) === String(targetId) || Number(x.id) === Number(targetId));
         if (placeAfter) {
           dataArray.splice(toIdx + 1, 0, moved);
         } else {
@@ -1858,14 +1895,17 @@ const Admin = {
 
     list.querySelectorAll('[data-edit-pid]').forEach(btn => {
       btn.onclick = () => {
-        const product = this.data.products.find(item => item.id === Number(btn.dataset.editPid));
+        const pid = btn.dataset.editPid;
+        const product = this.data.products.find(item => String(item.id) === String(pid) || Number(item.id) === Number(pid));
         if (product) this.setProductEdit(product);
       };
     });
 
     list.querySelectorAll('[data-pid]').forEach(btn => {
       btn.onclick = async () => {
-        await API.deleteProduct(Number(btn.dataset.pid));
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        const pid = btn.dataset.pid;
+        await API.deleteProduct(pid);
         await this.loadAll();
         this.renderProducts();
         App.loadProducts();
@@ -1997,7 +2037,7 @@ const Admin = {
     // Save status
     list.querySelectorAll('[data-save-oid]').forEach(btn => {
       btn.onclick = async () => {
-        const oid = Number(btn.dataset.saveOid);
+        const oid = btn.dataset.saveOid;
         const sel = list.querySelector(`.order-status-select[data-oid="${oid}"]`);
         if (!sel) return;
 
@@ -2025,7 +2065,7 @@ const Admin = {
     // Shipping Notify Email
     list.querySelectorAll('.order-shipping-notify-btn').forEach(btn => {
       btn.onclick = async () => {
-        const oid = Number(btn.dataset.notifyOid);
+        const oid = btn.dataset.notifyOid;
         const courierInput = list.querySelector(`.order-courier-name[data-oid="${oid}"]`);
         const trackingInput = list.querySelector(`.order-tracking-id[data-oid="${oid}"]`);
         const courierName = courierInput ? courierInput.value.trim() : '';
@@ -2058,7 +2098,7 @@ const Admin = {
     // Shipping Notify WhatsApp
     list.querySelectorAll('.order-shipping-wa-btn').forEach(btn => {
       btn.onclick = async () => {
-        const oid = Number(btn.dataset.waOid);
+        const oid = btn.dataset.waOid;
         const courierInput = list.querySelector(`.order-courier-name[data-oid="${oid}"]`);
         const trackingInput = list.querySelector(`.order-tracking-id[data-oid="${oid}"]`);
         const courierName = courierInput ? courierInput.value.trim() : '';
@@ -2070,7 +2110,7 @@ const Admin = {
         }
 
         // Get phone number from order data
-        const order = this.data.orders.find(o => o.id === oid);
+        const order = this.data.orders.find(o => String(o.id) === String(oid) || Number(o.id) === Number(oid));
         if (!order) return;
         const c = order.customer || {};
         const hasPhone = c.phone && c.phone.trim();
@@ -2342,7 +2382,8 @@ if (uploadUpiQrBtn && afUpiQrFile) {
     const status = document.getElementById('upiQrUploadStatus');
     if (status) status.textContent = 'Uploading QR image...';
     try {
-      const res = await API.uploadImage(file);
+      const optimizedFile = await Admin.resizeImageForUpload(file);
+      const res = await API.uploadImage(optimizedFile);
       if (res && res.url) {
         document.getElementById('afUpiQrImageUrl').value = res.url;
         const previewBox = document.getElementById('upiQrPreviewBox');
@@ -2720,7 +2761,7 @@ Admin.renderReviews = async function() {
     // Get product names for display
     const db_products = this.data.products || [];
     list.innerHTML = reviews.map(r => {
-      const prod = db_products.find(p => p.id === r.productId);
+      const prod = db_products.find(p => String(p.id) === String(r.productId) || Number(p.id) === Number(r.productId));
       const prodName = prod ? prod.name : `Product #${r.productId}`;
       return `
         <div class="admin-review-card">
@@ -2738,7 +2779,8 @@ Admin.renderReviews = async function() {
       btn.onclick = async () => {
         if (!confirm('Delete this review?')) return;
         try {
-          await API.deleteReview(Number(btn.dataset.rid));
+          const rid = btn.dataset.rid;
+          await API.deleteReview(rid);
           showToast('Review deleted', 'success');
           Admin.renderReviews();
         } catch (e) {
@@ -2808,7 +2850,8 @@ Admin.renderCoupons = async function() {
       btn.onclick = async () => {
         if (!confirm('Delete this coupon code?')) return;
         try {
-          await API.deleteCoupon(Number(btn.dataset.cid));
+          const cid = btn.dataset.cid;
+          await API.deleteCoupon(cid);
           showToast('Coupon deleted ✓', 'success');
           await Admin.loadAll();
           Admin.renderCoupons();

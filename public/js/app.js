@@ -2202,7 +2202,7 @@ const App = {
         if (!e.target.classList.contains('add-to-cart-btn') && 
             !e.target.classList.contains('buy-now-btn') && 
             !e.target.closest('.wishlist-card-btn')) {
-          window.location.hash = `#product/${Number(card.dataset.pid)}`;
+          window.location.hash = `#product/${card.dataset.pid}`;
         }
       };
     });
@@ -2211,7 +2211,8 @@ const App = {
     grid.querySelectorAll('.wishlist-card-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.stopPropagation();
-        const prod = products.find(p => p.id === Number(btn.dataset.pid));
+        const pid = btn.dataset.pid;
+        const prod = products.find(p => String(p.id) === String(pid) || Number(p.id) === Number(pid));
         if (prod) {
           const cat = catMap[prod.category] || {};
           if (typeof Wishlist !== 'undefined') {
@@ -2225,7 +2226,8 @@ const App = {
     grid.querySelectorAll('.add-to-cart-btn').forEach(btn => {
       btn.onclick = async (e) => {
         e.stopPropagation();
-        const prod = products.find(p => p.id === Number(btn.dataset.pid));
+        const pid = btn.dataset.pid;
+        const prod = products.find(p => String(p.id) === String(pid) || Number(p.id) === Number(pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
             window.location.hash = `#product/${prod.id}`;
@@ -2244,7 +2246,8 @@ const App = {
     grid.querySelectorAll('.buy-now-btn').forEach(btn => {
       btn.onclick = async (e) => {
         e.stopPropagation();
-        const prod = products.find(p => p.id === Number(btn.dataset.pid));
+        const pid = btn.dataset.pid;
+        const prod = products.find(p => String(p.id) === String(pid) || Number(p.id) === Number(pid));
         if (prod) {
           if (prod.variants && prod.variants.length > 0 && prod.variantLabel) {
             window.location.hash = `#product/${prod.id}`;
@@ -2315,7 +2318,7 @@ const App = {
 
   // ── Product Modal ─────────────────────────────────────────
   async openProductModal(id, products) {
-    const prod = products.find(p => p.id === id);
+    const prod = products.find(p => String(p.id) === String(id) || Number(p.id) === Number(id));
     if (!prod) return;
     const cat = this.state.categories.find(c => c.name === prod.category) || {};
     const origHTML = prod.originalPrice ? `<s style="color:#9CA3AF;font-size:0.85em">₹${prod.originalPrice}</s>` : '';
