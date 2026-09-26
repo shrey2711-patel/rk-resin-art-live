@@ -2456,6 +2456,17 @@ app.get('/api/settings', (req, res) => {
   });
 });
 
+// GET banners (Public & Admin)
+app.get('/api/banners', (req, res) => {
+  const db = readDB();
+  res.json(db.banners || []);
+});
+
+app.get('/api/admin/banners', requireAdmin, (req, res) => {
+  const db = readDB();
+  res.json(db.banners || []);
+});
+
 // GET nav links
 app.get('/api/nav', (req, res) => {
   res.json(readDB().navLinks);
@@ -3935,9 +3946,9 @@ app.post('/api/upload/payment-proof', checkoutLimiter, (req, res) => {
 });
 
 // BANNERS CRUD
-app.post('/api/admin/banners', requireAdmin, (req, res) => {
+const handleAddBanner = (req, res) => {
   const db = readDB();
-  db.banners = db.banners || [];
+  db.banners = (db.banners || []).filter(b => b && (b.imageUrl || b.desktopImageUrl || b.mobileImageUrl));
   if (db.banners.length >= 3) {
     return res.status(400).json({ error: 'Maximum 3 banners allowed. Please delete or edit an existing banner.' });
   }
@@ -3945,23 +3956,34 @@ app.post('/api/admin/banners', requireAdmin, (req, res) => {
   db.banners.push(banner);
   writeDB(db);
   res.json(banner);
-});
-app.put('/api/admin/banners/:id', requireAdmin, (req, res) => {
+};
+
+const handleUpdateBanner = (req, res) => {
   const db = readDB();
   const bannerId = req.params.id;
-  const idx = db.banners.findIndex(b => String(b.id) === String(bannerId) || Number(b.id) === Number(bannerId));
+  const idx = (db.banners || []).findIndex(b => String(b.id) === String(bannerId) || Number(b.id) === Number(bannerId));
   if (idx === -1) return res.status(404).json({ error: 'Banner not found' });
   db.banners[idx] = { ...db.banners[idx], ...req.body };
   writeDB(db);
   res.json(db.banners[idx]);
-});
-app.delete('/api/admin/banners/:id', requireAdmin, (req, res) => {
+};
+
+const handleDeleteBanner = (req, res) => {
   const db = readDB();
   const bannerId = req.params.id;
   db.banners = (db.banners || []).filter(b => String(b.id) !== String(bannerId) && Number(b.id) !== Number(bannerId));
   writeDB(db);
   res.json({ success: true });
-});
+};
+
+app.post('/api/admin/banners', requireAdmin, handleAddBanner);
+app.post('/api/banners', requireAdmin, handleAddBanner);
+
+app.put('/api/admin/banners/:id', requireAdmin, handleUpdateBanner);
+app.put('/api/banners/:id', requireAdmin, handleUpdateBanner);
+
+app.delete('/api/admin/banners/:id', requireAdmin, handleDeleteBanner);
+app.delete('/api/banners/:id', requireAdmin, handleDeleteBanner);
 
 // NAV CRUD
 app.put('/api/admin/nav/reorder', requireAdmin, (req, res) => {
