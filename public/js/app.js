@@ -2920,12 +2920,15 @@ const App = {
 
   bindMobileNav() {
     const openMobileNav = () => {
+      this.renderMobileNav();
       document.getElementById('mobileNavDrawer').classList.add('open');
       document.getElementById('drawerOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
     };
 
     const closeMobileNav = () => {
       document.getElementById('mobileNavDrawer').classList.remove('open');
+      document.body.style.overflow = '';
       // Only close overlay if both cart and wishlist are also closed
       const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
       const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
