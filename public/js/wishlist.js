@@ -19,6 +19,7 @@ const Wishlist = {
       this.renderDrawer();
       this.syncUi();
       showToast(`${product.name} removed from Wishlist 💔`, 'info');
+      return false;
     } else {
       this.items.push(product);
       this.save();
@@ -35,6 +36,7 @@ const Wishlist = {
           body: JSON.stringify({ email: user.email, productId: product.id })
         }).catch(err => console.error('Failed to register stock alert:', err));
       }
+      return true;
     }
   },
 
@@ -91,6 +93,21 @@ const Wishlist = {
       } else {
         modalBtn.classList.remove('active');
         modalBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+      }
+    }
+
+    // Sync product page standalone button if open
+    const ppBtn = document.getElementById('ppWishlistBtn');
+    if (ppBtn) {
+      const pid = Number(ppBtn.dataset.pid);
+      const active = this.has(pid);
+      ppBtn.classList.toggle('active', active);
+      const span = ppBtn.querySelector('span');
+      if (span) span.textContent = active ? 'Saved to Wishlist' : 'Add to Wishlist';
+      const heartSvg = ppBtn.querySelector('svg');
+      if (heartSvg) {
+        heartSvg.setAttribute('fill', active ? 'currentColor' : 'none');
+        heartSvg.classList.toggle('filled', active);
       }
     }
   },
@@ -206,21 +223,27 @@ const Wishlist = {
   },
 
   openDrawer() {
-    // Close cart drawer if open
+    // Close cart drawer and mobile nav if open
     if (typeof Cart !== 'undefined') {
       Cart.closeDrawer();
     }
+    const mobDrawer = document.getElementById('mobileNavDrawer');
+    if (mobDrawer) mobDrawer.classList.remove('open');
+
     document.getElementById('wishlistDrawer').classList.add('open');
     document.getElementById('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
     this.renderDrawer();
   },
 
   closeDrawer() {
     document.getElementById('wishlistDrawer').classList.remove('open');
-    // Only close overlay if both cart and wishlist drawers are closed
+    // Only close overlay if cart, wishlist and mobile drawers are all closed
     const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
-    if (!cartOpen) {
+    const mobOpen = document.getElementById('mobileNavDrawer') && document.getElementById('mobileNavDrawer').classList.contains('open');
+    if (!cartOpen && !mobOpen) {
       document.getElementById('drawerOverlay').classList.remove('open');
+      document.body.style.overflow = '';
     }
   }
 };

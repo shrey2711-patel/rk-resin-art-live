@@ -1013,8 +1013,9 @@ const Admin = {
     this.editState = { section: null, id: null };
     
     // Show base inputs for simple product by default
-    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
-    if (basePriceStockContainer) basePriceStockContainer.style.display = '';
+    document.querySelectorAll('.pf-simple-only').forEach(el => el.style.display = '');
+    const pfPriceInp = document.getElementById('pfPrice');
+    if (pfPriceInp) pfPriceInp.required = true;
     const baseImageContainer = document.getElementById('pfBaseImageContainer');
     if (baseImageContainer) baseImageContainer.style.display = '';
 
@@ -1089,16 +1090,17 @@ const Admin = {
     if (cancel) cancel.style.display = '';
     this.editState = { section: 'product', id: product.id };
 
-    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
     const baseImageContainer = document.getElementById('pfBaseImageContainer');
     const adminVariantsSection = document.getElementById('adminVariantsSection');
     const multiVariantChk = document.getElementById('pfMultiVariant');
+    const pfPriceInp = document.getElementById('pfPrice');
 
     const vl = product.variantLabel || '';
     if (!vl) {
       // Simple Product Mode
       if (multiVariantChk) multiVariantChk.checked = false;
-      if (basePriceStockContainer) basePriceStockContainer.style.display = '';
+      document.querySelectorAll('.pf-simple-only').forEach(el => el.style.display = '');
+      if (pfPriceInp) pfPriceInp.required = true;
       if (baseImageContainer) baseImageContainer.style.display = '';
       if (adminVariantsSection) adminVariantsSection.style.display = 'none';
 
@@ -1134,7 +1136,8 @@ const Admin = {
       const commonImagesChk = document.getElementById('pfCommonImages');
       if (commonImagesChk) commonImagesChk.checked = isCommon;
 
-      if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
+      document.querySelectorAll('.pf-simple-only').forEach(el => el.style.display = 'none');
+      if (pfPriceInp) pfPriceInp.required = false;
       if (adminVariantsSection) adminVariantsSection.style.display = '';
 
       document.getElementById('pfPrice').value = '';
@@ -1409,11 +1412,18 @@ const Admin = {
 
   toggleMultiVariant() {
     const isMulti = document.getElementById('pfMultiVariant')?.checked;
-    const basePriceStockContainer = document.getElementById('pfBasePriceStockContainer');
     const adminVariantsSection = document.getElementById('adminVariantsSection');
+    const pfPriceInp = document.getElementById('pfPrice');
     
+    // Toggle simple-only pricing & stock containers
+    document.querySelectorAll('.pf-simple-only').forEach(el => {
+      el.style.display = isMulti ? 'none' : '';
+    });
+    if (pfPriceInp) {
+      pfPriceInp.required = !isMulti;
+    }
+
     if (isMulti) {
-      if (basePriceStockContainer) basePriceStockContainer.style.display = 'none';
       if (adminVariantsSection) adminVariantsSection.style.display = '';
       
       const vlSel = document.getElementById('pfVariantLabel');
@@ -1422,7 +1432,6 @@ const Admin = {
         vlSel.dispatchEvent(new Event('change'));
       }
     } else {
-      if (basePriceStockContainer) basePriceStockContainer.style.display = '';
       if (adminVariantsSection) adminVariantsSection.style.display = 'none';
       
       const rowsEl = document.getElementById('pfVariantRows');
@@ -2239,8 +2248,8 @@ const Admin = {
             <div class="order-date">${date}</div>
           </div>
         </div>
-        <div class="order-customer">👤 <strong>${fullName}</strong> | 📞 ${c.phone || '—'} | ${c.city || ''}</div>
-        ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${[c.address, c.city, c.pin].filter(Boolean).join(', ')}</div>` : ''}
+        <div class="order-customer">👤 <strong>${escapeHtml(fullName)}</strong> | 📞 ${escapeHtml(c.phone || '—')} | ${escapeHtml(c.city || '')}</div>
+        ${c.address ? `<div style="font-size:0.75rem;color:var(--muted)">📍 ${escapeHtml([c.address, c.city, c.pin].filter(Boolean).join(', '))}</div>` : ''}
         ${isUpiOrder ? `
           <div style="margin: 8px 0; padding: 8px 12px; background: rgba(124, 58, 237, 0.05); border: 1px dashed rgba(124, 58, 237, 0.3); border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
             <div>
@@ -2254,18 +2263,18 @@ const Admin = {
             ` : '<span style="font-size:0.75rem;color:var(--muted)">No screenshot attached</span>'}
           </div>
         ` : ''}
-        <div class="order-items-list">${itemsSummary}</div>
+        <div class="order-items-list">${escapeHtml(itemsSummary)}</div>
 
         <!-- Courier & Tracking Info Panel -->
         <div class="order-shipping-details" style="margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1.5px solid var(--border);">
           <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
             <div style="flex: 1; min-width: 130px;">
               <label style="font-size: 0.7rem; font-weight: bold; color: var(--muted); display: block; margin-bottom: 3px;">Courier Name</label>
-              <input type="text" class="admin-input order-courier-name" data-oid="${o.id}" value="${o.courierName || ''}" placeholder="e.g. Delhivery, DTDC" style="padding: 6px 10px; font-size: 0.8rem; height: 32px; width: 100%; box-sizing: border-box;">
+              <input type="text" class="admin-input order-courier-name" data-oid="${o.id}" value="${escapeHtml(o.courierName || '')}" placeholder="e.g. Delhivery, DTDC" style="padding: 6px 10px; font-size: 0.8rem; height: 32px; width: 100%; box-sizing: border-box;">
             </div>
             <div style="flex: 1; min-width: 150px;">
               <label style="font-size: 0.7rem; font-weight: bold; color: var(--muted); display: block; margin-bottom: 3px;">Tracking ID / URL</label>
-              <input type="text" class="admin-input order-tracking-id" data-oid="${o.id}" value="${o.trackingId || ''}" placeholder="e.g. 1234567890" style="padding: 6px 10px; font-size: 0.8rem; height: 32px; width: 100%; box-sizing: border-box;">
+              <input type="text" class="admin-input order-tracking-id" data-oid="${o.id}" value="${escapeHtml(o.trackingId || '')}" placeholder="e.g. 1234567890" style="padding: 6px 10px; font-size: 0.8rem; height: 32px; width: 100%; box-sizing: border-box;">
             </div>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
@@ -3890,45 +3899,38 @@ Admin._renderUserList = function (users) {
     return;
   }
   list.innerHTML = users.map(u => {
-    const initials = (u.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const rawInitials = (u.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const initials = escapeHtml(rawInitials);
     const joinDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-    const address = [u.address, u.city, u.pin].filter(Boolean).join(', ') || '<span style="color:var(--muted)">No address</span>';
+    const address = [u.address, u.city, u.pin].filter(Boolean).join(', ');
+    const safeAddress = address ? escapeHtml(address) : '<span style="color:var(--muted)">No address</span>';
     const orders = u.orderCount || 0;
-    const passwordDisplay = u.passwordPlain ? `<span style="font-weight:700;color:var(--p);font-family:monospace;background:rgba(15,118,110,0.08);padding:2px 8px;border-radius:6px;">${u.passwordPlain}</span>` : (u.hasPassword ? '<span style="color:var(--muted);font-style:italic;">•••••••• (Encrypted)</span>' : '<span style="color:var(--muted)">—</span>');
+    const passwordDisplay = u.hasPassword ? '<span style="color:var(--green);font-style:italic;font-weight:600;">•••••••• (Secure Hash)</span>' : '<span style="color:var(--muted)">—</span>';
+    const safeName = escapeHtml(u.name || '—');
+    const safeEmail = escapeHtml(u.email || '—');
+    const safePhone = escapeHtml(u.phone || '—');
+
     return `
       <div class="user-row" data-uid="${u.id}" style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);transition:background 0.18s">
         <div class="user-avatar-initials" style="flex-shrink:0;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--green));color:#fff;font-weight:800;font-size:1.05rem;display:flex;align-items:center;justify-content:center;letter-spacing:0.5px">${initials}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:3px">
-            <span style="font-weight:800;font-size:0.96rem;color:var(--ink)">${u.name || '—'}</span>
+            <span style="font-weight:800;font-size:0.96rem;color:var(--ink)">${safeName}</span>
             <span style="font-size:0.73rem;background:${orders > 0 ? '#d1fae5' : 'var(--border)'};color:${orders > 0 ? '#065f46' : 'var(--muted)'};padding:2px 8px;border-radius:99px;font-weight:700">${orders} order${orders !== 1 ? 's' : ''}</span>
             ${u.hasPassword ? '<span style="font-size:0.7rem;background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:99px;font-weight:700">🔐 Has Password</span>' : ''}
           </div>
-          <div style="font-size:0.82rem;color:var(--muted);margin-bottom:2px">📧 ${u.email || '—'} &nbsp;|&nbsp; 📱 ${u.phone || '—'}</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:2px">🏠 ${address}</div>
+          <div style="font-size:0.82rem;color:var(--muted);margin-bottom:2px">📧 ${safeEmail} &nbsp;|&nbsp; 📱 ${safePhone}</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:2px">🏠 ${safeAddress}</div>
           <div style="font-size:0.74rem;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;">
             <span>Joined: ${joinDate} &nbsp;|&nbsp; 🔑 Password: ${passwordDisplay}</span>
-            <button type="button" class="download-pw-inline-btn" data-uid="${u.id}" style="background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:0.72rem;cursor:pointer;color:var(--p);font-weight:700;display:inline-flex;align-items:center;gap:3px;" title="Download password .txt file">
-              📥 Download TXT
-            </button>
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
-          <button class="admin-action-btn download-pw-btn" data-uid="${u.id}" title="Download customer password .txt file" style="font-size:0.8rem;padding:6px 12px;border-radius:8px;background:#0f766e;color:#fff;border:none;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:4px;transition:opacity 0.18s">📥 Show / Download Password</button>
           <button class="admin-action-btn edit-user-btn" data-uid="${u.id}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--p);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">✏️ Edit</button>
-          <button class="admin-action-btn delete-user-btn" data-uid="${u.id}" data-name="${u.name || 'this user'}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">🗑️ Delete</button>
+          <button class="admin-action-btn delete-user-btn" data-uid="${u.id}" data-name="${safeName}" style="font-size:0.8rem;padding:6px 14px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-weight:700;transition:opacity 0.18s">🗑️ Delete</button>
         </div>
       </div>`;
   }).join('');
-
-  // Bind download password buttons
-  list.querySelectorAll('.download-pw-btn, .download-pw-inline-btn').forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const uid = String(btn.dataset.uid);
-      Admin.downloadUserPassword(uid);
-    };
-  });
 
   // Bind edit buttons
   list.querySelectorAll('.edit-user-btn').forEach(btn => {

@@ -190,7 +190,6 @@
   </div>
 
   <!-- FOOTER -->
-  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-grid">
       <!-- Col 1: Brand & Identity -->
@@ -1277,7 +1276,8 @@
                   </div>
                 </div>
 
-                <div class="apf-col-half">
+                <!-- ROW 2 (Right): Base Price -->
+                <div class="apf-col-half pf-simple-only" id="pfPriceContainer">
                   <div class="form-field-compact">
                     <label for="pfPrice">Price (₹) <span class="req-star">*</span></label>
                     <div class="input-currency-group">
@@ -1287,8 +1287,8 @@
                   </div>
                 </div>
 
-                <!-- ROW 3: Original Price & Offered Price (pfBasePriceStockContainer) -->
-                <div class="apf-col-half" id="pfOrigPriceContainer">
+                <!-- ROW 3: Original Price & Offered Price -->
+                <div class="apf-col-half pf-simple-only" id="pfOrigPriceContainer">
                   <div class="form-field-compact">
                     <label for="pfOrig">Original Price <span class="opt-tag">(Optional)</span></label>
                     <div class="input-currency-group">
@@ -1298,7 +1298,7 @@
                   </div>
                 </div>
 
-                <div class="apf-col-half" id="pfOfferPriceContainer">
+                <div class="apf-col-half pf-simple-only" id="pfOfferPriceContainer">
                   <div class="form-field-compact">
                     <label for="pfOfferPrice">Offered Price <span class="opt-tag">(Optional)</span></label>
                     <div class="input-currency-group">
@@ -1309,7 +1309,7 @@
                 </div>
 
                 <!-- ROW 4: Stock Status & Badge -->
-                <div class="apf-col-half" id="pfStockContainer">
+                <div class="apf-col-half pf-simple-only" id="pfStockContainer">
                   <div class="form-field-compact">
                     <label id="pfStockLabel">Stock Status</label>
                     <!-- Segmented Control for In Stock / Out of Stock -->
@@ -1887,7 +1887,6 @@
         <div class="form-field" style="margin-top:10px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
             <label style="margin:0;">Set / Reset Password (Optional)</label>
-            <button type="button" id="downloadEuPwBtn" style="background:none; border:none; color:var(--p); font-size:0.78rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px;">📥 Download Password (.txt)</button>
           </div>
           <div style="position:relative;">
             <input type="password" class="admin-input" id="euPassword" placeholder="Leave blank to keep current password" style="padding-right:36px;">

@@ -126,14 +126,28 @@ const Cart = {
   },
 
   openDrawer() {
+    // Close wishlist drawer and mobile nav if open
+    if (typeof Wishlist !== 'undefined') {
+      Wishlist.closeDrawer();
+    }
+    const mobDrawer = document.getElementById('mobileNavDrawer');
+    if (mobDrawer) mobDrawer.classList.remove('open');
+
     document.getElementById('cartDrawer').classList.add('open');
     document.getElementById('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
     this.renderDrawer();
   },
 
   closeDrawer() {
     document.getElementById('cartDrawer').classList.remove('open');
-    document.getElementById('drawerOverlay').classList.remove('open');
+    // Only close overlay if cart, wishlist and mobile drawers are all closed
+    const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
+    const mobOpen = document.getElementById('mobileNavDrawer') && document.getElementById('mobileNavDrawer').classList.contains('open');
+    if (!wlOpen && !mobOpen) {
+      document.getElementById('drawerOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
   },
 
   async syncWithServer(forceOverwrite = false) {

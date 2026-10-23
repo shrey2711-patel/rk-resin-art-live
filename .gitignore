@@ -13,6 +13,10 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# Environment files & Scratch scripts
+.env*
+scratch/
+
 # Live uploaded images & database backups
 data/uploads/
 data/backups/

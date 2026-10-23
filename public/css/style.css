@@ -8,22 +8,22 @@
   --papaya-whip: #fee2e2;
   --light-bronze: #d97706;
 
-  /* Global Theme System Mappings - Light Theme (Royal Amethyst & Peach Gold) */
-  --p: #7c3aed;            /* Royal Amethyst */
-  --pd: #6d28d9;           /* Deep Royal Amethyst */
-  --pl: #f5f3ff;           /* Soft Lavender Breeze */
-  --ink: #0f172a;          /* Deep Slate Black */
-  --muted: #475569;        /* Charcoal Slate */
+  /* Global Theme System Mappings - Pure White & Emerald Forest */
+  --p: #145a46;            /* Deep Pine Emerald */
+  --pd: #0f3f32;           /* Dark Pine */
+  --pl: #f0fdf4;           /* Soft Mint Tint */
+  --ink: #1f2522;          /* Slate Ink */
+  --muted: #6f766f;        /* Charcoal Muted */
   --border: #e2e8f0;       /* Crisp Border */
   --bg: #ffffff;           /* Pure White */
   --white: #ffffff;        /* Pure White */
   --card: #ffffff;         /* Card Background */
-  --red: #f43f5e;          /* Crimson Red */
-  --green: #10b981;        /* Emerald Green */
-  --gold: #f59e0b;         /* Warm Gold Accent */
-  --shadow: 0 8px 30px rgba(124, 58, 237, 0.04), 0 2px 8px rgba(124, 58, 237, 0.02);
-  --shadow-lg: 0 16px 40px rgba(124, 58, 237, 0.08), 0 4px 16px rgba(124, 58, 237, 0.04);
-  --radius: 20px;          /* Softer, luxury rounded corners */
+  --red: #b9403a;          /* Crimson Red */
+  --green: #18724f;        /* Emerald Green */
+  --gold: #c8943f;         /* Warm Gold Accent */
+  --shadow: 0 10px 30px rgba(31, 37, 34, 0.05);
+  --shadow-lg: 0 18px 44px rgba(31, 37, 34, 0.08);
+  --radius: 20px;          /* Luxury rounded corners */
   --header-h: 130px;
 }
 
@@ -3744,17 +3744,16 @@ input, select, textarea { font-family: inherit; }
 /* Mobile: up to 768px */
 @media (max-width: 768px) {
   .header-inner {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
     padding: 8px 12px;
   }
-  .nav-hamburger { order: 1; display: flex; }
-  .logo { order: 2; gap: 6px; }
-  .header-actions { order: 3; gap: 5px; }
-  .search-wrap { order: 4; width: 100%; max-width: 100%; margin-top: 4px; }
+  .nav-hamburger { grid-column: 1; display: flex; width: 36px; height: 36px; }
+  .logo { grid-column: 2; gap: 6px; overflow: hidden; }
+  .header-actions { grid-column: 3; justify-content: flex-end; gap: 5px; }
+  .search-wrap { grid-column: 1 / -1; width: 100%; max-width: 100%; margin-top: 4px; }
   
   .header-actions .admin-btn { display: none; }
   .logo-img { width: 38px; height: 38px; }
@@ -4272,32 +4271,38 @@ body {
   }
 
   .toast {
-    width: calc(100vw - 24px);
-    max-width: 420px;
+    width: calc(100vw - 32px);
+    max-width: 380px;
     white-space: normal;
     text-align: center;
-    bottom: 72px;
+    bottom: auto;
+    top: 20px;
+    transform: translateX(-50%) translateY(-20px);
+    z-index: 10000;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
   }
 
   .wa-float {
-    width: 48px;
-    height: 48px;
-    right: 14px;
+    width: 44px;
+    height: 44px;
+    right: 12px;
     bottom: 14px;
   }
 
   .ig-float {
-    width: 48px;
-    height: 48px;
-    right: 14px;
-    bottom: 70px;
+    width: 44px;
+    height: 44px;
+    right: 12px;
+    bottom: 64px;
   }
 
   .cart-float {
-    width: 48px;
-    height: 48px;
-    right: 14px;
-    bottom: 126px;
+    width: 44px;
+    height: 44px;
+    right: 12px;
+    bottom: 114px;
   }
 }
 

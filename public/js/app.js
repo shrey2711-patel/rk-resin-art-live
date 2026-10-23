@@ -340,6 +340,7 @@ const App = {
   },
 
   // ── Mobile Navigation Drawer ─────────────────────────────
+  // ── Mobile Navigation Drawer ─────────────────────────────
   bindMobileNav() {
     const mobileBtn = document.getElementById('mobileNavBtn');
     const drawer = document.getElementById('mobileNavDrawer');
@@ -347,20 +348,32 @@ const App = {
     const overlay = document.getElementById('drawerOverlay');
 
     const openDrawer = () => {
+      // Close cart and wishlist drawers if open
+      if (typeof Cart !== 'undefined') Cart.closeDrawer();
+      if (typeof Wishlist !== 'undefined') Wishlist.closeDrawer();
+
+      this.renderMobileNav();
       if (drawer) drawer.classList.add('open');
       if (overlay) overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
-      this.renderMobileNav();
     };
 
     const closeDrawer = () => {
       if (drawer) drawer.classList.remove('open');
-      if (overlay) overlay.classList.remove('open');
-      document.body.style.overflow = '';
+      const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
+      const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
+      if (!cartOpen && !wlOpen) {
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
     };
 
     if (mobileBtn) mobileBtn.onclick = openDrawer;
     if (closeBtn) closeBtn.onclick = closeDrawer;
+
+    if (overlay) {
+      overlay.addEventListener('click', closeDrawer);
+    }
   },
 
   renderMobileNav() {
@@ -403,8 +416,34 @@ const App = {
       </button>
     `;
 
+    html += '<div style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:var(--muted); padding:16px 16px 8px; letter-spacing:0.5px; border-top:1px solid var(--border); margin-top:10px;">Store Administration</div>';
+    html += `
+      <div style="padding: 6px 16px 14px;">
+        <button class="mn-admin-btn" id="mobileOpenAdminBtn" type="button" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; background:var(--p); color:#fff; border:none; border-radius:10px; font-size:0.88rem; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          ⚙️ Admin Control Panel
+        </button>
+      </div>
+    `;
+
     html += '</div>';
     container.innerHTML = html;
+
+    const adminBtn = container.querySelector('#mobileOpenAdminBtn');
+    if (adminBtn) {
+      adminBtn.onclick = () => {
+        const drawer = document.getElementById('mobileNavDrawer');
+        const overlay = document.getElementById('drawerOverlay');
+        if (drawer) drawer.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+        if (typeof Admin !== 'undefined' && typeof Admin.open === 'function') {
+          Admin.open();
+        } else {
+          const adminOverlay = document.getElementById('adminOverlay');
+          if (adminOverlay) adminOverlay.classList.add('open');
+        }
+      };
+    }
   },
 
   // ── Hash Router ───────────────────────────────────────────
@@ -623,8 +662,8 @@ const App = {
     if (colls) colls.style.display = 'none';
     if (header) header.style.display = 'none';
     if (shopMain) shopMain.style.display = 'none';
-    if (siteHeader) siteHeader.style.display = 'none';
-    if (announceBar) announceBar.style.display = 'none';
+    if (siteHeader) siteHeader.style.display = '';
+    if (announceBar) announceBar.style.display = '';
     prodPage.style.display = '';
 
     prodContent.innerHTML = `
@@ -949,7 +988,8 @@ const App = {
 
       document.getElementById('ppWishlistBtn').onclick = () => {
         if (typeof Wishlist !== 'undefined') {
-          const active = Wishlist.toggle({ ...prod, thumbBg: cat.color || '#f0eef8' });
+          Wishlist.toggle({ ...prod, thumbBg: cat.color || '#f0eef8' });
+          const active = Wishlist.has(prod.id);
           const wlBtn = document.getElementById('ppWishlistBtn');
           if (wlBtn) {
             wlBtn.classList.toggle('active', active);
@@ -2889,8 +2929,29 @@ const App = {
       this.state.page = 1;
       const q = this.state.searchQuery;
       document.getElementById('shopHeading').textContent = q ? `Results for "${q}"` : 'All Products';
+
+      // Restore shop main view if on standalone product page or sub-page
+      const prodPage = document.getElementById('productPageSection');
+      if (prodPage && prodPage.style.display !== 'none') {
+        prodPage.style.display = 'none';
+        const banner = document.getElementById('bannerSection');
+        const colls = document.getElementById('collectionsSection');
+        const collHeader = document.getElementById('collectionPageHeader');
+        const shopMain = document.getElementById('shopMain');
+        if (shopMain) shopMain.style.display = '';
+        if (banner) banner.style.display = '';
+        if (colls) colls.style.display = '';
+        if (collHeader) collHeader.style.display = 'none';
+        window.location.hash = '';
+      }
+
       this.renderCatFilters(this.state.categories);
       this.loadProducts();
+
+      const shopHeading = document.getElementById('shopHeading');
+      if (shopHeading) {
+        shopHeading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     };
     document.getElementById('searchBtn').onclick = doSearch;
     document.getElementById('searchInput').onkeydown = e => { if (e.key === 'Enter') doSearch(); };
@@ -2916,42 +2977,6 @@ const App = {
     if (fCart) fCart.onclick = () => Cart.openDrawer();
     const fAcc = document.getElementById('footerAccountBtn');
     if (fAcc) fAcc.onclick = () => Auth.open();
-  },
-
-  bindMobileNav() {
-    const openMobileNav = () => {
-      this.renderMobileNav();
-      document.getElementById('mobileNavDrawer').classList.add('open');
-      document.getElementById('drawerOverlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    };
-
-    const closeMobileNav = () => {
-      document.getElementById('mobileNavDrawer').classList.remove('open');
-      document.body.style.overflow = '';
-      // Only close overlay if both cart and wishlist are also closed
-      const cartOpen = document.getElementById('cartDrawer') && document.getElementById('cartDrawer').classList.contains('open');
-      const wlOpen = document.getElementById('wishlistDrawer') && document.getElementById('wishlistDrawer').classList.contains('open');
-      if (!cartOpen && !wlOpen) {
-        document.getElementById('drawerOverlay').classList.remove('open');
-      }
-    };
-
-    const toggleBtn = document.getElementById('mobileNavBtn');
-    if (toggleBtn) toggleBtn.onclick = openMobileNav;
-
-    const closeBtn = document.getElementById('closeMobileNav');
-    if (closeBtn) closeBtn.onclick = closeMobileNav;
-
-    // Shared backdrop overlay click logic
-    const overlay = document.getElementById('drawerOverlay');
-    if (overlay) {
-      const originalClick = overlay.onclick;
-      overlay.onclick = (e) => {
-        if (originalClick) originalClick(e);
-        closeMobileNav();
-      };
-    }
   }
 };
 
@@ -3217,6 +3242,15 @@ const Auth = {
       if (typeof Cart !== 'undefined') {
         Cart.syncWithServer();
       }
+
+      // Refresh product reviews section if on product page
+      const hash = window.location.hash;
+      const prodMatch = hash.match(/^#product\/(.+)$/);
+      if (prodMatch && typeof App !== 'undefined' && App.loadReviewsForModal) {
+        App.loadReviewsForModal(Number(prodMatch[1]), 'ppPaneReviews');
+      }
+
+      setTimeout(() => this.close(), 600);
     } catch (e) {
       this.message(e.message || 'Invalid email or password.', 'error');
     }
@@ -3247,6 +3281,14 @@ const Auth = {
       if (typeof Cart !== 'undefined') {
         Cart.syncWithServer();
       }
+
+      const hash = window.location.hash;
+      const prodMatch = hash.match(/^#product\/(.+)$/);
+      if (prodMatch && typeof App !== 'undefined' && App.loadReviewsForModal) {
+        App.loadReviewsForModal(Number(prodMatch[1]), 'ppPaneReviews');
+      }
+
+      setTimeout(() => this.close(), 600);
     } catch (e) {
       this.message(e.message || 'Could not create account.', 'error');
     }

@@ -1773,201 +1773,6 @@ app.use((req, res, next) => {
           city: geo.city,
           isp: geo.isp
         });
-    stats.regions[cleanRegion] = (stats.regions[cleanRegion] || 0) + 1;
-    stats.cities[cleanCity] = (stats.cities[cleanCity] || 0) + 1;
-    stats.isps[cleanIsp] = (stats.isps[cleanIsp] || 0) + 1;
-    
-    writeDB(db);
-  }
-}
-
-// ── Rate Limiters & Middlewares ─────────────────────────────────
-
-const globalLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 150,
-  message: { error: 'Too many requests. Please try again in a minute.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 60,
-  message: { error: 'Too many requests. Please try again in 15 minutes.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res, next, options) => {
-    const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-    logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Auth rate limit exceeded on ${req.originalUrl || req.url}`);
-    res.status(options.statusCode).send(options.message);
-  }
-});
-
-const checkoutLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 5,
-  message: { error: 'Too many checkout attempts. Please wait 10 minutes before trying again.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res, next, options) => {
-    const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-    logSecurityEvent(clientIp, 'RATE_LIMIT_EXCEEDED', `Checkout rate limit exceeded on ${req.originalUrl || req.url}`);
-    res.status(options.statusCode).send(options.message);
-  }
-});
-
-const wishlistLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 10,
-  message: { error: 'Too many subscription attempts. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Manual cookie parser middleware
-app.use((req, res, next) => {
-  req.cookies = {};
-  const rc = req.headers.cookie;
-  if (rc) {
-    rc.split(';').forEach(cookie => {
-      const parts = cookie.split('=');
-      req.cookies[parts.shift().trim()] = decodeURI(parts.join('='));
-    });
-  }
-  next();
-});
-
-// Blocklist enforcement middleware
-app.use((req, res, next) => {
-  const normalizedIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '');
-  
-  if (isWhitelistedIp(normalizedIp)) {
-    return next();
-  }
-
-  const db = readDB();
-  const blockedIps = db.blockedIps || [];
-
-  if (blockedIps.includes(normalizedIp)) {
-    return res.status(403).send(`<h1>403 Forbidden</h1><p>Access denied. Your IP address (${normalizedIp}) has been blocked by the administrator.</p>`);
-  }
-  next();
-});
-
-// Real-Time Attack & Intrusion Detection Shield
-app.use((req, res, next) => {
-  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-  if (isWhitelistedIp(clientIp)) return next();
-
-  let rawUrl = '';
-  try {
-    rawUrl = decodeURIComponent(req.originalUrl || req.url || '');
-  } catch {
-    rawUrl = req.originalUrl || req.url || '';
-  }
-  const userAgent = String(req.headers['user-agent'] || '');
-
-  // 1. Check for malicious vulnerability scanner User-Agents
-  const scannerUaRegex = /\b(sqlmap|nikto|masscan|dirbuster|gobuster|wpscan|zgrab|acunetix|nessus)\b/i;
-  if (scannerUaRegex.test(userAgent)) {
-    logSecurityEvent(clientIp, 'MALICIOUS_SCANNER', `Automated vulnerability scanner bot detected: ${userAgent.substring(0, 60)}`, {
-      severity: 'HIGH',
-      target: `${req.method} ${rawUrl}`,
-      method: req.method,
-      blocked: true
-    });
-    return res.status(403).json({ error: 'Access denied: Malicious vulnerability scanner signature detected.' });
-  }
-
-  // 2. Check for directory / path traversal
-  if (/(\.\.[\/\\]|%2e%2e[\/\\])/i.test(rawUrl)) {
-    logSecurityEvent(clientIp, 'PATH_TRAVERSAL', `Directory traversal exploit attempt: ${rawUrl.substring(0, 80)}`, {
-      severity: 'CRITICAL',
-      target: `${req.method} ${rawUrl}`,
-      method: req.method,
-      blocked: true
-    });
-    return res.status(403).json({ error: 'Access denied: Path traversal pattern detected.' });
-  }
-
-  // 3. Check for sensitive file / admin probe scanning
-  const probeRegex = /(\/\.env|\/\.git|\/\.aws|\/\.config|\/wp-admin|\/wp-login\.php|\/xmlrpc\.php|\/phpmyadmin|\/pma|\/adminer|\/cgi-bin|\/actuator|\/swagger|\/console|\/\.htaccess)/i;
-  if (probeRegex.test(rawUrl)) {
-    logSecurityEvent(clientIp, 'VULNERABILITY_PROBE', `Unauthorized probe for protected resource: ${rawUrl.substring(0, 80)}`, {
-      severity: 'CRITICAL',
-      target: `${req.method} ${rawUrl}`,
-      method: req.method,
-      blocked: true
-    });
-    return res.status(403).json({ error: 'Access denied: Security probe signature detected.' });
-  }
-
-  // 4. Check for SQL Injection patterns in query URL
-  const sqliRegex = /(\bunion\s+(all\s+)?select\b|\bselect\s+.*\s+from\b|\binsert\s+into\b|\bdrop\s+table\b|\bdelete\s+from\b|'\s*or\s*['"]?1['"]?\s*=\s*['"]?1|\bwaitfor\s+delay\b|;\s*drop\b)/i;
-  if (sqliRegex.test(rawUrl)) {
-    logSecurityEvent(clientIp, 'SQLI_ATTACK', `SQL Injection exploit payload in request: ${rawUrl.substring(0, 80)}`, {
-      severity: 'CRITICAL',
-      target: `${req.method} ${rawUrl}`,
-      method: req.method,
-      blocked: true
-    });
-    return res.status(403).json({ error: 'Access denied: Malicious SQL injection signature detected.' });
-  }
-
-  // 5. Check for XSS script tag injection in URL
-  const xssRegex = /(<script|javascript:|onerror\s*=|onload\s*=|onclick\s*=|vbscript:)/i;
-  if (xssRegex.test(rawUrl)) {
-    logSecurityEvent(clientIp, 'XSS_ATTACK', `Cross-Site Scripting (XSS) probe detected in query URL: ${rawUrl.substring(0, 80)}`, {
-      severity: 'HIGH',
-      target: `${req.method} ${rawUrl}`,
-      method: req.method,
-      blocked: true
-    });
-    return res.status(403).json({ error: 'Access denied: Malicious script pattern detected.' });
-  }
-
-  next();
-});
-
-// Developer request logger & analytics collector middleware
-app.use((req, res, next) => {
-  const startTime = Date.now();
-  const clientIp = normalizeClientIp(req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || '127.0.0.1');
-  
-  let visitorId = req.cookies.visitor_id;
-  let isNewVisitor = false;
-  if (!visitorId) {
-    visitorId = crypto.randomBytes(16).toString('hex');
-    res.cookie('visitor_id', visitorId, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true });
-    isNewVisitor = true;
-  }
-
-  const originalEnd = res.end;
-  res.end = function(chunk, encoding) {
-    res.end = originalEnd;
-    res.end(chunk, encoding);
-    
-    const duration = Date.now() - startTime;
-    const statusCode = res.statusCode;
-    
-    const ext = path.extname(req.url);
-    const isAsset = ext && ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'].includes(ext.toLowerCase());
-    
-    if (!isAsset && !req.url.startsWith('/uploads/')) {
-      const geo = getIpLocation(clientIp);
-      
-      // Disabled to prevent automatic visitor analytics updates from triggering database writes on every page load, saving Render bandwidth.
-      /*
-      try {
-        updateAggregatedAnalytics({
-          ip: clientIp,
-          isNew: isNewVisitor,
-          country: geo.country,
-          region: geo.region,
-          city: geo.city,
-          isp: geo.isp
-        });
       } catch (err) {
         console.error('Error updating analytics:', err.message);
       }
@@ -2361,7 +2166,7 @@ function requireUser(req, res, next) {
 
 // ── TEST EMAIL ENDPOINT ─────────────────────────────────────
 // Visit: http://localhost:3000/api/test-email?to=YOUR_EMAIL
-app.get('/api/test-email', async (req, res) => {
+app.get('/api/test-email', requireAdmin, async (req, res) => {
   if (!mailTransporter) {
     return res.status(500).json({ success: false, error: 'Mail transporter not initialised. Check SMTP settings in db.json.' });
   }
@@ -2548,7 +2353,6 @@ app.post('/api/admin/login', authLimiter, async (req, res) => {
 
   const envAdminPass = process.env.ADMIN_PASSWORD;
   const storedPass = db.settings.adminPassword;
-  const ALLOWED_INITIAL_PASSWORDS = ['rk3495', 'rk2024'];
 
   let passwordMatch = false;
 
@@ -2561,31 +2365,20 @@ app.post('/api/admin/login', authLimiter, async (req, res) => {
     }
   }
 
-  // 2. Check database stored password hash or plaintext
+  // 2. Check database stored password hash or legacy plaintext
   if (!passwordMatch && storedPass) {
     if (storedPass.startsWith('$2')) {
       passwordMatch = await bcrypt.compare(password, storedPass);
     } else {
       passwordMatch = (password === storedPass);
-    }
-  }
-
-  // 3. Fallback check for initial passwords (rk3495 & rk2024)
-  if (!passwordMatch) {
-    if (ALLOWED_INITIAL_PASSWORDS.includes(password)) {
-      passwordMatch = true;
-    }
-  }
-
-  if (passwordMatch) {
-    // Automatically save & hash password if not yet hashed or if logging in with rk3495
-    try {
-      if (!storedPass || !storedPass.startsWith('$2') || password === 'rk3495') {
-        db.settings.adminPassword = await bcrypt.hash(password, 10);
-        writeDB(db);
+      if (passwordMatch) {
+        try {
+          db.settings.adminPassword = await bcrypt.hash(password, 10);
+          writeDB(db);
+        } catch (e) {
+          console.error('Error upgrading admin password hash:', e.message);
+        }
       }
-    } catch (e) {
-      console.error('Error saving updated admin password:', e.message);
     }
   }
 
@@ -2639,7 +2432,6 @@ app.post('/api/admin/change-password', requireAdmin, async (req, res) => {
 
   const envAdminPass = process.env.ADMIN_PASSWORD;
   const storedPass = db.settings.adminPassword;
-  const ALLOWED_INITIAL_PASSWORDS = ['rk3495', 'rk2024'];
 
   let passwordMatch = false;
   if (envAdminPass) {
@@ -2647,9 +2439,6 @@ app.post('/api/admin/change-password', requireAdmin, async (req, res) => {
   }
   if (!passwordMatch && storedPass) {
     passwordMatch = storedPass.startsWith('$2') ? await bcrypt.compare(currentPassword, storedPass) : (currentPassword === storedPass);
-  }
-  if (!passwordMatch) {
-    passwordMatch = ALLOWED_INITIAL_PASSWORDS.includes(currentPassword);
   }
 
   if (!passwordMatch) {
@@ -2691,7 +2480,6 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     city: (req.body.city || '').trim(),
     pin: (req.body.pin || '').trim(),
     passwordHash: await bcrypt.hash(password, 10),
-    passwordPlain: password,
     createdAt: new Date().toISOString()
   };
   db.users.push(user);
@@ -2743,10 +2531,10 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     sendSecurityAlertEmail(user, geo, clientIp);
   }
 
-  // Update user last login location and capture passwordPlain
+  // Update user last login location
   const idx = db.users.findIndex(u => u.id === user.id);
   if (idx !== -1) {
-    db.users[idx].passwordPlain = password;
+    delete db.users[idx].passwordPlain;
     db.users[idx].lastLoginIp = clientIp;
     db.users[idx].lastLoginCountry = geo.country;
     db.users[idx].lastLoginRegion = geo.region;
@@ -2831,7 +2619,7 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
       o.userId === u.id || 
       (o.customer && o.customer.email && o.customer.email.toLowerCase() === (u.email || '').toLowerCase())
     ).length;
-    return { ...safe, orderCount, hasPassword: !!passwordHash, passwordPlain: u.passwordPlain || '' };
+    return { ...safe, orderCount, hasPassword: !!passwordHash };
   });
   res.json(users);
 });
@@ -2865,16 +2653,16 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   // Admin password reset (direct — no OTP needed for admin)
   if (req.body.password && req.body.password.length >= 6) {
     db.users[idx].passwordHash = await bcrypt.hash(req.body.password, 10);
-    db.users[idx].passwordPlain = req.body.password;
+    delete db.users[idx].passwordPlain;
   }
 
   writeDB(db);
-  const { passwordHash, cart, ...safe } = db.users[idx];
+  const { passwordHash, cart, passwordPlain, ...safe } = db.users[idx];
   const orderCount = (db.orders || []).filter(o => 
     o.userId === userId || 
     (o.customer && o.customer.email && o.customer.email.toLowerCase() === (db.users[idx].email || '').toLowerCase())
   ).length;
-  const userPayload = { ...safe, orderCount, hasPassword: true, passwordPlain: db.users[idx].passwordPlain || '' };
+  const userPayload = { ...safe, orderCount, hasPassword: true };
   res.json({ success: true, user: userPayload, ...userPayload });
 });
 
@@ -2904,10 +2692,10 @@ app.post('/api/auth/request-password-otp', requireUser, async (req, res) => {
     return res.status(400).json({ error: 'New password must be at least 8 characters' });
   }
 
-  // Generate 6-digit OTP
-  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  // Cryptographically secure 6-digit OTP
+  const otp = String(crypto.randomInt(100000, 1000000));
   const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-  otpStore.set(user.email, { otp, expiresAt, userId: user.id });
+  otpStore.set(user.email, { otp, expiresAt, userId: user.id, attempts: 0 });
 
   // Send OTP email
   const htmlBody = `
@@ -2970,8 +2758,13 @@ app.post('/api/auth/change-password', requireUser, async (req, res) => {
     otpStore.delete(user.email);
     return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
   }
+  stored.attempts = (stored.attempts || 0) + 1;
+  if (stored.attempts > 5) {
+    otpStore.delete(user.email);
+    return res.status(429).json({ error: 'Too many incorrect attempts. This OTP has been invalidated. Please request a new one.' });
+  }
   if (stored.otp !== String(otp).trim()) {
-    return res.status(400).json({ error: 'Incorrect OTP. Please try again.' });
+    return res.status(400).json({ error: `Incorrect OTP. ${5 - stored.attempts} attempts remaining.` });
   }
   if (stored.userId !== req.user.userId) {
     return res.status(403).json({ error: 'OTP mismatch. Please request a new one.' });
@@ -2981,7 +2774,7 @@ app.post('/api/auth/change-password', requireUser, async (req, res) => {
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === req.user.userId);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
-  db.users[idx].passwordPlain = newPassword;
+  delete db.users[idx].passwordPlain;
   writeDB(db);
   res.json({ success: true, message: 'Password changed successfully!' });
 });
@@ -3001,10 +2794,10 @@ app.post('/api/auth/forgot-password-otp', authLimiter, async (req, res) => {
     return res.status(404).json({ error: 'No account found with this email address' });
   }
 
-  // Generate 6-digit OTP
-  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  // Cryptographically secure 6-digit OTP
+  const otp = String(crypto.randomInt(100000, 1000000));
   const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-  otpStore.set(user.email, { otp, expiresAt, userId: user.id });
+  otpStore.set(user.email, { otp, expiresAt, userId: user.id, attempts: 0 });
 
   const htmlBody = `
     <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:32px;background:#f9fafb;border-radius:12px">
@@ -3067,15 +2860,20 @@ app.post('/api/auth/reset-password-otp', authLimiter, async (req, res) => {
     otpStore.delete(user.email);
     return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
   }
+  stored.attempts = (stored.attempts || 0) + 1;
+  if (stored.attempts > 5) {
+    otpStore.delete(user.email);
+    return res.status(429).json({ error: 'Too many incorrect attempts. This OTP has been invalidated. Please request a new one.' });
+  }
   if (stored.otp !== String(otp).trim()) {
-    return res.status(400).json({ error: 'Incorrect OTP code. Please check your email.' });
+    return res.status(400).json({ error: `Incorrect OTP code. ${5 - stored.attempts} attempts remaining.` });
   }
 
   // Valid OTP -> update password hash
   otpStore.delete(user.email);
   const idx = db.users.findIndex(u => u.id === user.id);
   db.users[idx].passwordHash = await bcrypt.hash(newPassword, 10);
-  db.users[idx].passwordPlain = newPassword;
+  delete db.users[idx].passwordPlain;
   writeDB(db);
 
   // Generate JWT token so user is automatically logged in!
@@ -3097,6 +2895,16 @@ app.post('/api/payment/validate-coupon', (req, res) => {
   res.json(result);
 });
 
+function getCatalogItemPrice(prod, selectedVariant) {
+  if (selectedVariant && Array.isArray(prod.variants) && prod.variants.length > 0) {
+    const variant = prod.variants.find(v => v.label === selectedVariant);
+    if (variant && variant.price !== undefined && !isNaN(Number(variant.price))) {
+      return Number(variant.price);
+    }
+  }
+  return Number(prod.price || 0);
+}
+
 // ── Razorpay Online Payment Routes ──────────────────────────
 // 1. Create Razorpay order (secure, server-side calculations)
 app.post('/api/payment/create-order', checkoutLimiter, (req, res) => {
@@ -3107,6 +2915,7 @@ app.post('/api/payment/create-order', checkoutLimiter, (req, res) => {
   // Stock check & Secure Price calculation
   let subtotal = 0;
   for (const item of items) {
+    const qty = Math.max(1, parseInt(item.qty, 10) || 1);
     const prod = db.products.find(p => p.id === item.id);
     if (!prod) {
       return res.status(404).json({ error: `Product "${item.name}" not found` });
@@ -3115,19 +2924,19 @@ app.post('/api/payment/create-order', checkoutLimiter, (req, res) => {
       const variant = prod.variants.find(v => v.label === item.selectedVariant);
       if (variant) {
         if (db.settings.trackStock !== false) {
-          if (variant.stock !== undefined && variant.stock < item.qty) {
+          if (variant.stock !== undefined && variant.stock < qty) {
             return res.status(400).json({ error: `Sorry, only ${variant.stock} unit(s) of "${prod.name} (${item.selectedVariant})" in stock` });
           }
         }
       }
     } else {
       if (db.settings.trackStock !== false) {
-        if (prod.stock !== undefined && prod.stock < item.qty) {
+        if (prod.stock !== undefined && prod.stock < qty) {
           return res.status(400).json({ error: `Sorry, only ${prod.stock} unit(s) of "${prod.name}" in stock` });
         }
       }
     }
-    subtotal += prod.price * item.qty;
+    subtotal += getCatalogItemPrice(prod, item.selectedVariant) * qty;
   }
 
   let discount = 0;
@@ -3193,6 +3002,12 @@ app.post('/api/payment/verify', (req, res) => {
     return res.status(400).json({ error: 'Payment details are incomplete' });
   }
 
+  // Payment ID Replay Protection
+  const alreadyUsedPayment = db.orders.some(o => o.paymentId === razorpay_payment_id);
+  if (alreadyUsedPayment) {
+    return res.status(400).json({ error: 'This payment transaction has already been verified for an order.' });
+  }
+
   // Cryptographic SHA-256 HMAC verification
   const keySecret = db.settings.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || '';
   const hmac = crypto.createHmac('sha256', keySecret);
@@ -3206,13 +3021,18 @@ app.post('/api/payment/verify', (req, res) => {
   // Signature verified successfully! Create order and deduct stock
   if (!items || !items.length) return res.status(400).json({ error: 'No items provided' });
 
-  // Stock deduction & Verification
+  // Stock deduction & Secure Server-Side Price Verification
+  let calculatedSubtotal = 0;
   for (const item of items) {
+    item.qty = Math.max(1, parseInt(item.qty, 10) || 1);
     const prodIdx = db.products.findIndex(p => p.id === item.id);
     if (prodIdx === -1) {
       return res.status(400).json({ error: `Product "${item.name}" not found` });
     }
     const prod = db.products[prodIdx];
+    const catalogPrice = getCatalogItemPrice(prod, item.selectedVariant);
+    item.price = catalogPrice; // Enforce verified catalog price
+
     if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
       const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
       if (vIdx !== -1) {
@@ -3236,10 +3056,11 @@ app.post('/api/payment/verify', (req, res) => {
         }
       }
     }
+    calculatedSubtotal += catalogPrice * item.qty;
   }
 
   const loggedInUser = getUserFromRequest(req);
-  const itemTotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const itemTotal = calculatedSubtotal;
 
   let discount = 0;
   let appliedCoupon = null;
@@ -3309,13 +3130,18 @@ app.post('/api/orders', checkoutLimiter, (req, res) => {
   const { items, customer } = req.body;
   if (!items || !items.length) return res.status(400).json({ error: 'No items' });
 
-  // ── Stock validation & decrement ─────────────────────────
+  // ── Stock validation, sanitization & catalog price enforcement ─────────────────────────
+  let calculatedSubtotal = 0;
   for (const item of items) {
+    item.qty = Math.max(1, parseInt(item.qty, 10) || 1);
     const prodIdx = db.products.findIndex(p => p.id === item.id);
     if (prodIdx === -1) {
       return res.status(400).json({ error: `Product "${item.name}" not found` });
     }
     const prod = db.products[prodIdx];
+    const catalogPrice = getCatalogItemPrice(prod, item.selectedVariant);
+    item.price = catalogPrice; // Enforce catalog price
+
     if (item.selectedVariant && prod.variants && prod.variants.length > 0) {
       const vIdx = prod.variants.findIndex(v => v.label === item.selectedVariant);
       if (vIdx !== -1) {
@@ -3342,10 +3168,11 @@ app.post('/api/orders', checkoutLimiter, (req, res) => {
         }
       }
     }
+    calculatedSubtotal += catalogPrice * item.qty;
   }
 
   const loggedInUser = getUserFromRequest(req);
-  const itemTotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const itemTotal = calculatedSubtotal;
 
   let discount = 0;
   let appliedCoupon = null;

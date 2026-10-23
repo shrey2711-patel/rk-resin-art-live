@@ -13,7 +13,7 @@ const config = {
   family: 4,
   auth: {
     user: 'rinkupatel3495@gmail.com',
-    pass: 'rgxbhqlaawflvguy'
+    pass: 'REPLACE_WITH_ENV_APP_PASSWORD'
   }
 };
 
