@@ -2302,12 +2302,51 @@ app.get('/api/products', (req, res) => {
     prods = prods.filter(p => p.badge && p.badge.toLowerCase() === badge.toLowerCase());
   }
   if (search) {
-    const q = search.toLowerCase();
-    prods = prods.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      (p.description || '').toLowerCase().includes(q)
-    );
+    const q = search.toLowerCase().trim();
+    const escapeRegex = (s) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const wordBoundaryRegex = new RegExp(`(^|\\b|\\s)${escapeRegex(q)}`, 'i');
+    const exactWordRegex = new RegExp(`\\b${escapeRegex(q)}\\b`, 'i');
+
+    prods = prods.filter(p => {
+      const name = (p.name || '').toLowerCase();
+      const cat = (p.category || '').toLowerCase();
+      const desc = (p.description || '').toLowerCase();
+      const variantLabels = Array.isArray(p.variants)
+        ? p.variants.map(v => (v.label || '').toLowerCase()).join(' ')
+        : '';
+
+      // Match in name, category, or variants
+      if (name.includes(q) || cat.includes(q) || variantLabels.includes(q)) {
+        return true;
+      }
+      // Only match description as a whole word (never substring inside 'powdered', 'stored', etc.)
+      if (q.length >= 3 && exactWordRegex.test(desc)) {
+        return true;
+      }
+      return false;
+    });
+
+    // Rank results: exact name match first, prefix next, then substring
+    prods.sort((a, b) => {
+      const aName = (a.name || '').toLowerCase();
+      const bName = (b.name || '').toLowerCase();
+      const aExact = aName === q;
+      const bExact = bName === q;
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+
+      const aStarts = aName.startsWith(q);
+      const bStarts = bName.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      const aWordMatch = wordBoundaryRegex.test(aName);
+      const bWordMatch = wordBoundaryRegex.test(bName);
+      if (aWordMatch && !bWordMatch) return -1;
+      if (!aWordMatch && bWordMatch) return 1;
+
+      return 0;
+    });
   }
 
   if (sortBy) {

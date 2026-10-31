@@ -2190,39 +2190,118 @@ const Admin = {
     if (!q) return rawList;
 
     const terms = q.split(/\s+/).filter(Boolean);
+    const escapeRegex = (s) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-    return rawList.filter(p => {
-      if (!p) return false;
+    const scoredList = [];
+
+    for (const p of rawList) {
+      if (!p) continue;
+
+      const pName = (p.name || '').toLowerCase();
+      const pCat = (p.category || '').toLowerCase();
+      const pBadge = (p.badge || '').toLowerCase();
+      const pUnit = (p.unit || '').toLowerCase();
+      const pId = String(p.id || '');
+      const pDesc = (p.description || '').toLowerCase();
+
+      const pPrice = String(p.price !== undefined && p.price !== null ? p.price : '');
+      const pOrigPrice = String(p.originalPrice !== undefined && p.originalPrice !== null ? p.originalPrice : '');
+      const pOfferPrice = String(p.offerPrice !== undefined && p.offerPrice !== null ? p.offerPrice : '');
+
       const isOut = Number(p.stock) === 0;
-      const stockText = isOut 
-        ? 'out of stock outofstock 0' 
-        : `in stock instock available ${p.stock} stock:${p.stock}`;
+      const stockStatusWords = isOut ? ['out of stock', 'outofstock'] : ['in stock', 'instock', 'available'];
 
-      const variantWords = Array.isArray(p.variants)
-        ? p.variants.map(v => `${v.label || ''} ${v.price || ''} ${v.stock || ''}`).join(' ')
+      const variantLabels = Array.isArray(p.variants)
+        ? p.variants.map(v => (v.label || '').toLowerCase()).join(' ')
+        : '';
+      const variantPrices = Array.isArray(p.variants)
+        ? p.variants.map(v => String(v.price !== undefined && v.price !== null ? v.price : '')).join(' ')
         : '';
 
-      const priceWords = `${p.price || ''} ₹${p.price || ''} ${p.originalPrice || ''} ${p.offerPrice || ''}`;
+      let matchesAllTerms = true;
+      let score = 0;
 
-      const blob = [
-        p.name || '',
-        p.category || '',
-        p.badge || '',
-        p.unit || '',
-        p.description || '',
-        `#${p.id}`,
-        `id:${p.id}`,
-        String(p.id || ''),
-        priceWords,
-        stockText,
-        variantWords
-      ].join(' ').toLowerCase();
+      for (const rawTerm of terms) {
+        const term = rawTerm.replace(/^₹/, '');
+        if (!term) continue;
 
-      return terms.every(term => {
-        const cleanTerm = term.replace(/^₹/, '');
-        return blob.includes(term) || (cleanTerm && blob.includes(cleanTerm));
-      });
-    });
+        let termMatched = false;
+        const termPrefixRegex = new RegExp(`(^|\\b|\\s)${escapeRegex(term)}`, 'i');
+        const termExactWordRegex = new RegExp(`\\b${escapeRegex(term)}\\b`, 'i');
+
+        // 1. Match in Product Name (Primary & highest weight)
+        if (pName.includes(term)) {
+          termMatched = true;
+          if (pName === term) {
+            score += 200; // Exact full title
+          } else if (pName.startsWith(term)) {
+            score += 120; // Starts with search term
+          } else if (termPrefixRegex.test(pName)) {
+            score += 80;  // Word starts with search term in title
+          } else {
+            score += 40;  // Substring in title
+          }
+        }
+
+        // 2. Match in Category (e.g. "Pigments", "Resin", "Moulds")
+        if (pCat.includes(term)) {
+          termMatched = true;
+          score += termPrefixRegex.test(pCat) ? 60 : 30;
+        }
+
+        // 3. Match in Variants (e.g. Color or Size variant named "Red")
+        if (variantLabels.includes(term)) {
+          termMatched = true;
+          score += termPrefixRegex.test(variantLabels) ? 50 : 25;
+        }
+
+        // 4. Match in Exact Price or Product ID (e.g. "50", "₹50", "#144", "id:144")
+        if (pPrice === term || pOrigPrice === term || pOfferPrice === term || variantPrices.split(' ').includes(term)) {
+          termMatched = true;
+          score += 70;
+        } else if (`#${pId}` === rawTerm || `id:${pId}` === rawTerm || pId === term) {
+          termMatched = true;
+          score += 150;
+        }
+
+        // 5. Match in Badge or Unit
+        if (pBadge && (pBadge === term || termPrefixRegex.test(pBadge))) {
+          termMatched = true;
+          score += 35;
+        }
+        if (pUnit && termPrefixRegex.test(pUnit)) {
+          termMatched = true;
+          score += 20;
+        }
+
+        // 6. Match in Stock Status if explicitly searching for stock words
+        if (stockStatusWords.some(w => w.includes(term))) {
+          termMatched = true;
+          score += 15;
+        }
+
+        // 7. Match in Description ONLY as a whole word boundary
+        // Crucial: never match substrings inside words (e.g. 'red' inside 'powdered', 'stored', 'required')
+        if (!termMatched && term.length >= 3 && termExactWordRegex.test(pDesc)) {
+          termMatched = true;
+          score += 10;
+        }
+
+        if (!termMatched) {
+          matchesAllTerms = false;
+          break;
+        }
+      }
+
+      if (matchesAllTerms) {
+        scoredList.push({ product: p, score });
+      }
+    }
+
+    // Sort by relevance score descending so best matches always appear first
+    scoredList.sort((a, b) => b.score - a.score);
+
+    return scoredList.map(item => item.product);
   },
 
   renderProducts() {
