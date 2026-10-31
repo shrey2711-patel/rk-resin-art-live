@@ -56,6 +56,7 @@ const Admin = {
     }
   },
 
+  productSearchQuery: '',
   termsSearchQuery: '',
   termsCategoryFilter: 'all',
   termsStateCache: {},
@@ -2148,30 +2149,173 @@ const Admin = {
   },
 
   // ── Products ──────────────────────────────────────────────
+  initProductSearch() {
+    const input = document.getElementById('adminProdSearchInput');
+    const clearBtn = document.getElementById('adminProdSearchClear');
+    if (!input || input.dataset.bound === 'true') return;
+    input.dataset.bound = 'true';
+
+    input.addEventListener('input', (e) => {
+      this.productSearchQuery = e.target.value;
+      this.renderProducts();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.setProductSearchQuery('');
+      }
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.setProductSearchQuery('');
+      });
+    }
+  },
+
+  setProductSearchQuery(query) {
+    this.productSearchQuery = query || '';
+    const input = document.getElementById('adminProdSearchInput');
+    if (input) {
+      input.value = this.productSearchQuery;
+      if (!this.productSearchQuery) input.focus();
+    }
+    this.renderProducts();
+  },
+
+  getFilteredProducts() {
+    const rawList = Array.isArray(this.data?.products) ? this.data.products : [];
+    const q = (this.productSearchQuery || '').trim().toLowerCase();
+    if (!q) return rawList;
+
+    const terms = q.split(/\s+/).filter(Boolean);
+
+    return rawList.filter(p => {
+      if (!p) return false;
+      const isOut = Number(p.stock) === 0;
+      const stockText = isOut 
+        ? 'out of stock outofstock 0' 
+        : `in stock instock available ${p.stock} stock:${p.stock}`;
+
+      const variantWords = Array.isArray(p.variants)
+        ? p.variants.map(v => `${v.label || ''} ${v.price || ''} ${v.stock || ''}`).join(' ')
+        : '';
+
+      const priceWords = `${p.price || ''} ₹${p.price || ''} ${p.originalPrice || ''} ${p.offerPrice || ''}`;
+
+      const blob = [
+        p.name || '',
+        p.category || '',
+        p.badge || '',
+        p.unit || '',
+        p.description || '',
+        `#${p.id}`,
+        `id:${p.id}`,
+        String(p.id || ''),
+        priceWords,
+        stockText,
+        variantWords
+      ].join(' ').toLowerCase();
+
+      return terms.every(term => {
+        const cleanTerm = term.replace(/^₹/, '');
+        return blob.includes(term) || (cleanTerm && blob.includes(cleanTerm));
+      });
+    });
+  },
+
   renderProducts() {
     this.populateProdCatSelect();
+    this.initProductSearch();
+
     const list = document.getElementById('adminProdList');
     if (!list) return;
-    list.innerHTML = this.data.products.map(p => `
-      <div class="admin-list-item">
+
+    const allProducts = Array.isArray(this.data?.products) ? this.data.products : [];
+    const filtered = this.getFilteredProducts();
+    const query = (this.productSearchQuery || '').trim();
+
+    // Update Counter badge
+    const countBadge = document.getElementById('adminProdCountBadge');
+    if (countBadge) {
+      if (query) {
+        countBadge.textContent = `${filtered.length} / ${allProducts.length}`;
+        countBadge.title = `Showing ${filtered.length} of ${allProducts.length} products`;
+        countBadge.classList.add('is-filtering');
+      } else {
+        countBadge.textContent = String(allProducts.length);
+        countBadge.title = `Total ${allProducts.length} products`;
+        countBadge.classList.remove('is-filtering');
+      }
+    }
+
+    // Update Clear button
+    const clearBtn = document.getElementById('adminProdSearchClear');
+    if (clearBtn) {
+      clearBtn.style.display = query ? 'flex' : 'none';
+    }
+
+    if (!allProducts.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:20px;text-align:center;">No products in store inventory yet. Use the form below to add a product.</div>';
+      return;
+    }
+
+    if (!filtered.length) {
+      list.innerHTML = `
+        <div class="admin-find-empty">
+          <div class="admin-find-empty-icon">🔍</div>
+          <div class="admin-find-empty-title">No products found for "<strong>${escapeHtml(query)}</strong>"</div>
+          <div class="admin-find-empty-sub">Search by product name, category, price, stock status, or badge.</div>
+          <button type="button" class="admin-find-reset-btn" id="adminProdSearchResetEmpty">Clear Search</button>
+        </div>
+      `;
+      const resetBtn = document.getElementById('adminProdSearchResetEmpty');
+      if (resetBtn) {
+        resetBtn.onclick = () => this.setProductSearchQuery('');
+      }
+      return;
+    }
+
+    list.innerHTML = filtered.map(p => {
+      const isOut = Number(p.stock) === 0;
+      const stockBadge = isOut 
+        ? '<span style="color:#dc2626;background:#fee2e2;padding:1px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">Out of Stock</span>'
+        : `<span style="color:#059669;background:#d1fae5;padding:1px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">Stock: ${p.stock}</span>`;
+
+      const badgeHtml = p.badge 
+        ? `<span style="background:var(--pl);color:var(--p);padding:1px 6px;border-radius:4px;font-size:0.68rem;font-weight:700;margin-left:4px;">${escapeHtml(p.badge)}</span>` 
+        : '';
+
+      const originalPriceHtml = (p.originalPrice && Number(p.originalPrice) > Number(p.price))
+        ? `<span style="text-decoration:line-through;color:var(--muted);font-size:0.75rem;margin-left:4px;">₹${p.originalPrice}</span>`
+        : '';
+
+      return `
+      <div class="admin-list-item" data-item-pid="${p.id}">
         <div class="ali-thumb" style="background:var(--pl)">
-          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : (p.emoji || '📦')}
+          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${escapeHtml(p.name)}">` : (p.emoji || '📦')}
         </div>
         <div class="ali-info">
-          <div class="ali-name">${p.emoji} ${p.name}</div>
-          <div class="ali-sub">${p.category} · ₹${p.price} · Stock: ${p.stock}</div>
+          <div class="ali-name">${p.emoji || '📦'} ${escapeHtml(p.name)} ${badgeHtml}</div>
+          <div class="ali-sub">${escapeHtml(p.category || 'General')} · <span style="font-weight:700;color:var(--p)">₹${p.price}</span>${originalPriceHtml} · ${stockBadge}</div>
         </div>
         <div class="ali-actions">
           <button class="ali-edit" data-edit-pid="${p.id}">Edit</button>
           <button class="ali-del" data-pid="${p.id}">Delete</button>
         </div>
-      </div>`).join('') || '<div style="color:var(--muted);font-size:0.82rem;padding:8px">No products.</div>';
+      </div>`;
+    }).join('');
 
     list.querySelectorAll('[data-edit-pid]').forEach(btn => {
       btn.onclick = () => {
         const pid = btn.dataset.editPid;
         const product = this.data.products.find(item => String(item.id) === String(pid) || Number(item.id) === Number(pid));
-        if (product) this.setProductEdit(product);
+        if (product) {
+          this.setProductEdit(product);
+          const formCard = document.getElementById('adminProductFormCard');
+          if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       };
     });
 
@@ -2879,8 +3023,8 @@ document.getElementById('cancelProdBtn').onclick = () => {
   Admin.cancelProductEdit();
 };
 
-// Seed sample products
-document.getElementById('seedDemoProductsBtn').onclick = async () => {
+// Seed sample products (preserved on Admin object for testing / manual triggering)
+Admin.seedDemoProducts = async function() {
   if (!confirm("Are you sure you want to add 10 beautiful sample products (one for each category) to your database?")) return;
   
   const demoProducts = [
@@ -3012,6 +3156,14 @@ document.getElementById('seedDemoProductsBtn').onclick = async () => {
   Admin.renderProducts();
   App.loadProducts();
 };
+
+const seedDemoProductsBtnEl = document.getElementById('seedDemoProductsBtn');
+if (seedDemoProductsBtnEl) {
+  seedDemoProductsBtnEl.onclick = () => Admin.seedDemoProducts();
+}
+
+// Initialize Admin Product Find Bar
+Admin.initProductSearch();
 
 // Refresh Orders
 document.getElementById('refreshOrdersBtn').onclick = async () => {

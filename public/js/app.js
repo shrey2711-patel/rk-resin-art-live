@@ -547,8 +547,10 @@ const App = {
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
+    document.body.classList.remove('product-page-active');
     const prodPage = document.getElementById('productPageSection');
     const shopMain = document.getElementById('shopMain');
+    const stickyTop = document.getElementById('stickyTopWrapper');
     const siteHeader = document.getElementById('siteHeader');
     const announceBar = document.getElementById('announceBar');
 
@@ -557,6 +559,7 @@ const App = {
     if (header)  header.style.display  = '';
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
+    if (stickyTop) stickyTop.style.display = '';
     if (siteHeader) siteHeader.style.display = '';
     if (announceBar) announceBar.style.display = '';
 
@@ -601,11 +604,13 @@ const App = {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
   async showHomePage(forceFresh = false) {
+    document.body.classList.remove('product-page-active');
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
     const prodPage = document.getElementById('productPageSection');
     const shopMain = document.getElementById('shopMain');
+    const stickyTop = document.getElementById('stickyTopWrapper');
     const siteHeader = document.getElementById('siteHeader');
     const announceBar = document.getElementById('announceBar');
 
@@ -614,6 +619,7 @@ const App = {
     if (header)  header.style.display  = 'none';
     if (prodPage) prodPage.style.display = 'none';
     if (shopMain) shopMain.style.display = '';
+    if (stickyTop) stickyTop.style.display = '';
     if (siteHeader) siteHeader.style.display = '';
     if (announceBar) announceBar.style.display = '';
 
@@ -650,11 +656,14 @@ const App = {
       this.saveNavigationState();
     }
 
-    // Hide home sections
+    document.body.classList.add('product-page-active');
+
+    // Hide home sections and header completely
     const banner = document.getElementById('bannerSection');
     const colls  = document.getElementById('collectionsSection');
     const header = document.getElementById('collectionPageHeader');
     const shopMain = document.getElementById('shopMain');
+    const stickyTop = document.getElementById('stickyTopWrapper');
     const siteHeader = document.getElementById('siteHeader');
     const announceBar = document.getElementById('announceBar');
 
@@ -662,8 +671,9 @@ const App = {
     if (colls) colls.style.display = 'none';
     if (header) header.style.display = 'none';
     if (shopMain) shopMain.style.display = 'none';
-    if (siteHeader) siteHeader.style.display = '';
-    if (announceBar) announceBar.style.display = '';
+    if (stickyTop) stickyTop.style.display = 'none';
+    if (siteHeader) siteHeader.style.display = 'none';
+    if (announceBar) announceBar.style.display = 'none';
     prodPage.style.display = '';
 
     prodContent.innerHTML = `

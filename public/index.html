@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20260926_white_bg">
+  <link rel="stylesheet" href="/css/style.css?v=20261031_frameless_back">
   <!-- jsPDF for invoice generation -->
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- heic-to for modern iPhone HEIC image conversion -->
@@ -1226,9 +1226,27 @@
 
           <!-- PRODUCTS -->
           <div class="tab-pane" id="atab-products">
-            <div class="admin-section-head">
-              <span>Products</span>
-              <button class="refresh-btn" id="seedDemoProductsBtn" style="background:var(--p);color:var(--white);border:none;margin-left:auto;padding:5px 12px;border-radius:6px;font-weight:700;">⚡ Seed Sample Products</button>
+            <div class="admin-section-head admin-prod-section-head">
+              <div class="admin-section-title-wrap">
+                <span>Products</span>
+                <span class="admin-prod-count-pill" id="adminProdCountBadge" title="Total products in store">0</span>
+              </div>
+              <div class="admin-find-bar-wrap" id="adminProdSearchWrap">
+                <svg class="admin-find-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input 
+                  type="text" 
+                  id="adminProdSearchInput" 
+                  class="admin-find-input" 
+                  placeholder="Find by name, category, price, stock, badge..." 
+                  autocomplete="off" 
+                  spellcheck="false"
+                  aria-label="Find products in store inventory"
+                >
+                <button type="button" id="adminProdSearchClear" class="admin-find-clear-btn" title="Clear search" aria-label="Clear search" style="display:none">✕</button>
+              </div>
             </div>
             <div id="adminProdList" class="admin-list"></div>
             <!-- Modern Compact Product Form Card -->

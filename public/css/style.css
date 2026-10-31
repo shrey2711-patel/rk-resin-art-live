@@ -1633,6 +1633,152 @@ input, select, textarea { font-family: inherit; }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; }
 .admin-section-head { font-size: 0.85rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.admin-prod-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.admin-section-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.admin-prod-count-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 2px 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+}
+.admin-prod-count-pill.is-filtering {
+  background: var(--pl);
+  border-color: var(--p);
+  color: var(--p);
+}
+.admin-find-bar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  min-width: 280px;
+  max-width: 420px;
+  width: 100%;
+  flex: 1 1 280px;
+}
+.admin-find-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--muted);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+.admin-find-input {
+  width: 100%;
+  height: 36px;
+  padding: 6px 32px 6px 34px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  box-sizing: border-box;
+}
+.admin-find-input:focus {
+  border-color: var(--p);
+  box-shadow: 0 0 0 3px rgba(20, 90, 70, 0.15);
+  background: var(--white);
+}
+.admin-find-bar-wrap:focus-within .admin-find-icon {
+  color: var(--p);
+}
+.admin-find-input::placeholder {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.admin-find-clear-btn {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.07);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 700;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+.admin-find-clear-btn:hover {
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--ink);
+}
+.admin-find-empty {
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  margin: 6px 0 16px;
+}
+.admin-find-empty-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+  opacity: 0.6;
+}
+.admin-find-empty-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.admin-find-empty-sub {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.admin-find-reset-btn {
+  background: var(--p);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.admin-find-reset-btn:hover {
+  opacity: 0.9;
+}
 .admin-list { max-height: 220px; overflow-y: auto; margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
 .admin-list-item {
   display: flex; align-items: center; gap: 10px;
@@ -4336,6 +4482,17 @@ body {
     flex-wrap: wrap;
   }
 
+  .admin-prod-section-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .admin-find-bar-wrap {
+    min-width: 100%;
+    margin-left: 0;
+  }
+
   .admin-section-head .refresh-btn,
   #seedDemoProductsBtn {
     margin-left: 0 !important;
@@ -4642,6 +4799,26 @@ body.admin-page-active .admin-panel {
   }
 }
 
+/* ─── Product Card Detail Active State (Header Hidden, Frameless Back) ─── */
+body.product-page-active .sticky-top-wrapper,
+body.product-page-active #stickyTopWrapper,
+body.product-page-active .header,
+body.product-page-active #siteHeader,
+body.product-page-active .announce-bar,
+body.product-page-active #announceBar {
+  display: none !important;
+}
+
+body.product-page-active .product-page-section {
+  padding-top: 24px;
+}
+
+@media (max-width: 768px) {
+  body.product-page-active .product-page-section {
+    padding-top: 16px;
+  }
+}
+
 /* Product Page Layout */
 .product-page-section {
   padding: 40px 0;
@@ -4652,32 +4829,45 @@ body.admin-page-active .admin-panel {
   margin: 0 auto;
   padding: 0 24px;
 }
+/* Frameless Back Button */
 .product-page-back {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 6px 0 !important;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--ink);
   cursor: pointer;
   width: fit-content;
-  margin-bottom: 24px;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  margin-bottom: 22px;
+  transition: color 0.2s ease, transform 0.2s ease;
+  outline: none;
+  text-decoration: none;
+  user-select: none;
 }
-.product-page-back:hover {
-  background: var(--border);
-  transform: translateX(-3px);
+.product-page-back:hover,
+.product-page-back:focus-visible {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--p) !important;
 }
 .product-page-back svg {
-  transition: transform 0.2s;
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  transition: transform 0.2s ease;
 }
-.product-page-back:hover svg {
-  transform: translateX(-2px);
+.product-page-back:hover svg,
+.product-page-back:focus-visible svg {
+  transform: translateX(-4px);
+  color: var(--p);
 }
 
 @media (max-width: 768px) {
@@ -4700,17 +4890,6 @@ body.admin-page-active .admin-panel {
 
 .product-page-inner {
   max-width: 1180px;
-}
-
-.product-page-back {
-  border-radius: 999px;
-  background: var(--white);
-  box-shadow: 0 8px 24px rgba(17, 17, 17, 0.05);
-}
-
-.product-page-back:hover,
-.product-page-back:hover svg {
-  transform: none;
 }
 
 .product-modal {
